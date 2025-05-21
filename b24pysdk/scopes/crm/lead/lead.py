@@ -1,0 +1,253 @@
+from typing import Iterable, Optional, Text
+
+from ...._bitrix_api_request import BitrixAPIRequest
+from ....utils.types import JSONDict
+
+from ..relationships import Contact
+from ..item import Item
+from ..productrows import Productrows
+
+
+class Lead(Item):
+    """The methods provide capabilities for managing leads.
+    They allow you to retrieve fields, add, update, delete, and get lists of leads.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/crm/leads/index.html
+    """
+
+    ENTITY_TYPE_ID = 1
+    ENTITY_TYPE_NAME = "LEAD"
+    ENTITY_TYPE_ABBR = "L"
+    USER_FIELD_ENTITY_ID = "CRM_LEAD"
+
+    def fields(
+            self,
+            *args,
+            timeout: Optional[int] = None,
+    ) -> BitrixAPIRequest:
+        """Get CRM lead fields.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/leads/crm-lead-fields.html
+
+        The method returns the description of lead fields, including custom fields.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+        return super().fields(entity_type_id=self.ENTITY_TYPE_ID, timeout=timeout)
+
+    def add(
+            self,
+            fields: JSONDict,
+            *args,
+            params: Optional[JSONDict] = None,
+            timeout: Optional[int] = None,
+    ) -> BitrixAPIRequest:
+        """Create a new lead.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/leads/crm-lead-add.html
+
+        The method creates a new lead.
+
+        Args:
+            fields: Object format:
+
+                {
+                    field_1: value_1,
+
+                    field_2: value_2,
+
+                    ...,
+
+                    field_n: value_n,
+                };
+
+            params: Set of additional parameters where
+
+                - REGISTER_SONET_EVENT - whether to register additional event 'Y' or not 'N',
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+
+        return super()._add(
+            fields,
+            entity_type_id=self.ENTITY_TYPE_ID,
+            params=params,
+            timeout=timeout,
+        )
+
+    def get(
+            self,
+            bitrix_id: int,
+            *args,
+            timeout: Optional[int] = None,
+    ) -> BitrixAPIRequest:
+        """Get lead by ID.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/leads/crm-lead-get.html
+
+        The method returns a lead by its identifier.
+
+        Args:
+            bitrix_id: The identifier of the lead;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+        return super().get(
+            bitrix_id,
+            entity_type_id=self.ENTITY_TYPE_ID,
+            timeout=timeout,
+        )
+
+    def list(
+            self,
+            *args,
+            select: Optional[Iterable[Text]] = None,
+            filter: Optional[JSONDict] = None,
+            order: Optional[JSONDict] = None,
+            start: Optional[int] = None,
+            timeout: Optional[int] = None,
+    ) -> BitrixAPIRequest:
+        """Get a list of leads.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/leads/crm-lead-list.html
+
+        The method returns a list of leads based on a filter.
+
+        Args:
+            select: An array containing the list of fields to be selected;
+
+            filter: Object format:
+
+                {
+                    "field_1": "value_1",
+
+                    "field_2": "value_2",
+
+                    ...,
+
+                    "field_n": "value_n",
+                }
+
+            order: Object format:
+
+                {
+                    field_1: value_1,
+
+                    ...,
+                }
+
+                where
+
+                - field_n is the name of the field by which the selection will be sorted
+
+                - value_n is a string value equals to 'asc' (ascending sort) or 'desc' (descending sort);
+
+            start: This parameter is used to control pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+        return super().list(
+            entity_type_id=self.ENTITY_TYPE_ID,
+            select=select,
+            filter=filter,
+            order=order,
+            start=start,
+            timeout=timeout,
+        )
+
+    def update(
+            self,
+            bitrix_id: int,
+            fields: JSONDict,
+            *args,
+            params: Optional[JSONDict] = None,
+            timeout: Optional[int] = None,
+    ) -> BitrixAPIRequest:
+        """Update lead.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/leads/crm-lead-update.html
+
+        The method updates an existing lead.
+
+        Args:
+            bitrix_id: lead identifier;
+
+            fields: Object format:
+
+                {
+                    field_1: value_1,
+
+                    field_2: value_2,
+
+                    ...,
+
+                    field_n: value_n,
+                }
+
+            params: Set of additional parameters where
+
+                - REGISTER_SONET_EVENT - whether to register the change event in the activity stream 'Y' or not 'N';
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+        return super()._update(
+            bitrix_id,
+            fields,
+            entity_type_id=self.ENTITY_TYPE_ID,
+            params=params,
+            timeout=timeout,
+        )
+
+    def delete(
+            self,
+            bitrix_id: int,
+            *args,
+            timeout: Optional[int] = None,
+    ) -> BitrixAPIRequest:
+        """Delete lead.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/leads/crm-lead-delete.html
+
+        The method removes a lead and all associated objects: tasks, history, timeline records, and others.
+
+        Objects are deleted if they are not linked to other objects or entities. If the objects are linked to other entities, only the link to the deleted lead will be removed.
+
+        Args:
+            bitrix_id: Identifier of the lead;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+        return super().delete(
+            bitrix_id,
+            entity_type_id=self.ENTITY_TYPE_ID,
+            timeout=timeout,
+        )
+
+    @property
+    def productrows(self) -> Productrows:
+        """"""
+        return Productrows(self)
+
+    @property
+    def contact(self) -> Contact:
+        """"""
+        return Contact(self)
