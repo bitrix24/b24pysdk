@@ -1,5 +1,5 @@
-from abc import ABC
-from typing import Optional, Text
+from abc import ABC, abstractmethod
+from typing import Optional, Text, Union
 
 from ..utils.types import JSONDict
 
@@ -14,17 +14,23 @@ class BaseBitrixToken(ABC):
     domain: Text = NotImplemented
     """"""
 
-    auth_token: Optional[Text] = NotImplemented
+    auth_token: Text = NotImplemented
     """"""
 
     is_webhook: bool = NotImplemented
     """"""
 
+    @abstractmethod
+    def __init__(self, *args, **kwargs):
+        """"""
+        super().__init__(*args, **kwargs)
+
     def call_api_method(
             self,
             api_method: Text,
             params: Optional[JSONDict] = None,
-            timeout: int = DEFAULT_TIMEOUT,
+            *,
+            timeout: Union[int, float, None] = DEFAULT_TIMEOUT,
     ) -> JSONDict:
         """"""
         return api_call(
