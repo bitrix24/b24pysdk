@@ -1,10 +1,12 @@
 import requests
 import time
-from typing import Dict, IO, Optional, Text, Tuple
+from typing import Dict, IO, Optional, Text, Tuple, Union
 from urllib.parse import urlparse
 from http import HTTPStatus
 
 from ...error import BitrixTimeout, ConnectionToBitrixError
+
+from ..config import SdkConfig
 
 
 def request(
@@ -12,7 +14,7 @@ def request(
         *,
         params: bytes,
         files: Optional[Dict[Text, Tuple[Text, IO]]] = None,
-        timeout: Optional[int]
+        timeout: Union[int, float, None]
 ) -> requests.Response:
     """
     Performs a call to the Bitrix API
@@ -29,30 +31,20 @@ def request(
             ConnectionToBitrixError: if failed to establish HTTP connection
             BitrixTimeout: if the request timed out
     """
-    # TODO: pull default timeout, number of retries, and retry delay options from global config
-    client = ApiClient(
-        timeout=timeout,
-        max_retries=20,
-        initial_retry_delay=0.5,
-        retry_delay_increment=0.25
-    )
+    client = BitrixApiClient(timeout=timeout)
 
     return client.request(url, params=params, files=files)
 
 
-class ApiClient:
-    def __init__(
-            self,
-            timeout: int,
-            max_retries: int,
-            initial_retry_delay: float,
-            retry_delay_increment: float
-    ):
+class BitrixApiClient:
+    def __init__(self, timeout: Union[int, float, None] = SdkConfig().default_timeout):
+        # TODO: add sentinel class for default timeout
+        self.config = SdkConfig()
         self.timeout = timeout
-        self.max_retries = max_retries
-        self.retries_remaining = max_retries
-        self.initial_retry_delay = initial_retry_delay
-        self.retry_delay_increment = retry_delay_increment
+        self.max_retries = self.config.max_retries
+        self.retries_remaining = self.max_retries
+        self.initial_retry_delay = self.config.initial_retry_delay
+        self.retry_delay_increment = self.config.retry_delay_increment
         self.response: Optional[requests.Response] = None
         self.url = None
         self.params = None
@@ -100,7 +92,7 @@ class ApiClient:
             *,
             data: bytes,
             files: Optional[Dict[Text, Tuple[Text, IO]]],
-            timeout: int,
+            timeout: Union[int, float, None],
     ) -> requests.Response:
         """Makes a POST-request to given url
             Args:
