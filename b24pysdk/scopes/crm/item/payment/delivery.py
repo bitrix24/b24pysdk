@@ -11,7 +11,10 @@ if TYPE_CHECKING:
 
 
 class Delivery(BaseCRM):
-    """"""
+    """These methods provide capabilities for managing deliveries in payments.
+    
+    Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/payment/delivery-in-payment/index.html
+    """
 
     def __init__(self, payment: "Payment"):
         super().__init__(payment._scope)
@@ -25,7 +28,22 @@ class Delivery(BaseCRM):
             delivery_id: int,
             timeout: Optional[int] = None
     ) -> BitrixAPIRequest:
-        """"""
+        """Add delivery item to payment.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/payment/delivery-in-payment/crm-item-payment-delivery-add.html
+
+        This method adds a delivery item to the payment.
+
+        Args:
+            payment_id: Payment identifier;
+
+            delivery_id: Delivery identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "paymentId": payment_id,
@@ -48,7 +66,46 @@ class Delivery(BaseCRM):
             order: Optional[JSONDict] = None,
             timeout: Optional[int] = None
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the list of delivery items.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/payment/delivery-in-payment/crm-item-payment-delivery-list.html
+
+        This method retrieves the list of delivery items for a specific payment.
+
+        Args:
+            payment_id: Payment identifier.
+
+            filter: Object in the format:
+
+                {
+                    field_1: value_1,
+
+                    field_2: value_2,
+
+                    ...,
+
+                    field_n: value_n,
+                };
+
+            order: Object format:
+
+                {
+                    field_1: value_1,
+
+                    ...,
+                }
+
+                where
+
+                - field_n is the name of the field by which the selection will be sorted
+
+                - value_n is a string value equals to 'asc' (ascending sort) or 'desc' (descending sort);
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "paymentId": payment_id,
@@ -71,8 +128,21 @@ class Delivery(BaseCRM):
             *,
             timeout: Optional[int] = None,
     ) -> BitrixAPIRequest:
-        """"""
-        return super().delete(bitrix_id, timeout=timeout)
+        """Remove delivery item from payment.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/payment/delivery-in-payment/crm-item-payment-delivery-delete.html
+
+        This method removes a delivery item from the payment.
+
+        Args:
+            bitrix_id: Identifier of the delivery item in the payment;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+        return self._delete(bitrix_id, timeout=timeout)
 
     @type_checker
     def set_delivery(
@@ -82,7 +152,22 @@ class Delivery(BaseCRM):
             delivery_id: int,
             timeout: Optional[int] = None
     ) -> BitrixAPIRequest:
-        """"""
+        """Reassign delivery item to another document.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/payment/delivery-in-payment/crm-item-payment-delivery-set-delivery.html
+
+        This method reassigns a delivery item to another delivery document.
+
+        Args:
+            bitrix_id: Identifier of the delivery item in the payment;
+
+            delivery_id: Identifier of the delivery;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "id": bitrix_id,

@@ -17,7 +17,7 @@ class Userfield(BaseCRM):
             timeout: Optional[int] = None,
     ) -> BitrixAPIRequest:
         """"""
-        return super().fields(timeout=timeout)
+        return self._fields(timeout=timeout)
 
     @type_checker
     def types(

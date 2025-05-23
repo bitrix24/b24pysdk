@@ -35,4 +35,4 @@ class Communication(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().fields(timeout=timeout)
+        return self._fields(timeout=timeout)

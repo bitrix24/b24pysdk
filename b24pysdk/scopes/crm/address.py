@@ -32,7 +32,7 @@ class Address(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().fields(timeout=timeout)
+        return self._fields(timeout=timeout)
 
     def add(
             self,
@@ -64,7 +64,7 @@ class Address(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().add(fields, timeout=timeout)
+        return self._add(fields, timeout=timeout)
 
     @type_checker
     def update(
@@ -162,7 +162,7 @@ class Address(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().list(
+        return self._list(
             select=select,
             filter=filter,
             order=order,

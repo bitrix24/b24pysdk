@@ -24,7 +24,7 @@ class Productrows(BaseCRM):
             timeout: Optional[int] = None,
     ) -> BitrixAPIRequest:
         """"""
-        return super().get(bitrix_id, timeout=timeout)
+        return self._get(bitrix_id, timeout=timeout)
 
     @type_checker
     def set(

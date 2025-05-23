@@ -40,7 +40,7 @@ class Orderentity(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().add(fields, timeout=timeout)
+        return self._add(fields, timeout=timeout)
 
     def list(
             self,
@@ -93,7 +93,7 @@ class Orderentity(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().list(
+        return self.list(
             select=select,
             filter=filter,
             order=order,

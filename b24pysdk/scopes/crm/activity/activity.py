@@ -33,7 +33,7 @@ class Activity(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().fields(timeout=timeout)
+        return self._fields(timeout=timeout)
 
     def add(
             self,
@@ -64,7 +64,7 @@ class Activity(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().fields(fields, timeout=timeout)
+        return self._add(fields, timeout=timeout)
 
     def get(
             self,
@@ -86,7 +86,7 @@ class Activity(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().get(bitrix_id, timeout=timeout)
+        return self._get(bitrix_id, timeout=timeout)
 
     def list(
             self,
@@ -139,7 +139,7 @@ class Activity(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().list(
+        return self._list(
             select=select,
             filter=filter,
             order=order,
@@ -180,7 +180,7 @@ class Activity(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().update(
+        return self._update(
             bitrix_id,
             fields,
             timeout=timeout,
@@ -206,7 +206,7 @@ class Activity(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().update(bitrix_id, timeout=timeout)
+        return self._delete(bitrix_id, timeout=timeout)
 
     @property
     def communication(self) -> Communication:

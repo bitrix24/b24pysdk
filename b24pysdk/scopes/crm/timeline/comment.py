@@ -37,7 +37,7 @@ class Comment(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().fields(timeout=timeout)
+        return self._fields(timeout=timeout)
 
     def add(
             self,
@@ -74,7 +74,7 @@ class Comment(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().add(fields, timeout=timeout)
+        return self._add(fields, timeout=timeout)
 
     def get(
             self,
@@ -96,7 +96,7 @@ class Comment(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().get(bitrix_id, timeout=timeout)
+        return self._get(bitrix_id, timeout=timeout)
 
     def list(
             self,
@@ -149,7 +149,7 @@ class Comment(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().list(
+        return self._list(
             select=select,
             filter=filter,
             order=order,

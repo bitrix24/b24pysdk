@@ -31,7 +31,7 @@ class Type(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        return super().fields(timeout=timeout)
+        return self._fields(timeout=timeout)
 
     def add(
             self,
@@ -54,7 +54,7 @@ class Type(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        return super().add(fields, timeout=timeout)
+        return self._add(fields, timeout=timeout)
 
     def get(
             self,
@@ -77,7 +77,7 @@ class Type(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        return super().get(bitrix_id, timeout=timeout)
+        return self._get(bitrix_id, timeout=timeout)
 
     @type_checker
     def get_by_entity_type_id(
@@ -160,7 +160,7 @@ class Type(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        return super().list(
+        return self._list(
             filter=filter,
             order=order,
             start=start,
@@ -191,7 +191,7 @@ class Type(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        return super().update(bitrix_id, fields, timeout=timeout)
+        return self._update(bitrix_id, fields, timeout=timeout)
 
     def delete(
             self,
@@ -214,4 +214,4 @@ class Type(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        return super().delete(bitrix_id, timeout=timeout)
+        return self._delete(bitrix_id, timeout=timeout)

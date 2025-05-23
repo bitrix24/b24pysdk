@@ -38,7 +38,7 @@ class Delivery(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().get(bitrix_id, timeout=timeout)
+        return self._get(bitrix_id, timeout=timeout)
 
     @type_checker
     def list(

@@ -35,7 +35,7 @@ class Relationship(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().fields(timeout=timeout)
+        return self._fields(timeout=timeout)
 
     @type_checker
     def add(

@@ -57,7 +57,6 @@ class Item(BaseCRM):
             timeout=timeout,
         )
 
-    @type_checker
     def add(
             self,
             fields: JSONDict,
@@ -293,7 +292,6 @@ class Item(BaseCRM):
             timeout=timeout,
         )
 
-    @type_checker
     def update(
             self,
             bitrix_id: int,

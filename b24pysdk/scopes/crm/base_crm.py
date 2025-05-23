@@ -23,7 +23,7 @@ class BaseCRM(Base):
     """User Field Object Type."""
 
     @type_checker
-    def fields(
+    def _fields(
             self,
             *,
             timeout: Optional[int] = None,
@@ -31,12 +31,12 @@ class BaseCRM(Base):
         """"""
         return BitrixAPIRequest(
             bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.fields),
+            api_method=self._get_api_method(self._fields),
             timeout=timeout,
         )
 
     @type_checker
-    def add(
+    def _add(
             self,
             fields: JSONDict,
             *,
@@ -50,13 +50,13 @@ class BaseCRM(Base):
 
         return BitrixAPIRequest(
             bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.add),
+            api_method=self._get_api_method(self._add),
             params=params,
             timeout=timeout,
         )
 
     @type_checker
-    def get(
+    def _get(
             self,
             bitrix_id: int,
             *,
@@ -70,13 +70,13 @@ class BaseCRM(Base):
 
         return BitrixAPIRequest(
             bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.get),
+            api_method=self._get_api_method(self._get),
             params=params,
             timeout=timeout,
         )
 
     @type_checker
-    def list(
+    def _list(
             self,
             *,
             select: Optional[Iterable[Text]] = None,
@@ -102,13 +102,13 @@ class BaseCRM(Base):
 
         return BitrixAPIRequest(
             bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.list),
+            api_method=self._get_api_method(self._list),
             params=params,
             timeout=timeout,
         )
 
     @type_checker
-    def update(
+    def _update(
             self,
             bitrix_id: int,
             fields: JSONDict,
@@ -124,13 +124,13 @@ class BaseCRM(Base):
 
         return BitrixAPIRequest(
             bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.update),
+            api_method=self._get_api_method(self._update),
             params=params,
             timeout=timeout,
         )
 
     @type_checker
-    def delete(
+    def _delete(
             self,
             bitrix_id: int,
             *,
@@ -144,7 +144,7 @@ class BaseCRM(Base):
 
         return BitrixAPIRequest(
             bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.delete),
+            api_method=self._get_api_method(self._delete),
             params=params,
             timeout=timeout,
         )

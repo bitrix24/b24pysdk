@@ -77,7 +77,7 @@ class Payment(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().get(bitrix_id, timeout=timeout)
+        return self._get(bitrix_id, timeout=timeout)
 
     @type_checker
     def list(
@@ -175,7 +175,7 @@ class Payment(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().update(bitrix_id, fields, timeout=timeout)
+        return self._update(bitrix_id, fields, timeout=timeout)
 
     def delete(
             self,
@@ -197,7 +197,7 @@ class Payment(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().delete(bitrix_id, timeout=timeout)
+        return self._delete(bitrix_id, timeout=timeout)
 
     @type_checker
     def pay(
