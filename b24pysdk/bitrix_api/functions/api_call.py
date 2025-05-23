@@ -1,12 +1,10 @@
-from typing import Optional, Text
+from typing import Optional, Text, Union
 
 from ...utils.types import JSONDict
 
-from .call_with_retries import request
+from .bitrix_api_client import request
 from .convert_params import convert_params
 from .parse_response import parse_response
-
-DEFAULT_TIMEOUT = 10
 
 
 def api_call(
@@ -14,8 +12,9 @@ def api_call(
         api_method: Text,
         auth_token: Text,
         params: Optional[JSONDict] = None,
+        *,
         is_webhook: bool = False,
-        timeout: int = DEFAULT_TIMEOUT,
+        timeout: Union[int, float, None],
 ) -> JSONDict:
     """send POST reuqest to bitrix API
 
