@@ -46,8 +46,9 @@ class BitrixAPIRequest:
     @property
     def response(self) -> BitrixAPIResponse:
         if self._response is None:
-            self._response = self._call()
-        return self._response
+            return self.execute()
+        else:
+            return self._response
 
     @property
     def result(self) -> Union[JSONDict, JSONList, bool]:
@@ -57,10 +58,15 @@ class BitrixAPIRequest:
     def time(self) -> BitrixResponseTime:
         return self.response.time
 
-    def _call(self) -> BitrixAPIResponse:
-        json_response = self._bitrix_token.call_api_method(
+    def _call(self) -> JSONDict:
+        """"""
+        return self._bitrix_token.call_api_method(
             api_method=self._api_method,
             params=self._params,
             timeout=self._timeout,
         )
-        return BitrixAPIResponse.from_dict(json_response)
+
+    def execute(self) -> BitrixAPIResponse:
+        """"""
+        self._response = BitrixAPIResponse.from_dict(self._call())
+        return self._response
