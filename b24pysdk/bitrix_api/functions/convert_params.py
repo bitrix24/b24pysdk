@@ -1,18 +1,7 @@
+from typing import Text, Dict
 import urllib.parse
 
-
-class RawStringParam:
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return self.value
-
-    def __unicode__(self):
-        return self.__str__()
-
-    def __repr__(self):
-        return f"<RawStringParam {self.value!r}>"
+from ...utils.types import B24BatchRequestData, RawStringParam
 
 
 def convert_params(form_data):
@@ -21,27 +10,27 @@ def convert_params(form_data):
 
     Examples:
 
-        >>> convert_params({'field': {'hello': 'world'}})
-        'field[hello]=world'
+        >>> convert_params({"field": {"hello": "world"}})
+        "field[hello]=world"
 
-        >>> convert_params([{'field': 'hello'}, {'field': 'world'}])
-        '0[field]=hello&1[field]=world'
+        >>> convert_params([{"field": "hello"}, {"field": "world"}])
+        "0[field]=hello&1[field]=world"
 
-        >>> convert_params({'auth': 123, 'field': {'hello': 'world'}})
-        'auth=123&field[hello]=world'
+        >>> convert_params({"auth": 123, "field": {"hello": "world"}})
+        "auth=123&field[hello]=world"
 
-        >>> convert_params({'FILTER': {'>=PRICE': 15}})
-        'FILTER[%3E%3DPRICE]=15'
+        >>> convert_params({"FILTER": {">=PRICE": 15}})
+        "FILTER[%3E%3DPRICE]=15"
 
-        >>> convert_params({'FIELDS': {'POST_TITLE': "[1] + 1 == 11 // true"}})
-        'FIELDS[POST_TITLE]=%5B1%5D%20%2B%201%20%3D%3D%2011%20//%20true'
+        >>> convert_params({"FIELDS": {"POST_TITLE": "[1] + 1 == 11 // true"}})
+        "FIELDS[POST_TITLE]=%5B1%5D%20%2B%201%20%3D%3D%2011%20//%20true"
     """
 
     def recursive_traverse(values, key=None):
         """
         Args:
-            values: If argument is a string, returns a string of format 'key=values', else returns a string of key-value pairs separated by '&' like so: 'key=value&key=value'
-            key: Equals to None during top-level call, and recursive calls pass inner keys like so: '' => 'field' => 'field[hello]' => 'field[hello][there]' => ...
+            values: If argument is a string, returns a string of format "key=values", else returns a string of key-value pairs separated by "&" like so: "key=value&key=value"
+            key: Equals to None during top-level call, and recursive calls pass inner keys like so: "" => "field" => "field[hello]" => "field[hello][there]" => ...
         """
 
         params = []
@@ -92,3 +81,18 @@ def _force_str(s):
         return s
 
     return str(s, encoding="utf-8", errors="strict") if isinstance(s, bytes) else str(s)
+
+
+def encode_methods(methods: Dict[Text, B24BatchRequestData]) -> Dict[Text, RawStringParam]:
+    """
+    Urlencodes api methods and their params
+    """
+    def convert_method(method: B24BatchRequestData) -> RawStringParam:
+        """
+        Urlencodes api method and params
+        """
+        api_method, params = method
+        params = {} if params is None else params
+        return RawStringParam(f"{api_method}?{urllib.parse.quote(convert_params(params), safe='[]=')}")
+
+    return {identifier: convert_method(method) for identifier, method in methods.items()}

@@ -111,7 +111,7 @@ class B24Bool:
 
 
 class RawStringParam:
-    """Urlencoded string containing rest api method and its parameters."""
+    """Urlencoded string containing rest api method and parameters."""
     def __init__(self, value):
         self.value = value
 
