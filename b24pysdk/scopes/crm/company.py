@@ -5,6 +5,7 @@ from ...utils.types import JSONDict
 
 from .item import Item
 from .relationships import Contact
+from ._userfield import Userfield
 
 
 class Company(Item):
@@ -242,3 +243,8 @@ class Company(Item):
     def contact(self) -> Contact:
         """"""
         return Contact(self)
+
+    @property
+    def userfield(self) -> Userfield:
+        """"""
+        return Userfield(self)

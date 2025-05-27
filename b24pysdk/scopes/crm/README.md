@@ -76,6 +76,28 @@
 - crm.deal.contact.items.set
 - crm.deal.contact.items.delete
 
+### crm.deal.details.configuration
+- crm.deal.details.configuration.get
+- crm.deal.details.configuration.set
+- crm.deal.details.configuration.reset
+- crm.deal.details.configuration.force_common_scope_for_all
+
+### crm.deal.recurring
+- crm.deal.recurring.fields
+- crm.deal.recurring.add
+- crm.deal.recurring.get
+- crm.deal.recurring.list
+- crm.deal.recurring.update
+- crm.deal.recurring.delete
+- crm.deal.recurring.expose
+
+### crm.deal.userfield
+- crm.deal.userfield.add
+- crm.deal.userfield.update
+- crm.deal.userfield.get
+- crm.deal.userfield.list
+- crm.deal.userfield.delete
+
 ## crm.lead
 - crm.lead.fields
 - crm.lead.add
@@ -96,6 +118,19 @@
 - crm.lead.contact.items.set
 - crm.lead.contact.items.delete
 
+### crm.lead.details.configuration
+- crm.lead.details.configuration.get
+- crm.lead.details.configuration.set
+- crm.lead.details.configuration.reset
+- crm.lead.details.configuration.force_common_scope_for_all
+
+### crm.lead.userfield
+- crm.lead.userfield.add
+- crm.lead.userfield.update
+- crm.lead.userfield.get
+- crm.lead.userfield.list
+- crm.lead.userfield.delete
+
 ## crm.company
 - crm.company.fields
 - crm.company.add
@@ -112,6 +147,13 @@
 - crm.company.contact.items.set
 - crm.company.contact.items.delete
 
+### crm.company.userfield
+- crm.company.userfield.add
+- crm.company.userfield.update
+- crm.company.userfield.get
+- crm.company.userfield.list
+- crm.company.userfield.delete
+
 ## crm.contact
 - crm.contact.fields
 - crm.contact.add
@@ -127,6 +169,13 @@
 - crm.contact.company.items.get
 - crm.contact.company.items.set
 - crm.contact.company.items.delete
+
+### crm.contact.userfield
+- crm.contact.userfield.add
+- crm.contact.userfield.update
+- crm.contact.userfield.get
+- crm.contact.userfield.list
+- crm.contact.userfield.delete
 
 ## crm.quote
 - crm.quote.fields

@@ -1,11 +1,16 @@
-from typing import Iterable, Optional, Text
+from typing import Iterable, Optional, Text, TYPE_CHECKING
 
 from ...._bitrix_api_request import BitrixAPIRequest
 from ....utils.types import JSONDict
 
-from ..relationships import Contact
+from ..details import Details
 from ..item import Item
 from ..productrows import Productrows
+from ..relationships import Contact
+from .._userfield import Userfield
+
+if TYPE_CHECKING:
+    from .recurring import Recurring
 
 
 class Deal(Item):
@@ -246,11 +251,28 @@ class Deal(Item):
         )
 
     @property
+    def contact(self) -> Contact:
+        """"""
+        return Contact(self)
+
+    @property
+    def recurring(self) -> "Recurring":
+        """"""
+        from .recurring import Recurring
+
+        return Recurring(self)
+
+    @property
+    def details(self) -> "Details":
+        """"""
+        return Details(self)
+
+    @property
     def productrows(self) -> Productrows:
         """"""
         return Productrows(self)
 
     @property
-    def contact(self) -> Contact:
+    def userfield(self) -> Userfield:
         """"""
-        return Contact(self)
+        return Userfield(self)

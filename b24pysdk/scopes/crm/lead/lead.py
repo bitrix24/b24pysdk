@@ -3,9 +3,11 @@ from typing import Iterable, Optional, Text
 from ...._bitrix_api_request import BitrixAPIRequest
 from ....utils.types import JSONDict
 
+from ..details import Details
 from ..relationships import Contact
 from ..item import Item
 from ..productrows import Productrows
+from .._userfield import Userfield
 
 
 class Lead(Item):
@@ -243,11 +245,21 @@ class Lead(Item):
         )
 
     @property
+    def contact(self) -> Contact:
+        """"""
+        return Contact(self)
+
+    @property
+    def details(self) -> "Details":
+        """"""
+        return Details(self)
+
+    @property
     def productrows(self) -> Productrows:
         """"""
         return Productrows(self)
 
     @property
-    def contact(self) -> Contact:
+    def userfield(self) -> Userfield:
         """"""
-        return Contact(self)
+        return Userfield(self)

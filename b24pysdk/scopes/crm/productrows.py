@@ -7,13 +7,13 @@ from ...utils.types import JSONDict
 from .base_crm import BaseCRM
 
 if TYPE_CHECKING:
-    from . import Lead, Deal, Quote
+    from . import Deal, Lead, Quote
 
 
 class Productrows(BaseCRM):
     """"""
 
-    def __init__(self, item: Union["Lead", "Deal", "Quote"]):
+    def __init__(self, item: Union["Deal", "Lead", "Quote"]):
         super().__init__(item._scope)
         self._path = self._get_path(item)
 
