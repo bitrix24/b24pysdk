@@ -1,15 +1,21 @@
-from typing import Optional, Text, Union
+from typing import Optional, Text
 
 
 from ._bitrix_api_response import BitrixAPIResponse, BitrixResponseTime
 from .bitrix_api import BitrixToken
-from .utils.types import JSONDict, JSONList
+from .utils.types import B24APIResult, JSONDict
 
 
 class BitrixAPIRequest:
     """"""
 
     __slots__ = ("_bitrix_token", "_api_method", "_params", "_response", "_timeout")
+
+    _bitrix_token: BitrixToken
+    _api_method: Text
+    _params: Optional[JSONDict]
+    _timeout: Optional[int]
+    _response: Optional[BitrixAPIResponse]
 
     def __init__(
             self,
@@ -45,13 +51,10 @@ class BitrixAPIRequest:
 
     @property
     def response(self) -> BitrixAPIResponse:
-        if self._response is None:
-            return self.execute()
-        else:
-            return self._response
+        return self._response or self.execute()
 
     @property
-    def result(self) -> Union[JSONDict, JSONList, bool]:
+    def result(self) -> B24APIResult:
         return self.response.result
 
     @property

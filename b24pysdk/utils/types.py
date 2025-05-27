@@ -1,10 +1,11 @@
 from typing import (
     Any,
     Dict,
-    Literal,
     List,
+    Literal,
     Optional,
     Text,
+    Tuple,
     Union,
 )
 
@@ -12,8 +13,14 @@ from typing import (
 JSONDict = Dict[Text, Any]
 """A dictionary containing response from the API or data to send to the API."""
 
-JSONList = List[Any]
+JSONList = List[JSONDict]
 """A list containing response from the API or data to send to the API."""
+
+B24APIResult = Union[JSONDict, JSONList, bool]
+""""""
+
+B24BatchRequestData = Tuple[Text, Optional[JSONDict]]
+"""Tuple containing rest api method and parameters"""
 
 B24BoolLiteral = Literal["Y", "N", "D"]
 """"""
@@ -101,3 +108,18 @@ class B24Bool:
     def from_b24(cls, value: B24BoolLiteral) -> "B24Bool":
         """"""
         return cls(value)
+
+
+class RawStringParam:
+    """Urlencoded string containing rest api method and its parameters."""
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return self.value
+
+    def __unicode__(self):
+        return self.__str__()
+
+    def __repr__(self):
+        return f"<RawStringParam {self.value!r}>"

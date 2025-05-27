@@ -1,13 +1,21 @@
 from datetime import datetime
-from typing import Optional, Union
+from typing import Optional
 
-from .utils.types import JSONDict, JSONList
+from .utils.types import B24APIResult, JSONDict
 
 
 class BitrixResponseTime:
     """"""
 
     __slots__ = ("start", "finish", "duration", "processing", "date_start", "date_finish", "operating")
+
+    start: float
+    finish: float
+    duration: float
+    processing: float
+    date_start: datetime
+    date_finish: datetime
+    operating: Optional[float]
 
     def __init__(
             self,
@@ -62,10 +70,15 @@ class BitrixAPIResponse:
 
     __slots__ = ("_result", "_time", "_total", "_next")
 
+    _result: B24APIResult
+    _time: BitrixResponseTime
+    _total: Optional[int]
+    _next: Optional[int]
+
     def __init__(
             self,
             *,
-            result: Union[JSONDict, JSONList, bool],
+            result: B24APIResult,
             time: BitrixResponseTime,
             total: Optional[int] = None,
             next: Optional[int] = None,
@@ -81,7 +94,7 @@ class BitrixAPIResponse:
     __repr__ = __str__
 
     @property
-    def result(self) -> Union[JSONDict, JSONList, bool]:
+    def result(self) -> B24APIResult:
         return self._result
 
     @property
