@@ -1,16 +1,13 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Text, Union, Dict, Iterable
+from typing import Dict, Optional, Sequence, Text, Union
 
-from ..utils.types import B24BatchRequestData, JSONDict
+from ..utils.types import B24BatchRequestData, JSONDict, Key, Timeout
 
-from .functions import api_call
-from .functions.batch_api_call import batch_api_call
+from .functions import call_method, call_batch, call_batches
 
 
 class BaseBitrixToken(ABC):
     """"""
-
-    DEFAULT_TIMEOUT: int = 10
 
     domain: Text = NotImplemented
     """"""
@@ -26,15 +23,15 @@ class BaseBitrixToken(ABC):
         """"""
         super().__init__(*args, **kwargs)
 
-    def call_api_method(
+    def call_method(
             self,
             api_method: Text,
             params: Optional[JSONDict] = None,
             *,
-            timeout: Union[int, float, None] = DEFAULT_TIMEOUT,
+            timeout: Timeout = None,
     ) -> JSONDict:
         """"""
-        return api_call(
+        return call_method(
             domain=self.domain,
             api_method=api_method,
             auth_token=self.auth_token,
@@ -43,20 +40,38 @@ class BaseBitrixToken(ABC):
             timeout=timeout,
         )
 
-    def batch_api_call(
+    def call_batch(
             self,
-            methods: Union[Dict[Text, B24BatchRequestData], Iterable[B24BatchRequestData]],
+            methods: Union[Dict[Key, B24BatchRequestData], Sequence[B24BatchRequestData]],
             *,
-            halt: int = 0,
-            chunk_size: int = 50,
-            timeout: int = DEFAULT_TIMEOUT,
-    ):
-        return batch_api_call(
+            halt: bool = False,
+            ignore_size_limit: bool = False,
+            timeout: Timeout = None,
+    ) -> JSONDict:
+        """"""
+        return call_batch(
             methods=methods,
             domain=self.domain,
             auth_token=self.auth_token,
             halt=halt,
-            chunk_size=chunk_size,
+            is_webhook=self.is_webhook,
+            ignore_size_limit=ignore_size_limit,
+            timeout=timeout,
+        )
+
+    def call_batches(
+            self,
+            methods: Union[Dict[Key, B24BatchRequestData], Sequence[B24BatchRequestData]],
+            *,
+            halt: bool = False,
+            timeout: Timeout = None,
+    ) -> JSONDict:
+        """"""
+        return call_batches(
+            methods=methods,
+            domain=self.domain,
+            auth_token=self.auth_token,
+            halt=halt,
             is_webhook=self.is_webhook,
             timeout=timeout,
         )
