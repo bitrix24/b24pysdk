@@ -47,7 +47,7 @@ class Item(BaseCRM):
 
         params = {
             "entityTypeId": entity_type_id,
-            "useOriginalUfNames": B24Bool(use_original_uf_names),
+            "useOriginalUfNames": str(B24Bool(use_original_uf_names)),
         }
 
         return BitrixAPIRequest(
@@ -157,7 +157,7 @@ class Item(BaseCRM):
         params = {
             "fields": fields,
             "entityTypeId": entity_type_id,
-            "useOriginalUfNames": B24Bool(use_original_uf_names),
+            "useOriginalUfNames": str(B24Bool(use_original_uf_names)),
             "params": params or {},
         }
 
@@ -199,7 +199,7 @@ class Item(BaseCRM):
         params = {
             "entityTypeId": entity_type_id,
             "id": bitrix_id,
-            "useOriginalUfNames": B24Bool(use_original_uf_names),
+            "useOriginalUfNames": str(B24Bool(use_original_uf_names)),
         }
 
         return BitrixAPIRequest(
@@ -273,7 +273,7 @@ class Item(BaseCRM):
         params = {
             "entityTypeId": entity_type_id,
             "start": start,
-            "useOriginalUfNames": B24Bool(use_original_uf_names),
+            "useOriginalUfNames": str(B24Bool(use_original_uf_names)),
         }
 
         if select is not None:
@@ -392,7 +392,7 @@ class Item(BaseCRM):
             "entityTypeId": entity_type_id,
             "id": bitrix_id,
             "fields": fields,
-            "useOriginalUfNames": B24Bool(use_original_uf_names),
+            "useOriginalUfNames": str(B24Bool(use_original_uf_names)),
             "params": params or {},
         }
 
@@ -454,7 +454,7 @@ class Item(BaseCRM):
         params = {
             "entityTypeId": entity_type_id,
             "fields": fields,
-            "useOriginalUfNames": B24Bool(use_original_uf_names),
+            "useOriginalUfNames": str(B24Bool(use_original_uf_names)),
         }
 
         return BitrixAPIRequest(
@@ -478,7 +478,7 @@ class Item(BaseCRM):
         params = {
             "entityTypeId": entity_type_id,
             "data": list(data),
-            "useOriginalUfNames": B24Bool(use_original_uf_names),
+            "useOriginalUfNames": str(B24Bool(use_original_uf_names)),
         }
 
         return BitrixAPIRequest(
