@@ -5,7 +5,7 @@ from typing import Text
 from .utils.types import JSONDict
 
 
-class BitrixApiException(Exception):
+class BitrixSDKException(Exception):
     """Base class for all bitrix API exceptions."""
 
     __slots__ = ("message",)
@@ -18,36 +18,35 @@ class BitrixApiException(Exception):
         return self.message
 
 
-class BitrixTimeout(BitrixApiException):
-    """"""
-
-    __slots__ = ("timeout", "original_error")
-
-    STATUS_CODE: int = HTTPStatus.GATEWAY_TIMEOUT
-
-    def __init__(self, original_error: Exception, timeout: int):
-        super().__init__(f"BitrixTimeout: {timeout} sec., {original_error}", original_error, timeout)
-        self.original_error = original_error
-        self.timeout = timeout
-
-
-class ConnectionToBitrixError(BitrixApiException):
+class RequestToBitrixError(BitrixSDKException):
     """A Connection error occurred."""
 
     __slots__ = ("original_error",)
 
-    def __init__(self, original_error: Exception):
-        super().__init__(f"ConnectionToBitrixError: {original_error}", original_error)
+    def __init__(self, original_error: Exception, *args):
+        super().__init__(f"{self.__class__.__name__}: {original_error}", original_error, *args)
         self.original_error = original_error
 
 
-class BitrixApiError(BitrixApiException):
+class BitrixTimeout(RequestToBitrixError):
+    """"""
+
+    __slots__ = ("timeout",)
+
+    STATUS_CODE: int = HTTPStatus.GATEWAY_TIMEOUT
+
+    def __init__(self, original_error: Exception, timeout: int):
+        super().__init__(original_error, timeout)
+        self.timeout = timeout
+
+
+class BitrixApiError(BitrixSDKException):
     """"""
 
     __slots__ = ("json_response", "response")
 
     def __init__(self, json_response: JSONDict, response: requests.Response):
-        message = json_response.get("error_description", f"BitrixApiError: {response.text}")
+        message = json_response.get("error_description", f"{self.__class__.__name__}: {response.text}")
         super().__init__(message, json_response, response)
         self.json_response = json_response
         self.response = response
