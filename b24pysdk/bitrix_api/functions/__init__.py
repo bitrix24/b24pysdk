@@ -1,8 +1,12 @@
-from .api_call import api_call
-from .parse_response import parse_response
+from .call import call
+from .call_batch import call_batch
+from .call_batches import call_batches
+from .call_method import call_method
 
 
 __all__ = [
-    "api_call",
-    "parse_response",
+    "call",
+    "call_method",
+    "call_batch",
+    "call_batches",
 ]

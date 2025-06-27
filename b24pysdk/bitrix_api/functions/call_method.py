@@ -1,20 +1,20 @@
-from typing import Optional, Text, Union
+from typing import Optional, Text
 
-from ...utils.types import JSONDict
+from ...utils.types import JSONDict, Timeout
 
-from .bitrix_api_client import request
-from .convert_params import convert_params
+from .call import call
 from .parse_response import parse_response
 
 
-def api_call(
-        domain: Text,
-        api_method: Text,
-        auth_token: Text,
-        params: Optional[JSONDict] = None,
+def call_method(
         *,
-        is_webhook: bool = False,
-        timeout: Union[int, float, None],
+        domain: Text,
+        auth_token: Text,
+        is_webhook: bool,
+        api_method: Text,
+        params: Optional[JSONDict] = None,
+        timeout: Timeout = None,
+        **kwargs,
 ) -> JSONDict:
     """send POST reuqest to bitrix API
 
@@ -30,7 +30,7 @@ def api_call(
         response of sent request
     """
 
-    if not params:
+    if params is None:
         params = {}
 
     if is_webhook:
@@ -39,9 +39,13 @@ def api_call(
         hook_key = ""
         params["auth"] = auth_token
 
-    converted_params = convert_params(params).encode("utf-8")
     url = f"https://{domain}/rest/{hook_key}{api_method}.json"
 
-    response = request(url, params=converted_params, timeout=timeout)
+    response = call(
+        url,
+        params=params,
+        timeout=timeout,
+        **kwargs,
+    )
 
     return parse_response(response)
