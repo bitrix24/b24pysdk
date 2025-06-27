@@ -63,7 +63,7 @@ class BitrixAPIRequest:
 
     def _call(self) -> JSONDict:
         """"""
-        return self._bitrix_token.call_api_method(
+        return self._bitrix_token.call_method(
             api_method=self._api_method,
             params=self._params,
             timeout=self._timeout,

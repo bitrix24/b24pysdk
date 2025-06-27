@@ -7,7 +7,16 @@ from .utils.types import B24APIResult, JSONDict
 class BitrixResponseTime:
     """"""
 
-    __slots__ = ("start", "finish", "duration", "processing", "date_start", "date_finish", "operating")
+    __slots__ = (
+        "start",
+        "finish",
+        "duration",
+        "processing",
+        "date_start",
+        "date_finish",
+        "operating_reset_at",
+        "operating",
+    )
 
     start: float
     finish: float
@@ -15,6 +24,7 @@ class BitrixResponseTime:
     processing: float
     date_start: datetime
     date_finish: datetime
+    operating_reset_at: Optional[datetime]
     operating: Optional[float]
 
     def __init__(
@@ -26,7 +36,8 @@ class BitrixResponseTime:
             processing: float,
             date_start: datetime,
             date_finish: datetime,
-            operating: Optional[float],
+            operating_reset_at: Optional[datetime] = None,
+            operating: Optional[float] = None,
     ):
         self.start = start
         self.finish = finish
@@ -34,6 +45,7 @@ class BitrixResponseTime:
         self.processing = processing
         self.date_start = date_start
         self.date_finish = date_finish
+        self.operating_reset_at = operating_reset_at
         self.operating = operating
 
     def __str__(self):
@@ -50,6 +62,7 @@ class BitrixResponseTime:
             processing=response_time["processing"],
             date_start=datetime.fromisoformat(response_time["date_start"]),
             date_finish=datetime.fromisoformat(response_time["date_finish"]),
+            operating_reset_at=response_time.get("operating_reset_at") and datetime.fromtimestamp(response_time["operating_reset_at"]),
             operating=response_time.get("operating"),
         )
 
@@ -61,6 +74,7 @@ class BitrixResponseTime:
             "processing": self.processing,
             "date_start": self.date_start,
             "date_finish": self.date_finish,
+            "operating_reset_at": self.operating_reset_at,
             "operating": self.operating,
         }
 
@@ -68,12 +82,12 @@ class BitrixResponseTime:
 class BitrixAPIResponse:
     """"""
 
-    __slots__ = ("_result", "_time", "_total", "_next")
+    __slots__ = ("result", "time", "total", "next")
 
-    _result: B24APIResult
-    _time: BitrixResponseTime
-    _total: Optional[int]
-    _next: Optional[int]
+    result: B24APIResult
+    time: BitrixResponseTime
+    total: Optional[int]
+    next: Optional[int]
 
     def __init__(
             self,
@@ -83,31 +97,15 @@ class BitrixAPIResponse:
             total: Optional[int] = None,
             next: Optional[int] = None,
     ):
-        self._result = result
-        self._time = time
-        self._total = total
-        self._next = next
+        self.result = result
+        self.time = time
+        self.total = total
+        self.next = next
 
     def __str__(self):
         return f"{self.__class__.__name__}({self.to_dict()})"
 
     __repr__ = __str__
-
-    @property
-    def result(self) -> B24APIResult:
-        return self._result
-
-    @property
-    def time(self) -> BitrixResponseTime:
-        return self._time
-
-    @property
-    def total(self) -> Optional[int]:
-        return self._total
-
-    @property
-    def next(self) -> Optional[int]:
-        return self._next
 
     @classmethod
     def from_dict(cls, json_response: JSONDict) -> "BitrixAPIResponse":
@@ -120,8 +118,8 @@ class BitrixAPIResponse:
 
     def to_dict(self) -> JSONDict:
         return {
-            "result": self._result,
-            "time": self._time,
-            "total": self._total,
-            "next": self._next,
+            "result": self.result,
+            "time": self.time,
+            "total": self.total,
+            "next": self.next,
         }
