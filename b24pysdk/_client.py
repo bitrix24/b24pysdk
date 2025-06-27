@@ -1,7 +1,8 @@
-from typing import Iterable
+from typing import Sequence
 
 from ._bitrix_api_request import BitrixAPIRequest
 from .bitrix_api import BitrixToken
+
 from . import scopes
 
 
@@ -17,5 +18,8 @@ class Client:
         self.bitrix_token = bitrix_token
         self.crm = scopes.CRM(self)
 
-    def batch(self, bitrix_api_requests: Iterable[BitrixAPIRequest]):
+    def call_batch(self, bitrix_api_requests: Sequence[BitrixAPIRequest]):
+        """"""
+
+    def call_batches(self, bitrix_api_requests: Sequence[BitrixAPIRequest]):
         """"""
