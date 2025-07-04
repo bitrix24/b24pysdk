@@ -2,7 +2,6 @@ from typing import Optional
 
 from ...._bitrix_api_request import BitrixAPIRequest
 from ....utils.types import JSONDict
-
 from .relationship import Relationship
 
 

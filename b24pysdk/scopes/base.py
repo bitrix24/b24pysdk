@@ -3,7 +3,6 @@ from typing import Callable, Optional, Text
 
 from .._bitrix_api_request import BitrixAPIRequest
 from ..utils.functional import Classproperty
-
 from .scope import Scope
 
 
@@ -53,5 +52,5 @@ class Base(ABC):
     @staticmethod
     def __to_camel_case(snake_str: Text) -> Text:
         """Converts Python methods names to camelCase to be used in _get_api_method"""
-        first, *parts = snake_str.split('_')
-        return ''.join([first.lower(), *map(lambda part: str.title(part), parts)])
+        first, *parts = snake_str.split("_")
+        return "".join([first.lower(), *(str.title(part) for part in parts)])

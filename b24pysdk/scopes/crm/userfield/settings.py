@@ -1,10 +1,8 @@
-from typing import Optional, Text, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional, Text
 
 from ...._bitrix_api_request import BitrixAPIRequest
 from ....utils.functional import type_checker
-
 from ..base_crm import BaseCRM
-
 
 if TYPE_CHECKING:
     from .userfield import Userfield
@@ -24,7 +22,20 @@ class Settings(BaseCRM):
             type: Text,
             timeout: Optional[int] = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the settings description.
+
+        Documentation:
+
+        The method returns the description of the settings fields for the custom field type
+
+        Args:
+            type: The type of the custom field type;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "type": type,

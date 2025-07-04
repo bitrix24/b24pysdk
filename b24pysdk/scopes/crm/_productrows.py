@@ -1,9 +1,8 @@
-from typing import Iterable, Optional, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Iterable, Optional, Union
 
 from ..._bitrix_api_request import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict
-
 from .base_crm import BaseCRM
 
 if TYPE_CHECKING:

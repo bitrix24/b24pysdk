@@ -1,22 +1,22 @@
-from typing import Optional, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from ..._bitrix_api_request import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, JSONList
-
 from .base_crm import BaseCRM
 
 if TYPE_CHECKING:
-    from . import Company, Contact, Deal, Lead
+    from . import Company, Contact, Deal, Lead, Quote, Requisite
 
 
 class Userfield(BaseCRM):
     """"""
 
-    def __init__(self, item: Union["Company", "Contact", "Deal", "Lead"]):
+    def __init__(self, item: Union["Company", "Contact", "Deal", "Lead", "Quote", "Requisite"]):
         super().__init__(item._scope)
         self._path = self._get_path(item)
 
+    @type_checker
     def add(
             self,
             fields: JSONDict,
@@ -26,6 +26,7 @@ class Userfield(BaseCRM):
         """"""
         return self._add(fields, timeout=timeout)
 
+    @type_checker
     def get(
             self,
             bitrix_id: int,
@@ -35,6 +36,7 @@ class Userfield(BaseCRM):
         """"""
         return self._get(bitrix_id, timeout=timeout)
 
+    @type_checker
     def list(
             self,
             *,
@@ -75,6 +77,7 @@ class Userfield(BaseCRM):
             timeout=timeout,
         )
 
+    @type_checker
     def delete(
             self,
             bitrix_id: int,

@@ -1,16 +1,15 @@
-from typing import Iterable, Optional, Text, TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterable, Optional, Text
 
 from ...._bitrix_api_request import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import B24Bool, JSONDict
-
+from ....utils.types import B24Bool, JSONDict, Timeout
 from ..base_crm import BaseCRM
 
 if TYPE_CHECKING:
     from .delivery import Delivery
+    from .details import Details
     from .payment import Payment
     from .productrow import Productrow
-    from .details import Details
 
 
 class Item(BaseCRM):
@@ -20,13 +19,25 @@ class Item(BaseCRM):
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/index.html
     """
 
+    ENTITY_TYPE_ID: Optional[int] = None
+    """Numeric Identifier of Type."""
+
+    ENTITY_TYPE_NAME: Optional[Text] = None
+    """Symbolic Code of Type."""
+
+    ENTITY_TYPE_ABBR: Optional[Text] = None
+    """Short Symbolic Code of Type."""
+
+    USER_FIELD_ENTITY_ID: Optional[Text] = None
+    """User Field Object Type."""
+
     @type_checker
     def fields(
             self,
             *,
             entity_type_id: int,
             use_original_uf_names: bool = False,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get fields of CRM item.
 
@@ -57,13 +68,14 @@ class Item(BaseCRM):
             timeout=timeout,
         )
 
+    @type_checker
     def add(
             self,
             fields: JSONDict,
             *,
             entity_type_id: int,
             use_original_uf_names: bool = False,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Create a new CRM entity.
 
@@ -105,15 +117,14 @@ class Item(BaseCRM):
             timeout=timeout,
         )
 
-    @type_checker
     def _add(
             self,
             fields: JSONDict,
             *,
-            entity_type_id: int,
+            entity_type_id: Optional[int] = None,
             use_original_uf_names: bool = False,
             params: Optional[JSONDict] = None,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Create a new CRM entity.
 
@@ -158,7 +169,7 @@ class Item(BaseCRM):
             "fields": fields,
             "entityTypeId": entity_type_id,
             "useOriginalUfNames": str(B24Bool(use_original_uf_names)),
-            "params": params or {},
+            "params": params or dict(),
         }
 
         return BitrixAPIRequest(
@@ -292,6 +303,7 @@ class Item(BaseCRM):
             timeout=timeout,
         )
 
+    @type_checker
     def update(
             self,
             bitrix_id: int,
@@ -340,13 +352,12 @@ class Item(BaseCRM):
             timeout=timeout,
         )
 
-    @type_checker
     def _update(
             self,
             bitrix_id: int,
             fields: JSONDict,
             *,
-            entity_type_id: int,
+            entity_type_id: Optional[int] = None,
             use_original_uf_names: bool = False,
             params: Optional[JSONDict] = None,
             timeout: Optional[int] = None,
@@ -393,7 +404,7 @@ class Item(BaseCRM):
             "id": bitrix_id,
             "fields": fields,
             "useOriginalUfNames": str(B24Bool(use_original_uf_names)),
-            "params": params or {},
+            "params": params or dict(),
         }
 
         return BitrixAPIRequest(

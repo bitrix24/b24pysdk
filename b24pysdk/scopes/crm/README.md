@@ -1,5 +1,10 @@
 # Available methods
 
+## crm.activity.type
+- crm.activity.type.add
+- crm.activity.type.delete
+- crm.activity.type.list
+
 ## crm.item
 - crm.item.fields
 - crm.item.add
@@ -76,7 +81,7 @@
 - crm.deal.contact.items.set
 - crm.deal.contact.items.delete
 
-### crm.deal.details.configuration
+#### crm.deal.details.configuration
 - crm.deal.details.configuration.get
 - crm.deal.details.configuration.set
 - crm.deal.details.configuration.reset
@@ -118,7 +123,7 @@
 - crm.lead.contact.items.set
 - crm.lead.contact.items.delete
 
-### crm.lead.details.configuration
+#### crm.lead.details.configuration
 - crm.lead.details.configuration.get
 - crm.lead.details.configuration.set
 - crm.lead.details.configuration.reset
@@ -154,6 +159,12 @@
 - crm.company.userfield.list
 - crm.company.userfield.delete
 
+#### crm.company.details.configuration
+- crm.company.details.configuration.get
+- crm.company.details.configuration.set
+- crm.company.details.configuration.reset
+- crm.company.details.configuration.force_common_scope_for_all
+
 ## crm.contact
 - crm.contact.fields
 - crm.contact.add
@@ -177,6 +188,12 @@
 - crm.contact.userfield.list
 - crm.contact.userfield.delete
 
+#### crm.contact.details.configuration
+- crm.contact.details.configuration.get
+- crm.contact.details.configuration.set
+- crm.contact.details.configuration.reset
+- crm.contact.details.configuration.force_common_scope_for_all
+
 ## crm.quote
 - crm.quote.fields
 - crm.quote.add
@@ -197,12 +214,64 @@
 - crm.requisite.update
 - crm.requisite.delete
 
+### crm.requisite.preset
+- crm.requisite.preset.fields
+- crm.requisite.preset.add
+- crm.requisite.preset.get
+- crm.requisite.preset.list
+- crm.requisite.preset.update
+- crm.requisite.preset.delete
+- crm.requisite.preset.countries
+
+#### crm.requisite.preset.field
+- crm.requisite.preset.field.fields
+- crm.requisite.preset.field.add
+- crm.requisite.preset.field.get
+- crm.requisite.preset.field.list
+- crm.requisite.preset.field.update
+- crm.requisite.preset.field.delete
+- crm.requisite.preset.field.availabletoadd
+
+### crm.requisite.bankdetail
+- crm.requisite.bankdetail.fields
+- crm.requisite.bankdetail.add
+- crm.requisite.bankdetail.get
+- crm.requisite.bankdetail.list
+- crm.requisite.bankdetail.update
+- crm.requisite.bankdetail.delete
+
+### crm.requisite.userfield
+- crm.requisite.userfield.add
+- crm.requisite.userfield.update
+- crm.requisite.userfield.get
+- crm.requisite.userfield.list
+- crm.requisite.userfield.delete
+
+### crm.requisite.link
+- crm.requisite.link.register
+- crm.requisite.link.get
+- crm.requisite.link.list
+- crm.requisite.link.unregister
+- crm.requisite.link.fields
+
 ## crm.address
 - crm.address.fields
 - crm.address.add
 - crm.address.list
 - crm.address.update
 - crm.address.delete
+
+## crm.status
+- crm.status.add
+- crm.status.delete
+- crm.status.fields
+- crm.status.get
+- crm.status.list
+- crm.status.update
+
+### crm.status.entity
+- crm.status.entity.items
+- crm.status.entity.types
 
 ### crm.timeline.bindings
 - crm.timeline.bindings.fields
@@ -222,6 +291,24 @@
 - crm.timeline.note.get
 - crm.timeline.note.delete
 - crm.timeline.note.save
+
+### crm.timeline.logmessage
+- crm.timeline.logmessage.add
+- crm.timeline.logmessage.get
+- crm.timeline.logmessage.list
+- crm.timeline.logmessage.delete
+
+### crm.timeline.icon
+- crm.timeline.icon.add
+- crm.timeline.icon.get
+- crm.timeline.icon.list
+- crm.timeline.icon.delete
+
+### crm.timeline.logo
+- crm.timeline.logo.add
+- crm.timeline.logo.get
+- crm.timeline.logo.list
+- crm.timeline.logo.delete
 
 ## crm.userfield
 - crm.userfield.fields

@@ -1,8 +1,8 @@
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from ...._bitrix_api_request import BitrixAPIRequest
 from ....utils.functional import type_checker
-
+from ....utils.types import Timeout
 from ..base_crm import BaseCRM
 
 if TYPE_CHECKING:
@@ -26,7 +26,7 @@ class Binding(BaseCRM):
             *,
             entity_type_id: int,
             entity_id: int,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Add a deal binding to a CRM entity.
 
@@ -69,7 +69,7 @@ class Binding(BaseCRM):
             source_entity_id: int,
             target_entity_type_id: int,
             target_entity_id: int,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ):
         """Update the deal's connection with the CRM entity.
 
@@ -114,7 +114,7 @@ class Binding(BaseCRM):
             self,
             activity_id: int,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of all bindings for the activity.
 
@@ -150,7 +150,7 @@ class Binding(BaseCRM):
             *,
             entity_type_id: int,
             entity_id: int,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Delete the connection of the activity with the CRM entity.
 

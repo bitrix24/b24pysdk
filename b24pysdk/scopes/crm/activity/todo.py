@@ -1,11 +1,9 @@
 from datetime import datetime
-from typing import List, Optional, Text, TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Optional, Text
 
 from ...._bitrix_api_request import BitrixAPIRequest
 from ....utils.functional import type_checker
-
 from ..base_crm import BaseCRM
-
 
 if TYPE_CHECKING:
     from .activity import Activity

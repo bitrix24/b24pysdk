@@ -1,7 +1,6 @@
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from ...._bitrix_api_request import BitrixAPIRequest
-
 from ..base_crm import BaseCRM
 
 if TYPE_CHECKING:
@@ -20,5 +19,16 @@ class Enumeration(BaseCRM):
             *,
             timeout: Optional[int] = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get field descriptions for custom field type
+
+        Documentation:
+
+        The method returns the field descriptions for a custom field of type 'enumeration' (list).
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
         return self._fields(timeout=timeout)

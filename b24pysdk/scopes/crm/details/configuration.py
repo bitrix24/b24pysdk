@@ -1,124 +1,155 @@
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, Text
 
 from ...._bitrix_api_request import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import JSONDict
-
-from ..base_crm import BaseCRM
-
-if TYPE_CHECKING:
-    from .details import Details
+from ....utils.types import JSONDict, Timeout
+from ..item.details.configuration import Configuration as BaseConfiguration
 
 
-class Configuration(BaseCRM):
-    """"""
-    def __init__(self, details: "Details"):
-        super().__init__(details._scope)
-        self._path = self._get_path(details)
+class Configuration(BaseConfiguration):
+    """The group of methods manages the settings of the card for two views: 'General view' and 'My view'
+
+    Documentation:
+    """
 
     @type_checker
     def get(
             self,
-            *,
+            *args,
+            scope: Optional[Text] = None,
             user_id: Optional[int] = None,
-            scope: Optional[str] = None,
             extras: Optional[JSONDict] = None,
-            timeout: Optional[int] = None
+            timeout: Timeout = None
     ) -> BitrixAPIRequest:
-        """"""
-        params = {}
+        """Get parameters of deal configuration.
 
-        if user_id is not None:
-            params["userId"] = user_id
+        Documentation:
 
-        if scope is not None:
-            params["scope"] = scope
+        The method retrieves the settings of deal cards.
 
-        if extras is not None:
-            params["extras"] = extras
+        Args:
+            scope: The scope of the settings, where allowed values are:
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.get),
-            params=params,
-            timeout=timeout,
+                - P - personal settings,
+
+                - C - general settings;
+
+            user_id: User identifier, if not specified, the current user is taken and requiring only when getting personal settings;
+
+            extras: Additional parameters;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+        return self._get(
+            entity_type_id=self.details.entity_type_id,
+            user_id=user_id,
+            scope=scope,
+            extras=extras,
         )
 
     @type_checker
     def set(
             self,
-            *,
-            data: list[JSONDict],
+            *args,
+            scope: Optional[Text] = None,
             user_id: Optional[int] = None,
-            scope: Optional[str] = None,
             extras: Optional[JSONDict] = None,
-            timeout: Optional[int] = None
+            timeout: Timeout = None
     ) -> BitrixAPIRequest:
-        """"""
-        params = {
-            'data': data,
-        }
+        """Set parameters for the CRM deal detail card.
 
-        if user_id is not None:
-            params["userId"] = user_id
+        Documentation:
 
-        if scope is not None:
-            params["scope"] = scope
+        The method allows you to set the settings for deal cards.
 
-        if extras is not None:
-            params["extras"] = extras
+        Args:
+            scope: The scope of the settings, where allowed values are:
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.set),
-            params=params,
+                - P - personal settings,
+
+                - C - general settings;
+
+            user_id: User identifier, if not specified, the current user is taken and requiring only when setting personal settings;
+
+            extras: Additional parameters;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+        return self._set(
+            entity_type_id=self.details.entity_type_id,
+            data=list(),
+            user_id=user_id,
+            scope=scope,
+            extras=extras,
             timeout=timeout,
         )
 
     @type_checker
     def reset(
             self,
-            *,
+            *args,
+            scope: Optional[Text] = None,
             user_id: Optional[int] = None,
-            scope: Optional[str] = None,
             extras: Optional[JSONDict] = None,
-            timeout: Optional[int] = None
+            timeout: Timeout = None
     ) -> BitrixAPIRequest:
-        """"""
-        params = {}
+        """The method resets the settings of deal cards.
 
-        if user_id is not None:
-            params["userId"] = user_id
+        Documentation:
 
-        if scope is not None:
-            params["scope"] = scope
+        Args:
+            scope: The scope of the settings, where allowed values are:
 
-        if extras is not None:
-            params["extras"] = extras
+                - P - personal settings,
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.reset),
-            params=params,
+                - C - general settings;
+
+            user_id: User identifier, if not specified, the current user is taken and requiring only when resetting personal settings;
+
+            extras: Additional parameters;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+        return self._reset(
+            entity_type_id=self.details.entity_type_id,
+            user_id=user_id,
+            scope=scope,
+            extras=extras,
             timeout=timeout,
         )
 
     @type_checker
     def force_common_scope_for_all(
             self,
-            *,
+            *args,
             extras: Optional[JSONDict] = None,
-            timeout: Optional[int] = None
+            timeout: Timeout = None
     ) -> BitrixAPIRequest:
-        """"""
-        params = {}
+        """Set common deal card.
 
-        if extras is not None:
-            params["extras"] = extras
+        Documentation:
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.force_common_scope_for_all),
-            params=params,
+        The method forcibly sets a common deal card for all users.
+
+        Args:
+            extras: Additional parameters;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+        return self._force_common_scope_for_all(
+            entity_type_id=self.details.entity_type_id,
+            extras=extras,
             timeout=timeout,
         )

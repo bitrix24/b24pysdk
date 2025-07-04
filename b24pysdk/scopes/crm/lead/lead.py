@@ -1,13 +1,13 @@
 from typing import Iterable, Optional, Text
 
 from ...._bitrix_api_request import BitrixAPIRequest
-from ....utils.types import JSONDict
-
-from ..details import Details
-from ..relationships import Contact
-from ..item import Item
-from ..productrows import Productrows
+from ....utils.functional import type_checker
+from ....utils.types import JSONDict, Timeout
+from .._productrows import Productrows
 from .._userfield import Userfield
+from ..details import Details
+from ..item import Item
+from ..relationships import Contact
 
 
 class Lead(Item):
@@ -25,7 +25,7 @@ class Lead(Item):
     def fields(
             self,
             *args,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get CRM lead fields.
 
@@ -41,12 +41,13 @@ class Lead(Item):
         """
         return super().fields(entity_type_id=self.ENTITY_TYPE_ID, timeout=timeout)
 
+    @type_checker
     def add(
             self,
             fields: JSONDict,
             *args,
             params: Optional[JSONDict] = None,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Create a new lead.
 
@@ -88,7 +89,7 @@ class Lead(Item):
             self,
             bitrix_id: int,
             *args,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get lead by ID.
 
@@ -117,7 +118,7 @@ class Lead(Item):
             filter: Optional[JSONDict] = None,
             order: Optional[JSONDict] = None,
             start: Optional[int] = None,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of leads.
 
@@ -170,13 +171,14 @@ class Lead(Item):
             timeout=timeout,
         )
 
+    @type_checker
     def update(
             self,
             bitrix_id: int,
             fields: JSONDict,
             *args,
             params: Optional[JSONDict] = None,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update lead.
 
@@ -220,7 +222,7 @@ class Lead(Item):
             self,
             bitrix_id: int,
             *args,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Delete lead.
 

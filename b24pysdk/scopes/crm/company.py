@@ -1,11 +1,12 @@
 from typing import Iterable, Optional, Text
 
 from ..._bitrix_api_request import BitrixAPIRequest
-from ...utils.types import JSONDict
-
+from ...utils.functional import type_checker
+from ...utils.types import JSONDict, Timeout
+from ._userfield import Userfield
+from .details.details import Details
 from .item import Item
 from .relationships import Contact
-from ._userfield import Userfield
 
 
 class Company(Item):
@@ -23,7 +24,7 @@ class Company(Item):
     def fields(
             self,
             *args,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get company fields.
 
@@ -39,12 +40,13 @@ class Company(Item):
         """
         return super().fields(entity_type_id=self.ENTITY_TYPE_ID, timeout=timeout)
 
+    @type_checker
     def add(
             self,
             fields: JSONDict,
             *args,
             params: Optional[JSONDict] = None,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Create a new company.
 
@@ -85,7 +87,7 @@ class Company(Item):
             self,
             bitrix_id: int,
             *args,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get company by ID.
 
@@ -114,7 +116,7 @@ class Company(Item):
             filter: Optional[JSONDict] = None,
             order: Optional[JSONDict] = None,
             start: Optional[int] = None,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of companies.
 
@@ -167,13 +169,14 @@ class Company(Item):
             timeout=timeout,
         )
 
+    @type_checker
     def update(
             self,
             bitrix_id: int,
             fields: JSONDict,
             *args,
             params: Optional[JSONDict] = None,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update company.
 
@@ -217,7 +220,7 @@ class Company(Item):
             self,
             bitrix_id: int,
             *args,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Delete company.
 
@@ -248,3 +251,8 @@ class Company(Item):
     def userfield(self) -> Userfield:
         """"""
         return Userfield(self)
+
+    @property
+    def details(self) -> "Details":
+        """"""
+        return Details(self)

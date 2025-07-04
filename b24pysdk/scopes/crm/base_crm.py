@@ -1,32 +1,17 @@
 from typing import Iterable, Optional, Text
 
 from ..._bitrix_api_request import BitrixAPIRequest
-from ...utils.functional import type_checker
-from ...utils.types import JSONDict
-
+from ...utils.types import JSONDict, Timeout
 from ..base import Base
 
 
 class BaseCRM(Base):
     """"""
 
-    ENTITY_TYPE_ID: Optional[int] = None
-    """Numeric Identifier of Type."""
-
-    ENTITY_TYPE_NAME: Optional[Text] = None
-    """Symbolic Code of Type."""
-
-    ENTITY_TYPE_ABBR: Optional[Text] = None
-    """Short Symbolic Code of Type."""
-
-    USER_FIELD_ENTITY_ID: Optional[Text] = None
-    """User Field Object Type."""
-
-    @type_checker
     def _fields(
             self,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
         return BitrixAPIRequest(
@@ -35,12 +20,11 @@ class BaseCRM(Base):
             timeout=timeout,
         )
 
-    @type_checker
     def _add(
             self,
             fields: JSONDict,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
@@ -55,12 +39,11 @@ class BaseCRM(Base):
             timeout=timeout,
         )
 
-    @type_checker
     def _get(
             self,
             bitrix_id: int,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
@@ -75,7 +58,6 @@ class BaseCRM(Base):
             timeout=timeout,
         )
 
-    @type_checker
     def _list(
             self,
             *,
@@ -83,7 +65,7 @@ class BaseCRM(Base):
             filter: Optional[JSONDict] = None,
             order: Optional[JSONDict] = None,
             start: Optional[int] = None,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
@@ -107,13 +89,12 @@ class BaseCRM(Base):
             timeout=timeout,
         )
 
-    @type_checker
     def _update(
             self,
             bitrix_id: int,
             fields: JSONDict,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
@@ -129,12 +110,11 @@ class BaseCRM(Base):
             timeout=timeout,
         )
 
-    @type_checker
     def _delete(
             self,
             bitrix_id: int,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 

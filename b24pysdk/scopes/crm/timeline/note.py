@@ -1,8 +1,7 @@
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from ...._bitrix_api_request import BitrixAPIRequest
 from ....utils.functional import type_checker
-
 from ..base_crm import BaseCRM
 
 if TYPE_CHECKING:

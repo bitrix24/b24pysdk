@@ -2,8 +2,10 @@ from typing import Iterable, Optional, Text
 
 from ...._bitrix_api_request import BitrixAPIRequest
 from ....utils.types import JSONDict
-
+from .._userfield import Userfield
 from ..item import Item
+from .detail import Bankdetail, Preset
+from .link import Link
 
 
 class Requisite(Item):
@@ -227,16 +229,21 @@ class Requisite(Item):
         )
 
     @property
-    def bankdetail(self):
+    def bankdetail(self) -> Bankdetail:
         """"""
-        raise NotImplementedError
+        return Bankdetail(self)
 
     @property
-    def link(self):
+    def link(self) -> Link:
         """"""
-        raise NotImplementedError
+        return Link(self)
 
     @property
-    def preset(self):
+    def preset(self) -> Preset:
         """"""
-        raise NotImplementedError
+        return Preset(self)
+
+    @property
+    def userfield(self) -> Userfield:
+        """"""
+        return Userfield(self)

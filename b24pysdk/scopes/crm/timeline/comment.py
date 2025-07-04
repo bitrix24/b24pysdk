@@ -1,9 +1,8 @@
-from typing import Iterable, Optional, Text, TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterable, Optional, Text
 
 from ...._bitrix_api_request import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict
-
 from ..base_crm import BaseCRM
 
 if TYPE_CHECKING:
@@ -20,6 +19,7 @@ class Comment(BaseCRM):
         super().__init__(scope=timeline._scope)
         self._path = self._get_path(timeline)
 
+    @type_checker
     def fields(
             self,
             *,
@@ -39,6 +39,7 @@ class Comment(BaseCRM):
         """
         return self._fields(timeout=timeout)
 
+    @type_checker
     def add(
             self,
             fields: JSONDict,
@@ -76,6 +77,7 @@ class Comment(BaseCRM):
         """
         return self._add(fields, timeout=timeout)
 
+    @type_checker
     def get(
             self,
             bitrix_id: int,
@@ -98,6 +100,7 @@ class Comment(BaseCRM):
         """
         return self._get(bitrix_id, timeout=timeout)
 
+    @type_checker
     def list(
             self,
             *,

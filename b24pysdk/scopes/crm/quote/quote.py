@@ -2,9 +2,9 @@ from typing import Iterable, Optional, Text
 
 from ...._bitrix_api_request import BitrixAPIRequest
 from ....utils.types import JSONDict
-
+from .._productrows import Productrows
+from .._userfield import Userfield
 from ..item import Item
-from ..productrows import Productrows
 
 
 class Quote(Item):
@@ -229,3 +229,8 @@ class Quote(Item):
     def productrows(self) -> Productrows:
         """"""
         return Productrows(self)
+
+    @property
+    def userfield(self) -> Userfield:
+        """"""
+        return Userfield(self)

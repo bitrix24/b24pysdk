@@ -1,7 +1,8 @@
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from ...._bitrix_api_request import BitrixAPIRequest
-
+from ....utils.functional import type_checker
+from ....utils.types import Timeout
 from ..base_crm import BaseCRM
 
 if TYPE_CHECKING:
@@ -18,10 +19,11 @@ class Communication(BaseCRM):
         super().__init__(scope=activity._scope)
         self._path = self._get_path(activity)
 
+    @type_checker
     def fields(
             self,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get description of communication.
 
