@@ -1,5 +1,5 @@
-from typing import Text, Optional
 import urllib.parse
+from typing import Optional, Text
 
 
 def _force_str(s):

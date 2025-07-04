@@ -1,7 +1,6 @@
 from typing import Dict, List, Sequence, Text, Tuple, Union
 
 from ...utils.types import B24BatchRequestData, JSONDict, JSONList, Key, Timeout
-
 from .call_batch import call_batch
 
 MAX_BATCH_SIZE = 50
@@ -40,10 +39,7 @@ def call_batches(
 				**kwargs,
 		)
 
-	if isinstance(methods, dict):
-		default_type = dict
-	else:
-		default_type = list
+	if not isinstance(methods, dict):
 		methods = dict(enumerate(methods))
 
 	batch_responses: JSONList = list()
@@ -51,8 +47,7 @@ def call_batches(
 
 	for index in range(0, len(methods), MAX_BATCH_SIZE):
 		methods_chunk = dict(flat_methods[index:index + MAX_BATCH_SIZE])
-		batch_responses.append(
-			call_batch(
+		batch_response = call_batch(
 				domain=domain,
 				auth_token=auth_token,
 				is_webhook=is_webhook,
@@ -60,19 +55,22 @@ def call_batches(
 				halt=halt,
 				timeout=timeout,
 				**kwargs,
-			)
 		)
+		batch_responses.append(batch_response)
+
+		if halt and batch_response["result"]["result_error"]:
+			break
 
 	first_batch_response = batch_responses[0]
 	last_batch_response = batch_responses[-1]
 
 	combined_response = dict(
 		result=dict(
-			result=default_type(),
-			result_error=default_type(),
-			result_total=default_type(),
-			result_next=default_type(),
-			result_time=default_type(),
+			result=dict(),
+			result_error=dict(),
+			result_total=dict(),
+			result_next=dict(),
+			result_time=dict(),
 		),
 		time=dict(
 			start=first_batch_response["time"]["start"],
@@ -86,15 +84,18 @@ def call_batches(
 		)
 	)
 
+	if last_batch_response["time"].get("operating_reset_at") is None:
+		combined_response["time"]["operating_reset_at"] = last_batch_response["time"]["operating_reset_at"]
+
+	if last_batch_response["time"].get("operating") is None:
+		combined_response["time"]["operating"] = last_batch_response["time"]["operating"]
+
 	for batch_response in batch_responses:
 		result = batch_response["result"]
 		time = batch_response["time"]
 
 		for key in ("result", "result_error", "result_total", "result_next", "result_time"):
-			if default_type is dict:
-				combined_response["result"][key].update(_force_dict(result.get(key, {})))
-			else:
-				combined_response["result"][key].extend(result.get(key, []))
+			combined_response["result"][key].update(_force_dict(result.get(key, {})))
 
 		combined_response["time"]["duration"] += time["duration"]
 		combined_response["time"]["processing"] += time["processing"]

@@ -1,7 +1,6 @@
 from typing import Optional, Text
 
 from ...utils.types import JSONDict, Timeout
-
 from .call import call
 from .parse_response import parse_response
 
@@ -29,9 +28,6 @@ def call_method(
     Returns:
         response of sent request
     """
-
-    if params is None:
-        params = {}
 
     if is_webhook:
         hook_key = f"{auth_token}/"

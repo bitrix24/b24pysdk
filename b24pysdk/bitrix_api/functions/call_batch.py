@@ -1,10 +1,8 @@
 from typing import Dict, Sequence, Text, Union
 
 from ...utils.types import B24BatchRequestData, JSONDict, Key, Timeout
-
 from .call_method import call_method
 from .convert_params import convert_params
-
 
 MAX_BATCH_SIZE = 50
 API_METHOD = "batch"

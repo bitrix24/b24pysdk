@@ -1,67 +1,67 @@
-import requests
-from requests.exceptions import HTTPError, JSONDecodeError
 from typing import Dict, Text, Type
 
-from ...utils.types import JSONDict
+import requests
+from requests.exceptions import HTTPError, JSONDecodeError
 
 from ...error import (
-    BitrixApiError,
-    BitrixApiErrorUnexpectedAnswer,
-    BitrixApiQueryLimitExceeded,
-    BitrixApiErrorBatchMethodNotAllowed,
-    BitrixApiErrorBatchLengthExceeded,
-    BitrixApiNoAuthFound,
-    BitrixApiInvalidRequest,
-    BitrixApiOverloadLimit,
-    BitrixApiAccessDenied,
-    BitrixApiInvalidCredentials,
-    BitrixApiErrorManifestIsNotAvailable,
-    BitrixApiInsufficientScope,
-    BitrixApiExpiredToken,
-    BitrixApiUserAccessError,
-    BitrixApiInternalServerError,
-    BitrixApiServiceUnavailable,
-    BitrixApiMethodNotAllowed,
-    BitrixApiNotFound,
-    BitrixApiForbidden,
-    BitrixApiUnauthorized,
-    BitrixApiBadRequest,
+    BitrixAPIAccessDenied,
+    BitrixAPIBadRequest,
+    BitrixAPIError,
+    BitrixAPIErrorBatchLengthExceeded,
+    BitrixAPIErrorBatchMethodNotAllowed,
+    BitrixAPIErrorManifestIsNotAvailable,
+    BitrixAPIErrorUnexpectedAnswer,
+    BitrixAPIExpiredToken,
+    BitrixAPIForbidden,
+    BitrixAPIInsufficientScope,
+    BitrixAPIInternalServerError,
+    BitrixAPIInvalidCredentials,
+    BitrixAPIInvalidRequest,
+    BitrixAPIMethodNotAllowed,
+    BitrixAPINoAuthFound,
+    BitrixAPINotFound,
+    BitrixAPIOverloadLimit,
+    BitrixAPIQueryLimitExceeded,
+    BitrixAPIServiceUnavailable,
+    BitrixAPIUnauthorized,
+    BitrixAPIUserAccessError,
+    BitrixResponseJSONDecodeError,
 )
+from ...utils.types import JSONDict
 
-
-_EXCEPTIONS_BY_ERROR: Dict[Text, Type[BitrixApiError]] = {
+_EXCEPTIONS_BY_ERROR: Dict[Text, Type[BitrixAPIError]] = {
     # 400
-    "ERROR_BATCH_LENGTH_EXCEEDED": BitrixApiErrorBatchLengthExceeded,
-    "INVALID_REQUEST": BitrixApiInvalidRequest,
+    "ERROR_BATCH_LENGTH_EXCEEDED": BitrixAPIErrorBatchLengthExceeded,
+    "INVALID_REQUEST": BitrixAPIInvalidRequest,
     # 401
-    "EXPIRED_TOKEN": BitrixApiExpiredToken,
-    "NO_AUTH_FOUND": BitrixApiNoAuthFound,
+    "EXPIRED_TOKEN": BitrixAPIExpiredToken,
+    "NO_AUTH_FOUND": BitrixAPINoAuthFound,
     # 403
-    "ACCESS_DENIED": BitrixApiAccessDenied,
-    "INSUFFICIENT_SCOPE": BitrixApiInsufficientScope,
-    "INVALID_CREDENTIALS": BitrixApiInvalidCredentials,
-    "USER_ACCESS_ERROR": BitrixApiUserAccessError,
+    "ACCESS_DENIED": BitrixAPIAccessDenied,
+    "INSUFFICIENT_SCOPE": BitrixAPIInsufficientScope,
+    "INVALID_CREDENTIALS": BitrixAPIInvalidCredentials,
+    "USER_ACCESS_ERROR": BitrixAPIUserAccessError,
     # 404
-    "ERROR_MANIFEST_IS_NOT_AVAILABLE": BitrixApiErrorManifestIsNotAvailable,
+    "ERROR_MANIFEST_IS_NOT_AVAILABLE": BitrixAPIErrorManifestIsNotAvailable,
     # 405
-    "ERROR_BATCH_METHOD_NOT_ALLOWED": BitrixApiErrorBatchMethodNotAllowed,
+    "ERROR_BATCH_METHOD_NOT_ALLOWED": BitrixAPIErrorBatchMethodNotAllowed,
     # 500
-    "ERROR_UNEXPECTED_ANSWER": BitrixApiErrorUnexpectedAnswer,
-    "INTERNAL_SERVER_ERROR": BitrixApiInternalServerError,
+    "ERROR_UNEXPECTED_ANSWER": BitrixAPIErrorUnexpectedAnswer,
+    "INTERNAL_SERVER_ERROR": BitrixAPIInternalServerError,
     # 503
-    "OVERLOAD_LIMIT": BitrixApiOverloadLimit,
-    "QUERY_LIMIT_EXCEEDED": BitrixApiQueryLimitExceeded,
+    "OVERLOAD_LIMIT": BitrixAPIOverloadLimit,
+    "QUERY_LIMIT_EXCEEDED": BitrixAPIQueryLimitExceeded,
 }
 """"""
 
-_EXCEPTIONS_BY_STATUS_CODE: Dict[int, Type[BitrixApiError]] = {
-    BitrixApiInternalServerError.STATUS_CODE: BitrixApiInternalServerError,  # 500
-    BitrixApiServiceUnavailable.STATUS_CODE: BitrixApiServiceUnavailable,    # 503
-    BitrixApiMethodNotAllowed.STATUS_CODE: BitrixApiMethodNotAllowed,        # 405
-    BitrixApiNotFound.STATUS_CODE: BitrixApiNotFound,                        # 404
-    BitrixApiForbidden.STATUS_CODE: BitrixApiForbidden,                      # 403
-    BitrixApiUnauthorized.STATUS_CODE: BitrixApiUnauthorized,                # 401
-    BitrixApiBadRequest.STATUS_CODE: BitrixApiBadRequest,                    # 400
+_EXCEPTIONS_BY_STATUS_CODE: Dict[int, Type[BitrixAPIError]] = {
+    BitrixAPIInternalServerError.STATUS_CODE: BitrixAPIInternalServerError,  # 500
+    BitrixAPIServiceUnavailable.STATUS_CODE: BitrixAPIServiceUnavailable,    # 503
+    BitrixAPIMethodNotAllowed.STATUS_CODE: BitrixAPIMethodNotAllowed,        # 405
+    BitrixAPINotFound.STATUS_CODE: BitrixAPINotFound,                        # 404
+    BitrixAPIForbidden.STATUS_CODE: BitrixAPIForbidden,                      # 403
+    BitrixAPIUnauthorized.STATUS_CODE: BitrixAPIUnauthorized,                # 401
+    BitrixAPIBadRequest.STATUS_CODE: BitrixAPIBadRequest,                    # 400
 }
 """"""
 
@@ -78,11 +78,15 @@ def parse_response(response: requests.Response) -> JSONDict:
     except HTTPError:
         try:
             json_response = response.json()
-            error = json_response.get("error")
+            error = json_response.get("error", "")
 
-            exception_class = _EXCEPTIONS_BY_ERROR.get(error) or _EXCEPTIONS_BY_STATUS_CODE.get(response.status_code) or BitrixApiError
+            exception_class = (
+                _EXCEPTIONS_BY_ERROR.get(error.upper()) or
+                _EXCEPTIONS_BY_STATUS_CODE.get(response.status_code) or
+                BitrixAPIError
+            )
 
             raise exception_class(json_response, response)
 
-        except JSONDecodeError:
-            raise   # TODO
+        except JSONDecodeError as error:
+            raise BitrixResponseJSONDecodeError(original_error=error, response=response) from error

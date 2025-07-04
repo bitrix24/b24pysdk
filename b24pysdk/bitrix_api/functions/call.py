@@ -1,12 +1,12 @@
-from http import HTTPStatus
-import requests
 import time
-from typing import Dict, IO, Optional, Text, Tuple
+from http import HTTPStatus
+from typing import IO, Dict, Optional, Text, Tuple
 from urllib.parse import urlparse
 
-from ...error import BitrixTimeout, RequestToBitrixError
-from ...utils.types import JSONDict, Timeout
+import requests
 
+from ...error import BitrixRequestError, BitrixTimeout
+from ...utils.types import JSONDict, Timeout
 from ..config import SdkConfig
 
 
@@ -134,7 +134,7 @@ class BitrixApiRequester:
             raise BitrixTimeout(timeout=self._timeout, original_error=error) from error
 
         except requests.RequestException as error:
-            raise RequestToBitrixError(original_error=error) from error
+            raise BitrixRequestError(original_error=error) from error
 
     def _get_redirect_url(self) -> Optional[Text]:
         """
