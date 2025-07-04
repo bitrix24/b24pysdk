@@ -1,6 +1,6 @@
 from functools import wraps
 from types import FunctionType
-from typing import Any, Callable, get_args, get_origin, get_type_hints, Optional, Type, Union
+from typing import Any, Callable, Optional, Type, Union, get_args, get_origin, get_type_hints
 
 
 class Classproperty:
