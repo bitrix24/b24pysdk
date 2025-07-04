@@ -1,9 +1,8 @@
 from typing import Sequence
 
-from ._bitrix_api_request import BitrixAPIRequest
-from .bitrix_api import BitrixToken
-
 from . import scopes
+from ._bitrix_api_request import BitrixAPIRequest
+from .bitrix_api.bitrix_token import AbstractBitrixToken
 
 
 class Client:
@@ -11,10 +10,10 @@ class Client:
 
     __slots__ = ("bitrix_token", "crm")
 
-    bitrix_token: BitrixToken
+    bitrix_token: AbstractBitrixToken
     crm: scopes.CRM
 
-    def __init__(self, bitrix_token: BitrixToken):
+    def __init__(self, bitrix_token: AbstractBitrixToken):
         self.bitrix_token = bitrix_token
         self.crm = scopes.CRM(self)
 
