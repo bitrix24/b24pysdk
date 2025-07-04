@@ -9,7 +9,6 @@ from typing import (
     Union,
 )
 
-
 JSONDict = Dict[Text, Any]
 """A dictionary containing response from the API or data to send to the API."""
 
@@ -68,7 +67,7 @@ class B24Bool:
             self,
             value: Optional[Union["B24Bool", B24BoolLiteral, B24BoolStr, bool]]
     ):
-        self._value = self._normalize(value)
+        self.value = value
 
     def __bool__(self):
         return bool(self._value)
@@ -105,6 +104,11 @@ class B24Bool:
     def value(self) -> Optional[bool]:
         """"""
         return self._value
+
+    @value.setter
+    def value(self, value: Optional[Union["B24Bool", B24BoolLiteral, B24BoolStr, bool]]):
+        """"""
+        self._value = self._normalize(value)
 
     def to_b24(self) -> B24BoolLiteral:
         """"""
