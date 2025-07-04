@@ -1,13 +1,37 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
 
 # Virtual environment
 venv/
 env/
 .venv/
-.env
+.env/
 
-# PyCharm
+# Distribution / Packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Tool caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# IDEs
 .idea/
 *.iml
+.vscode/
+
+# Mac/Linux
+.DS_Store
+Thumbs.db
