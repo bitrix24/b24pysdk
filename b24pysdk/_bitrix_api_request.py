@@ -1,8 +1,7 @@
 from typing import Optional, Text
 
-
 from ._bitrix_api_response import BitrixAPIResponse, BitrixResponseTime
-from .bitrix_api import BitrixToken
+from .bitrix_api.bitrix_token import AbstractBitrixToken
 from .utils.types import B24APIResult, JSONDict
 
 
@@ -11,7 +10,7 @@ class BitrixAPIRequest:
 
     __slots__ = ("_bitrix_token", "_api_method", "_params", "_response", "_timeout")
 
-    _bitrix_token: BitrixToken
+    _bitrix_token: AbstractBitrixToken
     _api_method: Text
     _params: Optional[JSONDict]
     _timeout: Optional[int]
@@ -20,7 +19,7 @@ class BitrixAPIRequest:
     def __init__(
             self,
             *,
-            bitrix_token: BitrixToken,
+            bitrix_token: AbstractBitrixToken,
             api_method: Text,
             params: Optional[JSONDict] = None,
             timeout: Optional[int] = None,

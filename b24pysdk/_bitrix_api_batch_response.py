@@ -1,4 +1,4 @@
-from typing import List, Dict, Union
+from typing import Dict, List, Union
 
 from ._bitrix_api_response import BitrixResponseTime
 from .utils.types import B24APIResult, JSONDict, JSONList
