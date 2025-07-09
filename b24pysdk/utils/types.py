@@ -106,13 +106,20 @@ class B24Bool:
         return self._value
 
     @value.setter
-    def value(self, value: Optional[Union["B24Bool", B24BoolLiteral, B24BoolStr, bool]]):
+    def value(
+            self,
+            value: Optional[Union["B24Bool", B24BoolLiteral, B24BoolStr, bool]],
+    ):
         """"""
         self._value = self._normalize(value)
 
     def to_b24(self) -> B24BoolLiteral:
         """"""
         return self._B24_VALUES[self._value]
+
+    def to_str(self) -> Text:
+        """"""
+        return str(self)
 
     @classmethod
     def from_b24(cls, value: B24BoolLiteral) -> "B24Bool":
