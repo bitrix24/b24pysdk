@@ -13,7 +13,7 @@ def call_batch(
         domain: Text,
         auth_token: Text,
         is_webhook: bool,
-        methods: Union[Dict[Union[int, Text], B24BatchRequestData], Sequence[B24BatchRequestData]],
+        methods: Union[Dict[Key, B24BatchRequestData], Sequence[B24BatchRequestData]],
         halt: bool = False,
         ignore_size_limit: bool = False,
         timeout: Timeout = None,

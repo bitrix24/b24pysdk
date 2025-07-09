@@ -1,5 +1,5 @@
 import urllib.parse
-from typing import Optional, Text
+from typing import Any, Dict, List, Optional, Text, Union
 
 
 def _force_str(s):
@@ -10,7 +10,7 @@ def _force_str(s):
     return str(s, encoding="utf-8", errors="strict") if isinstance(s, bytes) else str(s)
 
 
-def convert_params(form_data):
+def convert_params(form_data: Union[Dict, List]):
     """
     Recursively converts list/tuple/dict to string that can be understood by Bitrix API
 
@@ -32,7 +32,7 @@ def convert_params(form_data):
         "FIELDS[POST_TITLE]=%5B1%5D%20%2B%201%20%3D%3D%2011%20//%20true"
     """
 
-    def recursive_traverse(values, key: Optional[Text] = None):
+    def recursive_traverse(values: Any, key: Optional[Text] = None) -> Union[Text, List[Text]]:
         """
         Args:
             values: If argument is a string, returns a string of format "key=values", else returns a string of key-value pairs separated by "&" like so: "key=value&key=value"

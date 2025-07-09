@@ -18,13 +18,13 @@ def _force_dict(collection: Union[Dict, List]) -> JSONDict:
 
 
 def call_batches(
-	domain: Text,
-	auth_token: Text,
-	is_webhook: bool,
-	methods: Union[Dict[Key, B24BatchRequestData], Sequence[B24BatchRequestData]],
-	halt: bool = False,
-	timeout: Timeout = None,
-	**kwargs,
+		domain: Text,
+		auth_token: Text,
+		is_webhook: bool,
+		methods: Union[Dict[Key, B24BatchRequestData], Sequence[B24BatchRequestData]],
+		halt: bool = False,
+		timeout: Timeout = None,
+		**kwargs,
 ) -> JSONDict:
 	""""""
 
@@ -84,10 +84,10 @@ def call_batches(
 		)
 	)
 
-	if last_batch_response["time"].get("operating_reset_at") is None:
+	if last_batch_response["time"].get("operating_reset_at") is not None:
 		combined_response["time"]["operating_reset_at"] = last_batch_response["time"]["operating_reset_at"]
 
-	if last_batch_response["time"].get("operating") is None:
+	if last_batch_response["time"].get("operating") is not None:
 		combined_response["time"]["operating"] = last_batch_response["time"]["operating"]
 
 	for batch_response in batch_responses:

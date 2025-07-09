@@ -25,13 +25,21 @@ from ...error import (
     BitrixAPIServiceUnavailable,
     BitrixAPIUnauthorized,
     BitrixAPIUserAccessError,
+    BitrixOAuthInvalidClient,
+    BitrixOAuthInvalidGrant,
+    BitrixOAuthInvalidScope,
+    BitrixOauthWrongClient,
     BitrixResponseJSONDecodeError,
 )
 from ...utils.types import JSONDict
 
 _EXCEPTIONS_BY_ERROR: Dict[Text, Type[BitrixAPIError]] = {
+    # 200
+    "WRONG_CLIENT": BitrixOauthWrongClient,
     # 400
     "ERROR_BATCH_LENGTH_EXCEEDED": BitrixAPIErrorBatchLengthExceeded,
+    "INVALID_CLIENT": BitrixOAuthInvalidClient,
+    "INVALID_GRANT": BitrixOAuthInvalidGrant,
     "INVALID_REQUEST": BitrixAPIInvalidRequest,
     # 401
     "EXPIRED_TOKEN": BitrixAPIExpiredToken,
@@ -40,6 +48,7 @@ _EXCEPTIONS_BY_ERROR: Dict[Text, Type[BitrixAPIError]] = {
     "ACCESS_DENIED": BitrixAPIAccessDenied,
     "INSUFFICIENT_SCOPE": BitrixAPIInsufficientScope,
     "INVALID_CREDENTIALS": BitrixAPIInvalidCredentials,
+    "INVALID_SCOPE": BitrixOAuthInvalidScope,
     "USER_ACCESS_ERROR": BitrixAPIUserAccessError,
     # 404
     "ERROR_MANIFEST_IS_NOT_AVAILABLE": BitrixAPIErrorManifestIsNotAvailable,
@@ -73,7 +82,12 @@ def parse_response(response: requests.Response) -> JSONDict:
 
     try:
         response.raise_for_status()
-        return response.json()
+        json_response = response.json()
+
+        if "error" in json_response:
+            raise HTTPError(f"{response.status_code} Client Error: {json_response['error']} for url: {response.url}", response=response)
+
+        return json_response
 
     except HTTPError:
         try:
