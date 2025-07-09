@@ -1,8 +1,9 @@
-from typing import Optional, Text
+from typing import Optional, Text, Tuple
 
-from ._bitrix_api_response import BitrixAPIResponse, BitrixResponseTime
-from .bitrix_api.bitrix_token import AbstractBitrixToken
-from .utils.types import B24APIResult, JSONDict
+from ...utils.types import B24APIResult, JSONDict, Timeout
+from ..bitrix_token import AbstractBitrixToken
+from .bitrix_api_response import BitrixAPIResponse
+from .bitrix_api_response_time import BitrixAPIResponseTime
 
 
 class BitrixAPIRequest:
@@ -13,7 +14,7 @@ class BitrixAPIRequest:
     _bitrix_token: AbstractBitrixToken
     _api_method: Text
     _params: Optional[JSONDict]
-    _timeout: Optional[int]
+    _timeout: Timeout
     _response: Optional[BitrixAPIResponse]
 
     def __init__(
@@ -22,7 +23,7 @@ class BitrixAPIRequest:
             bitrix_token: AbstractBitrixToken,
             api_method: Text,
             params: Optional[JSONDict] = None,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ):
         self._bitrix_token = bitrix_token
         self._api_method = api_method
@@ -31,7 +32,11 @@ class BitrixAPIRequest:
         self._response = None
 
     def __str__(self):
-        param_string = ", ".join([f"{key}={value}" for key, value in self._params.items()])
+        if isinstance(self._params, dict):
+            param_string = ", ".join([f"{key}={value}" for key, value in self._params.items()])
+        else:
+            param_string = ""
+
         return f"<{self.__class__.__name__} {self._api_method}({param_string})>"
 
     __repr__ = __str__
@@ -45,7 +50,7 @@ class BitrixAPIRequest:
         return self._params
 
     @property
-    def timeout(self) -> Optional[int]:
+    def timeout(self) -> Timeout:
         return self._timeout
 
     @property
@@ -57,7 +62,7 @@ class BitrixAPIRequest:
         return self.response.result
 
     @property
-    def time(self) -> BitrixResponseTime:
+    def time(self) -> BitrixAPIResponseTime:
         return self.response.time
 
     def _call(self) -> JSONDict:
@@ -72,3 +77,7 @@ class BitrixAPIRequest:
         """"""
         self._response = BitrixAPIResponse.from_dict(self._call())
         return self._response
+
+    def as_tuple(self) -> Tuple[Text, Optional[JSONDict]]:
+        """"""
+        return self._api_method, self._params
