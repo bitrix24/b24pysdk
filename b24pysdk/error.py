@@ -142,6 +142,14 @@ class BitrixAPIServiceUnavailable(BitrixAPIError):
 
 # Exceptions by error
 
+# 200
+
+class BitrixOauthWrongClient(BitrixAPIError, BitrixOAuthException):
+    """Wrong client"""
+
+    ERROR = "WRONG_CLIENT"
+
+
 # 400
 
 class BitrixAPIErrorBatchLengthExceeded(BitrixAPIBadRequest):
@@ -160,16 +168,16 @@ class BitrixOAuthInvalidRequest(BitrixAPIInvalidRequest, BitrixOAuthException):
     """An incorrectly formatted authorization request was provided"""
 
 
-class BitrixOAuthInvalidGrant(BitrixAPIBadRequest, BitrixOAuthException):
-    """Invalid authorization tokens were provided when obtaining access_token. This occurs during renewal or initial acquisition"""
-
-    ERROR = "INVALID_GRANT"
-
-
 class BitrixOAuthInvalidClient(BitrixAPIBadRequest, BitrixOAuthException):
     """Invalid client data was provided. The application may not be installed in Bitrix24"""
 
     ERROR = "INVALID_CLIENT"
+
+
+class BitrixOAuthInvalidGrant(BitrixAPIBadRequest, BitrixOAuthException):
+    """Invalid authorization tokens were provided when obtaining access_token. This occurs during renewal or initial acquisition"""
+
+    ERROR = "INVALID_GRANT"
 
 
 # 401
