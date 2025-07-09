@@ -1,6 +1,8 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
-from ...._bitrix_api_request import BitrixAPIRequest
+from ....bitrix_api.classes import BitrixAPIRequest
+from ....utils.functional import type_checker
+from ....utils.types import Timeout
 from ..base_crm import BaseCRM
 
 if TYPE_CHECKING:
@@ -14,14 +16,15 @@ class Enumeration(BaseCRM):
         super().__init__(scope=userfield._scope)
         self._path = self._get_path(userfield)
 
+    @type_checker
     def fields(
             self,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get field descriptions for custom field type
 
-        Documentation:
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/user-defined-fields/crm-userfield-enumeration-fields.html
 
         The method returns the field descriptions for a custom field of type 'enumeration' (list).
 

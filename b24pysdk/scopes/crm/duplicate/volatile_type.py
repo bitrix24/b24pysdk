@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, Optional, Text
 
-from ...._bitrix_api_request import BitrixAPIRequest
+from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
 from ..base_crm import BaseCRM
@@ -23,7 +23,7 @@ class VolatileType(BaseCRM):
     def fields(
             self,
             *,
-            entity_type_id: Optional[int],
+            entity_type_id: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of fields for duplicate search
@@ -77,7 +77,6 @@ class VolatileType(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-
         return BitrixAPIRequest(
             bitrix_token=self._scope.bitrix_token,
             api_method=self._get_api_method(self.list),
@@ -88,8 +87,8 @@ class VolatileType(BaseCRM):
     def register(
             self,
             *,
-            entity_type_id: Optional[int],
-            field_code: Optional[Text],
+            entity_type_id: int,
+            field_code: Text,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Add a field to the duplicate search
@@ -115,13 +114,10 @@ class VolatileType(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = dict()
-
-        if entity_type_id is not None:
-            params["entityTypeId"] = entity_type_id
-
-        if field_code is not None:
-            params["fieldCode"] = field_code
+        params = {
+            "entity_type_id": entity_type_id,
+            "field_code": field_code
+        }
 
         return BitrixAPIRequest(
             bitrix_token=self._scope.bitrix_token,
@@ -133,8 +129,8 @@ class VolatileType(BaseCRM):
     @type_checker
     def unregister(
             self,
+            bitrix_id: int,
             *,
-            bitrix_id: Optional[int],
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Remove field from duplicate search
@@ -151,10 +147,10 @@ class VolatileType(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        params = dict()
 
-        if bitrix_id is not None:
-            params["id"] = bitrix_id
+        params = {
+            "id": bitrix_id,
+        }
 
         return BitrixAPIRequest(
             bitrix_token=self._scope.bitrix_token,

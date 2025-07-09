@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import Callable, Optional, Text
 
-from .._bitrix_api_request import BitrixAPIRequest
+from ..bitrix_api.classes import BitrixAPIRequest
 from ..utils.functional import Classproperty
 from .scope import Scope
 

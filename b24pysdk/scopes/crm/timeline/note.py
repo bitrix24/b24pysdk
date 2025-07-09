@@ -1,7 +1,8 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Text
 
-from ...._bitrix_api_request import BitrixAPIRequest
+from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
+from ....utils.types import Timeout
 from ..base_crm import BaseCRM
 
 if TYPE_CHECKING:
@@ -26,7 +27,7 @@ class Note(BaseCRM):
             entity_id: int,
             item_type: int,
             item_id: int,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get Information about note.
 
@@ -51,11 +52,12 @@ class Note(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
+
         params = {
             "entityTypeId": entity_type_id,
             "entityId": entity_id,
             "itemType": item_type,
-            "itemId": item_id
+            "itemId": item_id,
         }
 
         return BitrixAPIRequest(
@@ -73,7 +75,7 @@ class Note(BaseCRM):
             entity_id: int,
             item_type: int,
             item_id: int,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Delete note.
 
@@ -96,11 +98,12 @@ class Note(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
+
         params = {
             "entityTypeId": entity_type_id,
             "entityId": entity_id,
             "itemType": item_type,
-            "itemId": item_id
+            "itemId": item_id,
         }
 
         return BitrixAPIRequest(
@@ -118,8 +121,8 @@ class Note(BaseCRM):
             entity_id: int,
             item_type: int,
             item_id: int,
-            text: str,
-            timeout: Optional[int] = None,
+            text: Text,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Save note.
 
@@ -144,12 +147,13 @@ class Note(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
+
         params = {
             "entityTypeId": entity_type_id,
             "entityId": entity_id,
             "itemType": item_type,
             "itemId": item_id,
-            "text": text
+            "text": text,
         }
 
         return BitrixAPIRequest(

@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING, Optional
 
-from ....._bitrix_api_request import BitrixAPIRequest
+from .....bitrix_api.classes import BitrixAPIRequest
 from .....utils.functional import type_checker
-from .....utils.types import JSONDict
+from .....utils.types import JSONDict, Timeout
 from ...base_crm import BaseCRM
 
 if TYPE_CHECKING:
@@ -25,7 +25,7 @@ class Delivery(BaseCRM):
             *,
             payment_id: int,
             delivery_id: int,
-            timeout: Optional[int] = None
+            timeout: Timeout = None
     ) -> BitrixAPIRequest:
         """Add delivery item to payment.
 
@@ -63,7 +63,7 @@ class Delivery(BaseCRM):
             payment_id: int,
             filter: JSONDict,
             order: Optional[JSONDict] = None,
-            timeout: Optional[int] = None
+            timeout: Timeout = None
     ) -> BitrixAPIRequest:
         """Get the list of delivery items.
 
@@ -121,11 +121,12 @@ class Delivery(BaseCRM):
             timeout=timeout,
         )
 
+    @type_checker
     def delete(
             self,
             bitrix_id: int,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Remove delivery item from payment.
 
@@ -149,7 +150,7 @@ class Delivery(BaseCRM):
             bitrix_id: int,
             *,
             delivery_id: int,
-            timeout: Optional[int] = None
+            timeout: Timeout = None
     ) -> BitrixAPIRequest:
         """Reassign delivery item to another document.
 

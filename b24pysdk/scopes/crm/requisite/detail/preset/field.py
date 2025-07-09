@@ -1,9 +1,9 @@
 from typing import TYPE_CHECKING
 
-from ....._bitrix_api_request import BitrixAPIRequest
-from .....utils.functional import type_checker
-from .....utils.types import JSONDict, Timeout
-from ...base_crm import BaseCRM
+from ......bitrix_api.classes import BitrixAPIRequest
+from ......utils.functional import type_checker
+from ......utils.types import JSONDict, Timeout
+from ....base_crm import BaseCRM
 
 if TYPE_CHECKING:
     from .preset import Preset
@@ -28,9 +28,9 @@ class Field(BaseCRM):
     @type_checker
     def add(
             self,
+            *,
             preset: JSONDict,
             fields: JSONDict,
-            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -51,8 +51,8 @@ class Field(BaseCRM):
     def get(
             self,
             bitrix_id: int,
-            preset: JSONDict,
             *,
+            preset: JSONDict,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -72,8 +72,8 @@ class Field(BaseCRM):
     @type_checker
     def list(
             self,
-            preset: JSONDict,
             *,
+            preset: JSONDict,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -93,9 +93,9 @@ class Field(BaseCRM):
     def update(
             self,
             bitrix_id: int,
+            *,
             preset: JSONDict,
             fields: JSONDict,
-            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -117,8 +117,8 @@ class Field(BaseCRM):
     def delete(
             self,
             bitrix_id: int,
-            preset: JSONDict,
             *,
+            preset: JSONDict,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -138,8 +138,8 @@ class Field(BaseCRM):
     @type_checker
     def availabletoadd(
             self,
-            preset: JSONDict,
             *,
+            preset: JSONDict,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""

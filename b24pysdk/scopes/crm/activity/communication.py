@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from ...._bitrix_api_request import BitrixAPIRequest
+from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
 from ..base_crm import BaseCRM

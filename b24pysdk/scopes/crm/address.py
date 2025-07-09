@@ -1,8 +1,8 @@
 from typing import Iterable, Optional, Text
 
-from ..._bitrix_api_request import BitrixAPIRequest
+from ...bitrix_api.classes import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import JSONDict
+from ...utils.types import JSONDict, Timeout
 from .base_crm import BaseCRM
 
 
@@ -13,10 +13,11 @@ class Address(BaseCRM):
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/addresses/index.html
     """
 
+    @type_checker
     def fields(
             self,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get address fields.
 
@@ -32,11 +33,12 @@ class Address(BaseCRM):
         """
         return self._fields(timeout=timeout)
 
+    @type_checker
     def add(
             self,
             fields: JSONDict,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Add address.
 
@@ -69,7 +71,7 @@ class Address(BaseCRM):
             self,
             fields: JSONDict,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update address.
 
@@ -109,6 +111,7 @@ class Address(BaseCRM):
             timeout=timeout,
         )
 
+    @type_checker
     def list(
             self,
             *,
@@ -116,7 +119,7 @@ class Address(BaseCRM):
             filter: Optional[JSONDict] = None,
             order: Optional[JSONDict] = None,
             start: Optional[int] = None,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of addresses.
 
@@ -173,7 +176,7 @@ class Address(BaseCRM):
             self,
             fields: JSONDict,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Delete address.
 

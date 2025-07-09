@@ -1,6 +1,6 @@
 from typing import Iterable, Optional, Text
 
-from ...._bitrix_api_request import BitrixAPIRequest
+from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
 from .._productrows import Productrows
@@ -22,9 +22,30 @@ class Lead(Item):
     ENTITY_TYPE_ABBR = "L"
     USER_FIELD_ENTITY_ID = "CRM_LEAD"
 
+    @property
+    def contact(self) -> Contact:
+        """"""
+        return Contact(self)
+
+    @property
+    def details(self) -> "Details":
+        """"""
+        return Details(self)
+
+    @property
+    def productrows(self) -> Productrows:
+        """"""
+        return Productrows(self)
+
+    @property
+    def userfield(self) -> Userfield:
+        """"""
+        return Userfield(self)
+
+    @type_checker
     def fields(
             self,
-            *args,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get CRM lead fields.
@@ -39,13 +60,13 @@ class Lead(Item):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().fields(entity_type_id=self.ENTITY_TYPE_ID, timeout=timeout)
+        return self._fields(timeout=timeout)
 
     @type_checker
     def add(
             self,
             fields: JSONDict,
-            *args,
+            *,
             params: Optional[JSONDict] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
@@ -78,17 +99,17 @@ class Lead(Item):
             Instance of BitrixAPIRequest
         """
 
-        return super()._add(
+        return self._add(
             fields,
-            entity_type_id=self.ENTITY_TYPE_ID,
-            params=params,
+            extra_params=params,
             timeout=timeout,
         )
 
+    @type_checker
     def get(
             self,
             bitrix_id: int,
-            *args,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get lead by ID.
@@ -105,15 +126,12 @@ class Lead(Item):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().get(
-            bitrix_id,
-            entity_type_id=self.ENTITY_TYPE_ID,
-            timeout=timeout,
-        )
+        return self._get(bitrix_id, timeout=timeout)
 
+    @type_checker
     def list(
             self,
-            *args,
+            *,
             select: Optional[Iterable[Text]] = None,
             filter: Optional[JSONDict] = None,
             order: Optional[JSONDict] = None,
@@ -162,8 +180,7 @@ class Lead(Item):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().list(
-            entity_type_id=self.ENTITY_TYPE_ID,
+        return self._list(
             select=select,
             filter=filter,
             order=order,
@@ -176,7 +193,7 @@ class Lead(Item):
             self,
             bitrix_id: int,
             fields: JSONDict,
-            *args,
+            *,
             params: Optional[JSONDict] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
@@ -210,18 +227,18 @@ class Lead(Item):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super()._update(
+        return self._update(
             bitrix_id,
             fields,
-            entity_type_id=self.ENTITY_TYPE_ID,
-            params=params,
+            extra_params=params,
             timeout=timeout,
         )
 
+    @type_checker
     def delete(
             self,
             bitrix_id: int,
-            *args,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Delete lead.
@@ -240,28 +257,4 @@ class Lead(Item):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().delete(
-            bitrix_id,
-            entity_type_id=self.ENTITY_TYPE_ID,
-            timeout=timeout,
-        )
-
-    @property
-    def contact(self) -> Contact:
-        """"""
-        return Contact(self)
-
-    @property
-    def details(self) -> "Details":
-        """"""
-        return Details(self)
-
-    @property
-    def productrows(self) -> Productrows:
-        """"""
-        return Productrows(self)
-
-    @property
-    def userfield(self) -> Userfield:
-        """"""
-        return Userfield(self)
+        return super().delete(bitrix_id, timeout=timeout)

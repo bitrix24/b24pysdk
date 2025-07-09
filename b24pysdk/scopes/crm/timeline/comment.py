@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING, Iterable, Optional, Text
 
-from ...._bitrix_api_request import BitrixAPIRequest
+from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import JSONDict
+from ....utils.types import JSONDict, Timeout
 from ..base_crm import BaseCRM
 
 if TYPE_CHECKING:
@@ -23,7 +23,7 @@ class Comment(BaseCRM):
     def fields(
             self,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get fields of comment.
 
@@ -44,7 +44,7 @@ class Comment(BaseCRM):
             self,
             fields: JSONDict,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Add a new comment.
 
@@ -82,7 +82,7 @@ class Comment(BaseCRM):
             self,
             bitrix_id: int,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get comment by ID.
 
@@ -108,7 +108,7 @@ class Comment(BaseCRM):
             filter: Optional[JSONDict] = None,
             order: Optional[JSONDict] = None,
             start: Optional[int] = None,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of comments.
 
@@ -168,7 +168,7 @@ class Comment(BaseCRM):
             *,
             entity_type_id: int,
             entity_id: int,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update comment.
 
@@ -199,6 +199,7 @@ class Comment(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
+
         params = {
             "id": bitrix_id,
             "fields": fields,
@@ -220,7 +221,7 @@ class Comment(BaseCRM):
             *,
             entity_type_id: int,
             entity_id: int,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Delete comment.
 
@@ -240,6 +241,7 @@ class Comment(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
+
         params = {
             "id": bitrix_id,
             "entityTypeId": entity_type_id,

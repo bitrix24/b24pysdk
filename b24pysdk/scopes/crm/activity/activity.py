@@ -1,11 +1,14 @@
 from typing import Iterable, Optional, Text
 
-from ...._bitrix_api_request import BitrixAPIRequest
+from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
 from ..base_crm import BaseCRM
+from .badge import Badge
 from .binding import Binding
 from .communication import Communication
+from .configurable import Configurable
+from .layout import Layout
 from .todo import Todo
 from .type import Type
 
@@ -17,6 +20,11 @@ class Activity(BaseCRM):
     """
 
     @property
+    def badge(self) -> Badge:
+        """"""
+        return Badge(self)
+
+    @property
     def binding(self) -> Binding:
         """"""
         return Binding(self)
@@ -25,6 +33,16 @@ class Activity(BaseCRM):
     def communication(self) -> Communication:
         """"""
         return Communication(self)
+
+    @property
+    def configurable(self) -> Configurable:
+        """"""
+        return Configurable(self)
+
+    @property
+    def layout(self) -> Layout:
+        """"""
+        return Layout(self)
 
     @property
     def todo(self) -> Todo:

@@ -1,9 +1,9 @@
-from typing import Iterable, Optional
+from typing import Iterable
 
-from ...._bitrix_api_request import BitrixAPIRequest
+from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict
-from ..base_crm import BaseCRM
+from ..base_crm import BaseCRM, Timeout
 from .relationship import Relationship
 
 
@@ -21,7 +21,7 @@ class Items(BaseCRM):
             bitrix_id: int,
             items: Iterable[JSONDict],
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Add set of CRM entities to the specified one.
 
@@ -63,7 +63,7 @@ class Items(BaseCRM):
             self,
             bitrix_id: int,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a collection associated with CRM entity.
 
@@ -95,7 +95,7 @@ class Items(BaseCRM):
             self,
             bitrix_id: int,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Clear a collection of similar-typed linked to the specified entity.
 

@@ -1,12 +1,17 @@
-from ....._bitrix_api_request import BitrixAPIRequest
-from .....utils.functional import type_checker
-from .....utils.types import Timeout
-from .detail import Detail
+from ......bitrix_api.classes import BitrixAPIRequest
+from ......utils.functional import type_checker
+from ......utils.types import Timeout
+from ..detail import Detail
 from .field import Field
 
 
 class Preset(Detail):
     """"""
+
+    @property
+    def field(self) -> Field:
+        """"""
+        return Field(self)
 
     @type_checker
     def countries(
@@ -20,8 +25,3 @@ class Preset(Detail):
             api_method=self._get_api_method(self.countries),
             timeout=timeout,
         )
-
-    @property
-    def field(self) -> Field:
-        """"""
-        return Field(self)

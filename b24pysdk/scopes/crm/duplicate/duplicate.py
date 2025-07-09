@@ -1,6 +1,6 @@
 from typing import Iterable, Literal, Optional, Text
 
-from ...._bitrix_api_request import BitrixAPIRequest
+from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
 from ..base_crm import BaseCRM
@@ -13,13 +13,18 @@ class Duplicate(BaseCRM):
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/duplicates/index.html
     """
 
+    @property
+    def volatile_type(self) -> VolatileType:
+        """"""
+        return VolatileType(self)
+
     @type_checker
     def find_by_comm(
             self,
             *,
             type: Literal["EMAIL", "PHONE"],
             values: Iterable[Text],
-            entity_type: Optional[Literal["LEAD", "CONTACT", "CONTACT"]],
+            entity_type: Optional[Literal["LEAD", "CONTACT", "CONTACT"]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get leads, contacts, and companies with matching data
@@ -66,8 +71,3 @@ class Duplicate(BaseCRM):
             params=params,
             timeout=timeout,
         )
-
-    @property
-    def volatile_type(self) -> VolatileType:
-        """"""
-        return VolatileType(self)

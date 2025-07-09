@@ -1,7 +1,8 @@
 from typing import Iterable, Optional, Text
 
-from ...._bitrix_api_request import BitrixAPIRequest
-from ....utils.types import JSONDict
+from ....bitrix_api.classes import BitrixAPIRequest
+from ....utils.functional import type_checker
+from ....utils.types import JSONDict, Timeout
 from .._userfield import Userfield
 from ..item import Item
 from .detail import Bankdetail, Preset
@@ -21,10 +22,31 @@ class Requisite(Item):
     ENTITY_TYPE_ABBR = "RQ"
     USER_FIELD_ENTITY_ID = "CRM_REQUISITE"
 
+    @property
+    def bankdetail(self) -> Bankdetail:
+        """"""
+        return Bankdetail(self)
+
+    @property
+    def link(self) -> Link:
+        """"""
+        return Link(self)
+
+    @property
+    def preset(self) -> Preset:
+        """"""
+        return Preset(self)
+
+    @property
+    def userfield(self) -> Userfield:
+        """"""
+        return Userfield(self)
+
+    @type_checker
     def fields(
             self,
-            *args,
-            timeout: Optional[int] = None,
+            *,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get requisite fields.
 
@@ -38,13 +60,14 @@ class Requisite(Item):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().fields(entity_type_id=self.ENTITY_TYPE_ID, timeout=timeout)
+        return self._fields(timeout=timeout)
 
+    @type_checker
     def add(
             self,
             fields: JSONDict,
-            *args,
-            timeout: Optional[int] = None,
+            *,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Add Requisite.
 
@@ -70,18 +93,15 @@ class Requisite(Item):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().add(
-            fields,
-            entity_type_id=self.ENTITY_TYPE_ID,
-            timeout=timeout,
-        )
+        return self._add(fields, timeout=timeout)
 
+    @type_checker
     def update(
             self,
             bitrix_id: int,
             fields: JSONDict,
-            *args,
-            timeout: Optional[int] = None,
+            *,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update Requisite.
 
@@ -109,18 +129,18 @@ class Requisite(Item):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().update(
+        return self._update(
             bitrix_id,
             fields,
-            entity_type_id=self.ENTITY_TYPE_ID,
             timeout=timeout,
         )
 
+    @type_checker
     def get(
             self,
             bitrix_id: int,
-            *args,
-            timeout: Optional[int] = None,
+            *,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get requisite by ID.
 
@@ -136,20 +156,17 @@ class Requisite(Item):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().get(
-            bitrix_id,
-            entity_type_id=self.ENTITY_TYPE_ID,
-            timeout=timeout,
-        )
+        return self._get(bitrix_id, timeout=timeout)
 
+    @type_checker
     def list(
             self,
-            *args,
+            *,
             select: Optional[Iterable[Text]] = None,
             filter: Optional[JSONDict] = None,
             order: Optional[JSONDict] = None,
             start: Optional[int] = None,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of requisites.
 
@@ -193,8 +210,7 @@ class Requisite(Item):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().list(
-            entity_type_id=self.ENTITY_TYPE_ID,
+        return self._list(
             select=select,
             filter=filter,
             order=order,
@@ -202,11 +218,12 @@ class Requisite(Item):
             timeout=timeout,
         )
 
+    @type_checker
     def delete(
             self,
             bitrix_id: int,
-            *args,
-            timeout: Optional[int] = None,
+            *,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Delete requisite.
 
@@ -222,28 +239,4 @@ class Requisite(Item):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().delete(
-            bitrix_id,
-            entity_type_id=self.ENTITY_TYPE_ID,
-            timeout=timeout,
-        )
-
-    @property
-    def bankdetail(self) -> Bankdetail:
-        """"""
-        return Bankdetail(self)
-
-    @property
-    def link(self) -> Link:
-        """"""
-        return Link(self)
-
-    @property
-    def preset(self) -> Preset:
-        """"""
-        return Preset(self)
-
-    @property
-    def userfield(self) -> Userfield:
-        """"""
-        return Userfield(self)
+        return self._delete(bitrix_id, timeout=timeout)

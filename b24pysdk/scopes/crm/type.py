@@ -1,8 +1,8 @@
 from typing import Optional
 
-from ..._bitrix_api_request import BitrixAPIRequest
+from ...bitrix_api.classes import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import JSONDict
+from ...utils.types import JSONDict, Timeout
 from .base_crm import BaseCRM
 
 
@@ -12,10 +12,11 @@ class Type(BaseCRM):
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/user-defined-object-types/index.html#methods-for-working-with-spas
     """
 
+    @type_checker
     def fields(
             self,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get custom fields.
 
@@ -29,14 +30,14 @@ class Type(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-
         return self._fields(timeout=timeout)
 
+    @type_checker
     def add(
             self,
             fields: JSONDict,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Create a new custom type (SPA).
 
@@ -52,14 +53,14 @@ class Type(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-
         return self._add(fields, timeout=timeout)
 
+    @type_checker
     def get(
             self,
             bitrix_id: int,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get custom type by ID.
 
@@ -75,7 +76,6 @@ class Type(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-
         return self._get(bitrix_id, timeout=timeout)
 
     @type_checker
@@ -83,7 +83,7 @@ class Type(BaseCRM):
             self,
             entity_type_id: int,
             *,
-            timeout: Optional[int] = None
+            timeout: Timeout = None
     ) -> BitrixAPIRequest:
         """Get smart process type by entityTypeId.
 
@@ -111,13 +111,14 @@ class Type(BaseCRM):
             timeout=timeout,
         )
 
+    @type_checker
     def list(
             self,
             *args,
             filter: Optional[JSONDict] = None,
             order: Optional[JSONDict] = None,
             start: Optional[int] = None,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of custom types.
 
@@ -166,12 +167,13 @@ class Type(BaseCRM):
             timeout=timeout,
         )
 
+    @type_checker
     def update(
             self,
             bitrix_id: int,
             fields: JSONDict,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update user type.
 
@@ -189,14 +191,18 @@ class Type(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
+        return self._update(
+            bitrix_id,
+            fields,
+            timeout=timeout,
+        )
 
-        return self._update(bitrix_id, fields, timeout=timeout)
-
+    @type_checker
     def delete(
             self,
             bitrix_id: int,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Delete custom type.
 
@@ -212,5 +218,4 @@ class Type(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-
         return self._delete(bitrix_id, timeout=timeout)

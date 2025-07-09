@@ -1,6 +1,6 @@
 from typing import Optional
 
-from ....._bitrix_api_request import BitrixAPIRequest
+from .....bitrix_api.classes import BitrixAPIRequest
 from .....utils.functional import type_checker
 from .....utils.types import JSONDict
 from ...base_crm import BaseCRM
@@ -175,6 +175,7 @@ class Payment(BaseCRM):
         """
         return self._update(bitrix_id, fields, timeout=timeout)
 
+    @type_checker
     def delete(
             self,
             bitrix_id: int,

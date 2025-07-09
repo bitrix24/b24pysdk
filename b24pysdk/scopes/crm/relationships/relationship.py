@@ -1,8 +1,8 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
-from ...._bitrix_api_request import BitrixAPIRequest
+from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import JSONDict
+from ....utils.types import JSONDict, Timeout
 from ..base_crm import BaseCRM
 from ..item import Item
 
@@ -18,10 +18,17 @@ class Relationship(BaseCRM):
         super().__init__(item._scope)
         self._path = self._get_path(item)
 
+    @property
+    def items(self) -> "Items":
+        """"""
+        from .items import Items
+        return Items(self)
+
+    @type_checker
     def fields(
             self,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get fields for the connection between entities.
 
@@ -42,7 +49,7 @@ class Relationship(BaseCRM):
             bitrix_id: int,
             fields: JSONDict,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Add a connection between CRM entities.
 
@@ -85,7 +92,7 @@ class Relationship(BaseCRM):
             bitrix_id: int,
             *,
             fields: JSONDict,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Delete connection between CRM entities.
 
@@ -116,9 +123,3 @@ class Relationship(BaseCRM):
             params=params,
             timeout=timeout,
         )
-
-    @property
-    def items(self) -> "Items":
-        """"""
-        from .items import Items
-        return Items(self)

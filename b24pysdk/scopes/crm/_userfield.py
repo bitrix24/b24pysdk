@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING, Optional, Union
 
-from ..._bitrix_api_request import BitrixAPIRequest
+from ...bitrix_api.classes import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import JSONDict, JSONList
+from ...utils.types import JSONDict, JSONList, Timeout
 from .base_crm import BaseCRM
 
 if TYPE_CHECKING:
@@ -21,7 +21,7 @@ class Userfield(BaseCRM):
             self,
             fields: JSONDict,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
         return self._add(fields, timeout=timeout)
@@ -31,7 +31,7 @@ class Userfield(BaseCRM):
             self,
             bitrix_id: int,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
         return self._get(bitrix_id, timeout=timeout)
@@ -42,7 +42,7 @@ class Userfield(BaseCRM):
             *,
             filter: Optional[JSONDict] = None,
             order: Optional[JSONDict] = None,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
         return self._list(
@@ -58,7 +58,7 @@ class Userfield(BaseCRM):
             fields: JSONDict,
             *,
             list: Optional[JSONList] = None,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
@@ -82,7 +82,7 @@ class Userfield(BaseCRM):
             self,
             bitrix_id: int,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
         return self._delete(bitrix_id, timeout=timeout)

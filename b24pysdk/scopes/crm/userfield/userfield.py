@@ -1,7 +1,6 @@
-from typing import Optional
-
-from ...._bitrix_api_request import BitrixAPIRequest
+from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
+from ....utils.types import Timeout
 from ..base_crm import BaseCRM
 from .enumeration import Enumeration
 from .settings import Settings
@@ -10,17 +9,28 @@ from .settings import Settings
 class Userfield(BaseCRM):
     """Methods for working with custom fields.
 
-    Documentation:
+    Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/user-defined-fields/index.html
     """
 
+    @property
+    def enumeration(self) -> Enumeration:
+        """"""
+        return Enumeration(self)
+
+    @property
+    def settings(self) -> Settings:
+        """"""
+        return Settings(self)
+
+    @type_checker
     def fields(
             self,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get description for custom fields.
 
-        Documentation:
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/user-defined-fields/crm-userfield-fields.html
 
         The method returns the description of fields for custom fields.
 
@@ -36,11 +46,11 @@ class Userfield(BaseCRM):
     def types(
             self,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of user field types.
 
-        Documentation:
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/user-defined-fields/crm-userfield-types.html
 
         The method returns the description of fields for user fields.
 
@@ -55,13 +65,3 @@ class Userfield(BaseCRM):
             api_method=self._get_api_method(self.types),
             timeout=timeout,
         )
-
-    @property
-    def enumeration(self) -> Enumeration:
-        """"""
-        return Enumeration(self)
-
-    @property
-    def settings(self) -> Settings:
-        """"""
-        return Settings(self)

@@ -1,21 +1,19 @@
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
-from ...._bitrix_api_request import BitrixAPIRequest
+from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
 from ..base_crm import BaseCRM
 from .entity import Entity
 
-if TYPE_CHECKING:
-    from ...crm import CRM
-
 
 class Status(BaseCRM):
     """"""
 
-    def __init__(self, crm: "CRM"):
-        super().__init__(crm)
-        self._path = self._get_path()
+    @property
+    def entity(self) -> Entity:
+        """"""
+        return Entity(self)
 
     @type_checker
     def fields(
@@ -109,8 +107,3 @@ class Status(BaseCRM):
             params=_params,
             timeout=timeout,
         )
-
-    @property
-    def entity(self) -> Entity:
-        """"""
-        return Entity(self)

@@ -1,8 +1,6 @@
-from typing import Optional
-
-from ..._bitrix_api_request import BitrixAPIRequest
+from ...bitrix_api.classes import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import JSONDict
+from ...utils.types import JSONDict, Timeout
 from .base_crm import BaseCRM
 
 
@@ -18,7 +16,7 @@ class Category(BaseCRM):
             self,
             *,
             entity_type_id: int,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get funnel fields.
 
@@ -52,7 +50,7 @@ class Category(BaseCRM):
             fields: JSONDict,
             *,
             entity_type_id: int,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Create a new funnel.
 
@@ -97,7 +95,7 @@ class Category(BaseCRM):
             bitrix_id: int,
             *,
             entity_type_id: int,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get funnel by ID.
 
@@ -133,7 +131,7 @@ class Category(BaseCRM):
             self,
             *,
             entity_type_id: int,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of funnels.
 
@@ -168,7 +166,7 @@ class Category(BaseCRM):
             fields: JSONDict,
             *,
             entity_type_id: int,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update funnel.
 
@@ -216,7 +214,7 @@ class Category(BaseCRM):
             bitrix_id: int,
             *,
             entity_type_id: int,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Delete funnel.
 

@@ -1,7 +1,5 @@
-from typing import Optional
-
-from ...._bitrix_api_request import BitrixAPIRequest
-from ....utils.types import JSONDict
+from ....bitrix_api.classes import BitrixAPIRequest
+from ....utils.types import JSONDict, Timeout
 from .relationship import Relationship
 
 
@@ -9,19 +7,23 @@ class Contact(Relationship):
     """These methods provide capabilities for managing Contacts linked to the Deals, Leads and Companies (CRM entity).
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/deals/contacts/index.html
+
     https://apidocs.bitrix24.com/api-reference/crm/leads/management-communication/index.html
+
     https://apidocs.bitrix24.com/api-reference/crm/companies/contacts/index.html
     """
 
     def fields(
             self,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get fields for entity-contact connection.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/leads/management-communication/crm-lead-contact-fields.html
+
         https://apidocs.bitrix24.com/api-reference/crm/deals/contacts/crm-deal-contact-fields.html
+
         https://apidocs.bitrix24.com/api-reference/crm/companies/contacts/crm-company-contact-fields.html
 
         The method retrieves the description of the fields for the entity-contact relationship, where entity is one of the available CRM-entities: Lead, Deal or Company.
@@ -39,12 +41,14 @@ class Contact(Relationship):
             bitrix_id: int,
             fields: JSONDict,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Add contact binding to CRM entity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/leads/management-communication/crm-lead-contact-add.html
+
         https://apidocs.bitrix24.com/api-reference/crm/deals/contacts/crm-deal-contact-add.html
+
         https://apidocs.bitrix24.com/api-reference/crm/companies/contacts/crm-company-contact-add.html
 
         This method adds a contact binding to the specified CRM entity, where entity is one of the available CRM-entities: Lead, Deal or Company.
@@ -66,19 +70,25 @@ class Contact(Relationship):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().add(bitrix_id, fields, timeout=timeout)
+        return super().add(
+            bitrix_id,
+            fields,
+            timeout=timeout,
+        )
 
     def delete(
             self,
             bitrix_id: int,
             *,
             fields: JSONDict,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Remove contact from CRM entity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/leads/management-communication/crm-lead-contact-delete.html
+
         https://apidocs.bitrix24.com/api-reference/crm/deals/contacts/crm-deal-contact-delete.html
+
         https://apidocs.bitrix24.com/api-reference/crm/companies/contacts/crm-company-contact-delete.html
 
         The method removes a contact from the specified CRM entity, where entity is one of the available CRM-entities: Lead, Deal or Company.

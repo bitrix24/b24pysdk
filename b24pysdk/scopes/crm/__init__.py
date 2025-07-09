@@ -4,6 +4,7 @@ from .address import Address
 from .category import Category
 from .company import Company
 from .contact import Contact
+from .currency import Currency
 from .deal import Deal
 from .duplicate import Duplicate, Entity
 from .item import Item
@@ -26,6 +27,7 @@ class CRM(Scope):
         "category",
         "company",
         "contact",
+        "currency",
         "deal",
         "duplicate",
         "entity",
@@ -45,6 +47,7 @@ class CRM(Scope):
     category: Category
     company: Company
     contact: Contact
+    currency: Currency
     deal: Deal
     duplicate: Duplicate
     entity: Entity
@@ -65,6 +68,7 @@ class CRM(Scope):
         self.category = Category(self)
         self.company = Company(self)
         self.contact = Contact(self)
+        self.currency = Currency(self)
         self.deal = Deal(self)
         self.duplicate = Duplicate(self)
         self.entity = Entity(self)

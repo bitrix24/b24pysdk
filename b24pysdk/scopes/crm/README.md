@@ -1,9 +1,25 @@
 # Available methods
 
-## crm.activity.type
+### crm.activity.badge
+- crm.activity.badge.add
+- crm.activity.badge.delete
+- crm.activity.badge.get
+- crm.activity.badge.list
+
+### crm.activity.configurable
+- crm.activity.configurable.add
+- crm.activity.configurable.get
+- crm.activity.configurable.update
+
+### crm.activity.type
 - crm.activity.type.add
 - crm.activity.type.delete
 - crm.activity.type.list
+
+#### crm.activity.layout.blocks
+- crm.activity.layout.blocks.delete
+- crm.activity.layout.blocks.get
+- crm.activity.layout.blocks.set
 
 ## crm.item
 - crm.item.fields
@@ -60,6 +76,24 @@
 - crm.orderentity.list
 - crm.orderentity.delete_by_filter
 - crm.orderentity.get_fields
+
+## crm.currency
+- crm.currency.fields
+- crm.currency.add
+- crm.currency.get
+- crm.currency.list
+- crm.currency.update
+- crm.currency.delete
+
+### crm.currency.base
+- crm.currency.base.get
+- crm.currency.base.set
+
+### crm.currency.localizations
+- crm.currency.localizations.fields
+- crm.currency.localizations.get
+- crm.currency.localizations.set
+- crm.currency.localizations.delete
 
 ## crm.deal
 - crm.deal.fields

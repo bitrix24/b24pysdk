@@ -1,6 +1,6 @@
 from typing import Iterable, Optional, Text
 
-from ..._bitrix_api_request import BitrixAPIRequest
+from ...bitrix_api.classes import BitrixAPIRequest
 from ...utils.types import JSONDict, Timeout
 from ..base import Base
 
@@ -69,9 +69,7 @@ class BaseCRM(Base):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {
-            "start": start,
-        }
+        params = dict()
 
         if select is not None:
             params["select"] = list(select)
@@ -81,6 +79,9 @@ class BaseCRM(Base):
 
         if order is not None:
             params["order"] = order
+
+        if start is not None:
+            params["start"] = start
 
         return BitrixAPIRequest(
             bitrix_token=self._scope.bitrix_token,

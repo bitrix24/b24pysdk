@@ -1,7 +1,8 @@
-from typing import TYPE_CHECKING, Optional, Text
+from typing import TYPE_CHECKING, Text
 
-from ...._bitrix_api_request import BitrixAPIRequest
+from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
+from ....utils.types import Timeout
 from ..base_crm import BaseCRM
 
 if TYPE_CHECKING:
@@ -20,11 +21,11 @@ class Settings(BaseCRM):
             self,
             *,
             type: Text,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get the settings description.
 
-        Documentation:
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/user-defined-fields/crm-userfield-settings-fields.html
 
         The method returns the description of the settings fields for the custom field type
 

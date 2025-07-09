@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, Iterable, Optional, Text
 
-from ...._bitrix_api_request import BitrixAPIRequest
+from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
 from ..base_crm import BaseCRM
@@ -10,7 +10,10 @@ if TYPE_CHECKING:
 
 
 class Link(BaseCRM):
-    """"""
+    """The methods provide capabilities for managing links between requisites and CRM objects.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/links/index.html
+    """
 
     def __init__(self, requisite: "Requisite"):
         super().__init__(requisite._scope)
@@ -22,7 +25,18 @@ class Link(BaseCRM):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get description of CRM requisite.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/links/crm-requisite-link-fields.html
+
+        The method returns a formal description of the link fields for requisites.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
         return self._fields(timeout=timeout)
 
     @type_checker
@@ -33,7 +47,32 @@ class Link(BaseCRM):
             entity_id: int,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get requisite link with CRM object.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/links/crm-requisite-link-get.html
+
+        The method returns the link between requisites and an object.
+
+        Args:
+            entity_type_id: Identifier of the object type to which the link belongs, where possible values are:
+
+                - deal (value 2),
+
+                - old invoice (value 5),
+
+                - estimate (value 7),
+
+                - new invoice (value 31),
+
+                - other dynamic objects;
+
+            entity_id: Identifier of the object to which the link belongs;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "entityTypeId": entity_type_id,
@@ -57,7 +96,48 @@ class Link(BaseCRM):
             start: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of requisite links.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/links/crm-requisite-link-list.html
+
+        The method returns a list of requisite links based on the filter.
+
+        Args:
+            select: An array of fields to select;
+
+            filter: Object format:
+
+                {
+                    field_1: value_1,
+
+                    field_2: value_2,
+
+                    ...,
+
+                    field_n: value_n,
+                };
+
+            order: Object format:
+
+                {
+                    field_1: value_1,
+
+                    ...,
+                }
+
+                where
+
+                - field_n is the name of the field by which the selection will be sorted
+
+                - value_n is a string value equals to 'asc' (ascending sort) or 'desc' (descending sort);
+
+            start: This parameter is used for pagination control;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
         return self._list(
             select=select,
             filter=filter,
@@ -73,7 +153,30 @@ class Link(BaseCRM):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Register requisite link.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/links/crm-requisite-link-register.html
+
+        This method registers a link between requisites and an object.
+
+        Args:
+            fields: Object format:
+
+                {
+                    field_1: value_1,
+
+                    field_2: value_2,
+
+                    ...,
+
+                    field_n: value_n,
+                };
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "fields": fields,
@@ -94,7 +197,32 @@ class Link(BaseCRM):
             entity_id: int,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Unlink requisite from object.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/links/crm-requisite-link-unregister.html
+
+        This method removes the link between requisites and an object.
+
+        Args:
+            entity_type_id: Identifier of the object type to which the link belongs, where possible values are:
+
+                - deal (value 2),
+
+                - old invoice (value 5),
+
+                - estimate (value 7),
+
+                - new invoice (value 31),
+
+                - other dynamic objects;
+
+            entity_id: Identifier of the object to which the link belongs;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "entityTypeId": entity_type_id,

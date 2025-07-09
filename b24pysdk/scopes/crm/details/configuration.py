@@ -1,31 +1,39 @@
 from typing import Optional, Text
 
-from ...._bitrix_api_request import BitrixAPIRequest
+from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
 from ..item.details.configuration import Configuration as BaseConfiguration
 
 
 class Configuration(BaseConfiguration):
-    """The group of methods manages the settings of the card for two views: 'General view' and 'My view'
+    """The group of methods manages the settings of the CRM card for two views: 'General view' and 'My view'. Works for leads, deals, contacts and companies.
 
     Documentation:
+    https://apidocs.bitrix24.com/api-reference/crm/deals/custom-form/index.html
+    https://apidocs.bitrix24.com/api-reference/crm/leads/custom-form/index.html
+    https://apidocs.bitrix24.com/api-reference/crm/contacts/custom-form/index.html
+    https://apidocs.bitrix24.com/api-reference/crm/companies/custom-form/index.html
     """
 
     @type_checker
     def get(
             self,
-            *args,
+            *,
             scope: Optional[Text] = None,
             user_id: Optional[int] = None,
             extras: Optional[JSONDict] = None,
             timeout: Timeout = None
     ) -> BitrixAPIRequest:
-        """Get parameters of deal configuration.
+        """Get parameters of CRM card configuration.
 
         Documentation:
+        https://apidocs.bitrix24.com/api-reference/crm/deals/custom-form/crm-deal-details-configuration-get.html
+        https://apidocs.bitrix24.com/api-reference/crm/leads/custom-form/crm-lead-details-configuration-get.html
+        https://apidocs.bitrix24.com/api-reference/crm/contacts/custom-form/crm-contact-details-configuration-get.html
+        https://apidocs.bitrix24.com/api-reference/crm/companies/custom-form/crm-company-details-configuration-get.html
 
-        The method retrieves the settings of deal cards.
+        The method retrieves the settings of CRM cards.
 
         Args:
             scope: The scope of the settings, where allowed values are:
@@ -44,26 +52,30 @@ class Configuration(BaseConfiguration):
             Instance of BitrixAPIRequest
         """
         return self._get(
-            entity_type_id=self.details.entity_type_id,
-            user_id=user_id,
             scope=scope,
+            user_id=user_id,
             extras=extras,
+            timeout=timeout,
         )
 
     @type_checker
     def set(
             self,
-            *args,
+            *,
             scope: Optional[Text] = None,
             user_id: Optional[int] = None,
             extras: Optional[JSONDict] = None,
             timeout: Timeout = None
     ) -> BitrixAPIRequest:
-        """Set parameters for the CRM deal detail card.
+        """Set parameters for the CRM detail card.
 
         Documentation:
+        https://apidocs.bitrix24.com/api-reference/crm/deals/custom-form/crm-deal-details-configuration-set.html
+        https://apidocs.bitrix24.com/api-reference/crm/leads/custom-form/crm-lead-details-configuration-set.html
+        https://apidocs.bitrix24.com/api-reference/crm/contacts/custom-form/crm-contact-details-configuration-set.html
+        https://apidocs.bitrix24.com/api-reference/crm/companies/custom-form/crm-company-details-configuration-set.html
 
-        The method allows you to set the settings for deal cards.
+        The method allows you to set the settings for CRM cards.
 
         Args:
             scope: The scope of the settings, where allowed values are:
@@ -82,7 +94,6 @@ class Configuration(BaseConfiguration):
             Instance of BitrixAPIRequest
         """
         return self._set(
-            entity_type_id=self.details.entity_type_id,
             data=list(),
             user_id=user_id,
             scope=scope,
@@ -93,15 +104,19 @@ class Configuration(BaseConfiguration):
     @type_checker
     def reset(
             self,
-            *args,
+            *,
             scope: Optional[Text] = None,
             user_id: Optional[int] = None,
             extras: Optional[JSONDict] = None,
             timeout: Timeout = None
     ) -> BitrixAPIRequest:
-        """The method resets the settings of deal cards.
+        """The method resets the settings of CRM cards.
 
         Documentation:
+        https://apidocs.bitrix24.com/api-reference/crm/deals/custom-form/crm-deal-details-configuration-reset.html
+        https://apidocs.bitrix24.com/api-reference/crm/leads/custom-form/crm-lead-details-configuration-reset.html
+        https://apidocs.bitrix24.com/api-reference/crm/contacts/custom-form/crm-contact-details-configuration-reset.html
+        https://apidocs.bitrix24.com/api-reference/crm/companies/custom-form/crm-company-details-configuration-reset.html
 
         Args:
             scope: The scope of the settings, where allowed values are:
@@ -120,7 +135,6 @@ class Configuration(BaseConfiguration):
             Instance of BitrixAPIRequest
         """
         return self._reset(
-            entity_type_id=self.details.entity_type_id,
             user_id=user_id,
             scope=scope,
             extras=extras,
@@ -130,15 +144,19 @@ class Configuration(BaseConfiguration):
     @type_checker
     def force_common_scope_for_all(
             self,
-            *args,
+            *,
             extras: Optional[JSONDict] = None,
             timeout: Timeout = None
     ) -> BitrixAPIRequest:
-        """Set common deal card.
+        """Set common CRM card.
 
         Documentation:
+        https://apidocs.bitrix24.com/api-reference/crm/deals/custom-form/crm-deal-details-configuration-force-common-scope-for-all.html
+        https://apidocs.bitrix24.com/api-reference/crm/leads/custom-form/crm-lead-details-configuration-force-common-scope-for-all.html
+        https://apidocs.bitrix24.com/api-reference/crm/contacts/custom-form/crm-contact-details-configuration-force-common-scope-for-all.html
+        https://apidocs.bitrix24.com/api-reference/crm/companies/custom-form/crm-company-details-configuration-force-common-scope-for-all.html
 
-        The method forcibly sets a common deal card for all users.
+        The method forcibly sets a common CRM card for all users.
 
         Args:
             extras: Additional parameters;
@@ -149,7 +167,6 @@ class Configuration(BaseConfiguration):
             Instance of BitrixAPIRequest
         """
         return self._force_common_scope_for_all(
-            entity_type_id=self.details.entity_type_id,
             extras=extras,
             timeout=timeout,
         )

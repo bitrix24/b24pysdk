@@ -1,8 +1,9 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, List, Optional, Text
 
-from ...._bitrix_api_request import BitrixAPIRequest
+from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
+from ....utils.types import Timeout
 from ..base_crm import BaseCRM
 
 if TYPE_CHECKING:
@@ -32,7 +33,7 @@ class Todo(BaseCRM):
             parent_activity_id: Optional[int] = None,
             ping_offsets: Optional[List[int]] = None,
             color_id: Optional[int] = None,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Add a new universal activity.
 
@@ -73,6 +74,7 @@ class Todo(BaseCRM):
             "description": description,
             "colorId": color_id,
         }
+
         if ping_offsets is not None:
             params["pingOffsets"] = ping_offsets
 
@@ -103,7 +105,7 @@ class Todo(BaseCRM):
             parent_activity_id: Optional[int] = None,
             ping_offsets: Optional[List[int]] = None,
             color_id: Optional[int] = None,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update universal activity.
 
@@ -112,6 +114,8 @@ class Todo(BaseCRM):
         The method updates a universal activity.
 
         Args:
+            bitrix_id: Identifier of the activity;
+
             owner_type_id: Identifier of the CRM object type to which the activity is linked;
 
             owner_id: Identifier of the CRM entity to which the activity is linked;
@@ -162,6 +166,7 @@ class Todo(BaseCRM):
             timeout=timeout,
         )
 
+    @type_checker
     def update_color(
             self,
             bitrix_id: int,
@@ -169,7 +174,7 @@ class Todo(BaseCRM):
             owner_type_id: int,
             owner_id: int,
             color_id: int,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update the color of the universal activity.
 
@@ -206,6 +211,7 @@ class Todo(BaseCRM):
             timeout=timeout,
         )
 
+    @type_checker
     def update_deadline(
             self,
             bitrix_id: int,
@@ -213,7 +219,7 @@ class Todo(BaseCRM):
             owner_type_id: int,
             owner_id: int,
             value: datetime,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update the deadline of the universal activity.
 
@@ -250,6 +256,7 @@ class Todo(BaseCRM):
             timeout=timeout,
         )
 
+    @type_checker
     def update_description(
             self,
             bitrix_id: int,
@@ -257,7 +264,7 @@ class Todo(BaseCRM):
             owner_type_id: int,
             owner_id: int,
             value: Text,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update the description of the universal activity.
 
@@ -294,6 +301,7 @@ class Todo(BaseCRM):
             timeout=timeout,
         )
 
+    @type_checker
     def update_responsible_user(
             self,
             bitrix_id: int,
@@ -301,7 +309,7 @@ class Todo(BaseCRM):
             owner_type_id: int,
             owner_id: int,
             responsible_id: int,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update the responsible user for the universal activity.
 

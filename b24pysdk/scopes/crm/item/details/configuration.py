@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING, Optional, Text
 
-from ....._bitrix_api_request import BitrixAPIRequest
+from .....bitrix_api.classes import BitrixAPIRequest
 from .....utils.functional import type_checker
-from .....utils.types import JSONDict, Timeout
+from .....utils.types import JSONDict, JSONList, Timeout
 from ...base_crm import BaseCRM
 
 if TYPE_CHECKING:
@@ -15,11 +15,8 @@ class Configuration(BaseCRM):
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/item-details-configuration/index.html
     """
 
-    __slots__ = ("details",)
-
     def __init__(self, details: "Details"):
         super().__init__(details._scope)
-        self.details = details
         self._path = self._get_path(details)
 
     @type_checker
@@ -57,7 +54,6 @@ class Configuration(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-
         return self._get(
             entity_type_id=entity_type_id,
             user_id=user_id,
@@ -69,7 +65,7 @@ class Configuration(BaseCRM):
     def _get(
             self,
             *,
-            entity_type_id: int,
+            entity_type_id: Optional[int] = None,
             user_id: Optional[int] = None,
             scope: Optional[Text] = None,
             extras: Optional[JSONDict] = None,
@@ -101,9 +97,10 @@ class Configuration(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
-            "entityTypeId": entity_type_id,
-        }
+        params = dict()
+
+        if entity_type_id is not None:
+            params["entityTypeId"] = entity_type_id
 
         if user_id is not None:
             params["userId"] = user_id
@@ -126,8 +123,8 @@ class Configuration(BaseCRM):
             self,
             *,
             entity_type_id: int,
-            data: list[JSONDict],
-            user_id: Optional[int],
+            data: JSONList,
+            user_id: Optional[int] = None,
             scope: Optional[str] = None,
             extras: Optional[JSONDict] = None,
             timeout: Timeout = None
@@ -159,7 +156,6 @@ class Configuration(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-
         return self._set(
             entity_type_id=entity_type_id,
             data=data,
@@ -172,9 +168,9 @@ class Configuration(BaseCRM):
     def _set(
             self,
             *,
-            entity_type_id: int,
-            data: list[JSONDict],
-            user_id: Optional[int],
+            entity_type_id: Optional[int] = None,
+            data: JSONList,
+            user_id: Optional[int] = None,
             scope: Optional[str] = None,
             extras: Optional[JSONDict] = None,
             timeout: Timeout = None
@@ -208,9 +204,11 @@ class Configuration(BaseCRM):
         """
 
         params = {
-            "entityTypeId": entity_type_id,
             "data": data,
         }
+
+        if entity_type_id is not None:
+            params["entityTypeId"] = entity_type_id
 
         if user_id is not None:
             params["userId"] = user_id
@@ -263,7 +261,6 @@ class Configuration(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-
         return self._reset(
             entity_type_id=entity_type_id,
             user_id=user_id,
@@ -275,8 +272,8 @@ class Configuration(BaseCRM):
     def _reset(
             self,
             *,
-            entity_type_id: int,
-            user_id: Optional[int],
+            entity_type_id: Optional[int] = None,
+            user_id: Optional[int] = None,
             scope: Optional[str] = None,
             extras: Optional[JSONDict] = None,
             timeout: Timeout = None
@@ -307,9 +304,10 @@ class Configuration(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
-            "entityTypeId": entity_type_id,
-        }
+        params = dict()
+
+        if entity_type_id is not None:
+            params["entityTypeId"] = entity_type_id
 
         if user_id is not None:
             params["userId"] = user_id
@@ -351,7 +349,6 @@ class Configuration(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-
         return self._force_common_scope_for_all(
             entity_type_id=entity_type_id,
             extras=extras,
@@ -361,7 +358,7 @@ class Configuration(BaseCRM):
     def _force_common_scope_for_all(
             self,
             *,
-            entity_type_id: int,
+            entity_type_id: Optional[int] = None,
             extras: Optional[JSONDict] = None,
             timeout: Timeout = None
     ) -> BitrixAPIRequest:
@@ -382,9 +379,10 @@ class Configuration(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
-            "entityTypeId": entity_type_id,
-        }
+        params = dict()
+
+        if entity_type_id is not None:
+            params["entityTypeId"] = entity_type_id
 
         if extras is not None:
             params["extras"] = extras

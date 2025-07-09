@@ -1,8 +1,8 @@
 from typing import Optional
 
-from ...._bitrix_api_request import BitrixAPIRequest
+from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import JSONDict
+from ....utils.types import JSONDict, Timeout
 from ..base_crm import BaseCRM
 from .item import Item
 
@@ -17,11 +17,12 @@ class Delivery(BaseCRM):
         super().__init__(item._scope)
         self._path = self._get_path(item)
 
+    @type_checker
     def get(
             self,
             bitrix_id: int,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get delivery information by ID.
 
@@ -47,7 +48,7 @@ class Delivery(BaseCRM):
             entity_id: int,
             filter: Optional[JSONDict] = None,
             order: Optional[JSONDict] = None,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get list of deliveries.
 

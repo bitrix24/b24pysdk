@@ -1,7 +1,5 @@
-from typing import Optional
-
-from ...._bitrix_api_request import BitrixAPIRequest
-from ....utils.types import JSONDict
+from ....bitrix_api.classes import BitrixAPIRequest
+from ....utils.types import JSONDict, Timeout
 from .relationship import Relationship
 
 
@@ -14,7 +12,7 @@ class Company(Relationship):
     def fields(
             self,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get fields for Contact-Company.
 
@@ -35,7 +33,7 @@ class Company(Relationship):
             bitrix_id: int,
             fields: JSONDict,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Add a Company to the specified Contact.
 
@@ -59,14 +57,18 @@ class Company(Relationship):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().add(bitrix_id, fields, timeout=timeout)
+        return super().add(
+            bitrix_id,
+            fields,
+            timeout=timeout,
+        )
 
     def delete(
             self,
             bitrix_id: int,
             *,
             fields: JSONDict,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Delete
 

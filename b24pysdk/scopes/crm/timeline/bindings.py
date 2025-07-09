@@ -1,8 +1,8 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
-from ...._bitrix_api_request import BitrixAPIRequest
+from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import JSONDict
+from ....utils.types import JSONDict, Timeout
 from ..base_crm import BaseCRM
 
 if TYPE_CHECKING:
@@ -19,10 +19,11 @@ class Bindings(BaseCRM):
         super().__init__(scope=timeline._scope)
         self._path = self._get_path(timeline)
 
+    @type_checker
     def fields(
             self,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get CRM entity binding fields and timeline record.
 
@@ -41,9 +42,9 @@ class Bindings(BaseCRM):
     @type_checker
     def list(
             self,
-            filter: JSONDict,
             *,
-            timeout: Optional[int] = None,
+            filter: JSONDict,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get the list of bindings for a record in the timeline.
 
@@ -69,8 +70,9 @@ class Bindings(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
+
         params = {
-            "filter": filter
+            "filter": filter,
         }
 
         return BitrixAPIRequest(
@@ -85,7 +87,7 @@ class Bindings(BaseCRM):
             self,
             fields: JSONDict,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ):
         """Add timeline record binding to CRM entity.
 
@@ -108,8 +110,9 @@ class Bindings(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
+
         params = {
-            "fields": fields
+            "fields": fields,
         }
 
         return BitrixAPIRequest(
@@ -124,7 +127,7 @@ class Bindings(BaseCRM):
             self,
             fields: JSONDict,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ):
         """Unbind timeline record from CRM entity.
 
@@ -147,8 +150,9 @@ class Bindings(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
+
         params = {
-            "fields": fields
+            "fields": fields,
         }
 
         return BitrixAPIRequest(

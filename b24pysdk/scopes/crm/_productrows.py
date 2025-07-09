@@ -1,8 +1,8 @@
-from typing import TYPE_CHECKING, Iterable, Optional, Union
+from typing import TYPE_CHECKING, Iterable, Union
 
-from ..._bitrix_api_request import BitrixAPIRequest
+from ...bitrix_api.classes import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import JSONDict
+from ...utils.types import JSONDict, Timeout
 from .base_crm import BaseCRM
 
 if TYPE_CHECKING:
@@ -16,11 +16,12 @@ class Productrows(BaseCRM):
         super().__init__(item._scope)
         self._path = self._get_path(item)
 
+    @type_checker
     def get(
             self,
             bitrix_id: int,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
         return self._get(bitrix_id, timeout=timeout)
@@ -31,7 +32,7 @@ class Productrows(BaseCRM):
             bitrix_id: int,
             rows: Iterable[JSONDict],
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 

@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING, Optional
 
-from ....._bitrix_api_request import BitrixAPIRequest
+from .....bitrix_api.classes import BitrixAPIRequest
 from .....utils.functional import type_checker
-from .....utils.types import JSONDict
+from .....utils.types import JSONDict, Timeout
 from ...base_crm import BaseCRM
 
 if TYPE_CHECKING:
@@ -26,7 +26,7 @@ class Product(BaseCRM):
             payment_id: int,
             row_id: int,
             quantity: float,
-            timeout: Optional[int] = None
+            timeout: Timeout = None
     ) -> BitrixAPIRequest:
         """Add product item to payment.
 
@@ -67,7 +67,7 @@ class Product(BaseCRM):
             payment_id: int,
             filter: JSONDict,
             order: Optional[JSONDict] = None,
-            timeout: Optional[int] = None
+            timeout: Timeout = None
     ) -> BitrixAPIRequest:
         """Get list of payment product items.
 
@@ -112,7 +112,7 @@ class Product(BaseCRM):
 
         params = {
             "paymentId": payment_id,
-            "filter": filter
+            "filter": filter,
         }
 
         if order is not None:
@@ -125,11 +125,12 @@ class Product(BaseCRM):
             timeout=timeout,
         )
 
+    @type_checker
     def delete(
             self,
             bitrix_id: int,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Remove product item from payment.
 
@@ -153,7 +154,7 @@ class Product(BaseCRM):
             bitrix_id: int,
             *,
             quantity: float,
-            timeout: Optional[int] = None
+            timeout: Timeout = None
     ) -> BitrixAPIRequest:
         """Change product quantity.
 
