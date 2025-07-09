@@ -2,13 +2,16 @@ from abc import ABC, abstractmethod
 from typing import Callable, Dict, Optional, Sequence, Text, Tuple, Union
 
 from ..error import BitrixAPIExpiredToken
-from ..utils.types import B24BatchRequestData, JSONDict, Key, Timeout
+from ..utils.types import B24BatchRequestData, JSONDict, JSONList, Key, Timeout
 from .bitrix_app import BitrixApp
-from .functions import call_batch, call_batches, call_method
+from .functions import call_batch, call_batches, call_list, call_method
 from .oauth_requester import OAuthRequester
 
 
 class AbstractBitrixToken(ABC):
+    """"""
+
+    AUTO_REFRESH: bool = True
     """"""
 
     domain: Text = NotImplemented
@@ -51,17 +54,20 @@ class AbstractBitrixToken(ABC):
             self,
             call_func: Callable,
             parameters: Dict,
-            auto_refresh: bool = True,
-    ) -> JSONDict:
+    ) -> Union[JSONDict, JSONList]:
         """"""
         try:
             return call_func(**self._auth_data, **parameters)
         except BitrixAPIExpiredToken as error:
-            if auto_refresh and not self.is_webhook:
+            if self.AUTO_REFRESH and not self.is_webhook:
                 self.auth_token, self.refresh_token = self.refresh()
                 return call_func(**self._auth_data, **parameters)
             else:
                 raise error
+
+    def authorize(self, code: Text) -> JSONDict:
+        """"""
+        return self.oauth_requester.authorize(code=code)
 
     def refresh(self) -> Tuple[Text, Text]:
         """"""
@@ -73,7 +79,6 @@ class AbstractBitrixToken(ABC):
             api_method: Text,
             params: Optional[JSONDict] = None,
             *,
-            auto_refresh: bool = True,
             timeout: Timeout = None,
     ) -> JSONDict:
         """"""
@@ -84,7 +89,22 @@ class AbstractBitrixToken(ABC):
                 params=params,
                 timeout=timeout,
             ),
-            auto_refresh=auto_refresh,
+        )
+
+    def call_list(
+            self,
+            api_method: Text,
+            params: Optional[JSONDict] = None,
+            timeout: Timeout = None,
+    ) -> JSONList:
+        """"""
+        return self._call_with_refresh(
+            call_func=call_list,
+            parameters=dict(
+                api_method=api_method,
+                params=params,
+                timeout=timeout,
+            ),
         )
 
     def call_batch(
@@ -93,7 +113,6 @@ class AbstractBitrixToken(ABC):
             *,
             halt: bool = False,
             ignore_size_limit: bool = False,
-            auto_refresh: bool = True,
             timeout: Timeout = None,
     ) -> JSONDict:
         """"""
@@ -105,7 +124,6 @@ class AbstractBitrixToken(ABC):
                 ignore_size_limit=ignore_size_limit,
                 timeout=timeout,
             ),
-            auto_refresh=auto_refresh,
         )
 
     def call_batches(
@@ -113,7 +131,6 @@ class AbstractBitrixToken(ABC):
             methods: Union[Dict[Key, B24BatchRequestData], Sequence[B24BatchRequestData]],
             *,
             halt: bool = False,
-            auto_refresh: bool = True,
             timeout: Timeout = None,
     ) -> JSONDict:
         """"""
@@ -124,7 +141,6 @@ class AbstractBitrixToken(ABC):
                 halt=halt,
                 timeout=timeout,
             ),
-            auto_refresh=auto_refresh,
         )
 
 
