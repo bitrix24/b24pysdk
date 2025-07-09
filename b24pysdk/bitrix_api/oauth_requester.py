@@ -2,7 +2,14 @@ from typing import Text
 
 import requests
 
-from ..error import BitrixOAuthTimeout, BitrixOAuthRequestError
+from ..error import (
+	BitrixAPIInsufficientScope,
+	BitrixAPIInvalidRequest,
+	BitrixOAuthInsufficientScope,
+	BitrixOAuthInvalidRequest,
+	BitrixOAuthRequestError,
+	BitrixOAuthTimeout,
+)
 from ..utils.types import JSONDict, Timeout
 from .bitrix_app import BitrixApp
 from .config import SdkConfig
@@ -37,7 +44,13 @@ class OAuthRequester:
 		except requests.RequestException as error:
 			raise BitrixOAuthRequestError(original_error=error) from error
 
-	def authenticate(self, code: Text) -> JSONDict:
+		except BitrixAPIInvalidRequest as error:
+			raise BitrixOAuthInvalidRequest(response=error.response, json_response=error.json_response) from error
+
+		except BitrixAPIInsufficientScope as error:
+			raise BitrixOAuthInsufficientScope(response=error.response, json_response=error.json_response) from error
+
+	def authorize(self, code: Text) -> JSONDict:
 		""""""
 
 		params = {
