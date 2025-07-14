@@ -92,7 +92,7 @@ def parse_response(response: requests.Response) -> JSONDict:
     except HTTPError:
         try:
             json_response = response.json()
-            error = json_response.get("error", "")
+            error = str(json_response.get("error", ""))
 
             exception_class = (
                 _EXCEPTIONS_BY_ERROR.get(error.upper()) or

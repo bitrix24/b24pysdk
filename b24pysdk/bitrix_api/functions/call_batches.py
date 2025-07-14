@@ -79,8 +79,6 @@ def call_batches(
 			processing=0,
 			date_start=first_batch_response["time"]["date_start"],
 			date_finish=last_batch_response["time"]["date_finish"],
-			operating_reset_at=last_batch_response["time"]["operating_reset_at"],
-			operating=last_batch_response["time"]["operating"],
 		)
 	)
 
