@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from ..._constants import PYTHON_VERSION
-from ...utils.types import B24APIResult, JSONDict
+from ...utils.types import B24APIResult, JSONDict, JSONList
 from .bitrix_api_response_time import BitrixAPIResponseTime
 
 DATACLASS_KWARGS = {"eq": False, "order": False, "frozen": True}
@@ -38,4 +38,27 @@ class BitrixAPIResponse:
             "time": self.time,
             "total": self.total,
             "next": self.next,
+        }
+
+
+@dataclass(**DATACLASS_KWARGS)
+class BitrixAPIListResponse(BitrixAPIResponse):
+    """"""
+
+    result: JSONList
+    total: int
+
+    @classmethod
+    def from_dict(cls, json_response: JSONDict) -> "BitrixAPIListResponse":
+        return cls(
+            result=json_response["result"],
+            time=BitrixAPIResponseTime.from_dict(json_response["time"]),
+            total=json_response["total"],
+        )
+
+    def to_dict(self) -> JSONDict:
+        return {
+            "result": self.result,
+            "time": self.time,
+            "total": self.total,
         }
