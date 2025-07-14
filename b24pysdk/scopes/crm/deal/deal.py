@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Iterable, Optional, Text
+from typing import Iterable, Optional, Text
 
 from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
@@ -8,9 +8,7 @@ from .._userfield import Userfield
 from ..details import Details
 from ..item import Item
 from ..relationships import Contact
-
-if TYPE_CHECKING:
-    from .recurring import Recurring
+from .recurring import Recurring
 
 
 class Deal(Item):
@@ -31,14 +29,7 @@ class Deal(Item):
         return Contact(self)
 
     @property
-    def recurring(self) -> "Recurring":
-        """"""
-        from .recurring import Recurring
-
-        return Recurring(self)
-
-    @property
-    def details(self) -> "Details":
+    def details(self) -> Details:
         """"""
         return Details(self)
 
@@ -46,6 +37,11 @@ class Deal(Item):
     def productrows(self) -> Productrows:
         """"""
         return Productrows(self)
+
+    @property
+    def recurring(self) -> Recurring:
+        """"""
+        return Recurring(self)
 
     @property
     def userfield(self) -> Userfield:

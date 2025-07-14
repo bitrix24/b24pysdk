@@ -1,15 +1,13 @@
-from typing import TYPE_CHECKING, Iterable, Optional, Text
+from typing import Iterable, Optional, Text
 
 from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import B24Bool, JSONDict, Timeout
 from ..base_crm import BaseCRM
-
-if TYPE_CHECKING:
-    from .delivery import Delivery
-    from .details import Details
-    from .payment import Payment
-    from .productrow import Productrow
+from .delivery import Delivery
+from .details import Details
+from .payment import Payment
+from .productrow import Productrow
 
 
 class Item(BaseCRM):
@@ -34,42 +32,38 @@ class Item(BaseCRM):
     @property
     def delivery(self) -> "Delivery":
         """"""
-        from .delivery import Delivery
 
         if type(self) is __class__:
             return Delivery(self)
         else:
-            raise AttributeError(f"'{self.__class__.__name__}' object has no property delivery. Use 'Item' object instead!")
+            raise AttributeError(f"'{self.__class__.__name__}' object has no property 'delivery'. Use 'Item' object instead!")
 
     @property
     def details(self) -> "Details":
         """"""
-        from .details import Details
 
         if type(self) is __class__:
             return Details(self)
         else:
-            raise AttributeError(f"'{self.__class__.__name__}' object has no property details. Use 'Item' object instead!")
+            raise AttributeError(f"'{self.__class__.__name__}' object has no property 'details'. Use 'Item' object instead!")
 
     @property
     def payment(self) -> "Payment":
         """"""
-        from .payment import Payment
 
         if type(self) is __class__:
             return Payment(self)
         else:
-            raise AttributeError(f"'{self.__class__.__name__}' object has no property payment. Use 'Item' object instead!")
+            raise AttributeError(f"'{self.__class__.__name__}' object has no property 'payment'. Use 'Item' object instead!")
 
     @property
     def productrow(self) -> "Productrow":
         """"""
-        from .productrow import Productrow
 
         if type(self) is __class__:
             return Productrow(self)
         else:
-            raise AttributeError(f"'{self.__class__.__name__}' object has no property productrow. Use 'Item' object instead!")
+            raise AttributeError(f"'{self.__class__.__name__}' object has no property 'productrow'. Use 'Item' object instead!")
 
     @type_checker
     def fields(
@@ -692,6 +686,9 @@ class Item(BaseCRM):
     ) -> BitrixAPIRequest:
         """"""
 
+        if type(self) is not __class__:
+            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'import_'. Use 'Item' object instead!")
+
         params = {
             "entityTypeId": entity_type_id,
             "fields": fields,
@@ -717,6 +714,9 @@ class Item(BaseCRM):
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
+
+        if type(self) is not __class__:
+            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'batch_import'. Use 'Item' object instead!")
 
         params = {
             "entityTypeId": entity_type_id,

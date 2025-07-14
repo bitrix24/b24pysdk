@@ -18,32 +18,32 @@ class Base(ABC):
         self._scope = scope
         self._path = self._get_path()
 
-    def fields(self, *args, **kwargs) -> BitrixAPIRequest:
+    def _fields(self, *args, **kwargs) -> BitrixAPIRequest:
         raise NotImplementedError(f"Method 'fields' is not implemented in class '{self.__class__.__name__}'")
 
-    def add(self, *args, **kwargs) -> BitrixAPIRequest:
+    def _add(self, *args, **kwargs) -> BitrixAPIRequest:
         raise NotImplementedError(f"Method 'add' is not implemented in class '{self.__class__.__name__}'")
 
-    def get(self, *args, **kwargs) -> BitrixAPIRequest:
+    def _get(self, *args, **kwargs) -> BitrixAPIRequest:
         raise NotImplementedError(f"Method 'get' is not implemented in class '{self.__class__.__name__}'")
 
-    def list(self, *args, **kwargs) -> BitrixAPIRequest:
+    def _list(self, *args, **kwargs) -> BitrixAPIRequest:
         raise NotImplementedError(f"Method 'list' is not implemented in class '{self.__class__.__name__}'")
 
-    def update(self, *args, **kwargs) -> BitrixAPIRequest:
+    def _update(self, *args, **kwargs) -> BitrixAPIRequest:
         raise NotImplementedError(f"Method 'update' is not implemented in class '{self.__class__.__name__}'")
 
-    def delete(self, *args, **kwargs) -> BitrixAPIRequest:
+    def _delete(self, *args, **kwargs) -> BitrixAPIRequest:
         raise NotImplementedError(f"Method 'delete' is not implemented in class '{self.__class__.__name__}'")
 
     @Classproperty
-    def bitrix_entity(cls) -> Text:
+    def _bitrix_entity(cls) -> Text:
         """"""
         return cls.__name__.lower()
 
     def _get_path(self, base: Optional["Base"] = None) -> Text:
         """"""
-        return f"{getattr(base, '_path', self._scope.name)}.{self.bitrix_entity}"
+        return f"{getattr(base, '_path', self._scope.name)}.{self._bitrix_entity}"
 
     def _get_api_method(self, method: Callable) -> Text:
         """"""

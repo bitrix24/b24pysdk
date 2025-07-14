@@ -114,7 +114,7 @@ class Type(BaseCRM):
     @type_checker
     def list(
             self,
-            *args,
+            *,
             filter: Optional[JSONDict] = None,
             order: Optional[JSONDict] = None,
             start: Optional[int] = None,

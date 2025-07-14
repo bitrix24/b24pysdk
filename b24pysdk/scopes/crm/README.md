@@ -137,6 +137,11 @@
 - crm.deal.userfield.list
 - crm.deal.userfield.delete
 
+## crm.enum
+- crm.enum.getorderownertypes
+- crm.enum.fields
+- crm.enum.ownertype
+
 ## crm.lead
 - crm.lead.fields
 - crm.lead.add
@@ -239,6 +244,9 @@
 ### crm.quote.productrows
 - crm.quote.productrows.get
 - crm.quote.productrows.set
+
+## crm.multifield
+- crm.multifield.fields
 
 ## crm.requisite
 - crm.requisite.fields

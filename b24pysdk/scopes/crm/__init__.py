@@ -7,8 +7,10 @@ from .contact import Contact
 from .currency import Currency
 from .deal import Deal
 from .duplicate import Duplicate, Entity
+from .enum import Enum
 from .item import Item
 from .lead import Lead
+from .multifield import Multifield
 from .orderentity import Orderentity
 from .quote import Quote
 from .requisite import Requisite
@@ -31,8 +33,10 @@ class CRM(Scope):
         "deal",
         "duplicate",
         "entity",
+        "enum",
         "item",
         "lead",
+        "multifield",
         "orderentity",
         "quote",
         "requisite",
@@ -51,8 +55,10 @@ class CRM(Scope):
     deal: Deal
     duplicate: Duplicate
     entity: Entity
+    enum: Enum
     item: Item
     lead: Lead
+    multifield: Multifield
     orderentity: Orderentity
     quote: Quote
     requisite: Requisite
@@ -72,8 +78,10 @@ class CRM(Scope):
         self.deal = Deal(self)
         self.duplicate = Duplicate(self)
         self.entity = Entity(self)
+        self.enum = Enum(self)
         self.item = Item(self)
         self.lead = Lead(self)
+        self.multifield = Multifield(self)
         self.orderentity = Orderentity(self)
         self.quote = Quote(self)
         self.requisite = Requisite(self)

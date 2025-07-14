@@ -1,10 +1,12 @@
-from typing import Iterable, Optional, Text
+from typing import TYPE_CHECKING, Iterable, Optional, Text
 
 from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
 from ..base_crm import BaseCRM
-from .item import Item
+
+if TYPE_CHECKING:
+    from .item import Item
 
 
 class Productrow(BaseCRM):
@@ -13,7 +15,7 @@ class Productrow(BaseCRM):
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/product-rows/index.html
     """
 
-    def __init__(self, item: Item):
+    def __init__(self, item: "Item"):
         super().__init__(item._scope)
         self._path = self._get_path(item)
 

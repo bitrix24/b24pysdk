@@ -1,10 +1,12 @@
-from typing import Iterable, Optional, Text
+from typing import TYPE_CHECKING, Iterable, Optional, Text
 
 from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict
 from ..base_crm import BaseCRM
-from .deal import Deal
+
+if TYPE_CHECKING:
+    from .deal import Deal
 
 
 class Recurring(BaseCRM):
@@ -13,7 +15,7 @@ class Recurring(BaseCRM):
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/deals/recurring-deals/index.html
     """
 
-    def __init__(self, deal: Deal):
+    def __init__(self, deal: "Deal"):
         super().__init__(deal._scope)
         self._path = self._get_path(deal)
 

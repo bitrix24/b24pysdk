@@ -1,11 +1,11 @@
 from typing import Iterable, Optional, Text
 
-from ....bitrix_api.classes import BitrixAPIRequest
-from ....utils.functional import type_checker
-from ....utils.types import JSONDict, Timeout
-from .._productrows import Productrows
-from .._userfield import Userfield
-from ..item import Item
+from ...bitrix_api.classes import BitrixAPIRequest
+from ...utils.functional import type_checker
+from ...utils.types import JSONDict, Timeout
+from ._productrows import Productrows
+from ._userfield import Userfield
+from .item import Item
 
 
 class Quote(Item):
