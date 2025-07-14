@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Callable, Dict, Optional, Sequence, Text, Tuple, Union
 
 from ..error import BitrixAPIExpiredToken
-from ..utils.types import B24BatchRequestData, JSONDict, JSONList, Key, Timeout
+from ..utils.types import B24BatchRequestData, JSONDict, Key, Timeout
 from .bitrix_app import BitrixApp
 from .functions import call_batch, call_batches, call_list, call_method
 from .oauth_requester import OAuthRequester
@@ -54,7 +54,7 @@ class AbstractBitrixToken(ABC):
             self,
             call_func: Callable,
             parameters: Dict,
-    ) -> Union[JSONDict, JSONList]:
+    ) -> JSONDict:
         """"""
         try:
             return call_func(**self._auth_data, **parameters)
@@ -84,22 +84,6 @@ class AbstractBitrixToken(ABC):
         """"""
         return self._call_with_refresh(
             call_func=call_method,
-            parameters=dict(
-                api_method=api_method,
-                params=params,
-                timeout=timeout,
-            ),
-        )
-
-    def call_list(
-            self,
-            api_method: Text,
-            params: Optional[JSONDict] = None,
-            timeout: Timeout = None,
-    ) -> JSONList:
-        """"""
-        return self._call_with_refresh(
-            call_func=call_list,
             parameters=dict(
                 api_method=api_method,
                 params=params,
@@ -139,6 +123,24 @@ class AbstractBitrixToken(ABC):
             parameters=dict(
                 methods=methods,
                 halt=halt,
+                timeout=timeout,
+            ),
+        )
+
+    def call_list(
+            self,
+            api_method: Text,
+            params: Optional[JSONDict] = None,
+            limit: Optional[int] = None,
+            timeout: Timeout = None,
+    ) -> JSONDict:
+        """"""
+        return self._call_with_refresh(
+            call_func=call_list,
+            parameters=dict(
+                api_method=api_method,
+                params=params,
+                limit=limit,
                 timeout=timeout,
             ),
         )
