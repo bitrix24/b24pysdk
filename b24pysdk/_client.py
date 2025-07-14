@@ -1,8 +1,8 @@
-from typing import Dict, Sequence, Union
+from typing import Dict, Optional, Sequence, Union
 
 from . import scopes
 from .bitrix_api.bitrix_token import AbstractBitrixToken
-from .bitrix_api.classes import BitrixAPIBatchesRequest, BitrixAPIBatchRequest, BitrixAPIRequest
+from .bitrix_api.classes import BitrixAPIBatchesRequest, BitrixAPIBatchRequest, BitrixAPIListRequest, BitrixAPIRequest
 from .utils.types import Key, Timeout
 
 
@@ -39,11 +39,23 @@ class Client:
             bitrix_api_requests: Union[Dict[Key, BitrixAPIRequest], Sequence[BitrixAPIRequest]],
             halt: bool = False,
             timeout: Timeout = None,
-    ):
+    ) -> BitrixAPIBatchesRequest:
         """"""
         return BitrixAPIBatchesRequest(
             bitrix_token=self.bitrix_token,
             bitrix_api_requests=bitrix_api_requests,
             halt=halt,
             timeout=timeout,
+        )
+
+    def call_list(
+            self,
+            bitrix_api_request: BitrixAPIRequest,
+            limit: Optional[int] = None,
+    ) -> BitrixAPIListRequest:
+        """"""
+        return BitrixAPIListRequest(
+            bitrix_token=self.bitrix_token,
+            bitrix_api_request=bitrix_api_request,
+            limit=limit,
         )
