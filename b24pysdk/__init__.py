@@ -1,4 +1,5 @@
 from ._client import Client
+from ._config import Config
 from .bitrix_api import BitrixApp, BitrixToken, BitrixWebhook
 
 __all__ = [
@@ -6,4 +7,5 @@ __all__ = [
     "BitrixToken",
     "BitrixWebhook",
     "Client",
+    "Config",
 ]
