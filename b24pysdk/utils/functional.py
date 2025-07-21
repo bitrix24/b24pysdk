@@ -8,14 +8,31 @@ class Classproperty:
     Decorator that converts a method with a single cls argument into a property
     that can be accessed directly from the class.
     """
+
     def __init__(self, method: Optional[FunctionType] = None):
         self.fget = method
+        self.fset = None
 
     def __get__(self, instance, cls: Optional[Type] = None):
+        if self.fget is None:
+            raise AttributeError("Unreadable attribute")
+
+        cls = instance if isinstance(instance, type) else type(instance)
         return self.fget(cls)
+
+    def __set__(self, instance, value):
+        if self.fset is None:
+            raise AttributeError("Can't set attribute")
+
+        cls = instance if isinstance(instance, type) else type(instance)
+        return self.fset(cls, value)
 
     def getter(self, method: Optional[FunctionType] = None):
         self.fget = method
+        return self
+
+    def setter(self, method: FunctionType):
+        self.fset = method
         return self
 
 
@@ -44,11 +61,13 @@ def type_checker(func: FunctionType) -> Callable:
         for param_index, arg in enumerate(args):
             param_name = func.__code__.co_varnames[param_index]
             expected_type = type_hints.get(param_name)
+
             if expected_type and not is_valid_type(arg, expected_type):
                 raise TypeError(f"Argument '{param_name}' must be of type {expected_type}, not {type(arg).__name__}")
 
         for param_name, arg in kwargs.items():
             expected_type = type_hints.get(param_name)
+
             if expected_type and not is_valid_type(arg, expected_type):
                 raise TypeError(f"Argument '{param_name}' must be of type {expected_type}, not {type(arg).__name__}")
 
