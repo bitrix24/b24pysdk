@@ -6,6 +6,7 @@ from .company import Company
 from .contact import Contact
 from .currency import Currency
 from .deal import Deal
+from .documentgenerator import Documentgenerator
 from .duplicate import Duplicate, Entity
 from .enum import Enum
 from .item import Item
@@ -18,6 +19,7 @@ from .status import Status
 from .timeline import Timeline
 from .type import Type
 from .userfield import Userfield
+from .vat import Vat
 
 
 class CRM(Scope):
@@ -31,6 +33,7 @@ class CRM(Scope):
         "contact",
         "currency",
         "deal",
+        "documentgenerator",
         "duplicate",
         "entity",
         "enum",
@@ -44,6 +47,7 @@ class CRM(Scope):
         "timeline",
         "type",
         "userfield",
+        "vat",
     )
 
     activity: Activity
@@ -53,6 +57,7 @@ class CRM(Scope):
     contact: Contact
     currency: Currency
     deal: Deal
+    documentgenerator: Documentgenerator
     duplicate: Duplicate
     entity: Entity
     enum: Enum
@@ -66,6 +71,7 @@ class CRM(Scope):
     timeline: Timeline
     type: Type
     userfield: Userfield
+    vat: Vat
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -76,6 +82,7 @@ class CRM(Scope):
         self.contact = Contact(self)
         self.currency = Currency(self)
         self.deal = Deal(self)
+        self.documentgenerator = Documentgenerator(self)
         self.duplicate = Duplicate(self)
         self.entity = Entity(self)
         self.enum = Enum(self)
@@ -89,6 +96,7 @@ class CRM(Scope):
         self.timeline = Timeline(self)
         self.type = Type(self)
         self.userfield = Userfield(self)
+        self.vat = Vat(self)
 
 
 __all__ = [

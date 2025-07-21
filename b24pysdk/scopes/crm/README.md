@@ -77,24 +77,6 @@
 - crm.orderentity.delete_by_filter
 - crm.orderentity.get_fields
 
-## crm.currency
-- crm.currency.fields
-- crm.currency.add
-- crm.currency.get
-- crm.currency.list
-- crm.currency.update
-- crm.currency.delete
-
-### crm.currency.base
-- crm.currency.base.get
-- crm.currency.base.set
-
-### crm.currency.localizations
-- crm.currency.localizations.fields
-- crm.currency.localizations.get
-- crm.currency.localizations.set
-- crm.currency.localizations.delete
-
 ## crm.deal
 - crm.deal.fields
 - crm.deal.add
@@ -138,9 +120,19 @@
 - crm.deal.userfield.delete
 
 ## crm.enum
+- crm.enum.activitydirection
+- crm.enum.activitynotifytype
+- crm.enum.activitypriority
+- crm.enum.activitystatus
+- crm.enum.activitytype
+- crm.enum.addresstype
+- crm.enum.contenttype
 - crm.enum.getorderownertypes
 - crm.enum.fields
 - crm.enum.ownertype
+
+### crm.enum.settings
+- crm.enum.settings.mode
 
 ## crm.lead
 - crm.lead.fields
@@ -315,6 +307,49 @@
 - crm.status.entity.items
 - crm.status.entity.types
 
+## crm.currency
+- crm.currency.fields
+- crm.currency.add
+- crm.currency.get
+- crm.currency.list
+- crm.currency.update
+- crm.currency.delete
+
+### crm.currency.base
+- crm.currency.base.get
+- crm.currency.base.set
+
+### crm.currency.localizations
+- crm.currency.localizations.fields
+- crm.currency.localizations.get
+- crm.currency.localizations.set
+- crm.currency.localizations.delete
+
+### crm.documentgenerator.document
+- crm.documentgenerator.document.getfields
+- crm.documentgenerator.document.add  ***Warning: Documentation lacks complete specifications regarding data types and field requirements.***
+- crm.documentgenerator.document.update  ***Warning: Documentation lacks complete specifications regarding data types and field requirements.***
+- crm.documentgenerator.document.get
+- crm.documentgenerator.document.list
+- crm.documentgenerator.document.enablepublicurl
+- crm.documentgenerator.document.upload  ***Warning: Documentation lacks complete specifications regarding data types and field requirements.***
+- crm.documentgenerator.document.delete
+- 
+- ### crm.documentgenerator.numerator
+- crm.documentgenerator.numerator.add  ***Warning: Documentation lacks complete specifications regarding data types and field requirements.***
+- crm.documentgenerator.numerator.update
+- crm.documentgenerator.numerator.get
+- crm.documentgenerator.numerator.list
+- crm.documentgenerator.numerator.delete
+
+### crm.documentgenerator.template
+- crm.documentgenerator.template.getfields  ***Warning: Documentation lacks complete specifications regarding data types and field requirements.***
+- crm.documentgenerator.template.add
+- crm.documentgenerator.template.update
+- crm.documentgenerator.template.get
+- crm.documentgenerator.template.list
+- crm.documentgenerator.template.delete
+
 ### crm.timeline.bindings
 - crm.timeline.bindings.fields
 - crm.timeline.bindings.list
@@ -361,3 +396,11 @@
 
 ### crm.userfield.settings
 - crm.userfield.settings.fields
+
+## crm.vat
+- crm.vat.add
+- crm.vat.delete
+- crm.vat.get
+- crm.vat.fields
+- crm.vat.list
+- crm.vat.update

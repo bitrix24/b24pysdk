@@ -10,7 +10,10 @@ if TYPE_CHECKING:
 
 
 class Logmessage(BaseCRM):
-    """"""
+    """These methods offer capabilities for working with the log message journal, where the log message journal is a special type of timeline record.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/logmessage/index.html
+    """
 
     def __init__(self, timeline: "Timeline"):
         super().__init__(timeline._scope)
@@ -23,7 +26,32 @@ class Logmessage(BaseCRM):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add log entry.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/logmessage/crm-timeline-logmessage-add.html
+
+        This method adds a new log entry to the timeline.
+
+        Args:
+            fields: Object format:
+
+                {
+                    entityTypeId: "value",
+
+                    entityId: "value",
+
+                    title: "value",
+
+                    text: "value",
+
+                    iconCode: "value",
+                };
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
         return self._add(fields, timeout=timeout)
 
     @type_checker
@@ -33,7 +61,20 @@ class Logmessage(BaseCRM):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get information about the log entry.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/logmessage/crm-timeline-logmessage-get.html
+
+        This method retrieves information about a timeline log entry.
+
+        Args:
+            bitrix_id: Integer identifier of the timeline entry;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
         return self._get(bitrix_id, timeout=timeout)
 
     @type_checker
@@ -46,7 +87,38 @@ class Logmessage(BaseCRM):
             start: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of log entries.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/logmessage/crm-timeline-logmessage-list.html
+
+        This method retrieves a list of timeline log entries.
+
+        Args:
+            entity_type_id: Identifier of the entity type for which to retrieve the list of log entries;
+
+            entity_id: Identifier of the entity item for which to retrieve the list of log entries;
+
+            order: Object format:
+
+                {
+                    field_1: value_1,
+
+                    ...,
+                }
+
+                where
+
+                - field_n is the name of the field by which the selection will be sorted
+
+                - value_n is a string value equals to 'asc' (ascending sort) or 'desc' (descending sort);
+
+            start: This parameter is used for pagination control;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "entityTypeId": entity_type_id,
@@ -73,5 +145,21 @@ class Logmessage(BaseCRM):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
-        return self._delete(bitrix_id)
+        """Delete log entry.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/logmessage/crm-timeline-logmessage-delete.html
+
+        This method deletes a timeline log entry.
+
+        Args:
+            bitrix_id: Integer identifier of the timeline entry;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+        return self._delete(
+            bitrix_id,
+            timeout=timeout
+        )

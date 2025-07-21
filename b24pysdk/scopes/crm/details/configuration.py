@@ -11,8 +11,11 @@ class Configuration(BaseConfiguration):
 
     Documentation:
     https://apidocs.bitrix24.com/api-reference/crm/deals/custom-form/index.html
+
     https://apidocs.bitrix24.com/api-reference/crm/leads/custom-form/index.html
+
     https://apidocs.bitrix24.com/api-reference/crm/contacts/custom-form/index.html
+
     https://apidocs.bitrix24.com/api-reference/crm/companies/custom-form/index.html
     """
 
@@ -29,8 +32,11 @@ class Configuration(BaseConfiguration):
 
         Documentation:
         https://apidocs.bitrix24.com/api-reference/crm/deals/custom-form/crm-deal-details-configuration-get.html
+
         https://apidocs.bitrix24.com/api-reference/crm/leads/custom-form/crm-lead-details-configuration-get.html
+
         https://apidocs.bitrix24.com/api-reference/crm/contacts/custom-form/crm-contact-details-configuration-get.html
+
         https://apidocs.bitrix24.com/api-reference/crm/companies/custom-form/crm-company-details-configuration-get.html
 
         The method retrieves the settings of CRM cards.
@@ -71,8 +77,11 @@ class Configuration(BaseConfiguration):
 
         Documentation:
         https://apidocs.bitrix24.com/api-reference/crm/deals/custom-form/crm-deal-details-configuration-set.html
+
         https://apidocs.bitrix24.com/api-reference/crm/leads/custom-form/crm-lead-details-configuration-set.html
+
         https://apidocs.bitrix24.com/api-reference/crm/contacts/custom-form/crm-contact-details-configuration-set.html
+
         https://apidocs.bitrix24.com/api-reference/crm/companies/custom-form/crm-company-details-configuration-set.html
 
         The method allows you to set the settings for CRM cards.
@@ -114,8 +123,11 @@ class Configuration(BaseConfiguration):
 
         Documentation:
         https://apidocs.bitrix24.com/api-reference/crm/deals/custom-form/crm-deal-details-configuration-reset.html
+
         https://apidocs.bitrix24.com/api-reference/crm/leads/custom-form/crm-lead-details-configuration-reset.html
+
         https://apidocs.bitrix24.com/api-reference/crm/contacts/custom-form/crm-contact-details-configuration-reset.html
+
         https://apidocs.bitrix24.com/api-reference/crm/companies/custom-form/crm-company-details-configuration-reset.html
 
         Args:
@@ -152,8 +164,11 @@ class Configuration(BaseConfiguration):
 
         Documentation:
         https://apidocs.bitrix24.com/api-reference/crm/deals/custom-form/crm-deal-details-configuration-force-common-scope-for-all.html
+
         https://apidocs.bitrix24.com/api-reference/crm/leads/custom-form/crm-lead-details-configuration-force-common-scope-for-all.html
+
         https://apidocs.bitrix24.com/api-reference/crm/contacts/custom-form/crm-contact-details-configuration-force-common-scope-for-all.html
+
         https://apidocs.bitrix24.com/api-reference/crm/companies/custom-form/crm-company-details-configuration-force-common-scope-for-all.html
 
         The method forcibly sets a common CRM card for all users.

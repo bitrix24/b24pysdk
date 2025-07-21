@@ -10,7 +10,8 @@ if TYPE_CHECKING:
 
 
 class VisualElement(BaseCRM):
-    """"""
+    """The class is a base class for logo and icon classes.
+    """
 
     def __init__(self, timeline: "Timeline"):
         super().__init__(timeline._scope)
@@ -24,7 +25,20 @@ class VisualElement(BaseCRM):
             file_content: Text,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add new visual element.
+
+        This method adds a new visual element (logo or icon).
+
+        Args:
+            code: Visual element code;
+
+            file_content: Base64 encoded content of the file;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "code": code,
@@ -45,7 +59,18 @@ class VisualElement(BaseCRM):
             code: Text,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get information about the visual element.
+
+        This method retrieves information about the visual element (logo or icon) of the timeline log entry.
+
+        Args:
+            code: Visual element code;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "code": code,
@@ -64,7 +89,11 @@ class VisualElement(BaseCRM):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of available visual elements.
+
+        This method retrieves a list of available visual elements (icons or logos) for timeline log entries.
+
+        """
         return self._list(timeout=timeout)
 
     @type_checker
@@ -74,7 +103,18 @@ class VisualElement(BaseCRM):
             code: Text,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete visual element.
+
+        This method deletes a visual element.
+
+        Args:
+            code: Visual element code;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "code": code,
