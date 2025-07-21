@@ -2,6 +2,7 @@ from typing import Text
 
 import requests
 
+from .._config import Config
 from ..error import (
 	BitrixAPIInsufficientScope,
 	BitrixAPIInvalidRequest,
@@ -12,7 +13,6 @@ from ..error import (
 )
 from ..utils.types import JSONDict, Timeout
 from .bitrix_app import BitrixApp
-from .config import SdkConfig
 from .functions.parse_response import parse_response
 
 
@@ -27,8 +27,8 @@ class OAuthRequester:
 		bitrix_app: BitrixApp,
 		timeout: Timeout = None,
 	):
-		self._config = SdkConfig()
-		self.bitrix_app = bitrix_app
+		self._config = Config()
+		self._bitrix_app = bitrix_app
 		self._timeout = timeout or self._config.default_timeout
 
 	def _get(self, params: JSONDict) -> JSONDict:
@@ -55,8 +55,8 @@ class OAuthRequester:
 
 		params = {
 			"grant_type": "authorization_code",
-			"client_id": self.bitrix_app.client_id,
-			"client_secret": self.bitrix_app.client_secret,
+			"client_id": self._bitrix_app.client_id,
+			"client_secret": self._bitrix_app.client_secret,
 			"code": code,
 		}
 
@@ -67,8 +67,8 @@ class OAuthRequester:
 
 		params = {
 			"grant_type": "refresh_token",
-			"client_id": self.bitrix_app.client_id,
-			"client_secret": self.bitrix_app.client_secret,
+			"client_id": self._bitrix_app.client_id,
+			"client_secret": self._bitrix_app.client_secret,
 			"refresh_token": refresh_token,
 		}
 

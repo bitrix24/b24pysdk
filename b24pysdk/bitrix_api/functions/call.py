@@ -5,9 +5,9 @@ from urllib.parse import urlparse
 
 import requests
 
+from ..._config import Config
 from ...error import BitrixRequestError, BitrixTimeout
 from ...utils.types import JSONDict, Timeout
-from ..config import SdkConfig
 
 
 def call(
@@ -39,7 +39,7 @@ def call(
             BitrixTimeout: if the request timed out
     """
 
-    bitrix_api_requester = BitrixApiRequester(
+    bitrix_api_requester = _BitrixApiRequester(
         url=url,
         params=params,
         files=files,
@@ -52,7 +52,7 @@ def call(
     return bitrix_api_requester.call()
 
 
-class BitrixApiRequester:
+class _BitrixApiRequester:
     """"""
 
     HEADERS = {
@@ -71,7 +71,7 @@ class BitrixApiRequester:
             initial_retry_delay: Optional[float] = None,
             retry_delay_increment: Optional[float] = None,
     ):
-        self._config = SdkConfig()
+        self._config = Config()
         self._url = url
         self._params = params
         self._files = files
