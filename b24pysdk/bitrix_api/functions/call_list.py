@@ -46,10 +46,10 @@ def _generate_methods_for_batch(
 	"""
 	Generates list of methods, using call_list() api_method and params, adding pagination parameter
 	Args:
-		total: total number of list method's results
-		next_step: index from which generation starts
 		api_method: bitrix api method to call
 		params: parameters of bitrix api method
+		next_step: index from which generation starts
+		total: total number of list method's results
 
 	Returns:
 		list of B24BatchRequestData, ready to be used by call_batches()
@@ -72,7 +72,7 @@ def _generate_filter_id_methods_for_batch(
 	filter_ids: List[int],
 ) -> List[B24BatchRequestData]:
 	"""
-	Generates list of methods, using call_list() api_method and params, slicing ids from paraps['filter'] in chunks
+	Generates list of methods, using call_list() api_method and params, slicing ids from filter parameter in chunks
 
 	Returns:
 		list of B24BatchRequestData, ready to be used by call_batches()
@@ -93,7 +93,11 @@ def _check_filter_by_id_only(params: JSONDict) -> Tuple[Text, Text, List[int]]:
 	Checks if method params contain only single filter by list of ids
 
 	Returns:
-		list of ids to filter by, if params satisfy the condition, otherwise None
+		key by which filter values can be accessed
+
+		key by which list of ids in filter can be accessed
+
+		list of ids to filter by if params satisfy the condition, otherwise None
 	"""
 
 	filter_key = ""
