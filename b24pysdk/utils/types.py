@@ -18,7 +18,10 @@ JSONList = List[JSONDict]
 Key = Union[int, Text]
 """"""
 
-Timeout = Optional[Union[int, float]]
+Number = Union[int, float]
+""""""
+
+Timeout = Optional[Number]
 """"""
 
 B24APIResult = Optional[Union[JSONDict, JSONList, bool]]
