@@ -1,14 +1,27 @@
+from abc import ABC, abstractmethod
 from typing import Text
 
 
-class BitrixApp:
-	"""Local or market bitrix application"""
+class AbstractBitrixApp(ABC):
+	""""""
 
-	__slots__ = ("client_id", "client_secret")
+	client_id: Text = NotImplemented
+	""""""
+
+	client_secret: Text = NotImplemented
+	""""""
+
+	@abstractmethod
+	def __init__(self, *args, **kwargs):
+		""""""
+		super().__init__(*args, **kwargs)
+
+
+class BitrixApp(AbstractBitrixApp):
+	"""Local or market bitrix application"""
 
 	def __init__(
 			self,
-			*,
 			client_id: Text,
 			client_secret: Text,
 	):
