@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 class Template(BaseCRM):
-    """The method offer capabilities for working with document templates.
+    """The methods offer capabilities for working with document templates.
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/document-generator/templates/index.html
     """

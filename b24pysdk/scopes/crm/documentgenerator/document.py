@@ -78,7 +78,7 @@ class Document(BaseCRM):
 
             values: Additional field values;
 
-            stamps_enabled: Stamps and signatures, where 1 - enable, 0 - disable;
+            stamps_enabled: Stamps and signatures, where True - enable, False - disable;
 
             timeout: Timeout in seconds.
 
@@ -204,7 +204,7 @@ class Document(BaseCRM):
 
             values: Array of new field values for the document;
 
-            stamps_enabled: Stamps and signatures, where 1 - enable, 0 - disable;
+            stamps_enabled: Stamps and signatures, where True - enable, False - disable;
 
             timeout: Timeout in seconds.
 
@@ -265,7 +265,7 @@ class Document(BaseCRM):
         Args:
             bitrix_id: Document identifier;
 
-            status: Status of the public link for the document, where 1 - enable, 0 - disable;
+            status: Status of the public link for the document, where True - enable, False - disable;
 
             timeout: Timeout in seconds.
 

@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 class Numerator(BaseCRM):
-    """The method provide capabilities for managing numberers.
+    """The methods provide capabilities for managing numberers.
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/document-generator/numerator/index.html
     """
