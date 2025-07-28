@@ -8,23 +8,31 @@ HALT = True
 DEFAULT_ID_FIELD = "ID"
 
 
-def _deep_merge(*dicts: dict) -> dict:
+def _deep_merge(*dicts: Dict) -> Dict:
     """
     Merges nested dictionaries recursively
     """
-    res = {}
-    for d in dicts:
-        for k, v in d.items():
-            if isinstance(v, dict):
-                if k in res and not isinstance(res[k], (dict, type(None))):
-                    raise ValueError(f"cannot merge {v} into {res[k]}")
-                res[k] = _deep_merge(res.get(k) or {}, v)
-                continue
-            res[k] = v
-    return res
+
+    result: Dict = {}
+
+    for current_dict in dicts:
+
+        for key, value in current_dict.items():
+            existing_value = result.get(key)
+
+            if isinstance(value, dict):
+
+                if existing_value is not None and not isinstance(existing_value, dict):
+                    raise ValueError(f"Cannot merge a dict into a non-dict at key '{key}': {existing_value}")
+
+                result[key] = _deep_merge(existing_value or {}, value)
+            else:
+                result[key] = value
+
+    return result
 
 
-def _order_by_id(request_id_field: Text, descending: bool = False) -> dict:
+def _order_by_id(request_id_field: Text, descending: bool = False) -> Dict:
     """
     Generate order by ID parameter
     """
@@ -36,33 +44,38 @@ def _filter_by_id(
         response_id_field: Text,
         index: int,
         last_id: Optional[int] = None,
-        wrapper: Optional[str] = None,
+        wrapper: Optional[Text] = None,
         descending: bool = False,
-) -> dict:
+) -> Dict:
     """
     Generate filter by id
     """
 
     cmp = "<" if descending else ">"
     prop = f"{cmp}{request_id_field}"
+
     if index == 0:
         if last_id is not None:
             return {"filter": {prop: last_id}}
-        return {}
+        else:
+            return {}
+
     path = f"$result[req_{index - 1}]"
+
     if wrapper:
         path = f"{path}[{wrapper}]"
-    return {"filter": {prop: f"{path}[49][{response_id_field}]"}}
+
+    return {"filter": {prop: f"{path}[{BATCH_SIZE - 1}][{response_id_field}]"}}
 
 
 def _generate_batch_methods(
         api_method: Text,
-        params: Optional[dict],
+        params: Dict,
         request_id_field: Text,
         response_id_field: Text,
         descending: bool,
         wrapper: Optional[Text],
-        last_item_id: Optional[int],
+        last_entity_id: Optional[int],
 ) -> Dict[Text, B24BatchRequestData]:
     """
     Generates list of methods, using call_list_fast() api_method and params, adding filter by ID
@@ -71,22 +84,23 @@ def _generate_batch_methods(
         dict of B24BatchRequestData, ready to be used by call_batches()
     """
 
-    methods = {}
-    for i in range(BATCH_SIZE):
+    methods: Dict[Text, B24BatchRequestData] = {}
+
+    for index in range(BATCH_SIZE):
         batch_params = _deep_merge(
-            dict() if params is None else params,
+            params,
             _order_by_id(request_id_field, descending),
             _filter_by_id(
                 request_id_field=request_id_field,
                 response_id_field=response_id_field,
-                index=i,
-                last_id=last_item_id,
+                index=index,
+                last_id=last_entity_id,
                 wrapper=wrapper,
                 descending=descending,
             ),
             dict(start=-1),
         )
-        methods[f"req_{i}"] = (api_method, batch_params)
+        methods[f"req_{index}"] = (api_method, batch_params)
 
     return methods
 
@@ -126,8 +140,12 @@ def call_list_fast(
         list of items
     """
 
-    items = []
-    last_item_id = None
+    entities = []
+    last_entity_id = None
+
+    if params is None:
+        params = dict()
+
     while True:
         methods = _generate_batch_methods(
             api_method=api_method,
@@ -136,10 +154,10 @@ def call_list_fast(
             response_id_field=response_id_field,
             descending=descending,
             wrapper=wrapper,
-            last_item_id=last_item_id,
+            last_entity_id=last_entity_id,
         )
 
-        batch = call_batches(
+        batch_response = call_batches(
             domain=domain,
             auth_token=auth_token,
             is_webhook=is_webhook,
@@ -149,17 +167,18 @@ def call_list_fast(
             **kwargs,
         )
 
-        results: JSONDict = batch["result"]["result"]
+        results: JSONDict = batch_response["result"]["result"]
+
         for batch_items in results.values():
             if wrapper:
                 batch_items = batch_items[wrapper]
 
-            items.extend(batch_items)
+            entities.extend(batch_items)
 
-            if limit is not None and len(items) >= limit:
-                return items[:limit]
+            if limit is not None and len(entities) >= limit:
+                return entities[:limit]
 
             if len(batch_items) < BATCH_SIZE:
-                return items
+                return entities
 
-            last_item_id = items[-1][response_id_field]
+            last_entity_id = entities[-1][response_id_field]

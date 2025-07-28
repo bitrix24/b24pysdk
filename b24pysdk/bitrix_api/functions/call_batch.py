@@ -1,8 +1,8 @@
 from typing import Dict, Sequence, Text, Union
 
+from ...utils.encoding import encode_params
 from ...utils.types import B24BatchRequestData, JSONDict, Key, Timeout
 from .call_method import call_method
-from .convert_params import convert_params
 
 MAX_BATCH_SIZE = 50
 API_METHOD = "batch"
@@ -31,10 +31,10 @@ def call_batch(
 
     if isinstance(methods, dict):
         for key, (api_method, params) in methods.items():
-            cmd[key] = f"{api_method}?{convert_params(params or dict())}"
+            cmd[key] = f"{api_method}?{encode_params(params)}"
     else:
         for index, (api_method, params) in enumerate(methods):
-            cmd[index] = f"{api_method}?{convert_params(params or dict())}"
+            cmd[index] = f"{api_method}?{encode_params(params)}"
 
     return call_method(
             domain=domain,
