@@ -9,14 +9,29 @@ from .utils.types import Key, Timeout
 class Client:
     """"""
 
-    __slots__ = ("bitrix_token", "crm")
+    __slots__ = (
+        "_bitrix_token",
+        "crm",
+        "user",
+    )
 
-    bitrix_token: AbstractBitrixToken
+    _bitrix_token: AbstractBitrixToken
     crm: scopes.CRM
+    user: scopes.User
 
-    def __init__(self, bitrix_token: AbstractBitrixToken):
-        self.bitrix_token = bitrix_token
+    def __init__(
+            self,
+            bitrix_token: AbstractBitrixToken,
+    ):
+        self._bitrix_token = bitrix_token
         self.crm = scopes.CRM(self)
+        self.user = scopes.User(self)
+
+    def __str__(self):
+        return f"<Client of portal {self._bitrix_token.domain}>"
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(bitrix_token={self._bitrix_token})"
 
     def call_batch(
             self,
@@ -27,7 +42,7 @@ class Client:
     ) -> BitrixAPIBatchRequest:
         """"""
         return BitrixAPIBatchRequest(
-            bitrix_token=self.bitrix_token,
+            bitrix_token=self._bitrix_token,
             bitrix_api_requests=bitrix_api_requests,
             halt=halt,
             ignore_size_limit=ignore_size_limit,
@@ -42,7 +57,7 @@ class Client:
     ) -> BitrixAPIBatchesRequest:
         """"""
         return BitrixAPIBatchesRequest(
-            bitrix_token=self.bitrix_token,
+            bitrix_token=self._bitrix_token,
             bitrix_api_requests=bitrix_api_requests,
             halt=halt,
             timeout=timeout,
@@ -55,7 +70,7 @@ class Client:
     ) -> BitrixAPIListRequest:
         """"""
         return BitrixAPIListRequest(
-            bitrix_token=self.bitrix_token,
+            bitrix_token=self._bitrix_token,
             bitrix_api_request=bitrix_api_request,
             limit=limit,
         )
