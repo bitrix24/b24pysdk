@@ -1,9 +1,8 @@
 from typing import Dict, List, Sequence, Text, Tuple, Union
 
+from ..._constants import MAX_BATCH_SIZE
 from ...utils.types import B24BatchRequestData, JSONDict, JSONList, Key, Timeout
 from .call_batch import call_batch
-
-MAX_BATCH_SIZE = 50
 
 
 def _force_dict(collection: Union[Dict, List]) -> JSONDict:
@@ -18,6 +17,7 @@ def _force_dict(collection: Union[Dict, List]) -> JSONDict:
 
 
 def call_batches(
+		*,
 		domain: Text,
 		auth_token: Text,
 		is_webhook: bool,
@@ -79,7 +79,7 @@ def call_batches(
 			processing=0,
 			date_start=first_batch_response["time"]["date_start"],
 			date_finish=last_batch_response["time"]["date_finish"],
-		)
+		),
 	)
 
 	if last_batch_response["time"].get("operating_reset_at") is not None:

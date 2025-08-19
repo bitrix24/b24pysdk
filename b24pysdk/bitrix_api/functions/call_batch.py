@@ -1,11 +1,11 @@
 from typing import Dict, Sequence, Text, Union
 
+from ..._constants import MAX_BATCH_SIZE
 from ...utils.encoding import encode_params
 from ...utils.types import B24BatchRequestData, JSONDict, Key, Timeout
 from .call_method import call_method
 
-MAX_BATCH_SIZE = 50
-API_METHOD = "batch"
+_API_METHOD = "batch"
 
 
 def call_batch(
@@ -40,7 +40,7 @@ def call_batch(
             domain=domain,
             auth_token=auth_token,
             is_webhook=is_webhook,
-            api_method=API_METHOD,
+            api_method=_API_METHOD,
             params=dict(
                 cmd=cmd,
                 halt=halt,

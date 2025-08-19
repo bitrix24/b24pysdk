@@ -1,12 +1,13 @@
 from typing import Iterable, List, Optional, Text, Tuple
 
+from ..._constants import MAX_BATCH_SIZE
 from ...utils.types import B24BatchRequestData, JSONDict, JSONList, Timeout
 from .call_batches import call_batches
 from .call_method import call_method
 
-STEP = 50
-HALT = True
-ALLOWED_PARAMS = ("filter", "select")
+_ALLOWED_PARAMS_FOR_OPTIMIZATION_BY_ID = ("filter", "select")
+_HALT = True
+_STEP = MAX_BATCH_SIZE
 
 
 def _unwrap_result(result: JSONDict, api_method: Text) -> JSONList:
@@ -18,7 +19,7 @@ def _unwrap_result(result: JSONDict, api_method: Text) -> JSONList:
 	if isinstance(result, list):
 		return result
 	else:
-		raise ValueError(f"API method '{api_method}' is not a list method!")
+		raise TypeError(f"API method '{api_method}' is not a list method!")
 
 
 def _unwrap_batch_result(batch_result: JSONDict, api_method: Text) -> JSONList:
@@ -57,7 +58,7 @@ def _generate_methods_for_batch(
 
 	methods: List[B24BatchRequestData] = list()
 
-	for start in range(next_step, total, STEP):
+	for start in range(next_step, total, _STEP):
 		page_params = params | {"start": start}
 		methods.append((api_method, page_params))
 
@@ -80,8 +81,8 @@ def _generate_filter_id_methods_for_batch(
 
 	methods: List[B24BatchRequestData] = list()
 
-	for start in range(0, len(filter_ids), STEP):
-		id_chunk = filter_ids[start:start + STEP]
+	for start in range(0, len(filter_ids), _STEP):
+		id_chunk = filter_ids[start:start + _STEP]
 		chunk_params = params | {filter_key: {filter_id_key: id_chunk}}
 		methods.append((api_method, chunk_params))
 
@@ -111,7 +112,7 @@ def _check_filter_by_id_only(params: JSONDict) -> Tuple[Text, Text, List[int]]:
 		if key.lower() == "filter":
 			filter_key = key
 
-		if key.lower() not in ALLOWED_PARAMS:
+		if key.lower() not in _ALLOWED_PARAMS_FOR_OPTIMIZATION_BY_ID:
 			return filter_key, filter_id_key, filter_ids
 
 	if not (filter_key and isinstance(params[filter_key], dict)):
@@ -129,6 +130,21 @@ def _check_filter_by_id_only(params: JSONDict) -> Tuple[Text, Text, List[int]]:
 		filter_ids = list(filter_id_value)
 
 	return filter_key, filter_id_key, filter_ids
+
+
+def _add_time(target_time: JSONDict, term_time: JSONDict):
+	""""""
+
+	target_time["finish"] = term_time["finish"]
+	target_time["duration"] += term_time["duration"]
+	target_time["processing"] += term_time["processing"]
+	target_time["date_finish"] = term_time["date_finish"]
+
+	if target_time.get("operating_reset_at") is not None:
+		target_time["operating_reset_at"] = term_time["operating_reset_at"]
+
+	if target_time.get("operating") is not None:
+		target_time["operating"] = term_time["operating"]
 
 
 def call_list(
@@ -164,7 +180,7 @@ def call_list(
 			auth_token=auth_token,
 			is_webhook=is_webhook,
 			methods=methods,
-			halt=HALT,
+			halt=_HALT,
 			timeout=timeout,
 			**kwargs,
 		)
@@ -203,24 +219,14 @@ def call_list(
 				next_step=next_step,
 				total=total,
 			),
-			halt=HALT,
+			halt=_HALT,
 			timeout=timeout,
 			**kwargs,
 		)
+
 		result.extend(_unwrap_batch_result(batch_response["result"], api_method))
 
-		batch_time = batch_response["time"]
-
-		time["finish"] = batch_time["finish"]
-		time["duration"] += batch_time["duration"]
-		time["processing"] += batch_time["processing"]
-		time["date_finish"] = batch_time["date_finish"]
-
-		if batch_time.get("operating_reset_at") is not None:
-			time["operating_reset_at"] = batch_time["operating_reset_at"]
-
-		if batch_time.get("operating") is not None:
-			time["operating"] = batch_time["operating"]
+		_add_time(time, batch_response["time"])
 
 	return dict(
 		result=result[:total],

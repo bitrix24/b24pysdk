@@ -65,14 +65,21 @@ _EXCEPTIONS_BY_ERROR: Dict[Text, Type[BitrixAPIError]] = {
 
 _EXCEPTIONS_BY_STATUS_CODE: Dict[int, Type[BitrixAPIError]] = {
     BitrixAPIInternalServerError.STATUS_CODE: BitrixAPIInternalServerError,  # 500
-    BitrixAPIServiceUnavailable.STATUS_CODE: BitrixAPIServiceUnavailable,    # 503
-    BitrixAPIMethodNotAllowed.STATUS_CODE: BitrixAPIMethodNotAllowed,        # 405
-    BitrixAPINotFound.STATUS_CODE: BitrixAPINotFound,                        # 404
-    BitrixAPIForbidden.STATUS_CODE: BitrixAPIForbidden,                      # 403
-    BitrixAPIUnauthorized.STATUS_CODE: BitrixAPIUnauthorized,                # 401
-    BitrixAPIBadRequest.STATUS_CODE: BitrixAPIBadRequest,                    # 400
+    BitrixAPIServiceUnavailable.STATUS_CODE: BitrixAPIServiceUnavailable,  # 503
+    BitrixAPIMethodNotAllowed.STATUS_CODE: BitrixAPIMethodNotAllowed,  # 405
+    BitrixAPINotFound.STATUS_CODE: BitrixAPINotFound,  # 404
+    BitrixAPIForbidden.STATUS_CODE: BitrixAPIForbidden,  # 403
+    BitrixAPIUnauthorized.STATUS_CODE: BitrixAPIUnauthorized,  # 401
+    BitrixAPIBadRequest.STATUS_CODE: BitrixAPIBadRequest,  # 400
 }
 """"""
+
+
+def _raise_http_error(response: requests.Response):
+    raise HTTPError(
+        f"{response.status_code} Client Error: {response.json()['error']} for url: {response.url}",
+        response=response,
+    )
 
 
 def parse_response(response: requests.Response) -> JSONDict:
@@ -85,9 +92,7 @@ def parse_response(response: requests.Response) -> JSONDict:
         json_response = response.json()
 
         if "error" in json_response:
-            raise HTTPError(f"{response.status_code} Client Error: {json_response['error']} for url: {response.url}", response=response)
-
-        return json_response
+            _raise_http_error(response)
 
     except HTTPError:
         try:
@@ -95,12 +100,15 @@ def parse_response(response: requests.Response) -> JSONDict:
             error = str(json_response.get("error", ""))
 
             exception_class = (
-                _EXCEPTIONS_BY_ERROR.get(error.upper()) or
-                _EXCEPTIONS_BY_STATUS_CODE.get(response.status_code) or
-                BitrixAPIError
+                    _EXCEPTIONS_BY_ERROR.get(error.upper()) or
+                    _EXCEPTIONS_BY_STATUS_CODE.get(response.status_code) or
+                    BitrixAPIError
             )
 
             raise exception_class(json_response, response)
 
         except JSONDecodeError as error:
             raise BitrixResponseJSONDecodeError(original_error=error, response=response) from error
+
+    else:
+        return json_response

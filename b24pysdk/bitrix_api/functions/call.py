@@ -1,6 +1,6 @@
 import time
 from http import HTTPStatus
-from typing import IO, Dict, Optional, Text, Tuple
+from typing import IO, ClassVar, Dict, Optional, Text, Tuple
 from urllib.parse import urlparse
 
 import requests
@@ -55,7 +55,7 @@ def call(
 class _BitrixApiRequester:
     """"""
 
-    HEADERS = {
+    HEADERS: ClassVar[Dict] = {
         "Content-Type": "application/json",
     }
     ALLOW_REDIRECTS = False

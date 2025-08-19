@@ -1,11 +1,20 @@
-from typing import Dict, Optional, Text
+from datetime import datetime
+from typing import Dict, Generator, Iterable, List, Optional, Text, Union
 
+from ..._constants import MAX_BATCH_SIZE
 from ...utils.types import B24BatchRequestData, JSONDict, JSONList, Timeout
-from .call_batches import call_batches
+from .call_batch import call_batch
 
-BATCH_SIZE = 50
-HALT = True
-DEFAULT_ID_FIELD = "ID"
+_DEFAULT_ID_FIELD = "ID"
+_HALT = True
+
+
+def _force_values(collection: Union[Dict, List]) -> Iterable[Union[JSONDict, JSONList]]:
+    """"""
+    if isinstance(collection, dict):
+        return collection.values()
+    else:
+        return collection
 
 
 def _deep_merge(*dicts: Dict) -> Dict:
@@ -13,26 +22,26 @@ def _deep_merge(*dicts: Dict) -> Dict:
     Merges nested dictionaries recursively
     """
 
-    result: Dict = {}
+    result_dict: Dict = {}
 
     for current_dict in dicts:
 
         for key, value in current_dict.items():
-            existing_value = result.get(key)
+            existing_value = result_dict.get(key)
 
             if isinstance(value, dict):
 
                 if existing_value is not None and not isinstance(existing_value, dict):
                     raise ValueError(f"Cannot merge a dict into a non-dict at key '{key}': {existing_value}")
 
-                result[key] = _deep_merge(existing_value or {}, value)
+                result_dict[key] = _deep_merge(existing_value or {}, value)
             else:
-                result[key] = value
+                result_dict[key] = value
 
-    return result
+    return result_dict
 
 
-def _order_by_id(request_id_field: Text, descending: bool = False) -> Dict:
+def _order_by_id(request_id_field: Text, descending: bool = False) -> JSONDict:
     """
     Generate order by ID parameter
     """
@@ -43,9 +52,9 @@ def _filter_by_id(
         request_id_field: Text,
         response_id_field: Text,
         index: int,
-        last_id: Optional[int] = None,
-        wrapper: Optional[Text] = None,
-        descending: bool = False,
+        last_id: Optional[int],
+        wrapper: Optional[Text],
+        descending: bool,
 ) -> Dict:
     """
     Generate filter by id
@@ -65,7 +74,7 @@ def _filter_by_id(
     if wrapper:
         path = f"{path}[{wrapper}]"
 
-    return {"filter": {prop: f"{path}[{BATCH_SIZE - 1}][{response_id_field}]"}}
+    return {"filter": {prop: f"{path}[{MAX_BATCH_SIZE - 1}][{response_id_field}]"}}
 
 
 def _generate_batch_methods(
@@ -84,12 +93,13 @@ def _generate_batch_methods(
         dict of B24BatchRequestData, ready to be used by call_batches()
     """
 
-    methods: Dict[Text, B24BatchRequestData] = {}
+    methods: Dict[Text, B24BatchRequestData] = dict()
+    order_dict: JSONDict = _order_by_id(request_id_field, descending)
 
-    for index in range(BATCH_SIZE):
+    for index in range(MAX_BATCH_SIZE):
         batch_params = _deep_merge(
             params,
-            _order_by_id(request_id_field, descending),
+            order_dict,
             _filter_by_id(
                 request_id_field=request_id_field,
                 response_id_field=response_id_field,
@@ -105,6 +115,88 @@ def _generate_batch_methods(
     return methods
 
 
+def _add_time(target_time: JSONDict, term_time: JSONDict):
+    """"""
+
+    target_time["finish"] = term_time["finish"]
+    target_time["duration"] += term_time["duration"]
+    target_time["processing"] += term_time["processing"]
+    target_time["date_finish"] = term_time["date_finish"]
+
+    if target_time.get("operating_reset_at") is not None:
+        target_time["operating_reset_at"] = term_time["operating_reset_at"]
+
+    if target_time.get("operating") is not None:
+        target_time["operating"] = term_time["operating"]
+
+
+def _generate_result(
+        domain: Text,
+        auth_token: Text,
+        is_webhook: bool,
+        api_method: Text,
+        params: JSONDict,
+        limit: Optional[int],
+        request_id_field: Text,
+        response_id_field: Text,
+        wrapper: Optional[Text],
+        descending: bool,
+        timeout: Timeout,
+        time: JSONDict,
+        **kwargs,
+) -> Generator[JSONDict, None, None]:
+    """"""
+
+    counter = 0
+    last_entity_id = None
+
+    while True:
+        methods = _generate_batch_methods(
+            api_method=api_method,
+            params=params,
+            request_id_field=request_id_field,
+            response_id_field=response_id_field,
+            descending=descending,
+            wrapper=wrapper,
+            last_entity_id=last_entity_id,
+        )
+
+        batch_response = call_batch(
+            domain=domain,
+            auth_token=auth_token,
+            is_webhook=is_webhook,
+            methods=methods,
+            halt=_HALT,
+            timeout=timeout,
+            **kwargs,
+        )
+
+        _add_time(time, batch_response["time"])
+
+        results: Union[JSONDict, JSONList] = batch_response["result"]["result"]
+
+        if not results:
+            return
+
+        for result_values in _force_values(results):
+            if wrapper:
+                unwrapped_values = result_values[wrapper]
+            else:
+                unwrapped_values = result_values
+
+            for result_value in unwrapped_values:
+                yield result_value
+                counter += 1
+
+                if limit is not None and counter >= limit:
+                    return
+
+            if len(unwrapped_values) < MAX_BATCH_SIZE:
+                return
+
+            last_entity_id = unwrapped_values[-1][response_id_field]
+
+
 def call_list_fast(
         *,
         domain: Text,
@@ -113,13 +205,13 @@ def call_list_fast(
         api_method: Text,
         params: Optional[JSONDict] = None,
         limit: Optional[int] = None,
-        request_id_field: Text = DEFAULT_ID_FIELD,
-        response_id_field: Text = DEFAULT_ID_FIELD,
+        request_id_field: Text = _DEFAULT_ID_FIELD,
+        response_id_field: Text = _DEFAULT_ID_FIELD,
         wrapper: Optional[Text] = None,
         descending: bool = False,
         timeout: Timeout = None,
         **kwargs,
-) -> JSONList:
+) -> JSONDict:
     """
     Retrieve large number of items using filter by ID and start=-1 parameter to disable the count of items
 
@@ -140,45 +232,35 @@ def call_list_fast(
         list of items
     """
 
-    entities = []
-    last_entity_id = None
-
     if params is None:
         params = dict()
 
-    while True:
-        methods = _generate_batch_methods(
-            api_method=api_method,
-            params=params,
-            request_id_field=request_id_field,
-            response_id_field=response_id_field,
-            descending=descending,
-            wrapper=wrapper,
-            last_entity_id=last_entity_id,
-        )
+    now_datetime = datetime.now().astimezone()
 
-        batch_response = call_batches(
+    time = dict(
+        start=now_datetime.timestamp(),
+        finish=now_datetime.timestamp(),
+        duration=0,
+        processing=0,
+        date_start=now_datetime.isoformat(timespec="seconds"),
+        date_finish=now_datetime.isoformat(timespec="seconds"),
+    )
+
+    return dict(
+        result=_generate_result(
             domain=domain,
             auth_token=auth_token,
             is_webhook=is_webhook,
-            methods=methods,
-            halt=HALT,
+            api_method=api_method,
+            params=params,
+            limit=limit,
+            request_id_field=request_id_field,
+            response_id_field=response_id_field,
+            wrapper=wrapper,
+            descending=descending,
             timeout=timeout,
+            time=time,
             **kwargs,
-        )
-
-        results: JSONDict = batch_response["result"]["result"]
-
-        for batch_items in results.values():
-            if wrapper:
-                batch_items = batch_items[wrapper]
-
-            entities.extend(batch_items)
-
-            if limit is not None and len(entities) >= limit:
-                return entities[:limit]
-
-            if len(batch_items) < BATCH_SIZE:
-                return entities
-
-            last_entity_id = entities[-1][response_id_field]
+        ),
+        time=time,
+    )
