@@ -1,6 +1,7 @@
-from functools import wraps
-from types import FunctionType
-from typing import Any, Callable, Optional, Type, Union, get_args, get_origin, get_type_hints
+import functools
+import typing
+
+_T = typing.TypeVar("_T", bound=typing.Callable[..., typing.Any])
 
 
 class Classproperty:
@@ -9,11 +10,11 @@ class Classproperty:
     that can be accessed directly from the class.
     """
 
-    def __init__(self, method: Optional[FunctionType] = None):
+    def __init__(self, method: typing.Optional[typing.Callable] = None):
         self.fget = method
         self.fset = None
 
-    def __get__(self, instance, cls: Optional[Type] = None):
+    def __get__(self, instance, cls: typing.Optional[typing.Type] = None):
         if self.fget is None:
             raise AttributeError("Unreadable attribute")
 
@@ -27,28 +28,28 @@ class Classproperty:
         cls = instance if isinstance(instance, type) else type(instance)
         return self.fset(cls, value)
 
-    def getter(self, method: Optional[FunctionType] = None):
+    def getter(self, method: typing.Optional[typing.Callable] = None):
         self.fget = method
         return self
 
-    def setter(self, method: FunctionType):
+    def setter(self, method: typing.Callable):
         self.fset = method
         return self
 
 
-def type_checker(func: FunctionType) -> Callable:
+def type_checker(func: _T) -> _T:
     """"""
 
-    type_hints = get_type_hints(func)
+    type_hints = typing.get_type_hints(func)
 
-    def is_valid_type(value: Any, expected_type: Type) -> bool:
-        if expected_type is Any:
+    def is_valid_type(value: typing.Any, expected_type: typing.Type) -> bool:
+        if expected_type is typing.Any:
             return True
 
-        origin_type = get_origin(expected_type)
-        args = get_args(expected_type)
+        origin_type = typing.get_origin(expected_type)
+        args = typing.get_args(expected_type)
 
-        if origin_type is Union:
+        if origin_type is typing.Union:
             return any(is_valid_type(value, arg) for arg in args)
 
         if origin_type is not None:
@@ -56,7 +57,7 @@ def type_checker(func: FunctionType) -> Callable:
 
         return isinstance(value, expected_type)
 
-    @wraps(func)
+    @functools.wraps(func)
     def wrapper(*args, **kwargs):
         for param_index, arg in enumerate(args):
             param_name = func.__code__.co_varnames[param_index]

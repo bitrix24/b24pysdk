@@ -1,10 +1,11 @@
-import urllib.parse
-from typing import Any, Iterable, List, Mapping, Optional, Text, Union
+import typing
+import urllib.parse as _parser
 
-from .types import JSONDict, JSONList
+from .types import JSONDict as _JSONDict
+from .types import JSONList as _JSONList
 
 
-def _force_str(value: Any) -> Text:
+def _force_str(value: typing.Any) -> typing.Text:
     """"""
 
     if isinstance(value, str):
@@ -15,7 +16,7 @@ def _force_str(value: Any) -> Text:
         return str(value)
 
 
-def encode_params(params: Optional[Union[JSONDict, JSONList]]) -> Text:
+def encode_params(params: typing.Optional[typing.Union[_JSONDict, _JSONList]]) -> typing.Text:
     """
     Recursively converts list/tuple/dict to string that can be understood by Bitrix API
 
@@ -40,18 +41,18 @@ def encode_params(params: Optional[Union[JSONDict, JSONList]]) -> Text:
     if params is None:
         params = dict()
 
-    def _traverse(values: Any, outer_key: Optional[Text] = None) -> List[Text]:
+    def _traverse(values: typing.Any, outer_key: typing.Optional[typing.Text] = None) -> typing.List[typing.Text]:
         """
         Args:
             values: If argument is a string, returns a string of format "key=values", else returns a string of key-value pairs separated by "&" like so: "key=value&key=value"
             outer_key: Equals to None during top-level call, and recursive calls pass inner keys like so: "" => "field" => "field[hello]" => "field[hello][there]" => ...
         """
 
-        encoded_params: List[Text] = []
+        encoded_params: typing.List[typing.Text] = []
 
-        if not isinstance(values, Iterable) or isinstance(values, (str, bytes)):
+        if not isinstance(values, typing.Iterable) or isinstance(values, (str, bytes)):
             # scalar values
-            encoded_values = "" if values is None else urllib.parse.quote_plus(_force_str(values))
+            encoded_values = "" if values is None else _parser.quote_plus(_force_str(values))
 
             return [f"{outer_key}={encoded_values}"]
 
@@ -62,17 +63,17 @@ def encode_params(params: Optional[Union[JSONDict, JSONList]]) -> Text:
             return [f"{outer_key}[]="]
 
         # create key-value iterator from iterable
-        items = values.items() if isinstance(values, Mapping) else enumerate(values)
+        items = values.items() if isinstance(values, typing.Mapping) else enumerate(values)
 
         # recursively converts inner keys
         for inner_key, value in items:
             # only inner key is converted, because outer key can contain square brackets which need to be preserved
-            inner_key = urllib.parse.quote_plus(_force_str(inner_key))
+            quoted_key = _parser.quote_plus(_force_str(inner_key))
 
             if outer_key is not None:
-                full_key = f"{outer_key}[{inner_key}]"
+                full_key = f"{outer_key}[{quoted_key}]"
             else:
-                full_key = inner_key
+                full_key = quoted_key
 
             encoded_params.extend(_traverse(value, full_key))
 

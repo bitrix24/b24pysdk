@@ -1,41 +1,37 @@
-from typing import (
-    Any,
-    Dict,
-    List,
-    Literal,
-    Optional,
-    Text,
-    Tuple,
-    Union,
-)
+import typing
 
-JSONDict = Dict[Text, Any]
+JSONDict = typing.Dict[typing.Text, typing.Any]
 """A dictionary containing response from the API or data to send to the API."""
 
-JSONList = List[JSONDict]
+JSONList = typing.List[JSONDict]
 """A list containing response from the API or data to send to the API."""
 
-Key = Union[int, Text]
+Key = typing.Union[int, typing.Text]
 """"""
 
-Number = Union[int, float]
+Number = typing.Union[int, float]
 """"""
 
-Timeout = Optional[Number]
+DefaultTimeout = typing.Union[Number, typing.Tuple[Number, Number]]
 """"""
 
-B24APIResult = Optional[Union[JSONDict, JSONList, bool]]
+Timeout = typing.Optional[DefaultTimeout]
 """"""
 
-B24BatchRequestData = Tuple[Text, Optional[JSONDict]]
+B24APIResult = typing.Optional[typing.Union[JSONDict, JSONList, bool]]
+""""""
+
+B24BatchRequestData = typing.Tuple[typing.Text, typing.Optional[JSONDict]]
 """Tuple containing rest api method and its parameters"""
 
-B24BoolLiteral = Literal["Y", "N", "D"]
+B24BoolLiteral = typing.Literal["Y", "N", "D"]
 """"""
 
 
 class B24BoolStr(str):
     """"""
+
+    __slots__ = ()
 
     _ALLOWED_VALUES = frozenset({"Y", "N", "D"})
 
@@ -58,7 +54,7 @@ class B24Bool:
     FALSE: B24BoolLiteral = "N"
     DEFAULT: B24BoolLiteral = "D"
 
-    _B24_VALUES = {
+    _B24_VALUES: typing.ClassVar[typing.Dict] = {
         True: TRUE,
         False: FALSE,
         None: DEFAULT,
@@ -68,9 +64,9 @@ class B24Bool:
 
     def __init__(
             self,
-            value: Optional[Union["B24Bool", B24BoolLiteral, B24BoolStr, bool]]
+            value: typing.Optional[typing.Union["B24Bool", B24BoolLiteral, B24BoolStr, bool]],
     ):
-        self.value = value
+        self._value = self._normalize(value)
 
     def __bool__(self):
         return bool(self._value)
@@ -84,8 +80,8 @@ class B24Bool:
     @classmethod
     def _normalize(
             cls,
-            value: Optional[Union["B24Bool", B24BoolLiteral, B24BoolStr, bool]]
-    ) -> Optional[bool]:
+            value: typing.Optional[typing.Union["B24Bool", B24BoolLiteral, B24BoolStr, bool]],
+    ) -> typing.Optional[bool]:
         """"""
 
         if isinstance(value, cls):
@@ -104,14 +100,14 @@ class B24Bool:
             raise ValueError(f"Invalid value for {cls.__name__}: {value}")
 
     @property
-    def value(self) -> Optional[bool]:
+    def value(self) -> typing.Optional[bool]:
         """"""
         return self._value
 
     @value.setter
     def value(
             self,
-            value: Optional[Union["B24Bool", B24BoolLiteral, B24BoolStr, bool]],
+            value: typing.Optional[typing.Union["B24Bool", B24BoolLiteral, B24BoolStr, bool]],
     ):
         """"""
         self._value = self._normalize(value)
@@ -120,7 +116,7 @@ class B24Bool:
         """"""
         return self._B24_VALUES[self._value]
 
-    def to_str(self) -> Text:
+    def to_str(self) -> typing.Text:
         """"""
         return str(self)
 
