@@ -1,15 +1,17 @@
 from abc import ABC
 from typing import Callable, Optional, Text
 
+from ..bitrix_api.bitrix_token import AbstractBitrixToken
 from ..bitrix_api.classes import BitrixAPIRequest
 from ..utils.functional import Classproperty
+from ..utils.types import JSONDict, Timeout
 from .scope import Scope
 
 
 class Base(ABC):
     """"""
 
-    __slots__ = ("_scope", "_path")
+    __slots__ = ("_path", "_scope")
 
     _scope: Scope
     _path: Text
@@ -18,39 +20,45 @@ class Base(ABC):
         self._scope = scope
         self._path = self._get_path()
 
-    def _fields(self, *args, **kwargs) -> BitrixAPIRequest:
-        raise NotImplementedError(f"Method 'fields' is not implemented in class '{self.__class__.__name__}'")
+    def __str__(self):
+        return self._path
 
-    def _add(self, *args, **kwargs) -> BitrixAPIRequest:
-        raise NotImplementedError(f"Method 'add' is not implemented in class '{self.__class__.__name__}'")
-
-    def _get(self, *args, **kwargs) -> BitrixAPIRequest:
-        raise NotImplementedError(f"Method 'get' is not implemented in class '{self.__class__.__name__}'")
-
-    def _list(self, *args, **kwargs) -> BitrixAPIRequest:
-        raise NotImplementedError(f"Method 'list' is not implemented in class '{self.__class__.__name__}'")
-
-    def _update(self, *args, **kwargs) -> BitrixAPIRequest:
-        raise NotImplementedError(f"Method 'update' is not implemented in class '{self.__class__.__name__}'")
-
-    def _delete(self, *args, **kwargs) -> BitrixAPIRequest:
-        raise NotImplementedError(f"Method 'delete' is not implemented in class '{self.__class__.__name__}'")
+    def __repr__(self):
+        return f"client.{self._path}"
 
     @Classproperty
-    def _bitrix_entity(cls) -> Text:
+    def _name(cls) -> Text:
         """"""
         return cls.__name__.lower()
 
     def _get_path(self, base: Optional["Base"] = None) -> Text:
         """"""
-        return f"{getattr(base, '_path', self._scope.name)}.{self._bitrix_entity}"
+        return f"{getattr(base, '_path', self._scope)}.{self._name}"
 
-    def _get_api_method(self, method: Callable) -> Text:
-        """"""
-        return f"{self._path}.{self.__to_camel_case(method.__name__.strip('_'))}"
+    @property
+    def _bitrix_token(self) -> AbstractBitrixToken:
+        return getattr(self._scope, "_bitrix_token")
 
     @staticmethod
     def __to_camel_case(snake_str: Text) -> Text:
         """Converts Python methods names to camelCase to be used in _get_api_method"""
         first, *parts = snake_str.split("_")
-        return "".join([first.lower(), *(str.title(part) for part in parts)])
+        return "".join([first.lower(), *(part.title() for part in parts)])
+
+    def _get_api_method(self, method: Callable) -> Text:
+        """"""
+        return f"{self}.{self.__to_camel_case(method.__name__.strip('_'))}"
+
+    def _make_bitrix_api_request(
+            self,
+            api_method: Callable,
+            params: Optional[JSONDict] = None,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+        return BitrixAPIRequest(
+            bitrix_token=self._bitrix_token,
+            api_method=self._get_api_method(api_method),
+            params=params,
+            timeout=timeout,
+        )
