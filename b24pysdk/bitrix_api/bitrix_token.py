@@ -4,7 +4,11 @@ from typing import Callable, Dict, Optional, Sequence, Text, Tuple, Union
 from ..error import BitrixAPIExpiredToken
 from ..utils.types import B24BatchRequestData, JSONDict, Key, Timeout
 from .bitrix_app import BitrixApp
-from .functions import call_batch, call_batches, call_list, call_list_fast, call_method
+from .functions.call_batch import call_batch
+from .functions.call_batches import call_batches
+from .functions.call_list import call_list
+from .functions.call_list_fast import call_list_fast
+from .functions.call_method import call_method
 from .oauth_requester import OAuthRequester
 
 
@@ -30,6 +34,9 @@ class AbstractBitrixToken(ABC):
     def __init__(self, *args, **kwargs):
         """"""
         super().__init__(*args, **kwargs)
+
+    def __str__(self):
+        return f"<{'Webhook' if self.is_webhook else 'Application'} token of portal {self.domain}>"
 
     @property
     def is_webhook(self) -> bool:
@@ -58,12 +65,12 @@ class AbstractBitrixToken(ABC):
         """"""
         try:
             return call_func(**self._auth_data, **parameters)
-        except BitrixAPIExpiredToken as error:
+        except BitrixAPIExpiredToken:
             if self.AUTO_REFRESH and not self.is_webhook:
                 self.auth_token, self.refresh_token = self.refresh()
                 return call_func(**self._auth_data, **parameters)
             else:
-                raise error
+                raise
 
     def authorize(self, code: Text) -> JSONDict:
         """"""

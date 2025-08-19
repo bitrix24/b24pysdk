@@ -1,4 +1,4 @@
-from typing import Text
+from typing import ClassVar, Dict, Text
 
 import requests
 
@@ -19,8 +19,8 @@ from .functions.parse_response import parse_response
 class OAuthRequester:
 	""""""
 
-	URL = "https://oauth.bitrix.info/oauth/token/"
-	HEADERS = {"Content-Type": "application/x-www-form-urlencoded"}
+	URL: ClassVar[Text] = "https://oauth.bitrix.info/oauth/token/"
+	HEADERS: ClassVar[Dict] = {"Content-Type": "application/x-www-form-urlencoded"}
 
 	def __init__(
 		self,
@@ -35,7 +35,7 @@ class OAuthRequester:
 		""""""
 
 		try:
-			response = requests.get(self.URL, params=params, headers=self.HEADERS)
+			response = requests.get(self.URL, params=params, headers=self.HEADERS, timeout=self._timeout)
 			return parse_response(response)
 
 		except requests.Timeout as error:
