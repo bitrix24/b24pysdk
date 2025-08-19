@@ -1,7 +1,7 @@
 import threading
 
 from ._constants import DEFAULT_TIMEOUT, INITIAL_RETRY_DELAY, MAX_RETRIES, RETRY_DELAY_INCREMENT
-from .utils.types import Number
+from .utils.types import DefaultTimeout, Number
 
 
 class _LocalConfig:
@@ -9,20 +9,20 @@ class _LocalConfig:
 
     __slots__ = (
         "default_timeout",
-        "max_retries",
         "initial_retry_delay",
+        "max_retries",
         "retry_delay_increment",
     )
 
-    default_timeout: Number
-    max_retries: int
     initial_retry_delay: Number
+    default_timeout: DefaultTimeout
+    max_retries: int
     retry_delay_increment: Number
 
     def __init__(self):
-        self.default_timeout: Number = DEFAULT_TIMEOUT
-        self.max_retries: int = MAX_RETRIES
+        self.default_timeout: DefaultTimeout = DEFAULT_TIMEOUT
         self.initial_retry_delay: Number = INITIAL_RETRY_DELAY
+        self.max_retries: int = MAX_RETRIES
         self.retry_delay_increment: Number = RETRY_DELAY_INCREMENT
 
 
@@ -40,16 +40,16 @@ class Config:
         self._config = local_thread.config
 
     @property
-    def default_timeout(self) -> Number:
+    def default_timeout(self) -> DefaultTimeout:
         """Default timeout for API calls"""
         return self._config.default_timeout
 
     @default_timeout.setter
-    def default_timeout(self, value: Number):
+    def default_timeout(self, value: DefaultTimeout):
         """"""
 
         if not (isinstance(value, (int, float)) and value > 0):
-            raise ValueError("default_timeout must be a positive number")
+            raise ValueError("Default_timeout must be a positive number or a tuple of two positive numbers (connect_timeout, read_timeout)")
 
         self._config.default_timeout = value
 
@@ -63,7 +63,7 @@ class Config:
         """"""
 
         if not (isinstance(value, int) and value >= 1):
-            raise ValueError("max_retries must be a positive integer (>= 1)")
+            raise ValueError("Max_retries must be a positive integer (>= 1)")
 
         self._config.max_retries = value
 
@@ -77,7 +77,7 @@ class Config:
         """"""
 
         if not (isinstance(value, (int, float)) and value > 0):
-            raise ValueError("initial_retry_delay must be a positive number")
+            raise ValueError("Initial_retry_delay must be a positive number")
 
         self._config.initial_retry_delay = value
 
@@ -91,6 +91,6 @@ class Config:
         """"""
 
         if not (isinstance(value, (int, float)) and value >= 0):
-            raise ValueError("retry_delay_increment must be a positive number")
+            raise ValueError("Retry_delay_increment must be a positive number")
 
         self._config.retry_delay_increment = value
