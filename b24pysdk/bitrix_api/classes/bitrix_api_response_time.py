@@ -5,13 +5,13 @@ from typing import Optional
 from ..._constants import PYTHON_VERSION
 from ...utils.types import JSONDict
 
-DATACLASS_KWARGS = {"eq": False, "order": False, "frozen": True}
+_DATACLASS_KWARGS = {"eq": False, "order": False, "frozen": True}
 
 if PYTHON_VERSION >= (3, 10):
-    DATACLASS_KWARGS["slots"] = True
+    _DATACLASS_KWARGS["slots"] = True
 
 
-@dataclass(**DATACLASS_KWARGS)
+@dataclass(**_DATACLASS_KWARGS)
 class BitrixAPIResponseTime:
     """"""
 
@@ -36,7 +36,7 @@ class BitrixAPIResponseTime:
             processing=response_time["processing"],
             date_start=datetime.fromisoformat(response_time["date_start"]),
             date_finish=datetime.fromisoformat(response_time["date_finish"]),
-            operating_reset_at=response_time.get("operating_reset_at") and datetime.fromtimestamp(response_time["operating_reset_at"]),
+            operating_reset_at=response_time.get("operating_reset_at") and datetime.fromtimestamp(response_time["operating_reset_at"]).astimezone(),
             operating=response_time.get("operating"),
         )
 

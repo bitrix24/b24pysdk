@@ -5,7 +5,7 @@ from ..bitrix_token import AbstractBitrixToken
 from .bitrix_api_batch_response import B24APIBatchResult, BitrixAPIBatchResponse
 from .bitrix_api_request import BitrixAPIRequest
 
-API_METHOD = "batch"
+_API_METHOD = "batch"
 
 
 class BitrixAPIBatchesRequest(BitrixAPIRequest):
@@ -27,7 +27,7 @@ class BitrixAPIBatchesRequest(BitrixAPIRequest):
     ):
         super().__init__(
             bitrix_token=bitrix_token,
-            api_method=API_METHOD,
+            api_method=_API_METHOD,
             timeout=timeout,
         )
         self._bitrix_api_request = bitrix_api_requests

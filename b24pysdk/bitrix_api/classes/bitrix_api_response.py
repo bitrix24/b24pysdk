@@ -5,13 +5,13 @@ from ..._constants import PYTHON_VERSION
 from ...utils.types import B24APIResult, JSONDict, JSONList
 from .bitrix_api_response_time import BitrixAPIResponseTime
 
-DATACLASS_KWARGS = {"eq": False, "order": False, "frozen": True}
+_DATACLASS_KWARGS = {"eq": False, "order": False, "frozen": True}
 
 if PYTHON_VERSION >= (3, 10):
-    DATACLASS_KWARGS["slots"] = True
+    _DATACLASS_KWARGS["slots"] = True
 
 
-@dataclass(**DATACLASS_KWARGS)
+@dataclass(**_DATACLASS_KWARGS)
 class BitrixAPIResponse:
     """"""
 
@@ -41,7 +41,7 @@ class BitrixAPIResponse:
         }
 
 
-@dataclass(**DATACLASS_KWARGS)
+@dataclass(**_DATACLASS_KWARGS)
 class BitrixAPIListResponse(BitrixAPIResponse):
     """"""
 

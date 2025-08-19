@@ -31,11 +31,16 @@ class BitrixAPIListRequest(BitrixAPIRequest):
 
     @property
     def response(self) -> BitrixAPIListResponse:
-        return self._response or self.execute()
+        return self._response or self.call()
 
     @property
     def result(self) -> JSONList:
         return self.response.result
+
+    @property
+    def limit(self) -> int:
+        """"""
+        return self._limit
 
     def _call(self) -> JSONDict:
         """"""
@@ -46,7 +51,7 @@ class BitrixAPIListRequest(BitrixAPIRequest):
             timeout=self._timeout,
         )
 
-    def execute(self) -> BitrixAPIListResponse:
+    def call(self) -> BitrixAPIListResponse:
         """"""
         self._response = BitrixAPIListResponse.from_dict(self._call())
         return self._response

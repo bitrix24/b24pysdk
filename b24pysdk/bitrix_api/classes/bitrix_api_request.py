@@ -9,7 +9,7 @@ from .bitrix_api_response_time import BitrixAPIResponseTime
 class BitrixAPIRequest:
     """"""
 
-    __slots__ = ("_bitrix_token", "_api_method", "_params", "_response", "_timeout")
+    __slots__ = ("_api_method", "_bitrix_token", "_params", "_response", "_timeout")
 
     _bitrix_token: AbstractBitrixToken
     _api_method: Text
@@ -55,7 +55,7 @@ class BitrixAPIRequest:
 
     @property
     def response(self) -> BitrixAPIResponse:
-        return self._response or self.execute()
+        return self._response or self.call()
 
     @property
     def result(self) -> B24APIResult:
@@ -73,7 +73,7 @@ class BitrixAPIRequest:
             timeout=self._timeout,
         )
 
-    def execute(self) -> BitrixAPIResponse:
+    def call(self) -> BitrixAPIResponse:
         """"""
         self._response = BitrixAPIResponse.from_dict(self._call())
         return self._response

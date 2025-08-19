@@ -5,11 +5,11 @@ from .bitrix_api_response import BitrixAPIListResponse, BitrixAPIResponse
 from .bitrix_api_response_time import BitrixAPIResponseTime
 
 __all__ = [
-    "BitrixAPIBatchesRequest",
     "BitrixAPIBatchRequest",
+    "BitrixAPIBatchesRequest",
     "BitrixAPIListRequest",
-    "BitrixAPIRequest",
     "BitrixAPIListResponse",
+    "BitrixAPIRequest",
     "BitrixAPIResponse",
     "BitrixAPIResponseTime",
 ]
