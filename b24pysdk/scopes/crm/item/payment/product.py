@@ -26,7 +26,7 @@ class Product(BaseCRM):
             payment_id: int,
             row_id: int,
             quantity: float,
-            timeout: Timeout = None
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Add product item to payment.
 
@@ -53,9 +53,8 @@ class Product(BaseCRM):
             "quantity": quantity,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.add),
+        return self._make_bitrix_api_request(
+            api_method=self.add,
             params=params,
             timeout=timeout,
         )
@@ -67,7 +66,7 @@ class Product(BaseCRM):
             payment_id: int,
             filter: JSONDict,
             order: Optional[JSONDict] = None,
-            timeout: Timeout = None
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get list of payment product items.
 
@@ -118,9 +117,8 @@ class Product(BaseCRM):
         if order is not None:
             params["order"] = order
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.list),
+        return self._make_bitrix_api_request(
+            api_method=self.list,
             params=params,
             timeout=timeout,
         )
@@ -154,7 +152,7 @@ class Product(BaseCRM):
             bitrix_id: int,
             *,
             quantity: float,
-            timeout: Timeout = None
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Change product quantity.
 
@@ -178,9 +176,8 @@ class Product(BaseCRM):
             "quantity": quantity,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.set_quantity),
+        return self._make_bitrix_api_request(
+            api_method=self.set_quantity,
             params=params,
             timeout=timeout,
         )

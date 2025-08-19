@@ -25,7 +25,7 @@ class Delivery(BaseCRM):
             *,
             payment_id: int,
             delivery_id: int,
-            timeout: Timeout = None
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Add delivery item to payment.
 
@@ -49,9 +49,8 @@ class Delivery(BaseCRM):
             "deliveryId": delivery_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.add),
+        return self._make_bitrix_api_request(
+            api_method=self.add,
             params=params,
             timeout=timeout,
         )
@@ -63,7 +62,7 @@ class Delivery(BaseCRM):
             payment_id: int,
             filter: JSONDict,
             order: Optional[JSONDict] = None,
-            timeout: Timeout = None
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get the list of delivery items.
 
@@ -114,9 +113,8 @@ class Delivery(BaseCRM):
         if order is not None:
             params["order"] = order
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.list),
+        return self._make_bitrix_api_request(
+            api_method=self.list,
             params=params,
             timeout=timeout,
         )
@@ -150,7 +148,7 @@ class Delivery(BaseCRM):
             bitrix_id: int,
             *,
             delivery_id: int,
-            timeout: Timeout = None
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Reassign delivery item to another document.
 
@@ -174,9 +172,8 @@ class Delivery(BaseCRM):
             "deliveryId": delivery_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.set_delivery),
+        return self._make_bitrix_api_request(
+            api_method=self.set_delivery,
             params=params,
             timeout=timeout,
         )

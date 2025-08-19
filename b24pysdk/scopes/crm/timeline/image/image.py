@@ -1,15 +1,15 @@
+from abc import abstractmethod
 from typing import TYPE_CHECKING, Text
 
 from .....bitrix_api.classes import BitrixAPIRequest
-from .....scopes.crm.base_crm import BaseCRM
-from .....utils.functional import type_checker
 from .....utils.types import Timeout
+from ...base_crm import BaseCRM
 
 if TYPE_CHECKING:
-    from b24pysdk.scopes.crm.timeline.timeline import Timeline
+    from ..timeline import Timeline
 
 
-class VisualElement(BaseCRM):
+class Image(BaseCRM):
     """The class is a base class for logo and icon classes.
     """
 
@@ -17,7 +17,7 @@ class VisualElement(BaseCRM):
         super().__init__(timeline._scope)
         self._path = self._get_path(timeline)
 
-    @type_checker
+    @abstractmethod
     def add(
             self,
             *,
@@ -27,7 +27,7 @@ class VisualElement(BaseCRM):
     ) -> BitrixAPIRequest:
         """Add new visual element.
 
-        This method adds a new visual element (logo or icon).
+        This method adds a new image (logo or icon).
 
         Args:
             code: Visual element code;
@@ -45,26 +45,25 @@ class VisualElement(BaseCRM):
             "fileContent": file_content,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self._add),
+        return self._make_bitrix_api_request(
+            api_method=self.add,
             params=params,
             timeout=timeout,
         )
 
-    @type_checker
+    @abstractmethod
     def get(
             self,
             *,
             code: Text,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """Get information about the visual element.
+        """Get information about the image.
 
-        This method retrieves information about the visual element (logo or icon) of the timeline log entry.
+        This method retrieves information about an image (logo or icon) of the timeline log entry.
 
         Args:
-            code: Visual element code;
+            code: Image element code;
 
             timeout: Timeout in seconds.
 
@@ -76,39 +75,38 @@ class VisualElement(BaseCRM):
             "code": code,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self._get),
+        return self._make_bitrix_api_request(
+            api_method=self.get,
             params=params,
             timeout=timeout,
         )
 
-    @type_checker
+    @abstractmethod
     def list(
             self,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """Get a list of available visual elements.
+        """Get a list of available image.
 
-        This method retrieves a list of available visual elements (icons or logos) for timeline log entries.
+        This method retrieves a list of available images (icons or logos) for timeline log entries.
 
         """
         return self._list(timeout=timeout)
 
-    @type_checker
+    @abstractmethod
     def delete(
             self,
             *,
             code: Text,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """Delete visual element.
+        """Delete image.
 
-        This method deletes a visual element.
+        This method deletes an image.
 
         Args:
-            code: Visual element code;
+            code: Image code;
 
             timeout: Timeout in seconds.
 
@@ -120,9 +118,8 @@ class VisualElement(BaseCRM):
             "code": code,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self._delete),
+        return self._make_bitrix_api_request(
+            api_method=self.delete,
             params=params,
             timeout=timeout,
         )

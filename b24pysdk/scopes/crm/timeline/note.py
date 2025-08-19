@@ -60,9 +60,8 @@ class Note(BaseCRM):
             "itemId": item_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.get),
+        return self._make_bitrix_api_request(
+            api_method=self.get,
             params=params,
             timeout=timeout,
         )
@@ -106,9 +105,8 @@ class Note(BaseCRM):
             "itemId": item_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.delete),
+        return self._make_bitrix_api_request(
+            api_method=self.delete,
             params=params,
             timeout=timeout,
         )
@@ -156,9 +154,8 @@ class Note(BaseCRM):
             "text": text,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.save),
+        return self._make_bitrix_api_request(
+            api_method=self.save,
             params=params,
             timeout=timeout,
         )

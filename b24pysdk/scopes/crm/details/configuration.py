@@ -3,7 +3,7 @@ from typing import Optional, Text
 from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
-from ..item.details.configuration import Configuration as BaseConfiguration
+from ..item.details.base_configuration import BaseConfiguration
 
 
 class Configuration(BaseConfiguration):
@@ -26,7 +26,7 @@ class Configuration(BaseConfiguration):
             scope: Optional[Text] = None,
             user_id: Optional[int] = None,
             extras: Optional[JSONDict] = None,
-            timeout: Timeout = None
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get parameters of CRM card configuration.
 
@@ -71,7 +71,7 @@ class Configuration(BaseConfiguration):
             scope: Optional[Text] = None,
             user_id: Optional[int] = None,
             extras: Optional[JSONDict] = None,
-            timeout: Timeout = None
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Set parameters for the CRM detail card.
 
@@ -117,7 +117,7 @@ class Configuration(BaseConfiguration):
             scope: Optional[Text] = None,
             user_id: Optional[int] = None,
             extras: Optional[JSONDict] = None,
-            timeout: Timeout = None
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """The method resets the settings of CRM cards.
 
@@ -158,7 +158,7 @@ class Configuration(BaseConfiguration):
             self,
             *,
             extras: Optional[JSONDict] = None,
-            timeout: Timeout = None
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Set common CRM card.
 

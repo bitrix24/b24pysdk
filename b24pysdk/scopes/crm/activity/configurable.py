@@ -76,9 +76,8 @@ class Configurable(BaseCRM):
             "layout": layout,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.add),
+        return self._make_bitrix_api_request(
+            api_method=self.add,
             params=params,
             timeout=timeout,
         )

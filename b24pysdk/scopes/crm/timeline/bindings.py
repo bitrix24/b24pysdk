@@ -75,9 +75,8 @@ class Bindings(BaseCRM):
             "filter": filter,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.list),
+        return self._make_bitrix_api_request(
+            api_method=self.list,
             params=params,
             timeout=timeout,
         )
@@ -115,9 +114,8 @@ class Bindings(BaseCRM):
             "fields": fields,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.bind),
+        return self._make_bitrix_api_request(
+            api_method=self.bind,
             params=params,
             timeout=timeout,
         )
@@ -155,9 +153,8 @@ class Bindings(BaseCRM):
             "fields": fields,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.unbind),
+        return self._make_bitrix_api_request(
+            api_method=self.unbind,
             params=params,
             timeout=timeout,
         )

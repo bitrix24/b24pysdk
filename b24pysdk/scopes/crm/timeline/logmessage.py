@@ -131,9 +131,8 @@ class Logmessage(BaseCRM):
         if start is not None:
             params["start"] = start
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self._list),
+        return self._make_bitrix_api_request(
+            api_method=self.list,
             params=params,
             timeout=timeout,
         )
@@ -161,5 +160,5 @@ class Logmessage(BaseCRM):
         """
         return self._delete(
             bitrix_id,
-            timeout=timeout
+            timeout=timeout,
         )

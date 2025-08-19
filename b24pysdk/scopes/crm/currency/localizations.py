@@ -65,9 +65,8 @@ class Localizations(BaseCRM):
             "id": bitrix_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.get),
+        return self._make_bitrix_api_request(
+            api_method=self.get,
             params=params,
             timeout=timeout,
         )
@@ -78,7 +77,7 @@ class Localizations(BaseCRM):
             bitrix_id: Text,
             *,
             localizations: JSONDict,
-            timeout: Timeout = None
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Set localization for currency.
 
@@ -102,9 +101,8 @@ class Localizations(BaseCRM):
             "localizations": localizations,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.set),
+        return self._make_bitrix_api_request(
+            api_method=self.set,
             params=params,
             timeout=timeout,
         )
@@ -139,9 +137,8 @@ class Localizations(BaseCRM):
             "lids": lids,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.delete),
+        return self._make_bitrix_api_request(
+            api_method=self.delete,
             params=params,
             timeout=timeout,
         )

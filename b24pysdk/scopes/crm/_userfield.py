@@ -70,9 +70,8 @@ class Userfield(BaseCRM):
         if list is not None:
             params["LIST"] = list
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self._update),
+        return self._make_bitrix_api_request(
+            api_method=self._update,
             params=params,
             timeout=timeout,
         )

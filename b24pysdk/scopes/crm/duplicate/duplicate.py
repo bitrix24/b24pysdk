@@ -24,7 +24,7 @@ class Duplicate(BaseCRM):
             *,
             type: Literal["EMAIL", "PHONE"],
             values: Iterable[Text],
-            entity_type: Optional[Literal["LEAD", "CONTACT", "CONTACT"]] = None,
+            entity_type: Optional[Literal["LEAD", "CONTACT", "COMPANY"]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get leads, contacts, and companies with matching data
@@ -65,9 +65,8 @@ class Duplicate(BaseCRM):
         if entity_type is not None:
             params["entity_type"] = entity_type
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.find_by_comm),
+        return self._make_bitrix_api_request(
+            api_method=self.find_by_comm,
             params=params,
             timeout=timeout,
         )

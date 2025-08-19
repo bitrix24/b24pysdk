@@ -52,9 +52,8 @@ class VolatileType(BaseCRM):
         if entity_type_id is not None:
             params["entityTypeId"] = entity_type_id
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.fields),
+        return self._make_bitrix_api_request(
+            api_method=self.fields,
             params=params,
             timeout=timeout,
         )
@@ -77,9 +76,8 @@ class VolatileType(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.list),
+        return self._make_bitrix_api_request(
+            api_method=self.list,
             timeout=timeout,
         )
 
@@ -116,12 +114,11 @@ class VolatileType(BaseCRM):
 
         params = {
             "entity_type_id": entity_type_id,
-            "field_code": field_code
+            "field_code": field_code,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.register),
+        return self._make_bitrix_api_request(
+            api_method=self.register,
             params=params,
             timeout=timeout,
         )
@@ -152,9 +149,8 @@ class VolatileType(BaseCRM):
             "id": bitrix_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.unregister),
+        return self._make_bitrix_api_request(
+            api_method=self.unregister,
             params=params,
             timeout=timeout,
         )

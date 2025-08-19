@@ -5,11 +5,11 @@ from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
 from ._userfield import Userfield
 from .details.details import Details
-from .item import Item
+from .item.base_item import BaseItem
 from .relationships import Company
 
 
-class Contact(Item):
+class Contact(BaseItem):
     """The methods provide capabilities for managing contacts.
     They allow you to retrieve fields, add, update, delete, and get lists of contacts.
 
@@ -27,14 +27,14 @@ class Contact(Item):
         return Company(self)
 
     @property
-    def userfield(self) -> Userfield:
-        """"""
-        return Userfield(self)
-
-    @property
     def details(self) -> "Details":
         """"""
         return Details(self)
+
+    @property
+    def userfield(self) -> Userfield:
+        """"""
+        return Userfield(self)
 
     @type_checker
     def fields(

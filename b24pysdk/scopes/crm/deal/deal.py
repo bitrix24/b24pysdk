@@ -6,12 +6,12 @@ from ....utils.types import JSONDict, Timeout
 from .._productrows import Productrows
 from .._userfield import Userfield
 from ..details import Details
-from ..item import Item
+from ..item.base_item import BaseItem
 from ..relationships import Contact
 from .recurring import Recurring
 
 
-class Deal(Item):
+class Deal(BaseItem):
     """The methods provide capabilities for managing deals.
     They allow you to retrieve fields, add, update, delete, and get lists of deals.
 

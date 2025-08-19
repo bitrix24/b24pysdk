@@ -104,9 +104,8 @@ class Address(BaseCRM):
             "fields": fields,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.update),
+        return self._make_bitrix_api_request(
+            api_method=self.update,
             params=params,
             timeout=timeout,
         )
@@ -209,9 +208,8 @@ class Address(BaseCRM):
             "fields": fields,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.delete),
+        return self._make_bitrix_api_request(
+            api_method=self.delete,
             params=params,
             timeout=timeout,
         )

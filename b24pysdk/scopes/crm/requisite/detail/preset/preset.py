@@ -6,7 +6,10 @@ from .field import Field
 
 
 class Preset(Detail):
-    """"""
+    """The class provide methods for working with requisite templates.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/presets/index.html
+    """
 
     @property
     def field(self) -> Field:
@@ -19,9 +22,19 @@ class Preset(Detail):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.countries),
+        """Get a list of countries for the template.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/presets/crm-requisite-preset-countries.html
+
+        THe method returns a possible list of countries for requisite template.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+        return self._make_bitrix_api_request(
+            api_method=self.countries,
             timeout=timeout,
         )

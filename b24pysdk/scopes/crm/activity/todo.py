@@ -84,9 +84,8 @@ class Todo(BaseCRM):
         if parent_activity_id is not None:
             params["parentActivityId"] = parent_activity_id
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.add),
+        return self._make_bitrix_api_request(
+            api_method=self.add,
             params=params,
             timeout=timeout,
         )
@@ -159,9 +158,8 @@ class Todo(BaseCRM):
         if parent_activity_id is not None:
             params["parentActivityId"] = parent_activity_id
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.update),
+        return self._make_bitrix_api_request(
+            api_method=self.update,
             params=params,
             timeout=timeout,
         )
@@ -204,9 +202,8 @@ class Todo(BaseCRM):
             "colorId": color_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.update_color),
+        return self._make_bitrix_api_request(
+            api_method=self.update_color,
             params=params,
             timeout=timeout,
         )
@@ -249,9 +246,8 @@ class Todo(BaseCRM):
             "value": value,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.update_deadline),
+        return self._make_bitrix_api_request(
+            api_method=self.update_deadline,
             params=params,
             timeout=timeout,
         )
@@ -294,9 +290,8 @@ class Todo(BaseCRM):
             "value": value,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.update_description),
+        return self._make_bitrix_api_request(
+            api_method=self.update_description,
             params=params,
             timeout=timeout,
         )
@@ -339,9 +334,8 @@ class Todo(BaseCRM):
             "responsibleId": responsible_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.update_responsible_user),
+        return self._make_bitrix_api_request(
+            api_method=self.update_responsible_user,
             params=params,
             timeout=timeout,
         )

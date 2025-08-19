@@ -1,53 +1,38 @@
+from abc import ABC
 from typing import Iterable, Optional, Text
 
 from ....bitrix_api.classes import BitrixAPIRequest
-from ....utils.functional import type_checker
 from ....utils.types import B24Bool, JSONDict, Timeout
-from .base_item import BaseItem
-from .delivery import Delivery
-from .details import Details
-from .payment import Payment
-from .productrow import Productrow
+from ..base_crm import BaseCRM
 
 
-class Item(BaseItem):
+class BaseItem(BaseCRM, ABC):
     """The methods provide capabilities for managing various CRM entities, such as leads, deals, contacts, companies, invoices, estimates, and SPA elements.
     They allow you to retrieve fields, add, update, delete, and get lists of elements.
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/index.html
     """
 
-    @property
-    def delivery(self) -> "Delivery":
-        """"""
-        return Delivery(self)
+    ENTITY_TYPE_ID: Optional[int] = None
+    """Numeric Identifier of Type."""
 
-    @property
-    def details(self) -> "Details":
-        """"""
-        return Details(self)
+    ENTITY_TYPE_NAME: Optional[Text] = None
+    """Symbolic Code of Type."""
 
-    @property
-    def payment(self) -> "Payment":
-        """"""
-        return Payment(self)
+    ENTITY_TYPE_ABBR: Optional[Text] = None
+    """Short Symbolic Code of Type."""
 
-    @property
-    def productrow(self) -> "Productrow":
-        """"""
-        return Productrow(self)
+    USER_FIELD_ENTITY_ID: Optional[Text] = None
+    """User Field Object Type."""
 
-    @type_checker
-    def fields(
+    def _fields(
             self,
             *,
-            entity_type_id: int,
+            entity_type_id: Optional[int] = None,
             use_original_uf_names: Optional[bool] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get fields of CRM item.
-
-        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/crm-item-fields.html
 
         This method retrieves a list of fields and their configuration for items of type entityTypeId.
 
@@ -61,24 +46,31 @@ class Item(BaseItem):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return self._fields(
-            entity_type_id=entity_type_id,
-            use_original_uf_names=use_original_uf_names,
+
+        params = dict()
+
+        if entity_type_id is not None:
+            params["entityTypeId"] = entity_type_id
+
+        if use_original_uf_names is not None:
+            params["originalUfNames"] = B24Bool(use_original_uf_names).to_str()
+
+        return self._make_bitrix_api_request(
+            api_method=self._fields,
+            params=params,
             timeout=timeout,
         )
 
-    @type_checker
-    def add(
+    def _add(
             self,
             fields: JSONDict,
             *,
-            entity_type_id: int,
+            entity_type_id: Optional[int] = None,
             use_original_uf_names: Optional[bool] = None,
+            extra_params: Optional[JSONDict] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Create a new CRM entity.
-
-        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/crm-item-add.html
 
         This method is a universal way to create objects in CRM. With it, you can create various types of objects, such as deals, contacts, companies, and more.
 
@@ -103,31 +95,46 @@ class Item(BaseItem):
 
             use_original_uf_names: This parameter controls the format of custom field names in the response;
 
+            extra_params: Set of additional parameters where
+
+                - REGISTER_SONET_EVENT - whether to register the change event in the activity stream 'Y' or not 'N',
+
+                - IMPORT - whether an import mode enabled 'Y' or not 'N' (by default);
+
             timeout: Timeout in seconds.
 
         Returns:
             Instance of BitrixAPIRequest
         """
 
-        return self._add(
-            fields,
-            entity_type_id=entity_type_id,
-            use_original_uf_names=use_original_uf_names,
+        params = {
+            "fields": fields,
+        }
+
+        if entity_type_id is not None:
+            params["entityTypeId"] = entity_type_id
+
+        if use_original_uf_names is not None:
+            params["useOriginalUfNames"] = B24Bool(use_original_uf_names).to_str()
+
+        if extra_params is not None:
+            params["params"] = extra_params
+
+        return self._make_bitrix_api_request(
+            api_method=self._add,
+            params=params,
             timeout=timeout,
         )
 
-    @type_checker
-    def get(
+    def _get(
             self,
             bitrix_id: int,
             *,
-            entity_type_id: int,
+            entity_type_id: Optional[int] = None,
             use_original_uf_names: Optional[bool] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get an item by ID.
-
-        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/crm-item-get.html
 
         The method returns information about an item based on the item identifier and the CRM object type identifier.
 
@@ -144,18 +151,26 @@ class Item(BaseItem):
             Instance of BitrixAPIRequest
         """
 
-        return self._get(
-            bitrix_id=bitrix_id,
-            entity_type_id=entity_type_id,
-            use_original_uf_names=use_original_uf_names,
+        params = {
+            "id": bitrix_id,
+        }
+
+        if entity_type_id is not None:
+            params["entityTypeId"] = entity_type_id
+
+        if use_original_uf_names is not None:
+            params["useOriginalUfNames"] = B24Bool(use_original_uf_names).to_str()
+
+        return self._make_bitrix_api_request(
+            api_method=self._get,
+            params=params,
             timeout=timeout,
         )
 
-    @type_checker
-    def list(
+    def _list(
             self,
             *,
-            entity_type_id: int,
+            entity_type_id: Optional[int] = None,
             select: Optional[Iterable[Text]] = None,
             filter: Optional[JSONDict] = None,
             order: Optional[JSONDict] = None,
@@ -164,8 +179,6 @@ class Item(BaseItem):
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of CRM elements.
-
-        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/crm-item-list.html
 
         This method retrieves a list of elements of a specific type of CRM entity.
 
@@ -212,29 +225,43 @@ class Item(BaseItem):
             Instance of BitrixAPIRequest
         """
 
-        return self._list(
-            entity_type_id=entity_type_id,
-            select=select,
-            filter=filter,
-            order=order,
-            start=start,
-            use_original_uf_names=use_original_uf_names,
+        params = dict()
+
+        if entity_type_id is not None:
+            params["entityTypeId"] = entity_type_id
+
+        if select is not None:
+            params["select"] = list(select)
+
+        if filter is not None:
+            params["filter"] = filter
+
+        if order is not None:
+            params["order"] = order
+
+        if start is not None:
+            params["start"] = start
+
+        if use_original_uf_names is not None:
+            params["useOriginalUfNames"] = B24Bool(use_original_uf_names).to_str()
+
+        return self._make_bitrix_api_request(
+            api_method=self._list,
+            params=params,
             timeout=timeout,
         )
 
-    @type_checker
-    def update(
+    def _update(
             self,
             bitrix_id: int,
             fields: JSONDict,
             *,
-            entity_type_id: int,
+            entity_type_id: Optional[int] = None,
             use_original_uf_names: Optional[bool] = None,
+            extra_params: Optional[JSONDict] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update CRM item.
-
-        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/crm-item-update.html
 
         This method updates an item of a specific type in the CRM object by assigning new values from the fields parameter.
 
@@ -257,31 +284,46 @@ class Item(BaseItem):
 
             use_original_uf_names: Parameter to control the format of custom field names in the request and response;
 
+            extra_params: Set of additional parameters where
+
+                - REGISTER_SONET_EVENT - whether to register the change event in the activity stream 'Y' or not 'N',
+
+                - REGISTER_HISTORY_EVENT - whether to create a record on history 'Y' or not 'N';
+
             timeout: Timeout in seconds.
 
         Returns:
             Instance of BitrixAPIRequest
         """
 
-        return self._update(
-            bitrix_id,
-            fields,
-            entity_type_id=entity_type_id,
-            use_original_uf_names=use_original_uf_names,
+        params = {
+            "id": bitrix_id,
+            "fields": fields,
+        }
+
+        if entity_type_id is not None:
+            params["entityTypeId"] = entity_type_id
+
+        if use_original_uf_names is not None:
+            params["useOriginalUfNames"] = B24Bool(use_original_uf_names).to_str()
+
+        if extra_params is not None:
+            params["params"] = extra_params
+
+        return self._make_bitrix_api_request(
+            api_method=self._update,
+            params=params,
             timeout=timeout,
         )
 
-    @type_checker
-    def delete(
+    def _delete(
             self,
             bitrix_id: int,
             *,
-            entity_type_id: int,
+            entity_type_id: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Delete CRM item.
-
-        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/crm-item-delete.html
 
         This method deletes a CRM entity item by its item ID and entity type ID.
 
@@ -296,58 +338,15 @@ class Item(BaseItem):
             Instance of BitrixAPIRequest
         """
 
-        return self._delete(
-            bitrix_id=bitrix_id,
-            entity_type_id=entity_type_id,
-            timeout=timeout,
-        )
-
-    @type_checker
-    def import_(
-            self,
-            fields: JSONDict,
-            *,
-            entity_type_id: int,
-            use_original_uf_names: Optional[bool] = None,
-            timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """"""
-
         params = {
-            "entityTypeId": entity_type_id,
-            "fields": fields,
+            "id": bitrix_id,
         }
 
-        if use_original_uf_names is not None:
-            params["useOriginalUfNames"] = B24Bool(use_original_uf_names).to_str()
+        if entity_type_id is not None:
+            params["entityTypeId"] = entity_type_id
 
         return self._make_bitrix_api_request(
-            api_method=self.import_,
-            params=params,
-            timeout=timeout,
-        )
-
-    @type_checker
-    def batch_import(
-            self,
-            data: Iterable[JSONDict],
-            *,
-            entity_type_id: int,
-            use_original_uf_names: Optional[bool] = None,
-            timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """"""
-
-        params = {
-            "entityTypeId": entity_type_id,
-            "data": list(data),
-        }
-
-        if use_original_uf_names is not None:
-            params["useOriginalUfNames"] = B24Bool(use_original_uf_names).to_str()
-
-        return self._make_bitrix_api_request(
-            api_method=self.batch_import,
+            api_method=self._delete,
             params=params,
             timeout=timeout,
         )

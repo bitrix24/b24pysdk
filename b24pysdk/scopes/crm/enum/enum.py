@@ -34,9 +34,8 @@ class Enum(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.activitydirection),
+        return self._make_bitrix_api_request(
+            api_method=self.activitydirection,
             timeout=timeout,
         )
 
@@ -58,9 +57,8 @@ class Enum(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.activitynotifytype),
+        return self._make_bitrix_api_request(
+            api_method=self.activitynotifytype,
             timeout=timeout,
         )
 
@@ -82,9 +80,8 @@ class Enum(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.activitypriority),
+        return self._make_bitrix_api_request(
+            api_method=self.activitypriority,
             timeout=timeout,
         )
 
@@ -106,9 +103,8 @@ class Enum(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.activitystatus),
+        return self._make_bitrix_api_request(
+            api_method=self.activitystatus,
             timeout=timeout,
         )
 
@@ -130,9 +126,8 @@ class Enum(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.activitytype),
+        return self._make_bitrix_api_request(
+            api_method=self.activitytype,
             timeout=timeout,
         )
 
@@ -154,9 +149,8 @@ class Enum(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.addresstype),
+        return self._make_bitrix_api_request(
+            api_method=self.addresstype,
             timeout=timeout,
         )
 
@@ -178,9 +172,8 @@ class Enum(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.contenttype),
+        return self._make_bitrix_api_request(
+            api_method=self.contenttype,
             timeout=timeout,
         )
 
@@ -202,9 +195,8 @@ class Enum(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.getorderownertypes),
+        return self._make_bitrix_api_request(
+            api_method=self.getorderownertypes,
             timeout=timeout,
         )
 
@@ -246,8 +238,7 @@ class Enum(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.ownertype),
+        return self._make_bitrix_api_request(
+            api_method=self.ownertype,
             timeout=timeout,
         )

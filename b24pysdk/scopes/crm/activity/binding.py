@@ -53,9 +53,8 @@ class Binding(BaseCRM):
             "entityId": entity_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.add),
+        return self._make_bitrix_api_request(
+            api_method=self.add,
             params=params,
             timeout=timeout,
         )
@@ -102,9 +101,8 @@ class Binding(BaseCRM):
             "targetEntityId": target_entity_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.move),
+        return self._make_bitrix_api_request(
+            api_method=self.move,
             params=params,
             timeout=timeout,
         )
@@ -136,9 +134,8 @@ class Binding(BaseCRM):
             "activityId": activity_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.list),
+        return self._make_bitrix_api_request(
+            api_method=self.list,
             params=params,
             timeout=timeout,
         )
@@ -178,9 +175,8 @@ class Binding(BaseCRM):
             "entityId": entity_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.delete),
+        return self._make_bitrix_api_request(
+            api_method=self.delete,
             params=params,
             timeout=timeout,
         )

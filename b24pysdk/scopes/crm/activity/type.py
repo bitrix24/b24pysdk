@@ -52,6 +52,26 @@ class Type(BaseCRM):
         return self._add(fields, timeout=timeout)
 
     @type_checker
+    def list(
+            self,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """Get a list of custom activity types.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/types/crm-activity-type-list.html
+
+        The method retrieves a list of custom activity types registered by the application.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+        return self._list(timeout=timeout)
+
+    @type_checker
     def delete(
             self,
             type_id: Text,
@@ -77,29 +97,8 @@ class Type(BaseCRM):
             "TYPE_ID": type_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.delete),
+        return self._make_bitrix_api_request(
+            api_method=self.delete,
             params=params,
             timeout=timeout,
         )
-
-    @type_checker
-    def list(
-            self,
-            *,
-            timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """Get a list of custom activity types.
-
-        Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/types/crm-activity-type-list.html
-
-        The method retrieves a list of custom activity types registered by the application.
-
-        Args:
-            timeout: Timeout in seconds.
-
-        Returns:
-            Instance of BitrixAPIRequest
-        """
-        return self._list(timeout=timeout)

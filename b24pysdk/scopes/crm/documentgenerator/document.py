@@ -45,9 +45,8 @@ class Document(BaseCRM):
             "id": bitrix_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.getfields),
+        return self._make_bitrix_api_request(
+            api_method=self.getfields,
             params=params,
             timeout=timeout,
         )
@@ -94,9 +93,8 @@ class Document(BaseCRM):
             "stampsEnabled": stamps_enabled,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.getfields),
+        return self._make_bitrix_api_request(
+            api_method=self.add,
             params=params,
             timeout=timeout,
         )
@@ -218,9 +216,8 @@ class Document(BaseCRM):
             "stampsEnabled": stamps_enabled,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.update),
+        return self._make_bitrix_api_request(
+            api_method=self.update,
             params=params,
             timeout=timeout,
         )
@@ -278,9 +275,8 @@ class Document(BaseCRM):
             "status": status,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.enablepublicurl),
+        return self._make_bitrix_api_request(
+            api_method=self.enablepublicurl,
             params=params,
             timeout=timeout,
         )
@@ -343,9 +339,8 @@ class Document(BaseCRM):
         if image_content is not None:
             params["imageContent"] = image_content
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.enablepublicurl),
+        return self._make_bitrix_api_request(
+            api_method=self.upload,
             params=params,
             timeout=timeout,
         )

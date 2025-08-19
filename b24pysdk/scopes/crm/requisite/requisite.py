@@ -4,12 +4,12 @@ from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
 from .._userfield import Userfield
-from ..item import Item
+from ..item.base_item import BaseItem
 from .detail import Bankdetail, Preset
 from .link import Link
 
 
-class Requisite(Item):
+class Requisite(BaseItem):
     """
     Details are separate CRM entities that store data used in closing deals: Tax Identification Number (TIN),
     Tax Registration Reason Code (TRRC), Primary State Registration Number (PSRN), banking details, and addresses.
@@ -96,46 +96,6 @@ class Requisite(Item):
         return self._add(fields, timeout=timeout)
 
     @type_checker
-    def update(
-            self,
-            bitrix_id: int,
-            fields: JSONDict,
-            *,
-            timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """Update Requisite.
-
-        Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/universal/crm-requisite-update.html
-
-        This method updates an existing requisite.
-
-        Args:
-            bitrix_id: Identifier of the requisite.
-
-            fields: Object format:
-
-                {
-                    field_1: value_1,
-
-                    field_2: value_2,
-
-                    ...,
-
-                    field_n: value_n,
-                };
-
-            timeout: Timeout in seconds.
-
-        Returns:
-            Instance of BitrixAPIRequest
-        """
-        return self._update(
-            bitrix_id,
-            fields,
-            timeout=timeout,
-        )
-
-    @type_checker
     def get(
             self,
             bitrix_id: int,
@@ -215,6 +175,46 @@ class Requisite(Item):
             filter=filter,
             order=order,
             start=start,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def update(
+            self,
+            bitrix_id: int,
+            fields: JSONDict,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """Update Requisite.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/universal/crm-requisite-update.html
+
+        This method updates an existing requisite.
+
+        Args:
+            bitrix_id: Identifier of the requisite.
+
+            fields: Object format:
+
+                {
+                    field_1: value_1,
+
+                    field_2: value_2,
+
+                    ...,
+
+                    field_n: value_n,
+                };
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+        return self._update(
+            bitrix_id,
+            fields,
             timeout=timeout,
         )
 

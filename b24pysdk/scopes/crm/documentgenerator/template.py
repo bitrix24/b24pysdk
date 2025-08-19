@@ -56,14 +56,13 @@ class Template(BaseCRM):
         }
 
         if entity_id is not None:
-            params["entityId"] = entity_id,
+            params["entityId"] = entity_id
 
         if values is not None:
             params["values"] = values
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.getfields),
+        return self._make_bitrix_api_request(
+            api_method=self.getfields,
             params=params,
             timeout=timeout,
         )

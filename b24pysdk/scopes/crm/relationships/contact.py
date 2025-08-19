@@ -1,4 +1,5 @@
 from ....bitrix_api.classes import BitrixAPIRequest
+from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
 from .relationship import Relationship
 
@@ -13,6 +14,7 @@ class Contact(Relationship):
     https://apidocs.bitrix24.com/api-reference/crm/companies/contacts/index.html
     """
 
+    @type_checker
     def fields(
             self,
             *,
@@ -36,6 +38,7 @@ class Contact(Relationship):
         """
         return super().fields(timeout=timeout)
 
+    @type_checker
     def add(
             self,
             bitrix_id: int,
@@ -76,6 +79,7 @@ class Contact(Relationship):
             timeout=timeout,
         )
 
+    @type_checker
     def delete(
             self,
             bitrix_id: int,

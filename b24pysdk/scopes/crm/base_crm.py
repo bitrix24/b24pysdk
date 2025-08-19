@@ -1,3 +1,4 @@
+from abc import ABC
 from typing import Iterable, Optional, Text
 
 from ...bitrix_api.classes import BitrixAPIRequest
@@ -5,7 +6,7 @@ from ...utils.types import JSONDict, Timeout
 from ..base import Base
 
 
-class BaseCRM(Base):
+class BaseCRM(Base, ABC):
     """"""
 
     def _fields(
@@ -14,9 +15,8 @@ class BaseCRM(Base):
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self._fields),
+        return self._make_bitrix_api_request(
+            api_method=self._fields,
             timeout=timeout,
         )
 
@@ -32,9 +32,8 @@ class BaseCRM(Base):
             "fields": fields,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self._add),
+        return self._make_bitrix_api_request(
+            api_method=self._add,
             params=params,
             timeout=timeout,
         )
@@ -51,9 +50,8 @@ class BaseCRM(Base):
             "id": bitrix_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self._get),
+        return self._make_bitrix_api_request(
+            api_method=self._get,
             params=params,
             timeout=timeout,
         )
@@ -83,9 +81,8 @@ class BaseCRM(Base):
         if start is not None:
             params["start"] = start
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self._list),
+        return self._make_bitrix_api_request(
+            api_method=self._list,
             params=params,
             timeout=timeout,
         )
@@ -104,9 +101,8 @@ class BaseCRM(Base):
             "fields": fields,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self._update),
+        return self._make_bitrix_api_request(
+            api_method=self._update,
             params=params,
             timeout=timeout,
         )
@@ -123,9 +119,8 @@ class BaseCRM(Base):
             "id": bitrix_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self._delete),
+        return self._make_bitrix_api_request(
+            api_method=self._delete,
             params=params,
             timeout=timeout,
         )

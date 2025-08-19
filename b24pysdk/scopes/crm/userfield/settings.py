@@ -42,9 +42,8 @@ class Settings(BaseCRM):
             "type": type,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.fields),
+        return self._make_bitrix_api_request(
+            api_method=self.fields,
             params=params,
             timeout=timeout,
         )

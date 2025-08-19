@@ -1,9 +1,9 @@
 from ..base_crm import BaseCRM
 from .bindings import Bindings
 from .comment import Comment
+from .image import Icon, Logo
 from .logmessage import Logmessage
 from .note import Note
-from .visual_element import Icon, Logo
 
 
 class Timeline(BaseCRM):

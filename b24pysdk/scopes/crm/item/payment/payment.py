@@ -21,6 +21,16 @@ class Payment(BaseCRM):
         super().__init__(item._scope)
         self._path = self._get_path(item)
 
+    @property
+    def delivery(self) -> Delivery:
+        """"""
+        return Delivery(self)
+
+    @property
+    def product(self) -> Product:
+        """"""
+        return Product(self)
+
     @type_checker
     def add(
             self,
@@ -45,14 +55,14 @@ class Payment(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
+
         params = {
             "entityTypeId": entity_type_id,
             "entityId": entity_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.add),
+        return self._make_bitrix_api_request(
+            api_method=self.add,
             params=params,
             timeout=timeout,
         )
@@ -129,6 +139,7 @@ class Payment(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
+
         params = {
             "entityTypeId": entity_type_id,
             "entityId": entity_id,
@@ -140,9 +151,8 @@ class Payment(BaseCRM):
         if order is not None:
             params["order"] = order
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.list),
+        return self._make_bitrix_api_request(
+            api_method=self.list,
             params=params,
             timeout=timeout,
         )
@@ -221,13 +231,13 @@ class Payment(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
+
         params = {
             "id": bitrix_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.pay),
+        return self._make_bitrix_api_request(
+            api_method=self.pay,
             params=params,
             timeout=timeout,
         )
@@ -252,23 +262,13 @@ class Payment(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
+
         params = {
             "id": bitrix_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.unpay),
+        return self._make_bitrix_api_request(
+            api_method=self.unpay,
             params=params,
             timeout=timeout,
         )
-
-    @property
-    def product(self) -> Product:
-        """"""
-        return Product(self)
-
-    @property
-    def delivery(self) -> Delivery:
-        """"""
-        return Delivery(self)

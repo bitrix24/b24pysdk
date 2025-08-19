@@ -6,11 +6,11 @@ from ...utils.types import JSONDict, Timeout
 from ._productrows import Productrows
 from ._userfield import Userfield
 from .details import Details
-from .item import Item
+from .item.base_item import BaseItem
 from .relationships import Contact
 
 
-class Lead(Item):
+class Lead(BaseItem):
     """The methods provide capabilities for managing leads.
     They allow you to retrieve fields, add, update, delete, and get lists of leads.
 
@@ -257,4 +257,4 @@ class Lead(Item):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return super().delete(bitrix_id, timeout=timeout)
+        return self._delete(bitrix_id, timeout=timeout)

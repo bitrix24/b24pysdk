@@ -60,8 +60,7 @@ class Userfield(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.types),
+        return self._make_bitrix_api_request(
+            api_method=self.types,
             timeout=timeout,
         )

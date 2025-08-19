@@ -149,9 +149,8 @@ class Status(BaseCRM):
         if order is not None:
             params["order"] = order
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.list),
+        return self._make_bitrix_api_request(
+            api_method=self.list,
             params=params,
             timeout=timeout,
         )
@@ -228,9 +227,8 @@ class Status(BaseCRM):
         if params is not None:
             _params["params"] = params
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.delete),
-            params=_params,
+        return self._make_bitrix_api_request(
+            api_method=self.delete,
+            params=params,
             timeout=timeout,
         )

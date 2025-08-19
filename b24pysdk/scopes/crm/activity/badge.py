@@ -57,42 +57,8 @@ class Badge(BaseCRM):
             "type": type,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.add),
-            params=params,
-            timeout=timeout,
-        )
-
-    @type_checker
-    def delete(
-            self,
-            code: Text,
-            *,
-            timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """Delete badge by code.
-
-        Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/configurable/badges/crm-activity-badge-delete.html
-
-        The method removes a badge.
-
-        Args:
-            code: Badge code;
-
-            timeout: Timeout in seconds.
-
-        Returns:
-            Instance of BitrixAPIRequest
-        """
-
-        params = {
-            "code": code,
-        }
-
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.delete),
+        return self._make_bitrix_api_request(
+            api_method=self.add,
             params=params,
             timeout=timeout,
         )
@@ -123,9 +89,8 @@ class Badge(BaseCRM):
             "code": code,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.get),
+        return self._make_bitrix_api_request(
+            api_method=self.get,
             params=params,
             timeout=timeout,
         )
@@ -150,3 +115,35 @@ class Badge(BaseCRM):
         """
 
         return self._list(timeout=timeout)
+
+    @type_checker
+    def delete(
+            self,
+            code: Text,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """Delete badge by code.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/configurable/badges/crm-activity-badge-delete.html
+
+        The method removes a badge.
+
+        Args:
+            code: Badge code;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+
+        params = {
+            "code": code,
+        }
+
+        return self._make_bitrix_api_request(
+            api_method=self.delete,
+            params=params,
+            timeout=timeout,
+        )

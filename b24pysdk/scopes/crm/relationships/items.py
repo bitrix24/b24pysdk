@@ -1,17 +1,19 @@
-from typing import Iterable
+from typing import TYPE_CHECKING, Iterable
 
 from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict
 from ..base_crm import BaseCRM, Timeout
-from .relationship import Relationship
+
+if TYPE_CHECKING:
+    from .relationship import Relationship
 
 
 class Items(BaseCRM):
     """These methods manage bindings between a specified CRM entity (such as a Contact, Lead, Deal, or Company) and a collection of similar-type CRM entities.
     """
 
-    def __init__(self, relationship: Relationship):
+    def __init__(self, relationship: "Relationship"):
         super().__init__(relationship._scope)
         self._path = self._get_path(relationship)
 
@@ -51,9 +53,8 @@ class Items(BaseCRM):
             "items": list(items),
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.set),
+        return self._make_bitrix_api_request(
+            api_method=self.set,
             params=params,
             timeout=timeout,
         )
@@ -83,9 +84,8 @@ class Items(BaseCRM):
             "id": bitrix_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.get),
+        return self._make_bitrix_api_request(
+            api_method=self.get,
             params=params,
             timeout=timeout,
         )
@@ -115,9 +115,8 @@ class Items(BaseCRM):
             "id": bitrix_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.delete),
+        return self._make_bitrix_api_request(
+            api_method=self.delete,
             params=params,
             timeout=timeout,
         )

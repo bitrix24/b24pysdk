@@ -83,7 +83,7 @@ class Type(BaseCRM):
             self,
             entity_type_id: int,
             *,
-            timeout: Timeout = None
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get smart process type by entityTypeId.
 
@@ -104,9 +104,8 @@ class Type(BaseCRM):
             "entityTypeId": entity_type_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.get_by_entity_type_id),
+        return self._make_bitrix_api_request(
+            api_method=self.get_by_entity_type_id,
             params=params,
             timeout=timeout,
         )

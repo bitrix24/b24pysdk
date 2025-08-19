@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Iterable, Optional, Text
 
 from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import JSONDict
+from ....utils.types import JSONDict, Timeout
 from ..base_crm import BaseCRM
 
 if TYPE_CHECKING:
@@ -19,10 +19,11 @@ class Recurring(BaseCRM):
         super().__init__(deal._scope)
         self._path = self._get_path(deal)
 
+    @type_checker
     def fields(
             self,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of fields for the recurring deal template.
 
@@ -38,11 +39,12 @@ class Recurring(BaseCRM):
         """
         return self._fields(timeout=timeout)
 
+    @type_checker
     def add(
             self,
             fields: JSONDict,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Create a new recurring deal
 
@@ -68,11 +70,12 @@ class Recurring(BaseCRM):
         """
         return self._add(fields, timeout=timeout)
 
+    @type_checker
     def get(
             self,
             bitrix_id: int,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get the fields of the recurring deal template settings by ID
 
@@ -90,6 +93,7 @@ class Recurring(BaseCRM):
         """
         return self._get(bitrix_id, timeout=timeout)
 
+    @type_checker
     def list(
             self,
             *,
@@ -148,12 +152,13 @@ class Recurring(BaseCRM):
             timeout=timeout,
         )
 
+    @type_checker
     def update(
             self,
             bitrix_id: int,
             fields: JSONDict,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update existing settings for the recurring deal template
 
@@ -179,11 +184,12 @@ class Recurring(BaseCRM):
         """
         return self._update(bitrix_id, fields, timeout=timeout)
 
+    @type_checker
     def delete(
             self,
             bitrix_id: int,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Delete existing configuration for recurring deal template
 
@@ -206,7 +212,7 @@ class Recurring(BaseCRM):
             self,
             bitrix_id: int,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Create a new deal from the template
 
@@ -222,13 +228,13 @@ class Recurring(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
+
         params = {
             "id": bitrix_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.expose),
+        return self._make_bitrix_api_request(
+            api_method=self.expose,
             params=params,
             timeout=timeout,
         )

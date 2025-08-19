@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 from ..scope import Scope
 from .activity import Activity
 from .address import Address
@@ -20,6 +22,13 @@ from .timeline import Timeline
 from .type import Type
 from .userfield import Userfield
 from .vat import Vat
+
+if TYPE_CHECKING:
+    from ... import Client
+
+__all__ = [
+    "CRM",
+]
 
 
 class CRM(Scope):
@@ -73,8 +82,8 @@ class CRM(Scope):
     userfield: Userfield
     vat: Vat
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, client: "Client"):
+        super().__init__(client)
         self.activity = Activity(self)
         self.address = Address(self)
         self.category = Category(self)
@@ -97,8 +106,3 @@ class CRM(Scope):
         self.type = Type(self)
         self.userfield = Userfield(self)
         self.vat = Vat(self)
-
-
-__all__ = [
-    "CRM",
-]

@@ -1,16 +1,18 @@
 from typing import Text
 
 from .....bitrix_api.classes import BitrixAPIRequest
-from .....scopes.crm.timeline.visual_element.visual_element import VisualElement
+from .....utils.functional import type_checker
 from .....utils.types import Timeout
+from .image import Image
 
 
-class Icon(VisualElement):
-    """A list of methods for managing log record icons.
+class Logo(Image):
+    """A list of methods for managing the logos of the entries in the journal.
 
-    Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/logmessage/icons/index.html
+    Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/logmessage/logo/index.html
     """
 
+    @type_checker
     def add(
             self,
             *,
@@ -18,20 +20,20 @@ class Icon(VisualElement):
             file_content: Text,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """Add icon.
+        """Add logo.
 
-        Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/logmessage/icons/crm-timeline-icon-add.html
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/logmessage/logo/crm-timeline-logo-add.html
 
-        This method adds a new icon.
+        This method adds a new logo.
 
         Args:
-            code: Icon code;
+            code: Logo code;
 
             file_content: Base64 encoded content of the icon file, where file requirements are:
 
                 - type: png,
 
-                - size: 24x24 pixels,
+                - size: 60x60 pixels,
 
                 - background: transparent;
 
@@ -46,38 +48,40 @@ class Icon(VisualElement):
             timeout=timeout,
         )
 
+    @type_checker
     def get(
             self,
             *,
             code: Text,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """Get information about the icon.
+        """Get information about the logo.
 
-        Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/logmessage/icons/crm-timeline-icon-get.html
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/logmessage/logo/crm-timeline-logo-get.html
 
-        This method retrieves information about the timeline log entry icon.
+        This method retrieves information about the logo of the timeline log entry.
 
         Args:
-            code: Icon code;
+            code: Logo code;
 
-            timeout: timeout in seconds.
+            timeout: Timeout in seconds.
 
         Returns:
             Instance of BitrixAPIRequest
         """
         return super().get(code=code, timeout=timeout)
 
+    @type_checker
     def list(
             self,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """Get a list of available icons.
+        """Get a list of available logos.
 
-        Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/logmessage/icons/crm-timeline-icon-list.html
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/logmessage/logo/crm-timeline-logo-list.html
 
-        This method retrieves a list of available icons for the timeline log entries.
+        This method retrieves a list of available logos for timeline log entries.
 
         Args:
             timeout: Timeout in seconds.
@@ -87,20 +91,21 @@ class Icon(VisualElement):
         """
         return super().list(timeout=timeout)
 
+    @type_checker
     def delete(
             self,
             *,
             code: Text,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """Delete icon
+        """Delete logo
 
-        Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/logmessage/icons/crm-timeline-icon-delete.html
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/logmessage/logo/crm-timeline-logo-delete.html
 
-        This method deletes an icon.
+        This method deletes the logo.
 
         Args:
-            code: Icon code;
+            code: Logo code;
 
             timeout: Timeout in seconds.
 

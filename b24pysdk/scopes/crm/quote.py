@@ -5,10 +5,10 @@ from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
 from ._productrows import Productrows
 from ._userfield import Userfield
-from .item import Item
+from .item.base_item import BaseItem
 
 
-class Quote(Item):
+class Quote(BaseItem):
     """An estimate is a CRM object that allows you to create printed documents and send them to the client before a deal.
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/quote/index.html

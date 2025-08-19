@@ -79,9 +79,8 @@ class Link(BaseCRM):
             "entityId": entity_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.get),
+        return self._make_bitrix_api_request(
+            api_method=self.get,
             params=params,
             timeout=timeout,
         )
@@ -182,9 +181,8 @@ class Link(BaseCRM):
             "fields": fields,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.register),
+        return self._make_bitrix_api_request(
+            api_method=self.register,
             params=params,
             timeout=timeout,
         )
@@ -229,9 +227,8 @@ class Link(BaseCRM):
             "entityId": entity_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.unregister),
+        return self._make_bitrix_api_request(
+            api_method=self.unregister,
             params=params,
             timeout=timeout,
         )

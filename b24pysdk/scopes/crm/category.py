@@ -37,9 +37,8 @@ class Category(BaseCRM):
             "entityTypeId": entity_type_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.fields),
+        return self._make_bitrix_api_request(
+            api_method=self.fields,
             params=params,
             timeout=timeout,
         )
@@ -82,9 +81,8 @@ class Category(BaseCRM):
             "fields": fields,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.add),
+        return self._make_bitrix_api_request(
+            api_method=self.add,
             params=params,
             timeout=timeout,
         )
@@ -119,9 +117,8 @@ class Category(BaseCRM):
             "id": bitrix_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.get),
+        return self._make_bitrix_api_request(
+            api_method=self.get,
             params=params,
             timeout=timeout,
         )
@@ -152,9 +149,8 @@ class Category(BaseCRM):
             "entityTypeId": entity_type_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.list),
+        return self._make_bitrix_api_request(
+            api_method=self.list,
             params=params,
             timeout=timeout,
         )
@@ -201,9 +197,8 @@ class Category(BaseCRM):
             "fields": fields,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.update),
+        return self._make_bitrix_api_request(
+            api_method=self.update,
             params=params,
             timeout=timeout,
         )
@@ -239,9 +234,8 @@ class Category(BaseCRM):
             "id": bitrix_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.delete),
+        return self._make_bitrix_api_request(
+            api_method=self.delete,
             params=params,
             timeout=timeout,
         )

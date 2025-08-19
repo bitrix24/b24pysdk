@@ -23,7 +23,7 @@ class Base(BaseCRM):
     def get(
             self,
             *,
-            timeout: Timeout = None
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get the symbolic identifier of the base currency.
 
@@ -37,9 +37,8 @@ class Base(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.get),
+        return self._make_bitrix_api_request(
+            api_method=self.get,
             timeout=timeout,
         )
 
@@ -48,7 +47,7 @@ class Base(BaseCRM):
             self,
             bitrix_id: Text,
             *,
-            timeout: Timeout = None
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Set currency as base.
 
@@ -69,9 +68,8 @@ class Base(BaseCRM):
             "id": bitrix_id,
         }
 
-        return BitrixAPIRequest(
-            bitrix_token=self._scope.bitrix_token,
-            api_method=self._get_api_method(self.set),
+        return self._make_bitrix_api_request(
+            api_method=self.set,
             params=params,
             timeout=timeout,
         )
