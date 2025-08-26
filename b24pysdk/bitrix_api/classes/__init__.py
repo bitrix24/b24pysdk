@@ -1,12 +1,26 @@
-from .bitrix_api_batch_request import BitrixAPIBatchesRequest, BitrixAPIBatchRequest
-from .bitrix_api_list_request import BitrixAPIListRequest
-from .bitrix_api_request import BitrixAPIRequest
-from .bitrix_api_response import BitrixAPIListResponse, BitrixAPIResponse
 from .bitrix_api_response_time import BitrixAPIResponseTime
+from .request import (
+    BitrixAPIBatchesRequest,
+    BitrixAPIBatchRequest,
+    BitrixAPIFastListRequest,
+    BitrixAPIListRequest,
+    BitrixAPIRequest,
+)
+from .response import (
+    B24APIBatchResult,
+    BitrixAPIBatchResponse,
+    BitrixAPIFastListResponse,
+    BitrixAPIListResponse,
+    BitrixAPIResponse,
+)
 
 __all__ = [
+    "B24APIBatchResult",
     "BitrixAPIBatchRequest",
+    "BitrixAPIBatchResponse",
     "BitrixAPIBatchesRequest",
+    "BitrixAPIFastListRequest",
+    "BitrixAPIFastListResponse",
     "BitrixAPIListRequest",
     "BitrixAPIListResponse",
     "BitrixAPIRequest",

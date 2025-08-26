@@ -1,12 +1,12 @@
-from dataclasses import dataclass
-from typing import Dict, List, Text, Union
+from dataclasses import asdict, dataclass, field
+from typing import Dict, List, Literal, Text, Union
 
-from ..._constants import PYTHON_VERSION
-from ...utils.types import B24APIResult, JSONDict, JSONList
+from ...._constants import PYTHON_VERSION
+from ....utils.types import B24APIResult, JSONDict, JSONList
+from ..bitrix_api_response_time import BitrixAPIResponseTime
 from .bitrix_api_response import BitrixAPIResponse
-from .bitrix_api_response_time import BitrixAPIResponseTime
 
-_DATACLASS_KWARGS = {"eq": False, "order": False, "frozen": True}
+_DATACLASS_KWARGS = {"repr": False, "eq": False, "frozen": True}
 
 if PYTHON_VERSION >= (3, 10):
     _DATACLASS_KWARGS["slots"] = True
@@ -21,6 +21,16 @@ class B24APIBatchResult:
     result_total: Union[Dict[Text, int], List[int]]
     result_next: Union[Dict[Text, int], List[int]]
     result_time: Union[Dict[Text, BitrixAPIResponseTime], List[BitrixAPIResponseTime]]
+
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}("
+            f"result=<{type(self.result).__name__}: {len(self.result)}>, "
+            f"result_error=<{type(self.result_error).__name__}: {len(self.result_error)}>, "
+            f"result_total=<{type(self.result_total).__name__}: {len(self.result_total)}>, "
+            f"result_next=<{type(self.result_next).__name__}: {len(self.result_next)}>, "
+            f"result_time=<{type(self.result_time).__name__}: {len(self.result_time)}>)"
+        )
 
     @classmethod
     def from_dict(cls, json_response: JSONDict) -> "B24APIBatchResult":
@@ -47,13 +57,7 @@ class B24APIBatchResult:
         )
 
     def to_dict(self) -> JSONDict:
-        return {
-            "result": self.result,
-            "result_error": self.result_error,
-            "result_total": self.result_total,
-            "result_next": self.result_next,
-            "result_time": self.result_time,
-        }
+        return asdict(self)
 
 
 @dataclass(**_DATACLASS_KWARGS)
@@ -61,16 +65,19 @@ class BitrixAPIBatchResponse(BitrixAPIResponse):
     """"""
 
     result: B24APIBatchResult
+    next: Literal[None] = field(init=False, default=None)
+    total: Literal[None] = field(init=False, default=None)
+
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}("
+            f"result={self.result}, "
+            f"time={self.time})"
+        )
 
     @classmethod
     def from_dict(cls, json_response: JSONDict) -> "BitrixAPIBatchResponse":
         return cls(
             result=B24APIBatchResult.from_dict(json_response["result"]),
-            time=BitrixAPIResponseTime.from_dict(json_response["time"]),
+            _time=BitrixAPIResponseTime.from_dict(json_response["time"]),
         )
-
-    def to_dict(self) -> JSONDict:
-        return {
-            "result": self.result,
-            "time": self.time,
-        }

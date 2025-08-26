@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from typing import Optional
 
@@ -24,9 +24,6 @@ class BitrixAPIResponseTime:
     operating_reset_at: Optional[datetime] = None
     operating: Optional[float] = None
 
-    def __str__(self):
-        return f"{self.__class__.__name__}({self.to_dict()})"
-
     @classmethod
     def from_dict(cls, response_time: JSONDict) -> "BitrixAPIResponseTime":
         return cls(
@@ -41,13 +38,4 @@ class BitrixAPIResponseTime:
         )
 
     def to_dict(self) -> JSONDict:
-        return {
-            "start": self.start,
-            "finish": self.finish,
-            "duration": self.duration,
-            "processing": self.processing,
-            "date_start": self.date_start,
-            "date_finish": self.date_finish,
-            "operating_reset_at": self.operating_reset_at,
-            "operating": self.operating,
-        }
+        return asdict(self)
