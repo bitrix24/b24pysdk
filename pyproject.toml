@@ -50,6 +50,7 @@ ignore = [
     "E501",
     "N805",     # https://docs.astral.sh/ruff/rules/invalid-first-argument-name-for-method
     "N818",     # https://docs.astral.sh/ruff/rules/error-suffix-on-exception-name
+    "PLC0415",
     "PLR0913",  # https://docs.astral.sh/ruff/rules/too-many-arguments/
     "RET505",   # https://docs.astral.sh/ruff/rules/superfluous-else-return
     "SIM108",   # https://docs.astral.sh/ruff/rules/if-else-block-instead-of-if-exp
