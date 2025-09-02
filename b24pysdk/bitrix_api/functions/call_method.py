@@ -1,8 +1,62 @@
 from typing import Optional, Text
 
 from ...utils.types import JSONDict, Timeout
+from ._base_caller import BaseCaller
 from .call import call
 from .parse_response import parse_response
+
+
+class _MethodCaller(BaseCaller):
+    """"""
+
+    def __init__(
+            self,
+            domain: Text,
+            auth_token: Text,
+            is_webhook: bool,
+            api_method: Text,
+            params: Optional[JSONDict] = None,
+            timeout: Timeout = None,
+            **kwargs,
+    ):
+        super().__init__(
+            domain=domain,
+            auth_token=auth_token,
+            is_webhook=is_webhook,
+            api_method=api_method,
+            params=params,
+            timeout=timeout,
+            **kwargs,
+        )
+
+    @property
+    def _hook_key(self) -> Text:
+        """"""
+        return ("", f"{self._auth_token}/")[self._is_webhook]
+
+    @property
+    def _url(self) -> Text:
+        """"""
+        return f"https://{self._domain}/rest/{self._hook_key}{self._api_method}.json"
+
+    @property
+    def _dynamic_params(self) -> JSONDict:
+        """"""
+        if self._is_webhook:
+            return self._params
+        else:
+            return self._params | {"auth": self._auth_token}
+
+    def call(self) -> JSONDict:
+        """"""
+        return parse_response(
+            call(
+                url=self._url,
+                params=self._dynamic_params,
+                timeout=self._timeout,
+                **self._kwargs,
+            ),
+        )
 
 
 def call_method(
@@ -15,33 +69,26 @@ def call_method(
         timeout: Timeout = None,
         **kwargs,
 ) -> JSONDict:
-    """send POST reuqest to bitrix API
+    """
+    Call a Bitrix API method
 
     Args:
         domain: bitrix portal domain
-        api_method: name of the API method (task.item.add)
-        auth_token: user token
-        params: dict of method parameters
-        is_webhook: is method called via webhook?
-        timeout: default is 10 seconds, pass None to disable timeout
+        auth_token: auth token
+        is_webhook: whether the method is being called using webhook token
+        api_method: name of the bitrix API method to call, e.g. crm.deal.add
+        params: API method parameters
+        timeout: timeout in seconds
 
     Returns:
-        response of sent request
+        dictionary containing the result of the API method call and information about call time
     """
-
-    if is_webhook:
-        hook_key = f"{auth_token}/"
-    else:
-        hook_key = ""
-        params["auth"] = auth_token
-
-    url = f"https://{domain}/rest/{hook_key}{api_method}.json"
-
-    response = call(
-        url,
+    return _MethodCaller(
+        domain=domain,
+        auth_token=auth_token,
+        is_webhook=is_webhook,
+        api_method=api_method,
         params=params,
         timeout=timeout,
         **kwargs,
-    )
-
-    return parse_response(response)
+    ).call()

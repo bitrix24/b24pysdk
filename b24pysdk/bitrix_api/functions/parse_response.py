@@ -5,6 +5,7 @@ from requests.exceptions import HTTPError, JSONDecodeError
 
 from ...error import (
     BitrixAPIAccessDenied,
+    BitrixAPIAllowedOnlyIntranetUser,
     BitrixAPIBadRequest,
     BitrixAPIError,
     BitrixAPIErrorBatchLengthExceeded,
@@ -15,6 +16,7 @@ from ...error import (
     BitrixAPIForbidden,
     BitrixAPIInsufficientScope,
     BitrixAPIInternalServerError,
+    BitrixAPIInvalidArgValue,
     BitrixAPIInvalidCredentials,
     BitrixAPIInvalidRequest,
     BitrixAPIMethodNotAllowed,
@@ -38,6 +40,7 @@ _EXCEPTIONS_BY_ERROR: Dict[Text, Type[BitrixAPIError]] = {
     "WRONG_CLIENT": BitrixOauthWrongClient,
     # 400
     "ERROR_BATCH_LENGTH_EXCEEDED": BitrixAPIErrorBatchLengthExceeded,
+    "INVALID_ARG_VALUE": BitrixAPIInvalidArgValue,
     "INVALID_CLIENT": BitrixOAuthInvalidClient,
     "INVALID_GRANT": BitrixOAuthInvalidGrant,
     "INVALID_REQUEST": BitrixAPIInvalidRequest,
@@ -46,11 +49,13 @@ _EXCEPTIONS_BY_ERROR: Dict[Text, Type[BitrixAPIError]] = {
     "NO_AUTH_FOUND": BitrixAPINoAuthFound,
     # 403
     "ACCESS_DENIED": BitrixAPIAccessDenied,
+    "ALLOWED_ONLY_INTRANET_USER": BitrixAPIAllowedOnlyIntranetUser,
     "INSUFFICIENT_SCOPE": BitrixAPIInsufficientScope,
     "INVALID_CREDENTIALS": BitrixAPIInvalidCredentials,
     "INVALID_SCOPE": BitrixOAuthInvalidScope,
     "USER_ACCESS_ERROR": BitrixAPIUserAccessError,
     # 404
+    "NOT_FOUND": BitrixAPINotFound,
     "ERROR_MANIFEST_IS_NOT_AVAILABLE": BitrixAPIErrorManifestIsNotAvailable,
     # 405
     "ERROR_BATCH_METHOD_NOT_ALLOWED": BitrixAPIErrorBatchMethodNotAllowed,
@@ -84,7 +89,18 @@ def _raise_http_error(response: requests.Response):
 
 def parse_response(response: requests.Response) -> JSONDict:
     """
-    Checks if response body contains an error message and raises appropriate exception
+    Parses the response from the API server. If response body contains an error message, raises appropriate exception
+
+    Args:
+        response: response returned by the API server
+
+    Returns:
+        dictionary containing the parsed response of the API server
+
+    Raises:
+        BitrixAPIError: base class for all API-related errors. Depening on an error code and/or an HTTP status code, more specific exception subclassed from BitrixAPIError will be raised.
+                        These exceptions indicate that the API server successfully processed the response, but some occured during API method execution.
+        BitrixResponseJSONDecodeError: if response returned by the API server is not a valid JSON
     """
 
     try:
