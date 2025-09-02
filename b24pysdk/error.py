@@ -119,6 +119,7 @@ class BitrixAPINotFound(BitrixAPIError):
     """Not Found."""
 
     STATUS_CODE: int = _HTTPStatus.NOT_FOUND
+    ERROR: typing.Text = "NOT_FOUND"
 
 
 class BitrixAPIMethodNotAllowed(BitrixAPIError):
@@ -156,6 +157,12 @@ class BitrixAPIErrorBatchLengthExceeded(BitrixAPIBadRequest):
     """Max batch length exceeded."""
 
     ERROR: typing.Text = "ERROR_BATCH_LENGTH_EXCEEDED"
+
+
+class BitrixAPIInvalidArgValue(BitrixAPIBadRequest):
+    """"""
+
+    ERROR: typing.Text = "INVALID_ARG_VALUE"
 
 
 class BitrixAPIInvalidRequest(BitrixAPIBadRequest):
@@ -208,6 +215,12 @@ class BitrixAPIAccessDenied(BitrixAPIForbidden):
     ERROR: typing.Text = "ACCESS_DENIED"
 
 
+class BitrixAPIAllowedOnlyIntranetUser(BitrixAPIForbidden):
+    """"""
+
+    ERROR: typing.Text = "ALLOWED_ONLY_INTRANET_USER"
+
+
 class BitrixAPIInsufficientScope(BitrixAPIForbidden):
     """The request requires higher privileges than provided by the webhook token."""
 
@@ -231,7 +244,7 @@ class BitrixAPIInvalidCredentials(BitrixAPIForbidden):
 
 
 class BitrixAPIUserAccessError(BitrixAPIForbidden):
-    """The user does not have access to the application."""
+    """The user does not have acfcess to the application."""
 
     ERROR: typing.Text = "USER_ACCESS_ERROR"
 
