@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Callable, Optional, Text
+from typing import Callable, Dict, Optional, Text
 
 from ..bitrix_api.bitrix_token import AbstractBitrixToken
 from ..bitrix_api.classes import BitrixAPIRequest
@@ -24,7 +24,7 @@ class Base(ABC):
         return self._path
 
     def __repr__(self):
-        return f"client.{self._path}"
+        return f"client.{self}"
 
     @Classproperty
     def _name(cls) -> Text:
@@ -39,6 +39,11 @@ class Base(ABC):
     def _bitrix_token(self) -> AbstractBitrixToken:
         return getattr(self._scope, "_bitrix_token")
 
+    @property
+    def _kwargs(self) -> Dict:
+        """"""
+        return getattr(self._scope, "_kwargs")
+
     @staticmethod
     def __to_camel_case(snake_str: Text) -> Text:
         """Converts Python methods names to camelCase to be used in _get_api_method"""
@@ -47,7 +52,10 @@ class Base(ABC):
 
     def _get_api_method(self, method: Callable) -> Text:
         """"""
-        return f"{self}.{self.__to_camel_case(method.__name__.strip('_'))}"
+        if hasattr(method, "__name__"):
+            return f"{self}.{self.__to_camel_case(method.__name__.strip('_'))}"
+        else:
+            return str(self)
 
     def _make_bitrix_api_request(
             self,
@@ -61,4 +69,5 @@ class Base(ABC):
             api_method=self._get_api_method(api_method),
             params=params,
             timeout=timeout,
+            **self._kwargs,
         )
