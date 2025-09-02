@@ -1,9 +1,9 @@
-from typing import ClassVar, Dict, Text
+from typing import Dict, Final, Text
 
 import requests
 
-from .._config import Config
-from ..error import (
+from ..._config import Config
+from ...error import (
 	BitrixAPIInsufficientScope,
 	BitrixAPIInvalidRequest,
 	BitrixOAuthInsufficientScope,
@@ -11,16 +11,17 @@ from ..error import (
 	BitrixOAuthRequestError,
 	BitrixOAuthTimeout,
 )
-from ..utils.types import JSONDict, Timeout
-from .bitrix_app import BitrixApp
-from .functions.parse_response import parse_response
+from ...utils.types import JSONDict, Timeout
+from ..bitrix_app import BitrixApp
+from ..functions.parse_response import parse_response
+from ._base_requester import BaseRequester
 
 
-class OAuthRequester:
+class OAuthRequester(BaseRequester):
 	""""""
 
-	URL: ClassVar[Text] = "https://oauth.bitrix.info/oauth/token/"
-	HEADERS: ClassVar[Dict] = {"Content-Type": "application/x-www-form-urlencoded"}
+	_URL: Final[Text] = "https://oauth.bitrix.info/oauth/token/"
+	_HEADERS: Final[Dict] = {"Content-Type": "application/x-www-form-urlencoded"}
 
 	def __init__(
 		self,
@@ -31,12 +32,16 @@ class OAuthRequester:
 		self._bitrix_app = bitrix_app
 		self._timeout = timeout or self._config.default_timeout
 
+	@property
+	def _headers(self) -> Dict:
+		""""""
+		return self._get_default_headers() | self._HEADERS
+
 	def _get(self, params: JSONDict) -> JSONDict:
 		""""""
 
 		try:
-			response = requests.get(self.URL, params=params, headers=self.HEADERS, timeout=self._timeout)
-			return parse_response(response)
+			response = requests.get(self._URL, params=params, headers=self._headers, timeout=self._timeout)
 
 		except requests.Timeout as error:
 			raise BitrixOAuthTimeout(timeout=self._timeout, original_error=error) from error
@@ -49,6 +54,9 @@ class OAuthRequester:
 
 		except BitrixAPIInsufficientScope as error:
 			raise BitrixOAuthInsufficientScope(response=error.response, json_response=error.json_response) from error
+
+		else:
+			return parse_response(response)
 
 	def authorize(self, code: Text) -> JSONDict:
 		""""""
