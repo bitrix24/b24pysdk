@@ -238,10 +238,13 @@ class Productrow(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
+        if product_rows.__class__ is not list:
+            product_rows = list(product_rows)
+
         params = {
             "ownerId": owner_id,
             "ownerType": owner_type,
-            "product_rows": list(product_rows),
+            "product_rows": product_rows,
         }
 
         return self._make_bitrix_api_request(

@@ -36,9 +36,12 @@ class Productrows(BaseCRM):
     ) -> BitrixAPIRequest:
         """"""
 
+        if rows.__class__ is not list:
+            rows = list(rows)
+
         params = {
             "id": bitrix_id,
-            "rows": list(rows),
+            "rows": rows,
         }
 
         return self._make_bitrix_api_request(

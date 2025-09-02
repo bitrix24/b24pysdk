@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Text, Union
 
 from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import JSONList, Timeout
+from ....utils.types import JSONDict, Timeout
 from ..base_crm import BaseCRM
 
 if TYPE_CHECKING:
@@ -23,8 +23,8 @@ class Badge(BaseCRM):
     def add(
             self,
             code: Text,
-            title: Union[Text, JSONList],
-            value: Union[Text, JSONList],
+            title: Union[Text, JSONDict],
+            value: Union[Text, JSONDict],
             type: Text,
             *,
             timeout: Timeout = None,

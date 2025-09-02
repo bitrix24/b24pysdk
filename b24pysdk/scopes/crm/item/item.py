@@ -108,7 +108,6 @@ class Item(BaseItem):
         Returns:
             Instance of BitrixAPIRequest
         """
-
         return self._add(
             fields,
             entity_type_id=entity_type_id,
@@ -143,7 +142,6 @@ class Item(BaseItem):
         Returns:
             Instance of BitrixAPIRequest
         """
-
         return self._get(
             bitrix_id=bitrix_id,
             entity_type_id=entity_type_id,
@@ -211,7 +209,6 @@ class Item(BaseItem):
         Returns:
             Instance of BitrixAPIRequest
         """
-
         return self._list(
             entity_type_id=entity_type_id,
             select=select,
@@ -262,7 +259,6 @@ class Item(BaseItem):
         Returns:
             Instance of BitrixAPIRequest
         """
-
         return self._update(
             bitrix_id,
             fields,
@@ -295,7 +291,6 @@ class Item(BaseItem):
         Returns:
             Instance of BitrixAPIRequest
         """
-
         return self._delete(
             bitrix_id=bitrix_id,
             entity_type_id=entity_type_id,
@@ -311,7 +306,40 @@ class Item(BaseItem):
             use_original_uf_names: Optional[bool] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Import a single record
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/import/crm-item-import.html
+
+        A universal method for importing objects into CRM.
+
+        Args:
+            fields: Object in the format:
+
+                {
+                    field_1: value_1,
+
+                    field_2: value_2,
+
+                    ...,
+
+                    field_n: value_n,
+
+                }
+
+                where:
+                    field_n — field name
+
+                    value_n — field value;
+
+            entity_type_id: Identifier of the system or custom type for which the item needs to be created;
+
+            use_original_uf_names: Parameter to control the format of custom field names in the request and response;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "entityTypeId": entity_type_id,
@@ -336,11 +364,31 @@ class Item(BaseItem):
             use_original_uf_names: Optional[bool] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Import a batch of CRM records.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/import/crm-item-batch-import.html
+
+        A universal method for importing objects into CRM.
+
+        Args:
+            data: An array of fields values for the items;
+
+            entity_type_id: Identifier of the system or custom type for which the item needs to be created;
+
+            use_original_uf_names: Parameter to control the format of custom field names in the request and response;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+
+        if data.__class__ is not list:
+            data = list(data)
 
         params = {
             "entityTypeId": entity_type_id,
-            "data": list(data),
+            "data": data,
         }
 
         if use_original_uf_names is not None:

@@ -229,6 +229,6 @@ class Status(BaseCRM):
 
         return self._make_bitrix_api_request(
             api_method=self.delete,
-            params=params,
+            params=_params,
             timeout=timeout,
         )

@@ -57,9 +57,12 @@ class Duplicate(BaseCRM):
 
         """
 
+        if values.__class__ is not list:
+            values = list(values)
+
         params = {
             "type": type,
-            "values": list(values),
+            "values": values,
         }
 
         if entity_type is not None:

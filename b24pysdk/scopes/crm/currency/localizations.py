@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List, Text
+from typing import TYPE_CHECKING, Iterable, Text
 
 from ....bitrix_api.classes import BitrixAPIRequest
 from ....utils.functional import type_checker
@@ -112,7 +112,7 @@ class Localizations(BaseCRM):
             self,
             bitrix_id: Text,
             *,
-            lids: List[Text],
+            lids: Iterable[Text],
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Delete currency localization.
@@ -131,6 +131,9 @@ class Localizations(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
+
+        if lids.__class__ is not list:
+            lids = list(lids)
 
         params = {
             "id": bitrix_id,

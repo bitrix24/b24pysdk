@@ -48,9 +48,12 @@ class Items(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
+        if items.__class__ is not list:
+            items = list(items)
+
         params = {
             "id": bitrix_id,
-            "items": list(items),
+            "items": items,
         }
 
         return self._make_bitrix_api_request(

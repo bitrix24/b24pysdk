@@ -28,7 +28,7 @@ class Lead(BaseItem):
         return Contact(self)
 
     @property
-    def details(self) -> "Details":
+    def details(self) -> Details:
         """"""
         return Details(self)
 

@@ -3,6 +3,9 @@ from typing import TYPE_CHECKING
 from ..scope import Scope
 from .activity import Activity
 from .address import Address
+from .automatedsolution import Automatedsolution
+from .automation import Automation
+from .calllist import Calllist
 from .category import Category
 from .company import Company
 from .contact import Contact
@@ -17,6 +20,7 @@ from .multifield import Multifield
 from .orderentity import Orderentity
 from .quote import Quote
 from .requisite import Requisite
+from .stagehistory import Stagehistory
 from .status import Status
 from .timeline import Timeline
 from .type import Type
@@ -37,6 +41,9 @@ class CRM(Scope):
     __slots__ = (
         "activity",
         "address",
+        "automatedsolution",
+        "automation",
+        "calllist",
         "category",
         "company",
         "contact",
@@ -52,6 +59,7 @@ class CRM(Scope):
         "orderentity",
         "quote",
         "requisite",
+        "stagehistory",
         "status",
         "timeline",
         "type",
@@ -61,6 +69,9 @@ class CRM(Scope):
 
     activity: Activity
     address: Address
+    automatedsolution: Automatedsolution
+    automation: Automation
+    calllist: Calllist
     category: Category
     company: Company
     contact: Contact
@@ -76,6 +87,7 @@ class CRM(Scope):
     orderentity: Orderentity
     quote: Quote
     requisite: Requisite
+    stagehistory: Stagehistory
     status: Status
     timeline: Timeline
     type: Type
@@ -86,6 +98,9 @@ class CRM(Scope):
         super().__init__(client)
         self.activity = Activity(self)
         self.address = Address(self)
+        self.automatedsolution = Automatedsolution(self)
+        self.automation = Automation(self)
+        self.calllist = Calllist(self)
         self.category = Category(self)
         self.company = Company(self)
         self.contact = Contact(self)
@@ -101,6 +116,7 @@ class CRM(Scope):
         self.orderentity = Orderentity(self)
         self.quote = Quote(self)
         self.requisite = Requisite(self)
+        self.stagehistory = Stagehistory(self)
         self.status = Status(self)
         self.timeline = Timeline(self)
         self.type = Type(self)

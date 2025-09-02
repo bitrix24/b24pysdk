@@ -231,7 +231,10 @@ class BaseItem(BaseCRM, ABC):
             params["entityTypeId"] = entity_type_id
 
         if select is not None:
-            params["select"] = list(select)
+            if select.__class__ is not list:
+                select = list(select)
+
+            params["select"] = select
 
         if filter is not None:
             params["filter"] = filter
