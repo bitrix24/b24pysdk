@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import TYPE_CHECKING, Callable, Optional, Text
+from typing import TYPE_CHECKING, Callable, Dict, Optional, Text
 
 from ..bitrix_api.bitrix_token import AbstractBitrixToken
 from ..bitrix_api.classes import BitrixAPIRequest
@@ -28,11 +28,18 @@ class Scope(ABC):
 
     @Classproperty
     def _name(cls) -> Text:
+        """"""
         return cls.__name__.lower()
 
     @property
     def _bitrix_token(self) -> AbstractBitrixToken:
+        """"""
         return getattr(self._client, "_bitrix_token")
+
+    @property
+    def _kwargs(self) -> Dict:
+        """"""
+        return getattr(self._client, "_kwargs")
 
     @staticmethod
     def __to_camel_case(snake_str: Text) -> Text:
@@ -42,7 +49,10 @@ class Scope(ABC):
 
     def _get_api_method(self, method: Callable) -> Text:
         """"""
-        return f"{self}.{self.__to_camel_case(method.__name__.strip('_'))}"
+        if hasattr(method, "__name__"):
+            return f"{self}.{self.__to_camel_case(method.__name__.strip('_'))}"
+        else:
+            return str(self)
 
     def _make_bitrix_api_request(
             self,
@@ -56,4 +66,5 @@ class Scope(ABC):
             api_method=self._get_api_method(api_method),
             params=params,
             timeout=timeout,
+            **self._kwargs,
         )
