@@ -4,11 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "b24pysdk"
-dynamic = ["version", "readme"]
+dynamic = ["readme"]
 authors = [
   { name = "Bitrix24", email = "pypi@bitrixsoft.com" }
 ]
 description = "An official Python library for the Bitrix24 REST API"
+license = { file = "LICENSE" }
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.9"
 keywords = ["bitrix24", "rest", "api"]
@@ -20,6 +21,9 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/bitrix24/b24pysdk"
+
+[tool.setuptools.dynamic]
+version = { attr = "b24pysdk.__version__" }
 
 [tool.setuptools.packages.find]
 where = ["."]
