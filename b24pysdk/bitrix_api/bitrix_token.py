@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import Callable, Dict, Final, Mapping, Optional, Sequence, Text, Tuple, Union, overload
+from typing import Callable, Dict, Final, Mapping, Optional, Sequence, Text, Union, overload
 
 from ..error import BitrixAPIExpiredToken
 from ..utils.types import B24BatchRequestData, JSONDict, Key, Timeout
-from .bitrix_app import BitrixApp
+from .bitrix_app import BitrixApp, BitrixAppLocal
 from .functions.call_batch import call_batch
 from .functions.call_batches import call_batches
 from .functions.call_list import call_list
@@ -57,6 +57,11 @@ class AbstractBitrixToken(ABC):
             is_webhook=self.is_webhook,
         )
 
+    def _refresh_and_set(self):
+        """"""
+        json_response = self.refresh()
+        self.auth_token, self.refresh_token = json_response["access_token"], json_response["refresh_token"]
+
     def _call_with_refresh(
             self,
             call_func: Callable,
@@ -67,7 +72,7 @@ class AbstractBitrixToken(ABC):
             return call_func(**self._auth_data, **parameters)
         except BitrixAPIExpiredToken:
             if self.AUTO_REFRESH and not self.is_webhook:
-                self.auth_token, self.refresh_token = self.refresh()
+                self._refresh_and_set()
                 return call_func(**self._auth_data, **parameters)
             else:
                 raise
@@ -76,10 +81,9 @@ class AbstractBitrixToken(ABC):
         """"""
         return self.oauth_requester.authorize(code=code)
 
-    def refresh(self) -> Tuple[Text, Text]:
+    def refresh(self) -> JSONDict:
         """"""
-        json_response = self.oauth_requester.refresh(refresh_token=self.refresh_token)
-        return json_response["access_token"], json_response["refresh_token"]
+        return self.oauth_requester.refresh(refresh_token=self.refresh_token)
 
     def call_method(
             self,
@@ -109,7 +113,8 @@ class AbstractBitrixToken(ABC):
             ignore_size_limit: bool = False,
             timeout: Timeout = None,
             **kwargs,
-    ) -> JSONDict: ...
+    ) -> JSONDict:
+        ...
 
     @overload
     def call_batch(
@@ -120,7 +125,8 @@ class AbstractBitrixToken(ABC):
             ignore_size_limit: bool = False,
             timeout: Timeout = None,
             **kwargs,
-    ) -> JSONDict: ...
+    ) -> JSONDict:
+        ...
 
     def call_batch(
             self,
@@ -151,7 +157,8 @@ class AbstractBitrixToken(ABC):
             halt: bool = False,
             timeout: Timeout = None,
             **kwargs,
-    ) -> JSONDict: ...
+    ) -> JSONDict:
+        ...
 
     @overload
     def call_batches(
@@ -161,7 +168,8 @@ class AbstractBitrixToken(ABC):
             halt: bool = False,
             timeout: Timeout = None,
             **kwargs,
-    ) -> JSONDict: ...
+    ) -> JSONDict:
+        ...
 
     def call_batches(
             self,
@@ -223,6 +231,18 @@ class AbstractBitrixToken(ABC):
                 **kwargs,
             ),
         )
+
+
+class AbstractBitrixTokenLocal(AbstractBitrixToken, ABC):
+    """"""
+
+    bitrix_app: BitrixAppLocal = NotImplemented
+    """"""
+
+    @property
+    def domain(self) -> Text:
+        """"""
+        return self.bitrix_app.domain
 
 
 class BitrixToken(AbstractBitrixToken):

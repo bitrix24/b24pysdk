@@ -29,7 +29,7 @@ class BitrixApp(AbstractBitrixApp):
         self.client_secret = client_secret
 
 
-class LocalBitrixApp(BitrixApp):
+class BitrixAppLocal(BitrixApp):
     """"""
 
     domain: Text

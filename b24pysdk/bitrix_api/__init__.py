@@ -1,9 +1,11 @@
-from .bitrix_app import BitrixApp, LocalBitrixApp
-from .bitrix_token import BitrixToken, BitrixWebhook
+from .bitrix_app import BitrixApp, BitrixAppLocal
+from .bitrix_token import AbstractBitrixToken, AbstractBitrixTokenLocal, BitrixToken, BitrixWebhook
 
 __all__ = [
+    "AbstractBitrixToken",
+    "AbstractBitrixTokenLocal",
     "BitrixApp",
+    "BitrixAppLocal",
     "BitrixToken",
     "BitrixWebhook",
-    "LocalBitrixApp",
 ]
