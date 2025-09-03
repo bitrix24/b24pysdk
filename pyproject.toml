@@ -22,6 +22,12 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/bitrix24/b24pysdk"
 
+[project.optional-dependencies]
+dev = [
+    "pre-commit",
+    "ruff",
+]
+
 [tool.setuptools.dynamic]
 version = { attr = "b24pysdk.__version__" }
 
