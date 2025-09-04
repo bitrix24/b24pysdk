@@ -98,9 +98,6 @@ class _BatchesCaller(BaseCaller):
         if last_response["time"].get("operating_reset_at") is not None:
             combined_response["time"]["operating_reset_at"] = last_response["time"]["operating_reset_at"]
 
-        if last_response["time"].get("operating") is not None:
-            combined_response["time"]["operating"] = last_response["time"]["operating"]
-
         for response in responses:
             result = response["result"]
             time = response["time"]
@@ -110,6 +107,9 @@ class _BatchesCaller(BaseCaller):
 
             combined_response["time"]["duration"] += time["duration"]
             combined_response["time"]["processing"] += time["processing"]
+
+            if time.get("operating") is not None:
+                combined_response["time"]["operating"] = combined_response["time"].get("operating", 0) + time["operating"]
 
         return combined_response
 

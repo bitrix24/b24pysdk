@@ -190,11 +190,11 @@ class _ListFastCaller(BaseCaller):
         self._time["processing"] += time["processing"]
         self._time["date_finish"] = time["date_finish"]
 
-        if self._time.get("operating_reset_at") is not None:
+        if time.get("operating_reset_at") is not None:
             self._time["operating_reset_at"] = time["operating_reset_at"]
 
-        if self._time.get("operating") is not None:
-            self._time["operating"] = time["operating"]
+        if time.get("operating") is not None:
+            self._time["operating"] = self._time.get("operating", 0) + time["operating"]
 
     def _unwrap_result(self, result: JSONDict) -> Tuple[Optional[Text], JSONList]:
         """"""
