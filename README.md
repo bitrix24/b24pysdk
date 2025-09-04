@@ -92,14 +92,29 @@ print(f'Call took {response.time.duration} seconds')
 Updated successfully: True
 Call took 0.40396690368652344 seconds
 ```
-For list methods, you can use .as_list() and .as_list_fast() to explicitly convert the result into a list.  
-The .as_list() method returns up to 50 records and supports pagination to retrieve additional results.  
+
+### Retrieving records with list methods
+
+For list methods, you can use .as_list() and .as_list_fast() to explicitly retrieve all records.
+> Documentation: https://apidocs.bitrix24.com/api-reference/performance/huge-data.html
+
+By default, calling .list() returns up to 50 records only.
 ```python
 response = client.crm.deal.list()
-deals = response.as_list().result
+deals = response.result  # up to 50 records
 ```
-The .as_list_fast() method is optimized for handling large datasets and returns all records in a single call.
+
+The .as_list() method retrieves all records by automatically.
 ```python
 response = client.crm.deal.list()
-deals = response.as_list_fast().result
+deals = response.as_list().result  # full list of records
+```
+
+The .as_list_fast() method is optimized for large datasets. 
+It uses a more efficient algorithm and is recommended when dealing with many records.
+```python
+response = client.crm.deal.list()
+deals = response.as_list_fast().result  # generator
+for deal in deals:  # requests are made lazily during iteration
+    print(deal)
 ```
