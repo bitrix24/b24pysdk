@@ -3,7 +3,7 @@ from typing import Callable, Dict, Final, Mapping, Optional, Sequence, Text, Uni
 
 from ..error import BitrixAPIExpiredToken
 from ..utils.types import B24BatchRequestData, JSONDict, Key, Timeout
-from .bitrix_app import BitrixApp, BitrixAppLocal
+from .bitrix_app import AbstractBitrixApp, AbstractBitrixAppLocal
 from .functions.call_batch import call_batch
 from .functions.call_batches import call_batches
 from .functions.call_list import call_list
@@ -27,7 +27,7 @@ class AbstractBitrixToken(ABC):
     refresh_token: Text = NotImplemented
     """"""
 
-    bitrix_app: Optional[BitrixApp] = NotImplemented
+    bitrix_app: Optional[AbstractBitrixApp] = NotImplemented
     """"""
 
     @abstractmethod
@@ -236,7 +236,7 @@ class AbstractBitrixToken(ABC):
 class AbstractBitrixTokenLocal(AbstractBitrixToken, ABC):
     """"""
 
-    bitrix_app: BitrixAppLocal = NotImplemented
+    bitrix_app: AbstractBitrixAppLocal = NotImplemented
     """"""
 
     @property
@@ -250,13 +250,27 @@ class BitrixToken(AbstractBitrixToken):
 
     def __init__(
             self,
+            *,
             domain: Text,
             auth_token: Text,
-            *,
             refresh_token: Optional[Text] = None,
-            bitrix_app: Optional[BitrixApp] = None,
+            bitrix_app: Optional[AbstractBitrixApp] = None,
     ):
         self.domain = domain
+        self.auth_token = auth_token
+        self.refresh_token = refresh_token
+        self.bitrix_app = bitrix_app
+
+
+class BitrixTokenLocal(AbstractBitrixTokenLocal):
+    """"""
+    def __init__(
+            self,
+            *,
+            auth_token: Text,
+            refresh_token: Optional[Text] = None,
+            bitrix_app: Optional[AbstractBitrixAppLocal] = None,
+    ):
         self.auth_token = auth_token
         self.refresh_token = refresh_token
         self.bitrix_app = bitrix_app
@@ -269,10 +283,11 @@ class BitrixWebhook(BitrixToken):
 
     def __init__(
             self,
+            *,
             domain: Text,
             auth_token: Text,
     ):
-        super().__init__(domain, auth_token)
+        super().__init__(domain=domain, auth_token=auth_token)
 
     @property
     def user_id(self) -> int:

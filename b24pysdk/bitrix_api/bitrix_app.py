@@ -17,11 +17,19 @@ class AbstractBitrixApp(ABC):
         super().__init__(*args, **kwargs)
 
 
+class AbstractBitrixAppLocal(AbstractBitrixApp, ABC):
+    """"""
+
+    domain: Text
+    """"""
+
+
 class BitrixApp(AbstractBitrixApp):
     """Local or market bitrix application"""
 
     def __init__(
             self,
+            *,
             client_id: Text,
             client_secret: Text,
     ):
@@ -29,14 +37,12 @@ class BitrixApp(AbstractBitrixApp):
         self.client_secret = client_secret
 
 
-class BitrixAppLocal(BitrixApp):
-    """"""
-
-    domain: Text
+class BitrixAppLocal(AbstractBitrixAppLocal):
     """"""
 
     def __init__(
             self,
+            *,
             domain: Text,
             client_id: Text,
             client_secret: Text,

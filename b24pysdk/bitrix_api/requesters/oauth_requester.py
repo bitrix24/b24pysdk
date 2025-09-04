@@ -12,7 +12,7 @@ from ...error import (
 	BitrixOAuthTimeout,
 )
 from ...utils.types import JSONDict, Timeout
-from ..bitrix_app import BitrixApp
+from ..bitrix_app import AbstractBitrixApp
 from ..functions.parse_response import parse_response
 from ._base_requester import BaseRequester
 
@@ -25,7 +25,7 @@ class OAuthRequester(BaseRequester):
 
 	def __init__(
 		self,
-		bitrix_app: BitrixApp,
+		bitrix_app: AbstractBitrixApp,
 		timeout: Timeout = None,
 	):
 		self._config = Config()
