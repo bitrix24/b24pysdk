@@ -3,7 +3,7 @@ from typing import IO, Dict, Optional, Text, Tuple
 import requests
 
 from ...utils.types import JSONDict, Timeout
-from ..requesters import BitrixApiRequester
+from ..requesters import BitrixAPIRequester
 
 
 def call(
@@ -34,7 +34,7 @@ def call(
             BitrixRequestError: if failed to establish HTTP connection
             BitrixTimeout: if the request timed out
     """
-    return BitrixApiRequester(
+    return BitrixAPIRequester(
         url=url,
         params=params,
         files=files,

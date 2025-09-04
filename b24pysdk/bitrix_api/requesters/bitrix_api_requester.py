@@ -11,7 +11,7 @@ from ...utils.types import JSONDict, Timeout
 from ._base_requester import BaseRequester
 
 
-class BitrixApiRequester(BaseRequester):
+class BitrixAPIRequester(BaseRequester):
     """"""
 
     _HEADERS: Final[Dict] = {"Content-Type": "application/json"}
