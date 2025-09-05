@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "b24pysdk"
-dynamic = ["readme"]
+dynamic = ["version"]
 authors = [
   { name = "Bitrix24", email = "pypi@bitrixsoft.com" }
 ]
