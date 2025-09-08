@@ -18,6 +18,7 @@ class _ListFastCaller(BaseCaller):
     _START: Final[int] = -1
 
     _REQUEST_ID_FIELDS: Final[Dict] = {
+        "socialnetwork.api.workgroup": "ID",
         "tasks.task": "ID",
     }
 
