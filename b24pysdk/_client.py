@@ -14,6 +14,7 @@ class Client:
         "_kwargs",
         "crm",
         "department",
+        "socialnetwork",
         "user",
     )
 
@@ -21,6 +22,7 @@ class Client:
     _kwargs: Dict
     crm: scopes.CRM
     department: scopes.Department
+    socialnetwork: scopes.Socialnetwork
     user: scopes.User
 
     def __init__(
@@ -32,6 +34,7 @@ class Client:
         self._kwargs = kwargs
         self.crm = scopes.CRM(self)
         self.department = scopes.Department(self)
+        self.socialnetwork = scopes.Socialnetwork(self)
         self.user = scopes.User(self)
 
     def __str__(self):
