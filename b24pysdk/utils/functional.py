@@ -64,13 +64,13 @@ def type_checker(func: _T) -> _T:
             expected_type = type_hints.get(param_name)
 
             if expected_type and not is_valid_type(arg, expected_type):
-                raise TypeError(f"Argument '{param_name}' must be of type '{expected_type.__name__}', not '{type(arg).__name__}'")
+                raise TypeError(f"Argument '{param_name}' must be of type '{expected_type}', not '{type(arg).__name__}'")
 
         for param_name, arg in kwargs.items():
             expected_type = type_hints.get(param_name)
 
             if expected_type and not is_valid_type(arg, expected_type):
-                raise TypeError(f"Argument '{param_name}' must be of type '{expected_type.__name__}', not '{type(arg).__name__}'")
+                raise TypeError(f"Argument '{param_name}' must be of type '{expected_type}', not '{type(arg).__name__}'")
 
         return func(*args, **kwargs)
 
