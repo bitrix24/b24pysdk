@@ -111,10 +111,17 @@ deals = response.as_list().result  # full list of records
 ```
 
 The .as_list_fast() method is optimized for large datasets. 
-It uses a more efficient algorithm and is recommended when dealing with many records.
+It uses a more efficient algorithm and is recommended when receiving many records.
 ```python
 response = client.crm.deal.list()
 deals = response.as_list_fast().result  # generator
 for deal in deals:  # requests are made lazily during iteration
     print(deal)
 ```
+
+## Library use via abstract classes
+
+Instead of BitrixApp and BitrixToken, you can use their abstract class versions with frameworks and ORM libraries.
+When using these abstract classes, the programmer is responsible for declaring the instance attributes and storing them.
+
+Examples of the available abstract classes are AbstractBitrixApp, AbstractBitrixAppLocal, AbstractBitrixToken and AbstractBitrixTokenLocal.
