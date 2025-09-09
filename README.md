@@ -28,6 +28,63 @@ Install from PyPI:
 pip install b24pysdk
 ```
 
+### Test environment (Docker-only, no local installs)
+
+Local development and tests run inside Docker containers only. Nothing is installed to your host Python.
+
+Two images are used:
+
+- CI image: mirrors GitHub Actions, bakes sources; slower for iteration (rebuild on code change).
+- Dev image: tools-only; build once, then run tests/lint against your working tree via bind mounts.
+
+Common Makefile targets:
+
+- Build dev image once: `make build-dev`
+- Run unit tests (mounted repo, editable install): `make test`
+- Run linter: `make lint`
+- Optional shell in dev container: `make shell`
+
+Notes:
+
+- The repository is mounted at /work inside the container; sources are not copied into the image.
+- If you add dependencies to `pyproject.toml`, `make test` reinstalls them in the container on next run.
+
+### Tests overview
+
+- Unit tests: fast, isolated; always run with `make test`.
+- Integration tests: hit real Bitrix24 REST API; opt‑in and require credentials.
+
+Run integration tests using one of the flows below.
+
+1. Using an env file (.env.local preferred):
+
+- Place credentials in `.env.local` (or `.env`). See `.env.example` template.
+- Run: `make test-int` (auto-detects `.env.local` or `.env`, prints which is used).
+
+2. Passing credentials via variables:
+
+- Webhook: `make test-int-webhook B24_DOMAIN=... B24_WEBHOOK=...`
+- OAuth: `make test-int-oauth B24_DOMAIN=... B24_CLIENT_ID=... B24_CLIENT_SECRET=... B24_ACCESS_TOKEN=...[ B24_REFRESH_TOKEN=...]`
+
+Environment variables:
+
+- Common
+    - `B24_DOMAIN`: portal host only, e.g. `example.bitrix24.com` (no scheme). Helpers normalize/validate.
+- Webhook
+    - `B24_WEBHOOK`: incoming webhook in format `user_id/hook_key`.
+- OAuth
+    - `B24_CLIENT_ID`, `B24_CLIENT_SECRET`, `B24_ACCESS_TOKEN`, optional `B24_REFRESH_TOKEN`.
+
+Behavior and skips:
+
+- If credentials are missing, integration tests are skipped with a clear reason.
+- The helpers will normalize `B24_DOMAIN` (strip scheme/slashes) and validate `B24_WEBHOOK`.
+
+CI note:
+
+- GitHub Actions runs linter and unit tests on push/PR (Python 3.9–3.12 matrix).
+- Integration tests that call the real REST API do not auto‑run in CI.
+
 ## Library structure at a glance
 
 - Client — entry point for all Bitrix24 calls: `client.crm`, `client.user`, `client.department`, `client.socialnetwork`.
