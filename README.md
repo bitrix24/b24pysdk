@@ -106,28 +106,51 @@ There are two ways to authenticate:
 1. Using a permanent incoming local webhook code: <https://apidocs.bitrix24.com/local-integrations/local-webhooks.html>
 
 ```python
-from b24pysdk import BitrixWebhook, Client
+from b24pysdk import BitrixWebhook
 
 bitrix_token = BitrixWebhook(domain="your_bitrix_portal", auth_token="key_of_your_webhook")
-client = Client(bitrix_token)
 ```
 
-1. Using a temporary OAuth 2.0 authorization token: <https://apidocs.bitrix24.com/api-reference/oauth/index.html>
+2. Using a temporary OAuth 2.0 authorization token: <https://apidocs.bitrix24.com/api-reference/oauth/index.html>
 
+For any type of apps:
 ```python
-from b24pysdk import BitrixToken, Client, BitrixApp
+from b24pysdk import BitrixToken, BitrixApp
 
 bitrix_app = BitrixApp(client_id="app_code", client_secret="app_key")
+
 bitrix_token = BitrixToken(
     domain="your_bitrix_portal",
     auth_token="key_of_your_webhook",
     refresh_token="refresh_token_of_the_app",  # optional parameter
     bitrix_app=bitrix_app,
 )
-client = Client(bitrix_token)
 ```
 
+For local apps:
+```python
+from b24pysdk import BitrixTokenLocal, BitrixAppLocal
+
+bitrix_app = BitrixAppLocal(
+  domain="your_bitrix_portal", 
+  client_id="app_code", 
+  client_secret="app_key",
+)
+
+bitrix_token = BitrixTokenLocal(
+    auth_token="key_of_your_webhook",
+    refresh_token="refresh_token_of_the_app",  # optional parameter
+    bitrix_app=bitrix_app,
+)
+```
+
+
 The `Client` is your entry point to the API. All supported methods are available via properties on the created instance.
+```python
+from b24pysdk import Client
+
+client = Client(bitrix_token)
+```
 
 For example, to get a description of deal fields you can call the `crm.deal.fields` method:
 
@@ -156,9 +179,9 @@ from b24pysdk import BitrixWebhook, Client
 bitrix_token = BitrixWebhook(domain="your_bitrix_portal", auth_token="key_of_your_webhook")
 client = Client(bitrix_token)
 
-response = client.crm.deal.update(bitrix_id=10, fields={'TITLE': 'New title'})
-print(f'Updated successfully: {response.result}')
-print(f'Call took {response.time.duration} seconds')
+request = client.crm.deal.update(bitrix_id=10, fields={"TITLE": "New title"})
+print(f'Updated successfully: {request.result}')
+print(f'Call took {request.time.duration} seconds')
 ```
 
 ```text
@@ -169,62 +192,71 @@ Call took 0.40396690368652344 seconds
 ### Retrieving records with list methods
 
 For list methods, you can use `.as_list()` and `.as_list_fast()` to explicitly retrieve all records.
+
 See documentation: [Handling large datasets](https://apidocs.bitrix24.com/api-reference/performance/huge-data.html)
 
-By default, calling `.list()` returns up to 50 records only.
+By default, list methods returns up to 50 records only.
 
 ```python
-response = client.crm.deal.list()
-deals = response.result  # up to 50 records
+request = client.crm.deal.list()
+deals = request.result  # up to 50 records
 ```
 
 The `.as_list()` method automatically retrieves all records.
 
 ```python
-response = client.crm.deal.list()
-deals = response.as_list().result  # full list of records
+request = client.crm.deal.list()
+deals = request.as_list().result  # full list of records
 ```
 
 The `.as_list_fast()` method is optimized for large datasets.
 It uses a more efficient algorithm and is recommended for receiving many records.
 
 ```python
-response = client.crm.deal.list()
-deals = response.as_list_fast().result  # generator
+request = client.crm.deal.list()
+deals = request.as_list_fast().result  # generator
+
 for deal in deals:  # requests are made lazily during iteration
-    print(deal)
+    print(deal["TITLE"])
 ```
 
 ### Batch requests
 
 You can execute multiple API calls in a single request using `call_batch`:
-
+> Method .call_batch() is used when you need to execute 50 or less API calls only.
 ```python
 from b24pysdk import Client, BitrixWebhook
+
 bitrix_token = BitrixWebhook(domain="your_bitrix_portal", auth_token="key_of_your_webhook")
 client = Client(bitrix_token)
 
-batch = {
-    'deal1': client.crm.deal.get(bitrix_id=1),
-    'deal2': client.crm.deal.get(bitrix_id=2),
+requests_data = {
+    "deal1": client.crm.deal.get(bitrix_id=1),
+    "deal2": client.crm.deal.get(bitrix_id=2),
+    # ...more requests
 }
-response = client.call_batch(batch)
-for key, result in response.result.items():
-    print(f"{key}: {result}")
+
+batch_request = client.call_batch(requests_data)
+
+for key, deal in batch_request.result.result.items():
+    print(f"{key}: {deal['TITLE']}")
 ```
 
 ### Multiple batches
 
 For very large workloads you can send multiple batches sequentially via `call_batches`:
-
+> Method .call_batches() can execute more than 50 API calls.
 ```python
 requests = [
     client.crm.deal.get(bitrix_id=1),
     client.crm.deal.get(bitrix_id=2),
     # ...more requests
 ]
-batches_response = client.call_batches(requests)
-print(batches_response.result)
+
+batches_request = client.call_batches(requests)
+
+for deal in batches_request.result.result:
+    print(deal["TITLE"])
 ```
 
 ### Response metadata
@@ -232,9 +264,9 @@ print(batches_response.result)
 List responses may include pagination metadata:
 
 ```python
-resp = client.crm.deal.list()
-print(resp.total)  # total number of records (if provided by API)
-print(resp.next)   # next page offset (if provided by API)
+request = client.crm.deal.list()
+print(request.response.total)  # total number of records (if provided by API)
+print(request.response.next)   # next page offset (if provided by API)
 ```
 
 ### Configuration (timeouts and retries)
@@ -263,8 +295,8 @@ Common exceptions you may want to handle:
 from b24pysdk.error import BitrixAPIError, BitrixTimeout
 
 try:
-    resp = client.crm.deal.get(bitrix_id=2)
-    print(resp.result)
+    request = client.crm.deal.get(bitrix_id=2)
+    print(request.result)
 except BitrixTimeout:
     # retry or log
     pass
@@ -277,4 +309,4 @@ except BitrixAPIError as e:
 Instead of BitrixApp and BitrixToken, you can use their abstract class versions with frameworks and ORM libraries.
 When using these abstract classes, the programmer is responsible for declaring the instance attributes and storing them.
 
-Examples of the available abstract classes are AbstractBitrixApp, AbstractBitrixAppLocal, AbstractBitrixToken and AbstractBitrixTokenLocal.
+Examples of the available abstract classes are `AbstractBitrixApp`, `AbstractBitrixAppLocal`, `AbstractBitrixToken` and `AbstractBitrixTokenLocal`.
