@@ -108,7 +108,9 @@ There are two ways to authenticate:
 ```python
 from b24pysdk import BitrixWebhook
 
-bitrix_token = BitrixWebhook(domain="your_bitrix_portal", auth_token="key_of_your_webhook")
+# For webhook URL: https://your_bitrix_portal.bitrix24.com/rest/1/key_of_your_webhook/
+# Use domain without protocol and auth_token in format "your_user_id/key_of_your_webhook"
+bitrix_token = BitrixWebhook(domain="your_bitrix_portal.bitrix24.com", auth_token="your_user_id/key_of_your_webhook")
 ```
 
 2. Using a temporary OAuth 2.0 authorization token: <https://apidocs.bitrix24.com/api-reference/oauth/index.html>
@@ -176,7 +178,7 @@ The JSON response retrieved from the server is parsed into an object: `response.
 ```python
 from b24pysdk import BitrixWebhook, Client
 
-bitrix_token = BitrixWebhook(domain="your_bitrix_portal", auth_token="key_of_your_webhook")
+bitrix_token = BitrixWebhook(domain="your_bitrix_portal.bitrix24.com", auth_token="your_user_id/key_of_your_webhook")
 client = Client(bitrix_token)
 
 request = client.crm.deal.update(bitrix_id=10, fields={"TITLE": "New title"})
@@ -227,7 +229,7 @@ You can execute multiple API calls in a single request using `call_batch`:
 ```python
 from b24pysdk import Client, BitrixWebhook
 
-bitrix_token = BitrixWebhook(domain="your_bitrix_portal", auth_token="key_of_your_webhook")
+bitrix_token = BitrixWebhook(domain="your_bitrix_portal.bitrix24.com", auth_token="your_user_id/key_of_your_webhook")
 client = Client(bitrix_token)
 
 requests_data = {
