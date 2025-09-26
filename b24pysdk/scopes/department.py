@@ -1,12 +1,9 @@
-from typing import TYPE_CHECKING, Optional, Text
+from typing import Optional, Text
 
 from ..bitrix_api.classes import BitrixAPIRequest
 from ..utils.functional import type_checker
 from ..utils.types import Timeout
 from .scope import Scope
-
-if TYPE_CHECKING:
-    from .. import Client
 
 __all__ = [
     "Department",
@@ -14,17 +11,30 @@ __all__ = [
 
 
 class Department(Scope):
-    """"""
+    """Class for managing departments.
 
-    def __init__(self, client: "Client"):
-        super().__init__(client)
+    Documentation: https://apidocs.bitrix24.com/api-reference/departments/index.html
+    """
 
     @type_checker
     def fields(
             self,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Get fields of a department.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/departments/department-fields.html
+
+        This method returns a list and description of available department fields.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+
         return self._make_bitrix_api_request(
             api_method=self.fields,
             timeout=timeout,
@@ -37,9 +47,29 @@ class Department(Scope):
             parent: int,
             sort: Optional[int] = None,
             uf_head: Optional[int] = None,
-            timeout: Optional[Timeout] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Add a new department.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/departments/department-add.html
+
+        This method adds a new department to the company's structure.
+
+        Args:
+            name: Name of the department;
+
+            parent: Parent department ID;
+
+            sort: Department sorting field;
+
+            uf_head: Identifier of the user who will become the head of the department;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "NAME": name,
@@ -68,9 +98,35 @@ class Department(Scope):
             parent: Optional[int] = None,
             uf_head: Optional[int] = None,
             start: Optional[int] = None,
-            timeout: Optional[Timeout] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Get a list of departments with filtering.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/departments/department-get.html
+
+        This method retrieves a list of departments, optionally filtered by provided parameters.
+
+        Args:
+            sort: Sort order for departments;
+
+            order: Order logic for sorting;
+
+            bitrix_id: Specific department ID to retrieve;
+
+            name: Name of the department to retrieve;
+
+            parent: Filter by parent department ID;
+
+            uf_head: Filter by department head;
+
+            start: Starting index for pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict()
 
@@ -109,9 +165,31 @@ class Department(Scope):
             sort: Optional[int] = None,
             parent: Optional[int] = None,
             uf_head: Optional[int] = None,
-            timeout: Optional[Timeout] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Update an existing department.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/departments/department-update.html
+
+        This method updates details of a specific department.
+
+        Args:
+            bitrix_id: ID of the department to update;
+
+            name: New name for the department;
+
+            sort: Sorting field of the department;
+
+            parent: New parent department ID;
+
+            uf_head: Identifier of the user who will be the head of the department;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "ID": bitrix_id,
@@ -139,9 +217,23 @@ class Department(Scope):
     def delete(
             self,
             bitrix_id: int,
-            timeout: Optional[Timeout] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Delete a department.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/departments/department-delete.html
+
+        This method deletes a department based on the provided ID.
+
+        Args:
+            bitrix_id: ID of the department to delete;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "ID": bitrix_id,
