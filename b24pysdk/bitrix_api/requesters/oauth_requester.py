@@ -1,8 +1,7 @@
-from typing import Dict, Final, Text
+from typing import Dict, Final, Optional, Text
 
 import requests
 
-from ..._config import Config
 from ...error import (
 	BitrixAPIInsufficientScope,
 	BitrixAPIInvalidRequest,
@@ -11,7 +10,7 @@ from ...error import (
 	BitrixOAuthRequestError,
 	BitrixOAuthTimeout,
 )
-from ...utils.types import JSONDict, Timeout
+from ...utils.types import JSONDict, Number, Timeout
 from ..bitrix_app import AbstractBitrixApp
 from ..functions.parse_response import parse_response
 from ._base_requester import BaseRequester
@@ -23,25 +22,44 @@ class OAuthRequester(BaseRequester):
 	_URL: Final[Text] = "https://oauth.bitrix.info/oauth/token/"
 	_HEADERS: Final[Dict] = {"Content-Type": "application/x-www-form-urlencoded"}
 
+	__slots__ = ("_bitrix_app",)
+
+	_bitrix_app: AbstractBitrixApp
+
 	def __init__(
 		self,
 		bitrix_app: AbstractBitrixApp,
 		timeout: Timeout = None,
+		max_retries: Optional[int] = None,
+		initial_retry_delay: Optional[Number] = None,
+		retry_delay_increment: Optional[Number] = None,
 	):
-		self._config = Config()
+		super().__init__(
+			timeout=timeout,
+			max_retries=max_retries,
+			initial_retry_delay=initial_retry_delay,
+			retry_delay_increment=retry_delay_increment,
+		)
 		self._bitrix_app = bitrix_app
-		self._timeout = timeout or self._config.default_timeout
 
 	@property
 	def _headers(self) -> Dict:
 		""""""
 		return self._get_default_headers() | self._HEADERS
 
-	def _get(self, params: JSONDict) -> JSONDict:
+	def _request(self, params: JSONDict) -> requests.Response:
+		return requests.get(
+			url=self._URL,
+			params=params,
+			headers=self._headers,
+			timeout=self._timeout,
+		)
+
+	def _get(self, params: JSONDict) -> requests.Response:
 		""""""
 
 		try:
-			response = requests.get(self._URL, params=params, headers=self._headers, timeout=self._timeout)
+			return self._request_with_retries(params=params)
 
 		except requests.Timeout as error:
 			raise BitrixOAuthTimeout(timeout=self._timeout, original_error=error) from error
@@ -55,9 +73,6 @@ class OAuthRequester(BaseRequester):
 		except BitrixAPIInsufficientScope as error:
 			raise BitrixOAuthInsufficientScope(response=error.response, json_response=error.json_response) from error
 
-		else:
-			return parse_response(response)
-
 	def authorize(self, code: Text) -> JSONDict:
 		""""""
 
@@ -68,7 +83,7 @@ class OAuthRequester(BaseRequester):
 			"code": code,
 		}
 
-		return self._get(params=params)
+		return parse_response(self._get(params=params))
 
 	def refresh(self, refresh_token: Text) -> JSONDict:
 		""""""
@@ -80,4 +95,4 @@ class OAuthRequester(BaseRequester):
 			"refresh_token": refresh_token,
 		}
 
-		return self._get(params=params)
+		return parse_response(self._get(params=params))
