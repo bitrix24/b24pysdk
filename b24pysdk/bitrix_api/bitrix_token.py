@@ -4,11 +4,9 @@ from typing import Callable, Dict, Final, Mapping, Optional, Sequence, Text, Uni
 from ..error import BitrixAPIExpiredToken
 from ..utils.types import B24BatchRequestData, JSONDict, Key, Timeout
 from .bitrix_app import AbstractBitrixApp, AbstractBitrixAppLocal
-from .functions.call_batch import call_batch
-from .functions.call_batches import call_batches
-from .functions.call_list import call_list
-from .functions.call_list_fast import call_list_fast
-from .functions.call_method import call_method
+from .classes.events import AuthTokenRenewedEvent
+from .classes.signal import BitrixSignalInstance, create_bitrix_signal
+from .functions import call_batch, call_batches, call_list, call_list_fast, call_method
 from .requesters import OAuthRequester
 
 
@@ -28,6 +26,9 @@ class AbstractBitrixToken(ABC):
     """"""
 
     bitrix_app: Optional[AbstractBitrixApp] = NotImplemented
+    """"""
+
+    auth_token_renewed: BitrixSignalInstance = create_bitrix_signal(AuthTokenRenewedEvent)
     """"""
 
     @abstractmethod
@@ -55,12 +56,18 @@ class AbstractBitrixToken(ABC):
             domain=self.domain,
             auth_token=self.auth_token,
             is_webhook=self.is_webhook,
+            bitrix_token=self,
         )
 
     def _refresh_and_set(self):
         """"""
         json_response = self.refresh()
         self.auth_token, self.refresh_token = json_response["access_token"], json_response["refresh_token"]
+
+        self.auth_token_renewed.emit(AuthTokenRenewedEvent(
+            auth_token=self.auth_token,
+            refresh_token=self.refresh_token,
+        ))
 
     def _call_with_refresh(
             self,
@@ -298,10 +305,10 @@ class BitrixWebhook(BitrixToken):
         if len(auth_parts) == self.__AUTH_TOKEN_PARTS_COUNT and auth_parts[0].isdigit():
             return int(auth_parts[0])
         else:
-            raise ValueError(f"Invalid webhook auth_token format: expected 'user_id/hook_key', got '{self.auth_token}'")
+            raise ValueError(f"Invalid webhook auth_token format: expected 'user_id/webhook_key', got '{self.auth_token}'")
 
     @property
-    def hook_key(self) -> Text:
+    def webhook_key(self) -> Text:
         """"""
 
         auth_parts = self.auth_token.strip("/").split("/")
@@ -309,4 +316,4 @@ class BitrixWebhook(BitrixToken):
         if len(auth_parts) == self.__AUTH_TOKEN_PARTS_COUNT:
             return auth_parts[1]
         else:
-            raise ValueError(f"Invalid webhook auth_token format: expected 'user_id/hook_key', got '{self.auth_token}'")
+            raise ValueError(f"Invalid webhook auth_token format: expected 'user_id/webhook_key', got '{self.auth_token}'")

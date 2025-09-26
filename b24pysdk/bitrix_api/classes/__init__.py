@@ -1,17 +1,17 @@
-from .bitrix_api_response_time import BitrixAPIResponseTime
 from .request import (
     BitrixAPIBatchesRequest,
     BitrixAPIBatchRequest,
-    BitrixAPIFastListRequest,
+    BitrixAPIListFastRequest,
     BitrixAPIListRequest,
     BitrixAPIRequest,
 )
 from .response import (
     B24APIBatchResult,
     BitrixAPIBatchResponse,
-    BitrixAPIFastListResponse,
+    BitrixAPIListFastResponse,
     BitrixAPIListResponse,
     BitrixAPIResponse,
+    BitrixAPITimeResponse,
 )
 
 __all__ = [
@@ -19,11 +19,11 @@ __all__ = [
     "BitrixAPIBatchRequest",
     "BitrixAPIBatchResponse",
     "BitrixAPIBatchesRequest",
-    "BitrixAPIFastListRequest",
-    "BitrixAPIFastListResponse",
+    "BitrixAPIListFastRequest",
+    "BitrixAPIListFastResponse",
     "BitrixAPIListRequest",
     "BitrixAPIListResponse",
     "BitrixAPIRequest",
     "BitrixAPIResponse",
-    "BitrixAPIResponseTime",
+    "BitrixAPITimeResponse",
 ]
