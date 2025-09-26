@@ -3,7 +3,7 @@ from typing import Optional
 
 from ...._constants import PYTHON_VERSION
 from ....utils.types import B24APIResult, JSONDict
-from ..bitrix_api_response_time import BitrixAPIResponseTime
+from .bitrix_api_time_response import BitrixAPITimeResponse
 
 _DATACLASS_KWARGS = {"repr": False, "eq": False, "frozen": True}
 
@@ -16,7 +16,7 @@ class BitrixAPIResponse:
     """"""
 
     result: B24APIResult
-    _time: BitrixAPIResponseTime
+    _time: BitrixAPITimeResponse
     next: Optional[int]
     total: Optional[int]
 
@@ -30,14 +30,14 @@ class BitrixAPIResponse:
         )
 
     @property
-    def time(self) -> BitrixAPIResponseTime:
+    def time(self) -> BitrixAPITimeResponse:
         return self._time
 
     @classmethod
     def from_dict(cls, json_response: JSONDict) -> "BitrixAPIResponse":
         return cls(
             result=json_response["result"],
-            _time=BitrixAPIResponseTime.from_dict(json_response["time"]),
+            _time=BitrixAPITimeResponse.from_dict(json_response["time"]),
             next=json_response.get("next"),
             total=json_response.get("total"),
         )

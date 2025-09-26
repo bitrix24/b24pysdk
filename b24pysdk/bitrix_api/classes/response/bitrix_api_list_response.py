@@ -3,8 +3,8 @@ from typing import Generator, Literal
 
 from ...._constants import PYTHON_VERSION
 from ....utils.types import JSONDict, JSONList
-from ..bitrix_api_response_time import BitrixAPIResponseTime
 from .bitrix_api_response import BitrixAPIResponse
+from .bitrix_api_time_response import BitrixAPITimeResponse
 
 _DATACLASS_KWARGS = {"repr": False, "eq": False, "frozen": True}
 
@@ -31,12 +31,12 @@ class BitrixAPIListResponse(BitrixAPIResponse):
     def from_dict(cls, json_response: JSONDict) -> "BitrixAPIListResponse":
         return cls(
             result=json_response["result"],
-            _time=BitrixAPIResponseTime.from_dict(json_response["time"]),
+            _time=BitrixAPITimeResponse.from_dict(json_response["time"]),
         )
 
 
 @dataclass(**_DATACLASS_KWARGS)
-class BitrixAPIFastListResponse(BitrixAPIListResponse):
+class BitrixAPIListFastResponse(BitrixAPIListResponse):
     """"""
 
     result: Generator[JSONDict, None, None]
@@ -50,11 +50,11 @@ class BitrixAPIFastListResponse(BitrixAPIListResponse):
         )
 
     @property
-    def time(self) -> BitrixAPIResponseTime:
-        return BitrixAPIResponseTime.from_dict(self._time)
+    def time(self) -> BitrixAPITimeResponse:
+        return BitrixAPITimeResponse.from_dict(self._time)
 
     @classmethod
-    def from_dict(cls, json_response: JSONDict) -> "BitrixAPIFastListResponse":
+    def from_dict(cls, json_response: JSONDict) -> "BitrixAPIListFastResponse":
         return cls(
             result=json_response["result"],
             _time=json_response["time"],

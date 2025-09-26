@@ -2,8 +2,8 @@ from dataclasses import asdict, dataclass
 from datetime import datetime
 from typing import Optional
 
-from ..._constants import PYTHON_VERSION
-from ...utils.types import JSONDict
+from ...._constants import PYTHON_VERSION
+from ....utils.types import JSONDict
 
 _DATACLASS_KWARGS = {"eq": False, "order": False, "frozen": True}
 
@@ -12,7 +12,7 @@ if PYTHON_VERSION >= (3, 10):
 
 
 @dataclass(**_DATACLASS_KWARGS)
-class BitrixAPIResponseTime:
+class BitrixAPITimeResponse:
     """"""
 
     start: float
@@ -25,7 +25,7 @@ class BitrixAPIResponseTime:
     operating: Optional[float] = None
 
     @classmethod
-    def from_dict(cls, response_time: JSONDict) -> "BitrixAPIResponseTime":
+    def from_dict(cls, response_time: JSONDict) -> "BitrixAPITimeResponse":
         return cls(
             start=response_time["start"],
             finish=response_time["finish"],

@@ -1,7 +1,7 @@
 from typing import Generator, Optional
 
 from ....utils.types import JSONDict, JSONList
-from ..response import BitrixAPIFastListResponse, BitrixAPIListResponse
+from ..response import BitrixAPIListFastResponse, BitrixAPIListResponse
 from .bitrix_api_request import BitrixAPIRequest
 
 
@@ -70,12 +70,12 @@ class BitrixAPIListRequest(BitrixAPIRequest):
         return self._response
 
 
-class BitrixAPIFastListRequest(BitrixAPIListRequest):
+class BitrixAPIListFastRequest(BitrixAPIListRequest):
     """"""
 
     __slots__ = ("_descending",)
 
-    _response: Optional[BitrixAPIFastListResponse]
+    _response: Optional[BitrixAPIListFastResponse]
     _descending: bool
 
     def __init__(
@@ -99,7 +99,7 @@ class BitrixAPIFastListRequest(BitrixAPIListRequest):
         return self._descending
 
     @property
-    def response(self) -> BitrixAPIFastListResponse:
+    def response(self) -> BitrixAPIListFastResponse:
         """"""
         return self._response or self.call()
 
@@ -119,7 +119,7 @@ class BitrixAPIFastListRequest(BitrixAPIListRequest):
             **self._kwargs,
         )
 
-    def call(self) -> BitrixAPIFastListResponse:
+    def call(self) -> BitrixAPIListFastResponse:
         """"""
-        self._response = BitrixAPIFastListResponse.from_dict(self._call())
+        self._response = BitrixAPIListFastResponse.from_dict(self._call())
         return self._response

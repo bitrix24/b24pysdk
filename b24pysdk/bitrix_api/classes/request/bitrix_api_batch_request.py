@@ -1,9 +1,11 @@
-from typing import Dict, Final, List, Mapping, Optional, Sequence, Text, Union, overload
+from typing import TYPE_CHECKING, Dict, Final, List, Mapping, Optional, Sequence, Text, Union, overload
 
 from ....utils.types import B24BatchRequestData, JSONDict, Key, Timeout
-from ...bitrix_token import AbstractBitrixToken
 from ..response import B24APIBatchResult, BitrixAPIBatchResponse
 from .bitrix_api_request import BitrixAPIRequest
+
+if TYPE_CHECKING:
+    from ...bitrix_token import AbstractBitrixToken
 
 
 class BitrixAPIBatchesRequest(BitrixAPIRequest):
@@ -21,7 +23,7 @@ class BitrixAPIBatchesRequest(BitrixAPIRequest):
     def __init__(
             self,
             *,
-            bitrix_token: AbstractBitrixToken,
+            bitrix_token: "AbstractBitrixToken",
             bitrix_api_requests: Mapping[Key, BitrixAPIRequest],
             halt: bool = False,
             timeout: Timeout = None,
@@ -32,7 +34,7 @@ class BitrixAPIBatchesRequest(BitrixAPIRequest):
     def __init__(
             self,
             *,
-            bitrix_token: AbstractBitrixToken,
+            bitrix_token: "AbstractBitrixToken",
             bitrix_api_requests: Sequence[BitrixAPIRequest],
             halt: bool = False,
             timeout: Timeout = None,
@@ -42,7 +44,7 @@ class BitrixAPIBatchesRequest(BitrixAPIRequest):
     def __init__(
             self,
             *,
-            bitrix_token: AbstractBitrixToken,
+            bitrix_token: "AbstractBitrixToken",
             bitrix_api_requests: Union[Mapping[Key, BitrixAPIRequest], Sequence[BitrixAPIRequest]],
             halt: bool = False,
             timeout: Timeout = None,
@@ -154,7 +156,7 @@ class BitrixAPIBatchRequest(BitrixAPIBatchesRequest):
     def __init__(
             self,
             *,
-            bitrix_token: AbstractBitrixToken,
+            bitrix_token: "AbstractBitrixToken",
             bitrix_api_requests: Mapping[Key, BitrixAPIRequest],
             halt: bool = False,
             ignore_size_limit: bool = False,
@@ -166,7 +168,7 @@ class BitrixAPIBatchRequest(BitrixAPIBatchesRequest):
     def __init__(
             self,
             *,
-            bitrix_token: AbstractBitrixToken,
+            bitrix_token: "AbstractBitrixToken",
             bitrix_api_requests: Sequence[BitrixAPIRequest],
             halt: bool = False,
             ignore_size_limit: bool = False,
@@ -177,7 +179,7 @@ class BitrixAPIBatchRequest(BitrixAPIBatchesRequest):
     def __init__(
             self,
             *,
-            bitrix_token: AbstractBitrixToken,
+            bitrix_token: "AbstractBitrixToken",
             bitrix_api_requests: Union[Mapping[Key, BitrixAPIRequest], Sequence[BitrixAPIRequest]],
             halt: bool = False,
             ignore_size_limit: bool = False,

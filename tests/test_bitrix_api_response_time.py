@@ -2,7 +2,7 @@ import datetime as dt
 
 import pytest
 
-from b24pysdk.bitrix_api.classes.bitrix_api_response_time import BitrixAPIResponseTime
+from b24pysdk.bitrix_api.classes import BitrixAPITimeResponse
 
 
 def test_response_time_from_dict_and_to_dict():
@@ -20,7 +20,7 @@ def test_response_time_from_dict_and_to_dict():
         "operating": 0.08,
     }
 
-    rt = BitrixAPIResponseTime.from_dict(payload)
+    rt = BitrixAPITimeResponse.from_dict(payload)
     assert rt.duration == pytest.approx(0.1)
     assert rt.processing == pytest.approx(0.05)
     assert isinstance(rt.date_start, dt.datetime)

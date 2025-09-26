@@ -3,8 +3,8 @@ from typing import Dict, List, Literal, Text, Union
 
 from ...._constants import PYTHON_VERSION
 from ....utils.types import B24APIResult, JSONDict, JSONList
-from ..bitrix_api_response_time import BitrixAPIResponseTime
 from .bitrix_api_response import BitrixAPIResponse
+from .bitrix_api_time_response import BitrixAPITimeResponse
 
 _DATACLASS_KWARGS = {"repr": False, "eq": False, "frozen": True}
 
@@ -20,7 +20,7 @@ class B24APIBatchResult:
     result_error: Union[JSONDict, JSONList]
     result_total: Union[Dict[Text, int], List[int]]
     result_next: Union[Dict[Text, int], List[int]]
-    result_time: Union[Dict[Text, BitrixAPIResponseTime], List[BitrixAPIResponseTime]]
+    result_time: Union[Dict[Text, BitrixAPITimeResponse], List[BitrixAPITimeResponse]]
 
     def __repr__(self):
         return (
@@ -40,13 +40,13 @@ class B24APIBatchResult:
             result_time = dict()
 
             for key, time_value in json_result_time.items():
-                result_time[key] = BitrixAPIResponseTime.from_dict(time_value)
+                result_time[key] = BitrixAPITimeResponse.from_dict(time_value)
 
         else:
             result_time = list()
 
             for time_value in json_result_time:
-                result_time.append(BitrixAPIResponseTime.from_dict(time_value))
+                result_time.append(BitrixAPITimeResponse.from_dict(time_value))
 
         return cls(
             result=json_response["result"],
@@ -79,5 +79,5 @@ class BitrixAPIBatchResponse(BitrixAPIResponse):
     def from_dict(cls, json_response: JSONDict) -> "BitrixAPIBatchResponse":
         return cls(
             result=B24APIBatchResult.from_dict(json_response["result"]),
-            _time=BitrixAPIResponseTime.from_dict(json_response["time"]),
+            _time=BitrixAPITimeResponse.from_dict(json_response["time"]),
         )

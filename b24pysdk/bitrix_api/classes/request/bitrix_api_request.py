@@ -1,12 +1,11 @@
 from typing import TYPE_CHECKING, Dict, Optional, Text, Tuple
 
 from ....utils.types import B24APIResult, JSONDict, Timeout
-from ...bitrix_token import AbstractBitrixToken
-from ..bitrix_api_response_time import BitrixAPIResponseTime
-from ..response import BitrixAPIResponse
+from ..response import BitrixAPIResponse, BitrixAPITimeResponse
 
 if TYPE_CHECKING:
-    from .bitrix_api_list_request import BitrixAPIFastListRequest, BitrixAPIListRequest
+    from ...bitrix_token import AbstractBitrixToken
+    from .bitrix_api_list_request import BitrixAPIListFastRequest, BitrixAPIListRequest
 
 
 class BitrixAPIRequest:
@@ -14,7 +13,7 @@ class BitrixAPIRequest:
 
     __slots__ = ("_api_method", "_bitrix_token", "_kwargs", "_params", "_response", "_timeout")
 
-    _bitrix_token: AbstractBitrixToken
+    _bitrix_token: "AbstractBitrixToken"
     _api_method: Text
     _params: Optional[JSONDict]
     _timeout: Timeout
@@ -24,7 +23,7 @@ class BitrixAPIRequest:
     def __init__(
             self,
             *,
-            bitrix_token: AbstractBitrixToken,
+            bitrix_token: "AbstractBitrixToken",
             api_method: Text,
             params: Optional[JSONDict] = None,
             timeout: Timeout = None,
@@ -55,7 +54,7 @@ class BitrixAPIRequest:
         return self._api_method, self._params
 
     @property
-    def bitrix_token(self) -> AbstractBitrixToken:
+    def bitrix_token(self) -> "AbstractBitrixToken":
         """"""
         return self._bitrix_token
 
@@ -93,7 +92,7 @@ class BitrixAPIRequest:
         return self.response.result
 
     @property
-    def time(self) -> BitrixAPIResponseTime:
+    def time(self) -> BitrixAPITimeResponse:
         """"""
         return self.response.time
 
@@ -127,10 +126,10 @@ class BitrixAPIRequest:
             self,
             descending: bool = False,
             limit: Optional[int] = None,
-    ) -> "BitrixAPIFastListRequest":
+    ) -> "BitrixAPIListFastRequest":
         """"""
-        from .bitrix_api_list_request import BitrixAPIFastListRequest
-        return BitrixAPIFastListRequest(
+        from .bitrix_api_list_request import BitrixAPIListFastRequest
+        return BitrixAPIListFastRequest(
             bitrix_api_request=self,
             descending=descending,
             limit=limit,
