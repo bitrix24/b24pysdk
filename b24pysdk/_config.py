@@ -1,6 +1,7 @@
 import threading
 
 from ._constants import DEFAULT_TIMEOUT, INITIAL_RETRY_DELAY, MAX_RETRIES, RETRY_DELAY_INCREMENT
+from .log import AbstractLogger, NullLogger
 from .utils.types import DefaultTimeout, Number
 
 
@@ -10,18 +11,21 @@ class _LocalConfig:
     __slots__ = (
         "default_timeout",
         "initial_retry_delay",
+        "logger",
         "max_retries",
         "retry_delay_increment",
     )
 
-    initial_retry_delay: Number
     default_timeout: DefaultTimeout
+    initial_retry_delay: Number
+    logger: AbstractLogger
     max_retries: int
     retry_delay_increment: Number
 
     def __init__(self):
         self.default_timeout: DefaultTimeout = DEFAULT_TIMEOUT
         self.initial_retry_delay: Number = INITIAL_RETRY_DELAY
+        self.logger = NullLogger()
         self.max_retries: int = MAX_RETRIES
         self.retry_delay_increment: Number = RETRY_DELAY_INCREMENT
 
@@ -52,6 +56,40 @@ class Config:
             raise ValueError("Default_timeout must be a positive number or a tuple of two positive numbers (connect_timeout, read_timeout)")
 
         self._config.default_timeout = value
+
+    @property
+    def logger(self) -> AbstractLogger:
+        """"""
+        return self._config.logger
+
+    @logger.setter
+    def logger(self, value: AbstractLogger):
+        """"""
+
+        if not isinstance(value, AbstractLogger):
+            raise TypeError("Logger must be an instance of AbstractLogger")
+
+        self._config.logger = value
+
+    @property
+    def log_level(self) -> int:
+        """"""
+        return self._config.logger.level
+
+    @log_level.setter
+    def log_level(self, value: int):
+        """"""
+
+        logger_class = self.logger.__class__
+
+        if value not in logger_class.LOG_LEVELS.values():
+            raise ValueError(
+                f"Invalid log level: {value}. "
+                f"It must be one of the levels defined in {logger_class.__name__}.LOG_LEVELS: "
+                f"{', '.join(map(str, logger_class.LOG_LEVELS.values()))}",
+            )
+
+        self._config.logger.set_level(value)
 
     @property
     def max_retries(self) -> int:
