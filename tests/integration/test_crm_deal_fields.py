@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from tests.integration.helpers import MissingCredentials, make_client_from_env
+from .helpers import MissingCredentials, make_client_from_env
 
 
 @pytest.mark.integration

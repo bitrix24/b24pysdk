@@ -2,8 +2,8 @@ import os
 
 import pytest
 
+from .helpers import MissingCredentials, make_client_from_env
 from b24pysdk.error import BitrixAPIInsufficientScope, BitrixAPIUnauthorized
-from tests.integration.helpers import MissingCredentials, make_client_from_env
 
 
 @pytest.mark.integration
@@ -13,7 +13,7 @@ def test_user_current_real():
     Skips if neither set of credentials is available.
     """
     try:
-    # Prefer webhook as it's simpler, fall back to OAuth if needed
+        # Prefer webhook as it's simpler, fall back to OAuth if needed
         client = make_client_from_env(prefer=os.getenv("B24_PREFER", "webhook"))
     except MissingCredentials:
         pytest.skip("No Bitrix24 credentials in environment; skipping integration test")
