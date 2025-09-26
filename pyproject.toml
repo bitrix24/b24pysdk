@@ -1,10 +1,12 @@
 [build-system]
-requires = ["setuptools>=61.0", "requests>=2.32.4,<3"]
+requires = [
+    "setuptools>=61.0",
+]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "b24pysdk"
-dynamic = ["version"]
+version = "0.1.0a1"
 authors = [
   { name = "Bitrix24", email = "pypi@bitrixsoft.com" }
 ]
@@ -16,7 +18,9 @@ keywords = ["bitrix24", "rest", "api"]
 classifiers = []
 
 dependencies = [
-  "requests>=2.32.4,<3"
+    "psygnal",
+    "requests>=2.32.4,<3",
+    "uuid6",
 ]
 
 [project.urls]
@@ -25,19 +29,16 @@ Homepage = "https://github.com/bitrix24/b24pysdk"
 [project.optional-dependencies]
 dev = [
     "pre-commit",
-    "ruff"
+    "ruff==0.5.7",
 ]
 test = [
   "pytest>=7",
   "pytest-cov>=4",
-  "pytest-mock>=3"
+  "pytest-mock>=3",
 ]
 
-[tool.setuptools.dynamic]
-version = { attr = "b24pysdk.__version__" }
-
 [tool.setuptools.packages.find]
-where = ["."]
+exclude = ["tests*"]
 
 [tool.ruff]
 line-length = 300
@@ -100,15 +101,6 @@ ignore = [
     "TRY003",   # https://docs.astral.sh/ruff/rules/raise-vanilla-args/
 ]
 
-[tool.ruff.lint.per-file-ignores]
-"tests/**" = [
-  "S101",   # allow assert in tests
-  "INP001", # ignore namespace package warning for tests
-  "ARG002", # allow unused kwargs in test doubles
-  "SIM118", # stylistic dict checks in tests
-  "F401"    # unused imports in tests (if any)
-]
-
 [tool.ruff.format]
 quote-style = "double"
 
@@ -118,7 +110,6 @@ markers = [
   "integration: marks tests that hit real Bitrix24 API (deselect with -m 'not integration')",
 ]
 testpaths = [
-  "tests"
+  "tests",
 ]
 python_files = ["test_*.py", "*_test.py"]
-
