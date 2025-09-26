@@ -37,7 +37,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest -q --disable-warnings --maxfail=1
+          pytest tests/ -v --disable-warnings --maxfail=1
 
   docker-ci:
     runs-on: ubuntu-latest
