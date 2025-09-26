@@ -11,15 +11,31 @@ __all__ = [
 
 
 class Userfield(Base):
-    """"""
+    """Manage user-defined fields in the Bitrix24 system.
 
+    Documentation: https://apidocs.bitrix24.com/api-reference/user/userfields/index.html
+    """
     @type_checker
     def add(
             self,
             fields: JSONDict,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Add a custom field.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/user/userfields/user-userfield-add.html
+
+        This method allows adding custom fields to the existing entities.
+
+        Args:
+            fields: A dictionary of field parameters to create;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "fields": fields,
@@ -38,7 +54,23 @@ class Userfield(Base):
             filter: Optional[JSONDict] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Retrieve a list of custom fields.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/user/userfields/user-userfield-list.html
+
+        This method retrieves a list of user fields with optional ordering and filtering.
+
+        Args:
+            order: A dictionary to sort the fields;
+
+            filter: A dictionary to filter the fields;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict()
 
@@ -61,7 +93,23 @@ class Userfield(Base):
             fields: JSONDict,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Update a custom field.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/user/userfields/user-userfield-update.html
+
+        This method modifies the properties of the specified user field.
+
+        Args:
+            bitrix_id: The ID of the user field to update;
+
+            fields: A dictionary of field parameters to update;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "id": bitrix_id,
@@ -80,7 +128,21 @@ class Userfield(Base):
             bitrix_id: int,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Delete a custom field
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/user/userfields/user-userfield-delete.html
+
+        This method removes a custom field from the system.
+
+        Args:
+            bitrix_id: The ID of the user field to delete;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "id": bitrix_id,
