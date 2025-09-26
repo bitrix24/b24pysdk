@@ -10,7 +10,10 @@ if TYPE_CHECKING:
 
 
 class Workgroup(Base):
-    """"""
+    """Handle operations related to Bitrix24 workgroups.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sonet-group/index.html
+    """
 
     def __init__(self, api: "API"):
         super().__init__(api._scope)
@@ -22,7 +25,21 @@ class Workgroup(Base):
             params: JSONDict,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Retrieve information about a specific workgroup.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sonet-group/socialnetwork-api-workgroup-get.html
+
+        This method fetches details of the workgroup based on the provided parameters.
+
+        Args:
+            params: Parameters to be sent with the API request;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params = {
             "params": params,
@@ -42,7 +59,24 @@ class Workgroup(Base):
             is_admin: Optional[bool] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Retrieve a list of workgroups based on provided filters.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sonet-group/socialnetwork-api-workgroup-list.html
+
+        This method fetches a list of workgroups that match the filter criteria and selection fields.
+
+        Args:
+            filter: A dictionary containing filters to apply;
+
+            select: An iterable of field names to include in the response;
+
+            is_admin: Boolean to specify if admin-specific data is required;
+
+            timeout: Timeout setting for the request in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params = dict()
 
