@@ -48,12 +48,11 @@ class Automatedsolution(BaseCRM):
         Args:
             fields: Field values for creating a digital workspace in the form of a structure:
 
-                "fields": {
+                {
                     "title": "value",
 
                     "typeIds": []
-
-                    }
+                }
 
             timeout: Timeout in seconds.
 
@@ -114,6 +113,11 @@ class Automatedsolution(BaseCRM):
             order: List for sorting;
 
             start: This parameter is used for pagination control;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
         """
         return self._list(
             filter=filter,

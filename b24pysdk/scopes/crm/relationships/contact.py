@@ -7,11 +7,10 @@ from .relationship import Relationship
 class Contact(Relationship):
     """These methods provide capabilities for managing Contacts linked to the Deals, Leads and Companies (CRM entity).
 
-    Documentation: https://apidocs.bitrix24.com/api-reference/crm/deals/contacts/index.html
-
-    https://apidocs.bitrix24.com/api-reference/crm/leads/management-communication/index.html
-
-    https://apidocs.bitrix24.com/api-reference/crm/companies/contacts/index.html
+    Documentation:
+        - for deals: https://apidocs.bitrix24.com/api-reference/crm/deals/contacts/index.html
+        - for leads: https://apidocs.bitrix24.com/api-reference/crm/leads/management-communication/index.html
+        - for companies: https://apidocs.bitrix24.com/api-reference/crm/companies/contacts/index.html
     """
 
     @type_checker
@@ -22,11 +21,13 @@ class Contact(Relationship):
     ) -> BitrixAPIRequest:
         """Get fields for entity-contact connection.
 
-        Documentation: https://apidocs.bitrix24.com/api-reference/crm/leads/management-communication/crm-lead-contact-fields.html
+        Documentation:
 
-        https://apidocs.bitrix24.com/api-reference/crm/deals/contacts/crm-deal-contact-fields.html
+        - `for leads; <https://apidocs.bitrix24.com/api-reference/crm/leads/management-communication/crm-lead-contact-fields.html>`__
 
-        https://apidocs.bitrix24.com/api-reference/crm/companies/contacts/crm-company-contact-fields.html
+        - `for deals; <https://apidocs.bitrix24.com/api-reference/crm/deals/contacts/crm-deal-contact-fields.html>`__
+
+        - `for companies. <https://apidocs.bitrix24.com/api-reference/crm/companies/contacts/crm-company-contact-fields.html>`__
 
         The method retrieves the description of the fields for the entity-contact relationship, where entity is one of the available CRM-entities: Lead, Deal or Company.
 
@@ -36,6 +37,7 @@ class Contact(Relationship):
         Returns:
             Instance of BitrixAPIRequest
         """
+
         return super().fields(timeout=timeout)
 
     @type_checker
@@ -48,11 +50,13 @@ class Contact(Relationship):
     ) -> BitrixAPIRequest:
         """Add contact binding to CRM entity.
 
-        Documentation: https://apidocs.bitrix24.com/api-reference/crm/leads/management-communication/crm-lead-contact-add.html
+        Documentation:
 
-        https://apidocs.bitrix24.com/api-reference/crm/deals/contacts/crm-deal-contact-add.html
+        - `for leads; <https://apidocs.bitrix24.com/api-reference/crm/leads/management-communication/crm-lead-contact-add.html>`__
 
-        https://apidocs.bitrix24.com/api-reference/crm/companies/contacts/crm-company-contact-add.html
+        - `for deals; <https://apidocs.bitrix24.com/api-reference/crm/deals/contacts/crm-deal-contact-add.html>`__
+
+        - `for companies. <https://apidocs.bitrix24.com/api-reference/crm/companies/contacts/crm-company-contact-add.html>`__
 
         This method adds a contact binding to the specified CRM entity, where entity is one of the available CRM-entities: Lead, Deal or Company.
 
@@ -73,6 +77,7 @@ class Contact(Relationship):
         Returns:
             Instance of BitrixAPIRequest
         """
+
         return super().add(
             bitrix_id,
             fields,
@@ -89,11 +94,13 @@ class Contact(Relationship):
     ) -> BitrixAPIRequest:
         """Remove contact from CRM entity.
 
-        Documentation: https://apidocs.bitrix24.com/api-reference/crm/leads/management-communication/crm-lead-contact-delete.html
+        Documentation:
 
-        https://apidocs.bitrix24.com/api-reference/crm/deals/contacts/crm-deal-contact-delete.html
+        - `for leads; <https://apidocs.bitrix24.com/api-reference/crm/leads/management-communication/crm-lead-contact-delete.html>`__
 
-        https://apidocs.bitrix24.com/api-reference/crm/companies/contacts/crm-company-contact-delete.html
+        - `for deals; <https://apidocs.bitrix24.com/api-reference/crm/deals/contacts/crm-deal-contact-delete.html>`__
+
+        - `for companies. <https://apidocs.bitrix24.com/api-reference/crm/companies/contacts/crm-company-contact-delete.html>`__
 
         The method removes a contact from the specified CRM entity, where entity is one of the available CRM-entities: Lead, Deal or Company.
 
@@ -110,6 +117,7 @@ class Contact(Relationship):
         Returns:
             Instance of BitrixAPIRequest
         """
+
         return super().delete(
             bitrix_id,
             fields=fields,
