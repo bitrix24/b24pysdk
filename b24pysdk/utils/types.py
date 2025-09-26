@@ -1,35 +1,35 @@
 import typing
 
 JSONDict = typing.Dict[typing.Text, typing.Any]
-"""A dictionary containing response from the API or data to send to the API."""
+"""A dictionary with string keys and values of any type, typically used for JSON data structures."""
 
 JSONList = typing.List[JSONDict]
-"""A list containing response from the API or data to send to the API."""
+"""A list containing dictionaries with string keys and values of any type, typically used for JSON data structures."""
 
 Key = typing.Union[int, typing.Text]
-""""""
+"""A key that can be an integer or string used in dictionaries."""
 
 Number = typing.Union[int, float]
-""""""
+"""A numeric type that can be either an integer or a float."""
 
 DefaultTimeout = typing.Union[Number, typing.Tuple[Number, Number]]
-""""""
+"""Timeout duration, represented as a single number or a tuple for connect and read timeouts."""
 
 Timeout = typing.Optional[DefaultTimeout]
-""""""
+"""An optional timeout setting for API requests."""
 
 B24APIResult = typing.Optional[typing.Union[JSONDict, JSONList, bool]]
-""""""
+"""Represents the result of a B24 API call, which can be a dictionary, a list of dictionaries, or a boolean."""
 
 B24BatchRequestData = typing.Tuple[typing.Text, typing.Optional[JSONDict]]
-"""Tuple containing rest api method and its parameters"""
+"""Tuple containing a REST API method name and its optional parameters - (api_method, params)."""
 
 B24BoolLiteral = typing.Literal["Y", "N", "D"]
-""""""
+"""Literal type for B24 boolean values: 'Y' for Yes, 'N' for No, and 'D' for Default."""
 
 
 class B24BoolStr(str):
-    """"""
+    """String subclass to represent B24 boolean values."""
 
     __slots__ = ()
 
@@ -48,8 +48,7 @@ class B24BoolStr(str):
 
 
 class B24Bool:
-    """"""
-
+    """Represents a B24 boolean value with a specific literal mapping."""
     TRUE: B24BoolLiteral = "Y"
     FALSE: B24BoolLiteral = "N"
     DEFAULT: B24BoolLiteral = "D"
@@ -82,8 +81,7 @@ class B24Bool:
             cls,
             value: typing.Optional[typing.Union["B24Bool", B24BoolLiteral, B24BoolStr, bool]],
     ) -> typing.Optional[bool]:
-        """"""
-
+        """Normalize input value to a boolean for B24Bool."""
         if isinstance(value, cls):
             return value._value
 
@@ -101,7 +99,7 @@ class B24Bool:
 
     @property
     def value(self) -> typing.Optional[bool]:
-        """"""
+        """Return the internal boolean value."""
         return self._value
 
     @value.setter
@@ -109,18 +107,18 @@ class B24Bool:
             self,
             value: typing.Optional[typing.Union["B24Bool", B24BoolLiteral, B24BoolStr, bool]],
     ):
-        """"""
+        """Set the internal boolean value."""
         self._value = self._normalize(value)
 
     def to_b24(self) -> B24BoolLiteral:
-        """"""
+        """Convert the internal boolean to a B24-compatible literal."""
         return self._B24_VALUES[self._value]
 
     def to_str(self) -> typing.Text:
-        """"""
+        """Return the B24 boolean as a string."""
         return str(self)
 
     @classmethod
     def from_b24(cls, value: B24BoolLiteral) -> "B24Bool":
-        """"""
+        """Create a B24Bool instance from a B24 boolean literal."""
         return cls(value)
