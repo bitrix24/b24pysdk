@@ -12,9 +12,10 @@ from .bitrix_api import (
     BitrixTokenLocal,
     BitrixWebhook,
 )
-from .version import SDK_VERSION
+from .version import SDK_NAME, SDK_VERSION
 
 __all__ = [
+    "SDK_NAME",
     "SDK_VERSION",
     "AbstractBitrixApp",
     "AbstractBitrixAppLocal",
