@@ -36,7 +36,7 @@ class Trigger(BaseCRM):
         Args:
             target: Target object for automation, specified in the form of TYPENAME_ID;
 
-            code: Unique symbolic code of the trigger configured in Automation for a specific statux\stage of the document;
+            code: Unique symbolic code of the trigger configured in Automation for a specific statux/stage of the document;
 
             timeout: Timeout in seconds.
 
