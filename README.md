@@ -157,7 +157,7 @@ client = Client(bitrix_token)
 For example, to get a description of deal fields you can call the `crm.deal.fields` method:
 
 ```python
-response = client.crm.deal.fields()
+request = client.crm.deal.fields()
 ```
 
 ### Passing parameters in API calls
@@ -167,7 +167,7 @@ Most Bitrix24 REST API methods accept parameters. Pass them as positional or key
 To illustrate, we can get a deal by calling:
 
 ```python
-response = client.crm.deal.get(bitrix_id=2)
+request = client.crm.deal.get(bitrix_id=2)
 ```
 
 ### Retrieving results of the call
@@ -312,3 +312,135 @@ Instead of BitrixApp and BitrixToken, you can use their abstract class versions 
 When using these abstract classes, the programmer is responsible for declaring the instance attributes and storing them.
 
 Examples of the available abstract classes are `AbstractBitrixApp`, `AbstractBitrixAppLocal`, `AbstractBitrixToken` and `AbstractBitrixTokenLocal`.
+
+
+## Use Cases
+
+### Add (Create a Record)
+
+You can add any Bitrix24 entity like CRM deals, user records, etc.
+Example: Adding a new deal in CRM
+
+```python
+deal_data = {
+                "TITLE":"New Deal #1",
+                "TYPE_ID":"COMPLEX",
+                "CATEGORY_ID":0,
+                "STAGE_ID":"PREPARATION",
+                "IS_RECURRING":"N",
+                "IS_RETURN_CUSTOMER":"Y",
+                "IS_REPEATED_APPROACH":"Y",
+                "PROBABILITY":99,
+                "CURRENCY_ID":"EUR",
+                "OPPORTUNITY":1000000,
+                "IS_MANUAL_OPPORTUNITY":"Y",
+                "TAX_VALUE":0.10,
+                "COMPANY_ID":9,
+                "CONTACT_IDS":[84,83],
+                "OPENED":"Y",
+                "CLOSED":"N",
+                "COMMENTS":"Example comment",
+                "SOURCE_ID":"CALLBACK",
+                "SOURCE_DESCRIPTION":"Additional information about the source",
+                "ADDITIONAL_INFO":"Additional information",
+                "UTM_SOURCE":"google",
+                "UTM_MEDIUM":"CPC",
+                "PARENT_ID_1220":22,
+                "UF_CRM_1721244482250":"Hello world!"
+            }
+request = client.crm.deal.add(fields=deal_data)
+print("Id: ", request.result)
+```
+
+### Get (Retrieve a Record)
+
+With get method you can fetch details for a specific entity by ID or unique key and get its field values.
+Example: Retrieve specific deal details
+
+```python
+request = client.crm.deal.get(bitrix_id=5)
+deal_info = request.result
+print(deal_info["TITLE"], deal_info["STAGE_ID"])
+```
+
+### Fields
+
+There is a method .fields() that provides fields of entities.
+Example: Get a lable of the userfield.
+
+```python
+request = client.crm.deal.fields()
+fields = request.result
+print(fields["UF_CRM_1758877091066"]["listLabel"])
+```
+
+### Update
+
+Modify details of a specific entity by ID.
+Example: Update a deal's title and move to another stage
+
+```python
+update_data = {"TITLE":"New deal title!", "STAGE_ID":"WON",}
+request = client.crm.deal.update(bitrix_id=5, fields=update_data)
+if request.result:
+    print("Deal updated successfully.")
+```
+
+### Delete
+
+To remove an entity permanently from the records you can use method .delete().
+Example: Delete a particular deal
+
+```python
+request = client.crm.deal.delete(bitrix_id=5)
+if request.result:
+    print("Deal deleted successfully.")
+```
+
+### Handling lists
+#### .list()
+
+Retrieve up to 50 deals with optional filters.
+Example: Obtain a list of CRM deals on 
+
+```python
+select = ["ID","TITLE","TYPE_ID","CATEGORY_ID","STAGE_ID","OPPORTUNITY","IS_MANUAL_OPPORTUNITY","ASSIGNED_BY_ID","DATE_CREATE"]
+filter = {
+            "=%TITLE":"%a","CATEGORY_ID":1,
+            "TYPE_ID":"COMPLEX",
+            "STAGE_ID":"C1:NEW",">OPPORTUNITY":10000,
+            "<=OPPORTUNITY":20000,
+            "IS_MANUAL_OPPORTUNITY":"Y"
+        }
+order = {
+            "TITLE":"ASC",
+            "OPPORTUNITY":"ASC"
+        }
+request = client.crm.deal.list(select=select, filter=filter, order=order)
+deals = request.result
+print(deals)
+```
+
+#### .as_list()
+
+Retrieve all pages of a list request.
+Example: Retrieve more than 50 deals.
+
+```python
+request = client.crm.deal.list()
+all_deals = request.as_list().result
+for deal in all_deals:
+    print(deal["TITLE"])
+```
+
+#### .as_list_fast()
+
+Optimized retrieval for very large datasets that returns generator for working with the result.
+Example: Efficiently retrieve a large dataset of deals.
+
+```python
+request = client.crm.deal.list()
+deal_iterator = request.as_list_fast().result
+for deal in deal_iterator:
+    print(deal["TITLE"])
+```
