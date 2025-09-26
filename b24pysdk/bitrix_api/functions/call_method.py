@@ -1,9 +1,12 @@
-from typing import Optional, Text
+from typing import TYPE_CHECKING, Optional, Text
 
 from ...utils.types import JSONDict, Timeout
 from ._base_caller import BaseCaller
 from .call import call
 from .parse_response import parse_response
+
+if TYPE_CHECKING:
+    from ..bitrix_token import AbstractBitrixToken
 
 
 class _MethodCaller(BaseCaller):
@@ -17,6 +20,7 @@ class _MethodCaller(BaseCaller):
             api_method: Text,
             params: Optional[JSONDict] = None,
             timeout: Timeout = None,
+            bitrix_token: Optional["AbstractBitrixToken"] = None,
             **kwargs,
     ):
         super().__init__(
@@ -26,6 +30,7 @@ class _MethodCaller(BaseCaller):
             api_method=api_method,
             params=params,
             timeout=timeout,
+            bitrix_token=bitrix_token,
             **kwargs,
         )
 
@@ -67,6 +72,7 @@ def call_method(
         api_method: Text,
         params: Optional[JSONDict] = None,
         timeout: Timeout = None,
+        bitrix_token: Optional["AbstractBitrixToken"] = None,
         **kwargs,
 ) -> JSONDict:
     """
@@ -79,6 +85,7 @@ def call_method(
         api_method: name of the bitrix API method to call, e.g. crm.deal.add
         params: API method parameters
         timeout: timeout in seconds
+        bitrix_token:
 
     Returns:
         dictionary containing the result of the API method call and information about call time
@@ -90,5 +97,6 @@ def call_method(
         api_method=api_method,
         params=params,
         timeout=timeout,
+        bitrix_token=bitrix_token,
         **kwargs,
     ).call()

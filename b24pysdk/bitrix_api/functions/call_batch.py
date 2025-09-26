@@ -1,10 +1,13 @@
-from typing import Dict, Final, Mapping, Sequence, Text, Union, overload
+from typing import TYPE_CHECKING, Dict, Final, Mapping, Optional, Sequence, Text, Union, overload
 
 from ..._constants import MAX_BATCH_SIZE
 from ...utils.encoding import encode_params
 from ...utils.types import B24BatchRequestData, JSONDict, Key, Timeout
 from ._base_caller import BaseCaller
 from .call_method import call_method
+
+if TYPE_CHECKING:
+    from ..bitrix_token import AbstractBitrixToken
 
 _BatchMethods = Union[Mapping[Key, B24BatchRequestData], Sequence[B24BatchRequestData]]
 
@@ -31,6 +34,7 @@ class _BatchCaller(BaseCaller):
             halt: bool = False,
             ignore_size_limit: bool = False,
             timeout: Timeout = None,
+            bitrix_token: Optional["AbstractBitrixToken"] = None,
             **kwargs,
     ):
         super().__init__(
@@ -39,6 +43,7 @@ class _BatchCaller(BaseCaller):
             is_webhook=is_webhook,
             api_method=self._API_METHOD,
             timeout=timeout,
+            bitrix_token=bitrix_token,
             **kwargs,
         )
         self._halt = halt
@@ -70,20 +75,30 @@ class _BatchCaller(BaseCaller):
 
         return cmd
 
+    @property
+    def _dynamic_params(self) -> JSONDict:
+        """"""
+        return dict(cmd=self._cmd, halt=self._halt)
+
     def _fetch_response(self) -> JSONDict:
         """"""
-        return call_method(
-            domain=self._domain,
-            auth_token=self._auth_token,
-            is_webhook=self._is_webhook,
-            api_method=self._api_method,
-            params=dict(
-                cmd=self._cmd,
-                halt=self._halt,
-            ),
-            timeout=self._timeout,
-            **self._kwargs,
-        )
+        if self._bitrix_token:
+            return self._bitrix_token.call_method(
+                api_method=self._api_method,
+                params=self._dynamic_params,
+                timeout=self._timeout,
+                **self._kwargs,
+            )
+        else:
+            return call_method(
+                domain=self._domain,
+                auth_token=self._auth_token,
+                is_webhook=self._is_webhook,
+                api_method=self._api_method,
+                params=self._dynamic_params,
+                timeout=self._timeout,
+                **self._kwargs,
+            )
 
     def call(self) -> JSONDict:
         """"""
@@ -127,6 +142,7 @@ def call_batch(
         halt: bool = False,
         ignore_size_limit: bool = False,
         timeout: Timeout = None,
+        bitrix_token: Optional["AbstractBitrixToken"] = None,
         **kwargs,
 ) -> JSONDict:
     """
@@ -144,6 +160,7 @@ def call_batch(
         halt: whether to halt the sequence of requests in case of an error
         ignore_size_limit: if the number of methods exceeds maximum, truncate methods sequence instead of raising an error
         timeout: timeout in seconds
+        bitrix_token:
 
     Returns:
         dictionary containing the result of the batch method call and information about call time
@@ -156,5 +173,6 @@ def call_batch(
         halt=halt,
         ignore_size_limit=ignore_size_limit,
         timeout=timeout,
+        bitrix_token=bitrix_token,
         **kwargs,
     ).call()

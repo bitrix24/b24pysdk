@@ -1,11 +1,14 @@
 from datetime import datetime
-from typing import Callable, Dict, Final, Generator, Iterable, Optional, Text, Tuple, Union
+from typing import TYPE_CHECKING, Callable, Dict, Final, Generator, Iterable, Optional, Text, Tuple, Union
 
 from ..._constants import MAX_BATCH_SIZE
 from ...utils.types import B24BatchRequestData, JSONDict, JSONList, Timeout
 from ._base_caller import BaseCaller
 from .call_batch import call_batch
 from .call_method import call_method
+
+if TYPE_CHECKING:
+    from ..bitrix_token import AbstractBitrixToken
 
 
 class _ListFastCaller(BaseCaller):
@@ -65,6 +68,7 @@ class _ListFastCaller(BaseCaller):
             descending: bool = False,
             limit: Optional[int] = None,
             timeout: Timeout = None,
+            bitrix_token: Optional["AbstractBitrixToken"] = None,
             **kwargs,
     ):
         super().__init__(
@@ -74,6 +78,7 @@ class _ListFastCaller(BaseCaller):
             api_method=api_method,
             params=params,
             timeout=timeout,
+            bitrix_token=bitrix_token,
             **kwargs,
         )
         self._descending = descending
@@ -260,15 +265,23 @@ class _ListFastCaller(BaseCaller):
 
     def _fetch_first_response(self) -> JSONDict:
         """"""
-        return call_method(
-            domain=self._domain,
-            auth_token=self._auth_token,
-            is_webhook=self._is_webhook,
-            api_method=self._api_method,
-            params=self._generate_method_params(),
-            timeout=self._timeout,
-            **self._kwargs,
-        )
+        if self._bitrix_token:
+            return self._bitrix_token.call_method(
+                api_method=self._api_method,
+                params=self._generate_method_params(),
+                timeout=self._timeout,
+                **self._kwargs,
+            )
+        else:
+            return call_method(
+                domain=self._domain,
+                auth_token=self._auth_token,
+                is_webhook=self._is_webhook,
+                api_method=self._api_method,
+                params=self._generate_method_params(),
+                timeout=self._timeout,
+                **self._kwargs,
+            )
 
     def _fetch_next_batch_response(self) -> JSONDict:
         """"""
@@ -354,6 +367,7 @@ def call_list_fast(
         descending: bool = False,
         limit: Optional[int] = None,
         timeout: Timeout = None,
+        bitrix_token: Optional["AbstractBitrixToken"] = None,
         **kwargs,
 ) -> JSONDict:
     """
@@ -371,6 +385,7 @@ def call_list_fast(
         limit: max number of items to retrieve
         descending: whether items should be retrieved in descending order
         timeout: timeout in seconds
+        bitrix_token:
 
     Returns:
         dictionary containing list of items returned by called API method and information about call time
@@ -384,5 +399,6 @@ def call_list_fast(
         descending=descending,
         limit=limit,
         timeout=timeout,
+        bitrix_token=bitrix_token,
         **kwargs,
     ).call()

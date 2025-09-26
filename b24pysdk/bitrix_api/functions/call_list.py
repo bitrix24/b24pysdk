@@ -1,10 +1,13 @@
-from typing import Final, Iterable, List, Mapping, Optional, Text, Tuple
+from typing import TYPE_CHECKING, Final, Iterable, List, Mapping, Optional, Text, Tuple
 
 from ..._constants import MAX_BATCH_SIZE
 from ...utils.types import B24BatchRequestData, JSONDict, JSONList, Timeout
 from ._base_caller import BaseCaller
 from .call_batches import call_batches
 from .call_method import call_method
+
+if TYPE_CHECKING:
+    from ..bitrix_token import AbstractBitrixToken
 
 
 class _ListCaller(BaseCaller):
@@ -30,6 +33,7 @@ class _ListCaller(BaseCaller):
             params: Optional[JSONDict] = None,
             limit: Optional[int] = None,
             timeout: Timeout = None,
+            bitrix_token: Optional["AbstractBitrixToken"] = None,
             **kwargs,
     ):
         super().__init__(
@@ -39,6 +43,7 @@ class _ListCaller(BaseCaller):
             api_method=api_method,
             params=params,
             timeout=timeout,
+            bitrix_token=bitrix_token,
             **kwargs,
         )
         self._limit = limit
@@ -130,15 +135,23 @@ class _ListCaller(BaseCaller):
 
     def _fetch_first_response(self) -> JSONDict:
         """"""
-        return call_method(
-            domain=self._domain,
-            auth_token=self._auth_token,
-            is_webhook=self._is_webhook,
-            api_method=self._api_method,
-            params=self._params,
-            timeout=self._timeout,
-            **self._kwargs,
-        )
+        if self._bitrix_token:
+            return self._bitrix_token.call_method(
+                api_method=self._api_method,
+                params=self._params,
+                timeout=self._timeout,
+                **self._kwargs,
+            )
+        else:
+            return call_method(
+                domain=self._domain,
+                auth_token=self._auth_token,
+                is_webhook=self._is_webhook,
+                api_method=self._api_method,
+                params=self._params,
+                timeout=self._timeout,
+                **self._kwargs,
+            )
 
     def _fetch_batches_response(self, methods: List[B24BatchRequestData]) -> JSONDict:
         """"""
@@ -240,6 +253,7 @@ def call_list(
         params: Optional[JSONDict] = None,
         limit: Optional[int] = None,
         timeout: Timeout = None,
+        bitrix_token: Optional["AbstractBitrixToken"] = None,
         **kwargs,
 ) -> JSONDict:
     """
@@ -253,6 +267,7 @@ def call_list(
         params: API method parameters
         limit: max number of items to retrieve
         timeout: timeout in seconds
+        bitrix_token:
 
     Returns:
         dictionary containing list of items returned by called API method and information about call time
@@ -265,5 +280,6 @@ def call_list(
         params=params,
         limit=limit,
         timeout=timeout,
+        bitrix_token=bitrix_token,
         **kwargs,
     ).call()

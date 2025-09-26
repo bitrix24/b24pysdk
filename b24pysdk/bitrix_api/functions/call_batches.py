@@ -1,4 +1,4 @@
-from typing import Dict, Final, List, Mapping, Sequence, Text, Tuple, Union, overload
+from typing import TYPE_CHECKING, Dict, Final, List, Mapping, Optional, Sequence, Text, Tuple, Union, overload
 
 from ..._constants import MAX_BATCH_SIZE
 from ...utils.types import B24BatchRequestData, JSONDict, JSONList, Key, Timeout
@@ -6,6 +6,9 @@ from ._base_caller import BaseCaller
 from .call_batch import call_batch
 
 _BatchMethods = Union[Mapping[Key, B24BatchRequestData], Sequence[B24BatchRequestData]]
+
+if TYPE_CHECKING:
+    from ..bitrix_token import AbstractBitrixToken
 
 
 class _BatchesCaller(BaseCaller):
@@ -29,6 +32,7 @@ class _BatchesCaller(BaseCaller):
             methods: _BatchMethods,
             halt: bool = False,
             timeout: Timeout = None,
+            bitrix_token: Optional["AbstractBitrixToken"] = None,
             **kwargs,
     ):
         super().__init__(
@@ -37,6 +41,7 @@ class _BatchesCaller(BaseCaller):
             is_webhook=is_webhook,
             api_method=self._API_METHOD,
             timeout=timeout,
+            bitrix_token=bitrix_token,
             **kwargs,
         )
         self._methods = methods
@@ -170,6 +175,7 @@ def call_batches(
         methods: _BatchMethods,
         halt: bool = False,
         timeout: Timeout = None,
+        bitrix_token: Optional["AbstractBitrixToken"] = None,
         **kwargs,
 ) -> JSONDict:
     """
@@ -186,6 +192,7 @@ def call_batches(
                 If the collection provided is a mapping, its keys are used to assosiate methods with their respective results.
         halt: whether to halt the sequence of requests in case of an error
         timeout: timeout in seconds
+        bitrix_token:
 
     Returns:
         dictionary containing the result of the batch method call and information about call time
@@ -197,5 +204,6 @@ def call_batches(
         methods=methods,
         halt=halt,
         timeout=timeout,
+        bitrix_token=bitrix_token,
         **kwargs,
     ).call()

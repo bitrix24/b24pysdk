@@ -1,7 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Optional, Text
+from typing import TYPE_CHECKING, Dict, Optional, Text
 
 from ...utils.types import JSONDict, Timeout
+
+if TYPE_CHECKING:
+    from ..bitrix_token import AbstractBitrixToken
 
 
 class BaseCaller(ABC):
@@ -10,6 +13,7 @@ class BaseCaller(ABC):
     __slots__ = (
         "_api_method",
         "_auth_token",
+        "_bitrix_token",
         "_domain",
         "_is_webhook",
         "_kwargs",
@@ -23,6 +27,7 @@ class BaseCaller(ABC):
     _api_method: Text
     _params: JSONDict
     _timeout: Timeout
+    _bitrix_token: Optional["AbstractBitrixToken"]
     _kwargs: Dict
 
     def __init__(
@@ -34,6 +39,7 @@ class BaseCaller(ABC):
             api_method: Text,
             params: Optional[JSONDict] = None,
             timeout: Timeout = None,
+            bitrix_token: Optional["AbstractBitrixToken"] = None,
             **kwargs,
     ):
         self._domain = domain
@@ -42,6 +48,7 @@ class BaseCaller(ABC):
         self._api_method = api_method
         self._params = params or dict()
         self._timeout = timeout
+        self._bitrix_token = bitrix_token
         self._kwargs = kwargs
 
     @abstractmethod
