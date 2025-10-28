@@ -10,10 +10,15 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
+
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.13"]
+
+    env:
+      B24_DOMAIN: ${{ secrets.B24_DOMAIN }}
+      B24_WEBHOOK: ${{ secrets.B24_WEBHOOK }}
 
     steps:
       - name: Checkout
@@ -35,23 +40,84 @@ jobs:
           ruff --version
           ruff check .
 
-      - name: Run tests
-        env:
-          B24_DOMAIN: ${{ secrets.B24_DOMAIN }}
-          B24_WEBHOOK: ${{ secrets.B24_WEBHOOK }}
+      - name: Detect changed paths
+        id: filter
+        uses: dorny/paths-filter@v3.0.2
+        with:
+          filters: |
+            scope_crm:
+              - 'b24pysdk/scopes/crm/**'
+              - 'tests/integration/crm/**'
+            scope_user:
+              - 'b24pysdk/scopes/user/**'
+              - 'tests/integration/user/**'
+
+      - name: Run crm tests
+        if: ${{ steps.filter.outputs.scope_crm == 'true' }}
         run: |
-          pytest tests/ -v --disable-warnings --maxfail=1
+          pytest tests/integration/crm/ -v  --disable-warnings --maxfail=1
+
+      - name: Run user tests
+        if: ${{ steps.filter.outputs.scope_user == 'true' }}
+        run: |
+          pytest tests/integration/user/ -v  --disable-warnings --maxfail=1
+
+      - name: Run mandatory tests
+        run: |
+          pytest tests/ --ignore=tests/integration/ -v --disable-warnings --maxfail=1
 
   docker-ci:
     runs-on: ubuntu-latest
+
+    env:
+      B24_DOMAIN: ${{ secrets.B24_DOMAIN }}
+      B24_WEBHOOK: ${{ secrets.B24_WEBHOOK }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Build CI Docker image
         run: |
-          docker build -f docker/ci.Dockerfile -t b24pysdk-ci --build-arg PYTHON_VERSION=3.12 .
+          docker build \
+            -f docker/ci.Dockerfile \
+            --build-arg PYTHON_VERSION=3.13 \
+            -t b24pysdk-ci .
 
-      - name: Run lint and tests in Docker
+      - name: Detect changed paths
+        id: filter
+        uses: dorny/paths-filter@v3.0.2
+        with:
+          filters: |
+            scope_crm:
+              - 'b24pysdk/scopes/crm/**'
+              - 'tests/integration/crm/**'
+            scope_user:
+              - 'b24pysdk/scopes/user/**'
+              - 'tests/integration/user/**'
+
+      - name: Run crm tests in Docker
+        if: ${{ steps.filter.outputs.scope_crm == 'true' }}
         run: |
-          docker run --rm b24pysdk-ci
+          docker run --rm \
+            -e B24_DOMAIN=$B24_DOMAIN \
+            -e B24_WEBHOOK=$B24_WEBHOOK \
+            b24pysdk-ci \
+            pytest tests/integration/crm/ -v --disable-warnings --maxfail=1
+
+      - name: Run user tests in Docker
+        if: ${{ steps.filter.outputs.scope_user == 'true' }}
+        run: |
+          docker run --rm \
+            -e B24_DOMAIN=$B24_DOMAIN \
+            -e B24_WEBHOOK=$B24_WEBHOOK \
+            b24pysdk-ci \
+            pytest tests/integration/user/ -v --disable-warnings --maxfail=1
+
+      - name: Run mandatory tests in Docker
+        run: |
+          docker run --rm \
+            -e B24_DOMAIN=$B24_DOMAIN \
+            -e B24_WEBHOOK=$B24_WEBHOOK \
+            b24pysdk-ci \
+            pytest tests/ --ignore=tests/integration/ -v --disable-warnings --maxfail=1
