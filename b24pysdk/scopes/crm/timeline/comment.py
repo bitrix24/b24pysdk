@@ -1,12 +1,13 @@
-from typing import TYPE_CHECKING, Iterable, Optional, Text
+from typing import Iterable, Optional, Text
 
-from ....bitrix_api.classes import BitrixAPIRequest
+from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
-from ..base_crm import BaseCRM
+from .._base_crm import BaseCRM
 
-if TYPE_CHECKING:
-    from .timeline import Timeline
+__all__ = [
+    "Comment",
+]
 
 
 class Comment(BaseCRM):
@@ -14,10 +15,6 @@ class Comment(BaseCRM):
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/comments/index.html
     """
-
-    def __init__(self, timeline: "Timeline"):
-        super().__init__(scope=timeline._scope)
-        self._path = self._get_path(timeline)
 
     @type_checker
     def fields(
@@ -208,7 +205,7 @@ class Comment(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.update,
+            api_wrapper=self.update,
             params=params,
             timeout=timeout,
         )
@@ -248,7 +245,7 @@ class Comment(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.delete,
+            api_wrapper=self.delete,
             params=params,
             timeout=timeout,
         )

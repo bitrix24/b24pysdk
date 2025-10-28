@@ -1,9 +1,13 @@
 from typing import Iterable, Optional, Text
 
-from ...bitrix_api.classes import BitrixAPIRequest
+from ...bitrix_api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
-from .base_crm import BaseCRM
+from ._base_crm import BaseCRM
+
+__all__ = [
+    "Vat",
+]
 
 
 class Vat(BaseCRM):

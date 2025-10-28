@@ -1,24 +1,26 @@
 from typing import Optional
 
-from ...bitrix_api.classes import BitrixAPIRequest
+from ...bitrix_api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
-from ..base import Base
+from .._base_entity import BaseEntity
 
 __all__ = [
     "Userfield",
 ]
 
 
-class Userfield(Base):
+class Userfield(BaseEntity):
     """Manage user-defined fields in the Bitrix24 system.
 
     Documentation: https://apidocs.bitrix24.com/api-reference/user/userfields/index.html
     """
+
     @type_checker
     def add(
             self,
             fields: JSONDict,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -42,7 +44,7 @@ class Userfield(Base):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.add,
+            api_wrapper=self.add,
             params=params,
             timeout=timeout,
         )
@@ -50,6 +52,7 @@ class Userfield(Base):
     @type_checker
     def list(
             self,
+            *,
             order: Optional[JSONDict] = None,
             filter: Optional[JSONDict] = None,
             timeout: Timeout = None,
@@ -81,7 +84,7 @@ class Userfield(Base):
             params["filter"] = filter
 
         return self._make_bitrix_api_request(
-            api_method=self.list,
+            api_wrapper=self.list,
             params=params,
             timeout=timeout,
         )
@@ -91,6 +94,7 @@ class Userfield(Base):
             self,
             bitrix_id: int,
             fields: JSONDict,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -117,7 +121,7 @@ class Userfield(Base):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.update,
+            api_wrapper=self.update,
             params=params,
             timeout=timeout,
         )
@@ -126,6 +130,7 @@ class Userfield(Base):
     def delete(
             self,
             bitrix_id: int,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -149,7 +154,7 @@ class Userfield(Base):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.delete,
+            api_wrapper=self.delete,
             params=params,
             timeout=timeout,
         )

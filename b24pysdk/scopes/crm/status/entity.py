@@ -1,20 +1,15 @@
-from typing import TYPE_CHECKING
-
-from ....bitrix_api.classes import BitrixAPIRequest
+from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
-from ..base_crm import BaseCRM
+from .._base_crm import BaseCRM
 
-if TYPE_CHECKING:
-    from .status import Status
+__all__ = [
+    "Entity",
+]
 
 
 class Entity(BaseCRM):
     """"""
-
-    def __init__(self, status: "Status"):
-        super().__init__(status._scope)
-        self._path = self._get_path(status)
 
     @type_checker
     def items(
@@ -43,7 +38,7 @@ class Entity(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.items,
+            api_wrapper=self.items,
             params=params,
             timeout=timeout,
         )
@@ -67,6 +62,6 @@ class Entity(BaseCRM):
             Instance of BitrixAPIRequest
         """
         return self._make_bitrix_api_request(
-            api_method=self.types,
+            api_wrapper=self.types,
             timeout=timeout,
         )

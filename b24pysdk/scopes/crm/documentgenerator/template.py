@@ -1,12 +1,13 @@
-from typing import TYPE_CHECKING, Iterable, Optional, Text
+from typing import Iterable, Optional, Text
 
-from ....bitrix_api.classes import BitrixAPIRequest
+from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, JSONList, Timeout
-from ..base_crm import BaseCRM
+from .._base_crm import BaseCRM
 
-if TYPE_CHECKING:
-    from .documentgenerator import Documentgenerator
+__all__ = [
+    "Template",
+]
 
 
 class Template(BaseCRM):
@@ -14,10 +15,6 @@ class Template(BaseCRM):
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/document-generator/templates/index.html
     """
-
-    def __init__(self, documentgenerator: "Documentgenerator"):
-        super().__init__(documentgenerator._scope)
-        self._path = self._get_path(documentgenerator)
 
     @type_checker
     def getfields(
@@ -62,7 +59,7 @@ class Template(BaseCRM):
             params["values"] = values
 
         return self._make_bitrix_api_request(
-            api_method=self.getfields,
+            api_wrapper=self.getfields,
             params=params,
             timeout=timeout,
         )

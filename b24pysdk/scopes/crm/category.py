@@ -1,7 +1,11 @@
-from ...bitrix_api.classes import BitrixAPIRequest
+from ...bitrix_api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
-from .base_crm import BaseCRM
+from ._base_crm import BaseCRM
+
+__all__ = [
+    "Category",
+]
 
 
 class Category(BaseCRM):
@@ -38,7 +42,7 @@ class Category(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.fields,
+            api_wrapper=self.fields,
             params=params,
             timeout=timeout,
         )
@@ -82,7 +86,7 @@ class Category(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.add,
+            api_wrapper=self.add,
             params=params,
             timeout=timeout,
         )
@@ -118,7 +122,7 @@ class Category(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.get,
+            api_wrapper=self.get,
             params=params,
             timeout=timeout,
         )
@@ -150,7 +154,7 @@ class Category(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.list,
+            api_wrapper=self.list,
             params=params,
             timeout=timeout,
         )
@@ -198,7 +202,7 @@ class Category(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.update,
+            api_wrapper=self.update,
             params=params,
             timeout=timeout,
         )
@@ -235,7 +239,7 @@ class Category(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.delete,
+            api_wrapper=self.delete,
             params=params,
             timeout=timeout,
         )

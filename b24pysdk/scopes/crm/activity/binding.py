@@ -1,12 +1,11 @@
-from typing import TYPE_CHECKING
-
-from ....bitrix_api.classes import BitrixAPIRequest
+from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
-from ..base_crm import BaseCRM
+from .._base_crm import BaseCRM
 
-if TYPE_CHECKING:
-    from .activity import Activity
+__all__ = [
+    "Binding",
+]
 
 
 class Binding(BaseCRM):
@@ -14,10 +13,6 @@ class Binding(BaseCRM):
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/binding/index.html
     """
-
-    def __init__(self, activity: "Activity"):
-        super().__init__(scope=activity._scope)
-        self._path = self._get_path(activity)
 
     @type_checker
     def add(
@@ -54,7 +49,7 @@ class Binding(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.add,
+            api_wrapper=self.add,
             params=params,
             timeout=timeout,
         )
@@ -102,7 +97,7 @@ class Binding(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.move,
+            api_wrapper=self.move,
             params=params,
             timeout=timeout,
         )
@@ -135,7 +130,7 @@ class Binding(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.list,
+            api_wrapper=self.list,
             params=params,
             timeout=timeout,
         )
@@ -176,7 +171,7 @@ class Binding(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.delete,
+            api_wrapper=self.delete,
             params=params,
             timeout=timeout,
         )

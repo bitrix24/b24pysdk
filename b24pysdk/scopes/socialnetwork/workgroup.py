@@ -1,28 +1,26 @@
-from typing import TYPE_CHECKING, Iterable, Optional, Text
+from typing import Iterable, Optional, Text
 
-from ...bitrix_api.classes import BitrixAPIRequest
+from ...bitrix_api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import JSONDict, Timeout
-from ..base import Base
+from ...utils.types import B24Bool, JSONDict, Timeout
+from .._base_entity import BaseEntity
 
-if TYPE_CHECKING:
-    from .api import API
+__all__ = [
+    "Workgroup",
+]
 
 
-class Workgroup(Base):
+class Workgroup(BaseEntity):
     """Handle operations related to Bitrix24 workgroups.
 
     Documentation: https://apidocs.bitrix24.com/api-reference/sonet-group/index.html
     """
 
-    def __init__(self, api: "API"):
-        super().__init__(api._scope)
-        self._path = self._get_path(api)
-
     @type_checker
     def get(
             self,
             params: JSONDict,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -33,7 +31,7 @@ class Workgroup(Base):
         This method fetches details of the workgroup based on the provided parameters.
 
         Args:
-            params: Parameters to be sent with the API request;
+            params: Parameters to be sent with the API requests;
 
             timeout: Timeout in seconds.
 
@@ -46,7 +44,7 @@ class Workgroup(Base):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.get,
+            api_wrapper=self.get,
             params=params,
             timeout=timeout,
         )
@@ -54,6 +52,7 @@ class Workgroup(Base):
     @type_checker
     def list(
             self,
+            *,
             filter: Optional[JSONDict] = None,
             select: Optional[Iterable[Text]] = None,
             is_admin: Optional[bool] = None,
@@ -68,11 +67,11 @@ class Workgroup(Base):
         Args:
             filter: A dictionary containing filters to apply;
 
-            select: An iterable of field names to include in the response;
+            select: An iterable of field names to include in the responses;
 
             is_admin: Boolean to specify if admin-specific data is required;
 
-            timeout: Timeout setting for the request in seconds.
+            timeout: Timeout setting for the requests in seconds.
 
         Returns:
             Instance of BitrixAPIRequest.
@@ -90,10 +89,10 @@ class Workgroup(Base):
             params["select"] = select
 
         if is_admin is not None:
-            params["IS_ADMIN"] = is_admin
+            params["IS_ADMIN"] = B24Bool(is_admin).to_str()
 
         return self._make_bitrix_api_request(
-            api_method=self.list,
+            api_wrapper=self.list,
             params=params,
             timeout=timeout,
         )

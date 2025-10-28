@@ -1,12 +1,13 @@
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
-from ....bitrix_api.classes import BitrixAPIRequest
+from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
-from ..base_crm import BaseCRM
+from .._base_crm import BaseCRM
 
-if TYPE_CHECKING:
-    from .documentgenerator import Documentgenerator
+__all__ = [
+    "Numerator",
+]
 
 
 class Numerator(BaseCRM):
@@ -14,10 +15,6 @@ class Numerator(BaseCRM):
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/document-generator/numerator/index.html
     """
-
-    def __init__(self, documentgenerator: "Documentgenerator"):
-        super().__init__(documentgenerator._scope)
-        self._path = self._get_path(documentgenerator)
 
     @type_checker
     def add(

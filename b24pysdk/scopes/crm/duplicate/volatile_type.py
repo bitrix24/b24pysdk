@@ -1,12 +1,13 @@
-from typing import TYPE_CHECKING, Literal, Optional, Text
+from typing import Literal, Optional, Text
 
-from ....bitrix_api.classes import BitrixAPIRequest
+from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
-from ..base_crm import BaseCRM
+from .._base_crm import BaseCRM
 
-if TYPE_CHECKING:
-    from .duplicate import Duplicate
+__all__ = [
+    "VolatileType",
+]
 
 
 class VolatileType(BaseCRM):
@@ -14,10 +15,6 @@ class VolatileType(BaseCRM):
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/duplicates/volatile-type/index.html
     """
-
-    def __init__(self, duplicate: "Duplicate"):
-        super().__init__(duplicate._scope)
-        self._path = self._get_path(duplicate)
 
     @type_checker
     def fields(
@@ -53,7 +50,7 @@ class VolatileType(BaseCRM):
             params["entityTypeId"] = entity_type_id
 
         return self._make_bitrix_api_request(
-            api_method=self.fields,
+            api_wrapper=self.fields,
             params=params,
             timeout=timeout,
         )
@@ -77,7 +74,7 @@ class VolatileType(BaseCRM):
             Instance of BitrixAPIRequest
         """
         return self._make_bitrix_api_request(
-            api_method=self.list,
+            api_wrapper=self.list,
             timeout=timeout,
         )
 
@@ -118,7 +115,7 @@ class VolatileType(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.register,
+            api_wrapper=self.register,
             params=params,
             timeout=timeout,
         )
@@ -150,7 +147,7 @@ class VolatileType(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.unregister,
+            api_wrapper=self.unregister,
             params=params,
             timeout=timeout,
         )

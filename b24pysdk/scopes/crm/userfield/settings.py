@@ -1,20 +1,17 @@
-from typing import TYPE_CHECKING, Text
+from typing import Text
 
-from ....bitrix_api.classes import BitrixAPIRequest
+from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
-from ..base_crm import BaseCRM
+from .._base_crm import BaseCRM
 
-if TYPE_CHECKING:
-    from .userfield import Userfield
+__all__ = [
+    "Settings",
+]
 
 
 class Settings(BaseCRM):
     """"""
-
-    def __init__(self, userfield: "Userfield"):
-        super().__init__(scope=userfield._scope)
-        self._path = self._get_path(userfield)
 
     @type_checker
     def fields(
@@ -43,7 +40,7 @@ class Settings(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.fields,
+            api_wrapper=self.fields,
             params=params,
             timeout=timeout,
         )

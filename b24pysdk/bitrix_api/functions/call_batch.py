@@ -1,15 +1,11 @@
-from typing import TYPE_CHECKING, Dict, Final, Mapping, Optional, Sequence, Text, Union, overload
+from typing import Dict, Final, Mapping, Optional, Sequence, Text, overload
 
 from ..._constants import MAX_BATCH_SIZE
 from ...utils.encoding import encode_params
-from ...utils.types import B24BatchRequestData, JSONDict, Key, Timeout
+from ...utils.types import B24BatchMethods, B24BatchMethodTuple, JSONDict, Key, Timeout
+from ..protocols import BitrixTokenProtocol
 from ._base_caller import BaseCaller
 from .call_method import call_method
-
-if TYPE_CHECKING:
-    from ..bitrix_token import AbstractBitrixToken
-
-_BatchMethods = Union[Mapping[Key, B24BatchRequestData], Sequence[B24BatchRequestData]]
 
 
 class _BatchCaller(BaseCaller):
@@ -20,7 +16,7 @@ class _BatchCaller(BaseCaller):
 
     __slots__ = ("_halt", "_ignore_size_limit", "_methods")
 
-    _methods: _BatchMethods
+    _methods: B24BatchMethods
     _halt: bool
     _ignore_size_limit: bool
 
@@ -30,11 +26,11 @@ class _BatchCaller(BaseCaller):
             domain: Text,
             auth_token: Text,
             is_webhook: bool,
-            methods: _BatchMethods,
+            methods: B24BatchMethods,
             halt: bool = False,
             ignore_size_limit: bool = False,
             timeout: Timeout = None,
-            bitrix_token: Optional["AbstractBitrixToken"] = None,
+            bitrix_token: Optional["BitrixTokenProtocol"] = None,
             **kwargs,
     ):
         super().__init__(
@@ -50,7 +46,7 @@ class _BatchCaller(BaseCaller):
         self._ignore_size_limit = ignore_size_limit
         self._methods = self._validate_methods(methods)
 
-    def _validate_methods(self, methods: _BatchMethods) -> _BatchMethods:
+    def _validate_methods(self, methods: B24BatchMethods) -> B24BatchMethods:
         """"""
         if len(methods) > self._MAX_BATCH_SIZE:
             if self._ignore_size_limit:
@@ -111,7 +107,7 @@ def call_batch(
         domain: Text,
         auth_token: Text,
         is_webhook: bool,
-        methods: Mapping[Key, B24BatchRequestData],
+        methods: Mapping[Key, B24BatchMethodTuple],
         halt: bool = False,
         ignore_size_limit: bool = False,
         timeout: Timeout = None,
@@ -125,7 +121,7 @@ def call_batch(
         domain: Text,
         auth_token: Text,
         is_webhook: bool,
-        methods: Sequence[B24BatchRequestData],
+        methods: Sequence[B24BatchMethodTuple],
         halt: bool = False,
         ignore_size_limit: bool = False,
         timeout: Timeout = None,
@@ -138,17 +134,17 @@ def call_batch(
         domain: Text,
         auth_token: Text,
         is_webhook: bool,
-        methods: _BatchMethods,
+        methods: B24BatchMethods,
         halt: bool = False,
         ignore_size_limit: bool = False,
         timeout: Timeout = None,
-        bitrix_token: Optional["AbstractBitrixToken"] = None,
+        bitrix_token: Optional["BitrixTokenProtocol"] = None,
         **kwargs,
 ) -> JSONDict:
     """
     Using 'batch' API method, call multiple API methods in one hit to Bitrix for performance benefits.
 
-    Note: one call to batch method allows you to make up to 50 actual REST API requests in one hit, mitigating request intensity limits.
+    Note: one call to batch method allows you to make up to 50 actual REST API requests in one hit, mitigating requests intensity limits.
 
     Args:
         domain: bitrix portal domain

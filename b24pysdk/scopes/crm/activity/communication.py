@@ -1,12 +1,11 @@
-from typing import TYPE_CHECKING
-
-from ....bitrix_api.classes import BitrixAPIRequest
+from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
-from ..base_crm import BaseCRM
+from .._base_crm import BaseCRM
 
-if TYPE_CHECKING:
-    from .activity import Activity
+__all__ = [
+    "Communication",
+]
 
 
 class Communication(BaseCRM):
@@ -14,10 +13,6 @@ class Communication(BaseCRM):
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/activity-base/index.html
     """
-
-    def __init__(self, activity: "Activity"):
-        super().__init__(scope=activity._scope)
-        self._path = self._get_path(activity)
 
     @type_checker
     def fields(

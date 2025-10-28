@@ -1,7 +1,11 @@
-from ...bitrix_api.classes import BitrixAPIRequest
+from ...bitrix_api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import Timeout
-from .base_crm import BaseCRM
+from ._base_crm import BaseCRM
+
+__all__ = [
+    "Multifield",
+]
 
 
 class Multifield(BaseCRM):

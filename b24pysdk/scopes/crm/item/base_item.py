@@ -1,9 +1,9 @@
 from abc import ABC
 from typing import Iterable, Optional, Text
 
-from ....bitrix_api.classes import BitrixAPIRequest
+from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.types import B24Bool, JSONDict, Timeout
-from ..base_crm import BaseCRM
+from .._base_crm import BaseCRM
 
 
 class BaseItem(BaseCRM, ABC):
@@ -12,18 +12,6 @@ class BaseItem(BaseCRM, ABC):
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/index.html
     """
-
-    ENTITY_TYPE_ID: Optional[int] = None
-    """Numeric Identifier of Type."""
-
-    ENTITY_TYPE_NAME: Optional[Text] = None
-    """Symbolic Code of Type."""
-
-    ENTITY_TYPE_ABBR: Optional[Text] = None
-    """Short Symbolic Code of Type."""
-
-    USER_FIELD_ENTITY_ID: Optional[Text] = None
-    """User Field Object Type."""
 
     def _fields(
             self,
@@ -39,7 +27,7 @@ class BaseItem(BaseCRM, ABC):
         Args:
             entity_type_id: Identifier of the system or custom type whose element we want to retrieve;
 
-            use_original_uf_names: This parameter controls the format of custom field names in the response;
+            use_original_uf_names: This parameter controls the format of custom field names in the responses;
 
             timeout: Timeout in seconds.
 
@@ -56,7 +44,7 @@ class BaseItem(BaseCRM, ABC):
             params["originalUfNames"] = B24Bool(use_original_uf_names).to_str()
 
         return self._make_bitrix_api_request(
-            api_method=self._fields,
+            api_wrapper=self._fields,
             params=params,
             timeout=timeout,
         )
@@ -76,7 +64,7 @@ class BaseItem(BaseCRM, ABC):
 
         To create an object, you need to pass the appropriate parameters, including the object type and its information: name, description, contact details, and other specifics.
 
-        Upon successful execution of the request, a new object is created.
+        Upon successful execution of the requests, a new object is created.
 
         Args:
             fields: Object format:
@@ -93,7 +81,7 @@ class BaseItem(BaseCRM, ABC):
 
             entity_type_id: Identifier of the system or user-defined type whose element we want to create;
 
-            use_original_uf_names: This parameter controls the format of custom field names in the response;
+            use_original_uf_names: This parameter controls the format of custom field names in the responses;
 
             extra_params: Set of additional parameters where
 
@@ -121,7 +109,7 @@ class BaseItem(BaseCRM, ABC):
             params["params"] = extra_params
 
         return self._make_bitrix_api_request(
-            api_method=self._add,
+            api_wrapper=self._add,
             params=params,
             timeout=timeout,
         )
@@ -143,7 +131,7 @@ class BaseItem(BaseCRM, ABC):
 
             entity_type_id: Identifier of the system or user-defined type whose item we want to retrieve;
 
-            use_original_uf_names: This parameter is used to control the format of custom field names in the response;
+            use_original_uf_names: This parameter is used to control the format of custom field names in the responses;
 
             timeout: Timeout in seconds.
 
@@ -162,7 +150,7 @@ class BaseItem(BaseCRM, ABC):
             params["useOriginalUfNames"] = B24Bool(use_original_uf_names).to_str()
 
         return self._make_bitrix_api_request(
-            api_method=self._get,
+            api_wrapper=self._get,
             params=params,
             timeout=timeout,
         )
@@ -217,7 +205,7 @@ class BaseItem(BaseCRM, ABC):
 
             start: This parameter is used to manage pagination;
 
-            use_original_uf_names: This parameter controls the format of user field names in the request and response;
+            use_original_uf_names: This parameter controls the format of user field names in the requests and responses;
 
             timeout: Timeout in seconds.
 
@@ -249,7 +237,7 @@ class BaseItem(BaseCRM, ABC):
             params["useOriginalUfNames"] = B24Bool(use_original_uf_names).to_str()
 
         return self._make_bitrix_api_request(
-            api_method=self._list,
+            api_wrapper=self._list,
             params=params,
             timeout=timeout,
         )
@@ -285,7 +273,7 @@ class BaseItem(BaseCRM, ABC):
 
             entity_type_id: Identifier of the system or user-defined type whose item we want to change;
 
-            use_original_uf_names: Parameter to control the format of custom field names in the request and response;
+            use_original_uf_names: Parameter to control the format of custom field names in the requests and responses;
 
             extra_params: Set of additional parameters where
 
@@ -314,7 +302,7 @@ class BaseItem(BaseCRM, ABC):
             params["params"] = extra_params
 
         return self._make_bitrix_api_request(
-            api_method=self._update,
+            api_wrapper=self._update,
             params=params,
             timeout=timeout,
         )
@@ -349,7 +337,7 @@ class BaseItem(BaseCRM, ABC):
             params["entityTypeId"] = entity_type_id
 
         return self._make_bitrix_api_request(
-            api_method=self._delete,
+            api_wrapper=self._delete,
             params=params,
             timeout=timeout,
         )

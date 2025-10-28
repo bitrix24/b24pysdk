@@ -1,12 +1,13 @@
-from typing import TYPE_CHECKING, Text
+from typing import Text
 
-from ....bitrix_api.classes import BitrixAPIRequest
+from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
-from ..base_crm import BaseCRM
+from .._base_crm import BaseCRM
 
-if TYPE_CHECKING:
-    from .currency import Currency
+__all__ = [
+    "Base",
+]
 
 
 class Base(BaseCRM):
@@ -14,10 +15,6 @@ class Base(BaseCRM):
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/currency/index.html
     """
-
-    def __init__(self, currency: "Currency"):
-        super().__init__(currency._scope)
-        self._path = self._get_path(currency)
 
     @type_checker
     def get(
@@ -38,7 +35,7 @@ class Base(BaseCRM):
             Instance of BitrixAPIRequest
         """
         return self._make_bitrix_api_request(
-            api_method=self.get,
+            api_wrapper=self.get,
             timeout=timeout,
         )
 
@@ -69,7 +66,7 @@ class Base(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.set,
+            api_wrapper=self.set,
             params=params,
             timeout=timeout,
         )

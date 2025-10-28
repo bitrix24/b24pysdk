@@ -9,8 +9,9 @@ from uuid6 import uuid7
 
 from ..._config import Config
 from ..._constants import TEXT_PYTHON_VERSION
-from ...utils.types import DefaultTimeout, Number, Timeout
+from ...utils.types import DefaultTimeout, JSONDict, Number, Timeout
 from ...version import SDK_VERSION
+from ._utils import parse_response
 
 
 class BaseRequester(ABC):
@@ -46,10 +47,10 @@ class BaseRequester(ABC):
     ):
         self._config = Config()
         self._timeout = timeout or self._config.default_timeout
-        self._max_retries = max_retries or self._config.max_retries
+        self._max_retries = max_retries or self._config.default_max_retries
         self._retries_remaining = self._max_retries
-        self._initial_retry_delay = initial_retry_delay or self._config.initial_retry_delay
-        self._retry_delay_increment = retry_delay_increment or self._config.retry_delay_increment
+        self._initial_retry_delay = initial_retry_delay or self._config.default_initial_retry_delay
+        self._retry_delay_increment = retry_delay_increment or self._config.default_retry_delay_increment
 
     @property
     @abstractmethod
@@ -73,13 +74,18 @@ class BaseRequester(ABC):
         """"""
         raise NotImplementedError
 
+    @classmethod
+    def _parse_response(cls, response: requests.Response) -> JSONDict:
+        """"""
+        return parse_response(response)
+
     @property
     def _retry_timeout(self) -> float:
         """
         Calculates timeout between retries based on amount of retries used
 
         Returns:
-            time to wait before next request in seconds
+            time to wait before next requests in seconds
         """
         used_retries = self._max_retries - self._retries_remaining
         return self._initial_retry_delay + used_retries * self._retry_delay_increment
@@ -95,17 +101,35 @@ class BaseRequester(ABC):
             response = self._request(*args, **kwargs)
 
             if response.status_code == HTTPStatus.SERVICE_UNAVAILABLE and self._retries_remaining:
+                retry_count = self._max_retries - self._retries_remaining
+
+                self._config.logger.warning(
+                    "Service unavailable!",
+                    context=dict(
+                        url=response.url,
+                        retry_count=retry_count,
+                        max_retries=self._max_retries,
+                        retries_remaining=self._retries_remaining,
+                    ),
+                )
+                self._config.logger.info(
+                    "Sleep before retry",
+                    context=dict(
+                        sleep_time=self._retry_timeout,
+                    ),
+                )
                 time.sleep(self._retry_timeout)
-            else:
-                return response
+                continue
+
+            return response
 
         raise RuntimeError(
             f"Request failed after {self._max_retries} attempts. "
-            "No valid response was received from the server.",
+            "No valid responses was received from the server.",
         )
 
     def _find_exists(self) -> Optional[Text]:
-        """Find an existing request id in environment variables."""
+        """Find an existing requests id in environment variables."""
 
         for key in self._KEY_NAME_VARIANTS:
             request_id = os.environ.get(key)
@@ -116,11 +140,11 @@ class BaseRequester(ABC):
 
     @staticmethod
     def _generate() -> Text:
-        """Generate a new UUIDv7 request ID."""
+        """Generate a new UUIDv7 requests ID."""
         return str(uuid7())
 
     def get_request_id(self) -> Text:
-        """Get existing request id or generate a new one."""
+        """Get existing requests id or generate a new one."""
 
         request_id = self._find_exists()
 

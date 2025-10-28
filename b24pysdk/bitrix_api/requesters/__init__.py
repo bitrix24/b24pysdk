@@ -1,7 +1,7 @@
 from .bitrix_api_requester import BitrixAPIRequester
-from .oauth_requester import OAuthRequester
+from .bitrix_oauth_requester import BitrixOAuthRequester
 
 __all__ = [
     "BitrixAPIRequester",
-    "OAuthRequester",
+    "BitrixOAuthRequester",
 ]

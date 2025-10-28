@@ -1,0 +1,69 @@
+from abc import ABC, abstractmethod
+from typing import Text
+
+from ..requesters import BitrixOAuthRequester
+from .renewed_oauth_token import RenewedOAuthToken
+
+
+class AbstractBitrixApp(ABC):
+    """"""
+
+    client_id: Text = NotImplemented
+    """"""
+
+    client_secret: Text = NotImplemented
+    """"""
+
+    @abstractmethod
+    def __init__(self, *args, **kwargs):
+        """"""
+        super().__init__(*args, **kwargs)
+
+    @property
+    def is_local(self) -> bool:
+        """"""
+        return bool(getattr(self, "domain", None))
+
+    def get_oauth_token(self, code: Text) -> RenewedOAuthToken:
+        """"""
+        return RenewedOAuthToken.from_dict(BitrixOAuthRequester(self).get_oauth_token(code))
+
+    def refresh_oauth_token(self, refresh_token: Text) -> RenewedOAuthToken:
+        """"""
+        return RenewedOAuthToken.from_dict(BitrixOAuthRequester(self).refresh_oauth_token(refresh_token))
+
+
+class AbstractBitrixAppLocal(AbstractBitrixApp, ABC):
+    """"""
+
+    domain: Text
+    """"""
+
+
+class BitrixApp(AbstractBitrixApp):
+    """Local or market bitrix application"""
+
+    def __init__(
+            self,
+            *,
+            client_id: Text,
+            client_secret: Text,
+    ):
+        self.client_id = client_id
+        self.client_secret = client_secret
+
+
+class BitrixAppLocal(AbstractBitrixAppLocal):
+    """"""
+
+    def __init__(
+            self,
+            *,
+            domain: Text,
+            client_id: Text,
+            client_secret: Text,
+    ):
+
+        self.domain = domain
+        self.client_id = client_id
+        self.client_secret = client_secret

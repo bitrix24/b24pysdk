@@ -1,9 +1,13 @@
 from typing import Iterable, Optional, Text
 
-from ...bitrix_api.classes import BitrixAPIRequest
+from ...bitrix_api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
-from .base_crm import BaseCRM
+from ._base_crm import BaseCRM
+
+__all__ = [
+    "Stagehistory",
+]
 
 
 class Stagehistory(BaseCRM):
@@ -75,7 +79,7 @@ class Stagehistory(BaseCRM):
             params["start"] = start
 
         return self._make_bitrix_api_request(
-            api_method=self.list,
+            api_wrapper=self.list,
             params=params,
             timeout=timeout,
         )

@@ -9,11 +9,13 @@ from .abstract_logger import AbstractLogger
 class BaseLogger(AbstractLogger, ABC):
     """"""
 
-    _DEFAULT_LEVEL: int
     _DEFAULT_HANDLER_TYPE: Type[logging.Handler]
+    _DEFAULT_LEVEL: int
 
-    _name: Text
+    __slots__ = ("_logger", "_name")
+
     _logger: logging.Logger
+    _name: Text
 
     def __init_subclass__(cls, *args, **kwargs):
         super().__init_subclass__(*args, **kwargs)
@@ -26,13 +28,14 @@ class BaseLogger(AbstractLogger, ABC):
         for attr, hint in required_attrs.items():
             if attr not in cls.__dict__:
                 raise TypeError(
-                    f"{cls.__name__} must define class attribute {attr} ({hint})",
+                    f"{cls.__name__!r} must define class attribute {attr!r} ({hint})",
                 )
 
     def __init__(
             self,
             *,
             name: Optional[Text] = None,
+            level: Optional[int] = None,
             handlers: Optional[Iterable[logging.Handler]] = None,
     ):
         self._name = name or self.get_default_logger_name()
@@ -40,9 +43,9 @@ class BaseLogger(AbstractLogger, ABC):
         self._logger = logging.getLogger(self._name)
         self._logger.propagate = False
 
-        self.set_level(self.get_default_level())
+        self.set_level(level or self.get_default_level())
 
-        if not self._logger.handlers:
+        if not self.handlers:
             for handler in (handlers or (self.get_default_handler_type()(),)):
                 self.set_handler(handler)
 
@@ -124,11 +127,11 @@ class BaseLogger(AbstractLogger, ABC):
     def set_level(self, level: int):
         self._logger.setLevel(level)
 
-        for handler in self._logger.handlers:
+        for handler in self.handlers:
             handler.setLevel(level)
 
     def set_handler(self, handler: logging.Handler):
-        handler.setLevel(self._logger.level)
+        handler.setLevel(self.level)
         self._logger.addHandler(handler)
 
     def remove_handler(self, handler: logging.Handler):

@@ -1,6 +1,6 @@
-from typing import TYPE_CHECKING
+from functools import cached_property
 
-from ..scope import Scope
+from .._base_scope import BaseScope
 from .activity import Activity
 from .address import Address
 from .automatedsolution import Automatedsolution
@@ -12,7 +12,8 @@ from .contact import Contact
 from .currency import Currency
 from .deal import Deal
 from .documentgenerator import Documentgenerator
-from .duplicate import Duplicate, Entity
+from .duplicate import Duplicate
+from .entity import Entity
 from .enum import Enum
 from .item import Item
 from .lead import Lead
@@ -20,6 +21,7 @@ from .multifield import Multifield
 from .orderentity import Orderentity
 from .quote import Quote
 from .requisite import Requisite
+from .settings import Settings
 from .stagehistory import Stagehistory
 from .status import Status
 from .timeline import Timeline
@@ -27,98 +29,145 @@ from .type import Type
 from .userfield import Userfield
 from .vat import Vat
 
-if TYPE_CHECKING:
-    from ... import Client
-
 __all__ = [
     "CRM",
 ]
 
 
-class CRM(Scope):
+class CRM(BaseScope):
     """"""
 
-    __slots__ = (
-        "activity",
-        "address",
-        "automatedsolution",
-        "automation",
-        "calllist",
-        "category",
-        "company",
-        "contact",
-        "currency",
-        "deal",
-        "documentgenerator",
-        "duplicate",
-        "entity",
-        "enum",
-        "item",
-        "lead",
-        "multifield",
-        "orderentity",
-        "quote",
-        "requisite",
-        "stagehistory",
-        "status",
-        "timeline",
-        "type",
-        "userfield",
-        "vat",
-    )
+    @cached_property
+    def activity(self) -> Activity:
+        """"""
+        return Activity(self)
 
-    activity: Activity
-    address: Address
-    automatedsolution: Automatedsolution
-    automation: Automation
-    calllist: Calllist
-    category: Category
-    company: Company
-    contact: Contact
-    currency: Currency
-    deal: Deal
-    documentgenerator: Documentgenerator
-    duplicate: Duplicate
-    entity: Entity
-    enum: Enum
-    item: Item
-    lead: Lead
-    multifield: Multifield
-    orderentity: Orderentity
-    quote: Quote
-    requisite: Requisite
-    stagehistory: Stagehistory
-    status: Status
-    timeline: Timeline
-    type: Type
-    userfield: Userfield
-    vat: Vat
+    @cached_property
+    def address(self) -> Address:
+        """"""
+        return Address(self)
 
-    def __init__(self, client: "Client"):
-        super().__init__(client)
-        self.activity = Activity(self)
-        self.address = Address(self)
-        self.automatedsolution = Automatedsolution(self)
-        self.automation = Automation(self)
-        self.calllist = Calllist(self)
-        self.category = Category(self)
-        self.company = Company(self)
-        self.contact = Contact(self)
-        self.currency = Currency(self)
-        self.deal = Deal(self)
-        self.documentgenerator = Documentgenerator(self)
-        self.duplicate = Duplicate(self)
-        self.entity = Entity(self)
-        self.enum = Enum(self)
-        self.item = Item(self)
-        self.lead = Lead(self)
-        self.multifield = Multifield(self)
-        self.orderentity = Orderentity(self)
-        self.quote = Quote(self)
-        self.requisite = Requisite(self)
-        self.stagehistory = Stagehistory(self)
-        self.status = Status(self)
-        self.timeline = Timeline(self)
-        self.type = Type(self)
-        self.userfield = Userfield(self)
-        self.vat = Vat(self)
+    @cached_property
+    def automatedsolution(self) -> Automatedsolution:
+        """"""
+        return Automatedsolution(self)
+
+    @cached_property
+    def automation(self) -> Automation:
+        """"""
+        return Automation(self)
+
+    @cached_property
+    def calllist(self) -> Calllist:
+        """"""
+        return Calllist(self)
+
+    @cached_property
+    def category(self) -> Category:
+        """"""
+        return Category(self)
+
+    @cached_property
+    def company(self) -> Company:
+        """"""
+        return Company(self)
+
+    @cached_property
+    def contact(self) -> Contact:
+        """"""
+        return Contact(self)
+
+    @cached_property
+    def currency(self) -> Currency:
+        """"""
+        return Currency(self)
+
+    @cached_property
+    def deal(self) -> Deal:
+        """"""
+        return Deal(self)
+
+    @cached_property
+    def documentgenerator(self) -> Documentgenerator:
+        """"""
+        return Documentgenerator(self)
+
+    @cached_property
+    def duplicate(self) -> Duplicate:
+        """"""
+        return Duplicate(self)
+
+    @cached_property
+    def entity(self) -> Entity:
+        """"""
+        return Entity(self)
+
+    @cached_property
+    def enum(self) -> Enum:
+        """"""
+        return Enum(self)
+
+    @cached_property
+    def item(self) -> Item:
+        """"""
+        return Item(self)
+
+    @cached_property
+    def lead(self) -> Lead:
+        """"""
+        return Lead(self)
+
+    @cached_property
+    def multifield(self) -> Multifield:
+        """"""
+        return Multifield(self)
+
+    @cached_property
+    def orderentity(self) -> Orderentity:
+        """"""
+        return Orderentity(self)
+
+    @cached_property
+    def quote(self) -> Quote:
+        """"""
+        return Quote(self)
+
+    @cached_property
+    def requisite(self) -> Requisite:
+        """"""
+        return Requisite(self)
+
+    @cached_property
+    def settings(self) -> Settings:
+        """"""
+        return Settings(self)
+
+    @cached_property
+    def stagehistory(self) -> Stagehistory:
+        """"""
+        return Stagehistory(self)
+
+    @cached_property
+    def status(self) -> Status:
+        """"""
+        return Status(self)
+
+    @cached_property
+    def timeline(self) -> Timeline:
+        """"""
+        return Timeline(self)
+
+    @cached_property
+    def type(self) -> Type:
+        """"""
+        return Type(self)
+
+    @cached_property
+    def userfield(self) -> Userfield:
+        """"""
+        return Userfield(self)
+
+    @cached_property
+    def vat(self) -> Vat:
+        """"""
+        return Vat(self)

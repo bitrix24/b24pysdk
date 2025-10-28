@@ -1,12 +1,13 @@
-from typing import TYPE_CHECKING, Optional, Text
+from typing import Optional, Text
 
-from ....bitrix_api.classes import BitrixAPIRequest
+from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
-from ..base_crm import BaseCRM
+from .._base_crm import BaseCRM
 
-if TYPE_CHECKING:
-    from .automation import Automation
+__all__ = [
+    "Trigger",
+]
 
 
 class Trigger(BaseCRM):
@@ -14,10 +15,6 @@ class Trigger(BaseCRM):
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/automation/triggers/index.html
     """
-
-    def __init__(self, automation: "Automation"):
-        super().__init__(automation._scope)
-        self._path = self._get_path(automation)
 
     @type_checker
     def __call__(
@@ -52,7 +49,7 @@ class Trigger(BaseCRM):
             params["code"] = code
 
         return self._make_bitrix_api_request(
-            api_method=self,
+            api_wrapper=self,
             params=params,
             timeout=timeout,
         )
@@ -88,7 +85,7 @@ class Trigger(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.add,
+            api_wrapper=self.add,
             params=params,
             timeout=timeout,
         )
@@ -128,7 +125,7 @@ class Trigger(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.execute,
+            api_wrapper=self.execute,
             params=params,
             timeout=timeout,
         )
@@ -180,7 +177,7 @@ class Trigger(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.delete,
+            api_wrapper=self.delete,
             params=params,
             timeout=timeout,
         )

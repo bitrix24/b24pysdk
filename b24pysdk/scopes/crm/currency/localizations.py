@@ -1,12 +1,13 @@
-from typing import TYPE_CHECKING, Iterable, Text
+from typing import Iterable, Text
 
-from ....bitrix_api.classes import BitrixAPIRequest
+from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
-from ..base_crm import BaseCRM
+from .._base_crm import BaseCRM
 
-if TYPE_CHECKING:
-    from .currency import Currency
+__all__ = [
+    "Localizations",
+]
 
 
 class Localizations(BaseCRM):
@@ -14,10 +15,6 @@ class Localizations(BaseCRM):
 
     Documenation: https://apidocs.bitrix24.com/api-reference/crm/currency/localizations/index.html
     """
-
-    def __init__(self, currency: "Currency"):
-        super().__init__(currency._scope)
-        self._path = self._get_path(currency)
 
     @type_checker
     def fields(
@@ -66,7 +63,7 @@ class Localizations(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.get,
+            api_wrapper=self.get,
             params=params,
             timeout=timeout,
         )
@@ -102,7 +99,7 @@ class Localizations(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.set,
+            api_wrapper=self.set,
             params=params,
             timeout=timeout,
         )
@@ -141,7 +138,7 @@ class Localizations(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.delete,
+            api_wrapper=self.delete,
             params=params,
             timeout=timeout,
         )

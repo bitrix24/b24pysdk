@@ -1,12 +1,9 @@
-from typing import TYPE_CHECKING, Optional, Text
+from typing import Optional, Text
 
 from ...utils.types import JSONDict, Timeout
+from ..protocols import BitrixTokenProtocol
 from ._base_caller import BaseCaller
 from .call import call
-from .parse_response import parse_response
-
-if TYPE_CHECKING:
-    from ..bitrix_token import AbstractBitrixToken
 
 
 class _MethodCaller(BaseCaller):
@@ -20,7 +17,7 @@ class _MethodCaller(BaseCaller):
             api_method: Text,
             params: Optional[JSONDict] = None,
             timeout: Timeout = None,
-            bitrix_token: Optional["AbstractBitrixToken"] = None,
+            bitrix_token: Optional["BitrixTokenProtocol"] = None,
             **kwargs,
     ):
         super().__init__(
@@ -35,14 +32,14 @@ class _MethodCaller(BaseCaller):
         )
 
     @property
-    def _hook_key(self) -> Text:
+    def _dynamic_auth_token(self) -> Text:
         """"""
         return ("", f"{self._auth_token}/")[self._is_webhook]
 
     @property
     def _url(self) -> Text:
         """"""
-        return f"https://{self._domain}/rest/{self._hook_key}{self._api_method}.json"
+        return f"https://{self._domain}/rest/{self._dynamic_auth_token}{self._api_method}.json"
 
     @property
     def _dynamic_params(self) -> JSONDict:
@@ -54,14 +51,28 @@ class _MethodCaller(BaseCaller):
 
     def call(self) -> JSONDict:
         """"""
-        return parse_response(
-            call(
+        self._config.logger.debug(
+            "start call_method",
+            context=dict(
+                domain=self._domain,
+                method=self._api_method,
+                parameters=self._params,
+            ),
+        )
+        json_response = call(
                 url=self._url,
                 params=self._dynamic_params,
                 timeout=self._timeout,
                 **self._kwargs,
+        )
+        self._config.logger.debug(
+            "finish call_method",
+            context=dict(
+                result=json_response["result"],
+                time=json_response["time"],
             ),
         )
+        return json_response
 
 
 def call_method(
@@ -72,7 +83,7 @@ def call_method(
         api_method: Text,
         params: Optional[JSONDict] = None,
         timeout: Timeout = None,
-        bitrix_token: Optional["AbstractBitrixToken"] = None,
+        bitrix_token: Optional["BitrixTokenProtocol"] = None,
         **kwargs,
 ) -> JSONDict:
     """

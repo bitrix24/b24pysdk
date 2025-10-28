@@ -1,14 +1,10 @@
-from typing import TYPE_CHECKING, Dict, Final, List, Mapping, Optional, Sequence, Text, Tuple, Union, overload
+from typing import Dict, Final, List, Mapping, Optional, Sequence, Text, Tuple, Union, overload
 
 from ..._constants import MAX_BATCH_SIZE
-from ...utils.types import B24BatchRequestData, JSONDict, JSONList, Key, Timeout
+from ...utils.types import B24BatchMethods, B24BatchMethodTuple, JSONDict, JSONList, Key, Timeout
+from ..protocols import BitrixTokenProtocol
 from ._base_caller import BaseCaller
 from .call_batch import call_batch
-
-_BatchMethods = Union[Mapping[Key, B24BatchRequestData], Sequence[B24BatchRequestData]]
-
-if TYPE_CHECKING:
-    from ..bitrix_token import AbstractBitrixToken
 
 
 class _BatchesCaller(BaseCaller):
@@ -20,7 +16,7 @@ class _BatchesCaller(BaseCaller):
 
     __slots__ = ("_halt", "_methods")
 
-    _methods: _BatchMethods
+    _methods: B24BatchMethods
     _halt: bool
 
     def __init__(
@@ -29,10 +25,10 @@ class _BatchesCaller(BaseCaller):
             domain: Text,
             auth_token: Text,
             is_webhook: bool,
-            methods: _BatchMethods,
+            methods: B24BatchMethods,
             halt: bool = False,
             timeout: Timeout = None,
-            bitrix_token: Optional["AbstractBitrixToken"] = None,
+            bitrix_token: Optional["BitrixTokenProtocol"] = None,
             **kwargs,
     ):
         super().__init__(
@@ -47,7 +43,7 @@ class _BatchesCaller(BaseCaller):
         self._methods = methods
         self._halt = halt
 
-    def _fetch_batch_response(self, methods: _BatchMethods) -> JSONDict:
+    def _fetch_batch_response(self, methods: B24BatchMethods) -> JSONDict:
         """"""
         return call_batch(
             domain=self._domain,
@@ -59,7 +55,7 @@ class _BatchesCaller(BaseCaller):
             **self._kwargs,
         )
 
-    def _get_flat_methods(self) -> List[Tuple[Key, B24BatchRequestData]]:
+    def _get_flat_methods(self) -> List[Tuple[Key, B24BatchMethodTuple]]:
         """"""
         if isinstance(self._methods, Mapping):
             return list(self._methods.items())
@@ -126,7 +122,7 @@ class _BatchesCaller(BaseCaller):
         if total_methods <= self._MAX_BATCH_SIZE:
             return self._fetch_batch_response(methods=self._methods)
 
-        flat_methods: List[Tuple[Key, B24BatchRequestData]] = self._get_flat_methods()
+        flat_methods: List[Tuple[Key, B24BatchMethodTuple]] = self._get_flat_methods()
 
         batch_responses: JSONList = list()
 
@@ -147,7 +143,7 @@ def call_batches(
         domain: Text,
         auth_token: Text,
         is_webhook: bool,
-        methods: Mapping[Key, B24BatchRequestData],
+        methods: Mapping[Key, B24BatchMethodTuple],
         halt: bool = False,
         timeout: Timeout = None,
         **kwargs,
@@ -160,7 +156,7 @@ def call_batches(
         domain: Text,
         auth_token: Text,
         is_webhook: bool,
-        methods: Sequence[B24BatchRequestData],
+        methods: Sequence[B24BatchMethodTuple],
         halt: bool = False,
         timeout: Timeout = None,
         **kwargs,
@@ -172,16 +168,16 @@ def call_batches(
         domain: Text,
         auth_token: Text,
         is_webhook: bool,
-        methods: _BatchMethods,
+        methods: B24BatchMethods,
         halt: bool = False,
         timeout: Timeout = None,
-        bitrix_token: Optional["AbstractBitrixToken"] = None,
+        bitrix_token: Optional["BitrixTokenProtocol"] = None,
         **kwargs,
 ) -> JSONDict:
     """
     Using 'batch' API method, call multiple API methods in one hit to Bitrix for performance benefits. Unlike call_batch(), works with any number of API methods
 
-    Note: one call to batch method allows you to make up to 50 actual REST API requests in one hit, mitigating request intensity limits.
+    Note: one call to batch method allows you to make up to 50 actual REST API requests in one hit, mitigating requests intensity limits.
 
     Args:
         domain: bitrix portal domain

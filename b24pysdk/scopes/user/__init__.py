@@ -1,34 +1,34 @@
-from typing import TYPE_CHECKING, Optional, Text
+from functools import cached_property
+from typing import Iterable, Optional, Text
 
-from ...bitrix_api.classes import BitrixAPIRequest
+from ...bitrix_api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
-from ..scope import Scope
+from .._base_scope import BaseScope
 from .userfield import Userfield
-
-if TYPE_CHECKING:
-    from ... import Client
 
 __all__ = [
     "User",
 ]
 
 
-class User(Scope):
+class User(BaseScope):
     """"""
 
-    def __init__(self, client: "Client"):
-        super().__init__(client)
-        self.userfield = Userfield(self)
+    @cached_property
+    def userfield(self) -> Userfield:
+        """"""
+        return Userfield(self)
 
     @type_checker
     def fields(
             self,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
         return self._make_bitrix_api_request(
-            api_method=self.fields,
+            api_wrapper=self.fields,
             timeout=timeout,
         )
 
@@ -36,11 +36,12 @@ class User(Scope):
     def add(
             self,
             fields: JSONDict,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
         return self._make_bitrix_api_request(
-            api_method=self.add,
+            api_wrapper=self.add,
             params=fields,
             timeout=timeout,
         )
@@ -48,6 +49,7 @@ class User(Scope):
     @type_checker
     def get(
             self,
+            *,
             sort: Optional[Text] = None,
             order: Optional[Text] = None,
             filter: Optional[JSONDict] = None,
@@ -75,7 +77,7 @@ class User(Scope):
             params["start"] = start
 
         return self._make_bitrix_api_request(
-            api_method=self.get,
+            api_wrapper=self.get,
             params=params,
             timeout=timeout,
         )
@@ -84,11 +86,12 @@ class User(Scope):
     def update(
             self,
             fields: JSONDict,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
         return self._make_bitrix_api_request(
-            api_method=self.update,
+            api_wrapper=self.update,
             params=fields,
             timeout=timeout,
         )
@@ -96,17 +99,19 @@ class User(Scope):
     @type_checker
     def current(
             self,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
         return self._make_bitrix_api_request(
-            api_method=self.current,
+            api_wrapper=self.current,
             timeout=timeout,
         )
 
     @type_checker
     def search(
             self,
+            *,
             filter: Optional[JSONDict] = None,
             sort: Optional[Text] = None,
             order: Optional[Text] = None,
@@ -134,7 +139,41 @@ class User(Scope):
             params["start"] = start
 
         return self._make_bitrix_api_request(
-            api_method=self.search,
+            api_wrapper=self.search,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def admin(
+            self,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+        return self._make_bitrix_api_request(
+            api_wrapper=self.admin,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def access(
+            self,
+            access: Iterable[Text],
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        if access.__class__ is not list:
+            access = list(access)
+
+        params = {
+            "ACCESS": access,
+        }
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.access,
             params=params,
             timeout=timeout,
         )

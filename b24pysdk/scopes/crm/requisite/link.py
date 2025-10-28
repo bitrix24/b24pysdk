@@ -1,12 +1,13 @@
-from typing import TYPE_CHECKING, Iterable, Optional, Text
+from typing import Iterable, Optional, Text
 
-from ....bitrix_api.classes import BitrixAPIRequest
+from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
-from ..base_crm import BaseCRM
+from .._base_crm import BaseCRM
 
-if TYPE_CHECKING:
-    from .requisite import Requisite
+__all__ = [
+    "Link",
+]
 
 
 class Link(BaseCRM):
@@ -14,10 +15,6 @@ class Link(BaseCRM):
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/links/index.html
     """
-
-    def __init__(self, requisite: "Requisite"):
-        super().__init__(requisite._scope)
-        self._path = self._get_path(requisite)
 
     @type_checker
     def fields(
@@ -80,7 +77,7 @@ class Link(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.get,
+            api_wrapper=self.get,
             params=params,
             timeout=timeout,
         )
@@ -182,7 +179,7 @@ class Link(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.register,
+            api_wrapper=self.register,
             params=params,
             timeout=timeout,
         )
@@ -228,7 +225,7 @@ class Link(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.unregister,
+            api_wrapper=self.unregister,
             params=params,
             timeout=timeout,
         )

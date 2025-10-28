@@ -1,39 +1,44 @@
 import threading
+import typing
 
-from ._constants import DEFAULT_TIMEOUT, INITIAL_RETRY_DELAY, MAX_RETRIES, RETRY_DELAY_INCREMENT
+from .constants import DEFAULT_INITIAL_RETRY_DELAY, DEFAULT_MAX_RETRIES, DEFAULT_RETRY_DELAY_INCREMENT, DEFAULT_TIMEOUT
 from .log import AbstractLogger, NullLogger
-from .utils.types import DefaultTimeout, Number
+from .utils.types import DefaultTimeout, Number, Timeout
 
 
 class _LocalConfig:
     """"""
 
     __slots__ = (
+        "default_initial_retry_delay",
+        "default_max_retries",
+        "default_retry_delay_increment",
         "default_timeout",
-        "initial_retry_delay",
         "logger",
-        "max_retries",
-        "retry_delay_increment",
     )
 
+    default_initial_retry_delay: Number
+    default_max_retries: int
+    default_retry_delay_increment: Number
     default_timeout: DefaultTimeout
-    initial_retry_delay: Number
     logger: AbstractLogger
-    max_retries: int
-    retry_delay_increment: Number
 
     def __init__(self):
+        self.default_initial_retry_delay: Number = DEFAULT_INITIAL_RETRY_DELAY
+        self.default_max_retries: int = DEFAULT_MAX_RETRIES
+        self.default_retry_delay_increment: Number = DEFAULT_RETRY_DELAY_INCREMENT
         self.default_timeout: DefaultTimeout = DEFAULT_TIMEOUT
-        self.initial_retry_delay: Number = INITIAL_RETRY_DELAY
         self.logger = NullLogger()
-        self.max_retries: int = MAX_RETRIES
-        self.retry_delay_increment: Number = RETRY_DELAY_INCREMENT
 
 
 class Config:
     """Thread-local configuration for SDK behavior"""
 
-    _local_thread = threading.local()
+    __slots__ = ("_config",)
+
+    _config: _LocalConfig
+
+    _local_thread: threading.local = threading.local()
 
     def __init__(self):
         local_thread = type(self)._local_thread
@@ -42,6 +47,78 @@ class Config:
             local_thread.config = _LocalConfig()
 
         self._config = local_thread.config
+
+    def configure(
+            self,
+            *,
+            default_initial_retry_delay: typing.Optional[Number] = None,
+            default_max_retries: typing.Optional[int] = None,
+            default_retry_delay_increment: typing.Optional[Number] = None,
+            default_timeout: Timeout = None,
+            logger: typing.Optional[AbstractLogger] = None,
+            log_level: typing.Optional[int] = None,
+    ):
+        """"""
+
+        if default_initial_retry_delay is not None:
+            self.default_initial_retry_delay = default_initial_retry_delay
+
+        if default_max_retries is not None:
+            self.default_max_retries = default_max_retries
+
+        if default_retry_delay_increment is not None:
+            self.default_retry_delay_increment = default_retry_delay_increment
+
+        if default_timeout is not None:
+            self.default_timeout = default_timeout
+
+        if logger is not None:
+            self.logger = logger
+
+        if log_level is not None:
+            self.log_level = log_level
+
+    @property
+    def default_initial_retry_delay(self) -> Number:
+        """Initial delay between retries in seconds"""
+        return self._config.default_initial_retry_delay
+
+    @default_initial_retry_delay.setter
+    def default_initial_retry_delay(self, value: Number):
+        """"""
+
+        if not (isinstance(value, (int, float)) and value > 0):
+            raise ValueError("Initial_retry_delay must be a positive number")
+
+        self._config.default_initial_retry_delay = value
+
+    @property
+    def default_max_retries(self) -> int:
+        """Maximum number retries that will occur when server is not responding"""
+        return self._config.default_max_retries
+
+    @default_max_retries.setter
+    def default_max_retries(self, value: int):
+        """"""
+
+        if not (isinstance(value, int) and value >= 1):
+            raise ValueError("Max_retries must be a positive integer (>= 1)")
+
+        self._config.default_max_retries = value
+
+    @property
+    def default_retry_delay_increment(self) -> Number:
+        """Amount by which delay between retries will increment after each retry"""
+        return self._config.default_retry_delay_increment
+
+    @default_retry_delay_increment.setter
+    def default_retry_delay_increment(self, value: Number):
+        """"""
+
+        if not (isinstance(value, (int, float)) and value >= 0):
+            raise ValueError("Retry_delay_increment must be a positive number")
+
+        self._config.default_retry_delay_increment = value
 
     @property
     def default_timeout(self) -> DefaultTimeout:
@@ -90,45 +167,3 @@ class Config:
             )
 
         self._config.logger.set_level(value)
-
-    @property
-    def max_retries(self) -> int:
-        """Maximum number retries that will occur when server is not responding"""
-        return self._config.max_retries
-
-    @max_retries.setter
-    def max_retries(self, value: int):
-        """"""
-
-        if not (isinstance(value, int) and value >= 1):
-            raise ValueError("Max_retries must be a positive integer (>= 1)")
-
-        self._config.max_retries = value
-
-    @property
-    def initial_retry_delay(self) -> Number:
-        """Initial delay between retries in seconds"""
-        return self._config.initial_retry_delay
-
-    @initial_retry_delay.setter
-    def initial_retry_delay(self, value: Number):
-        """"""
-
-        if not (isinstance(value, (int, float)) and value > 0):
-            raise ValueError("Initial_retry_delay must be a positive number")
-
-        self._config.initial_retry_delay = value
-
-    @property
-    def retry_delay_increment(self) -> Number:
-        """Amount by which delay between retries will increment after each retry"""
-        return self._config.retry_delay_increment
-
-    @retry_delay_increment.setter
-    def retry_delay_increment(self, value: Number):
-        """"""
-
-        if not (isinstance(value, (int, float)) and value >= 0):
-            raise ValueError("Retry_delay_increment must be a positive number")
-
-        self._config.retry_delay_increment = value

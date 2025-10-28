@@ -1,13 +1,11 @@
-from typing import TYPE_CHECKING, Final, Iterable, List, Mapping, Optional, Text, Tuple
+from typing import Final, Iterable, List, Mapping, Optional, Text, Tuple
 
 from ..._constants import MAX_BATCH_SIZE
-from ...utils.types import B24BatchRequestData, JSONDict, JSONList, Timeout
+from ...utils.types import B24BatchMethodTuple, JSONDict, JSONList, Timeout
+from ..protocols import BitrixTokenProtocol
 from ._base_caller import BaseCaller
 from .call_batches import call_batches
 from .call_method import call_method
-
-if TYPE_CHECKING:
-    from ..bitrix_token import AbstractBitrixToken
 
 
 class _ListCaller(BaseCaller):
@@ -33,7 +31,7 @@ class _ListCaller(BaseCaller):
             params: Optional[JSONDict] = None,
             limit: Optional[int] = None,
             timeout: Timeout = None,
-            bitrix_token: Optional["AbstractBitrixToken"] = None,
+            bitrix_token: Optional["BitrixTokenProtocol"] = None,
             **kwargs,
     ):
         super().__init__(
@@ -93,15 +91,15 @@ class _ListCaller(BaseCaller):
             filter_key: Text,
             filter_id_key: Text,
             filter_ids: List[int],
-    ) -> List[B24BatchRequestData]:
+    ) -> List[B24BatchMethodTuple]:
         """
         Generates list of methods, using call_list() api_method and params, slicing ids from filter parameter in chunks
 
         Returns:
-            list of B24BatchRequestData, ready to be used by call_batches()
+            list of B24BatchMethodTuple, ready to be used by call_batches()
         """
 
-        methods: List[B24BatchRequestData] = list()
+        methods: List[B24BatchMethodTuple] = list()
 
         for start in range(0, len(filter_ids), self._STEP):
             id_chunk = filter_ids[start:start + self._STEP]
@@ -114,7 +112,7 @@ class _ListCaller(BaseCaller):
             self,
             next_step: int,
             total: int,
-    ) -> List[B24BatchRequestData]:
+    ) -> List[B24BatchMethodTuple]:
         """
         Generates list of methods, using call_list() api_method and params, adding pagination parameter
         Args:
@@ -122,10 +120,10 @@ class _ListCaller(BaseCaller):
             total: total number of list method's results
 
         Returns:
-            list of B24BatchRequestData, ready to be used by call_batches()
+            list of B24BatchMethodTuple, ready to be used by call_batches()
         """
 
-        methods: List[B24BatchRequestData] = list()
+        methods: List[B24BatchMethodTuple] = list()
 
         for start in range(next_step, total, self._STEP):
             page_params = self._params | {"start": start}
@@ -153,7 +151,7 @@ class _ListCaller(BaseCaller):
                 **self._kwargs,
             )
 
-    def _fetch_batches_response(self, methods: List[B24BatchRequestData]) -> JSONDict:
+    def _fetch_batches_response(self, methods: List[B24BatchMethodTuple]) -> JSONDict:
         """"""
         return call_batches(
             domain=self._domain,
@@ -253,7 +251,7 @@ def call_list(
         params: Optional[JSONDict] = None,
         limit: Optional[int] = None,
         timeout: Timeout = None,
-        bitrix_token: Optional["AbstractBitrixToken"] = None,
+        bitrix_token: Optional["BitrixTokenProtocol"] = None,
         **kwargs,
 ) -> JSONDict:
     """

@@ -1,13 +1,118 @@
+import abc
 import typing
 from http import HTTPStatus as _HTTPStatus
+from urllib.parse import urlparse as _urlparse
 
 import requests
 
-from .utils.types import JSONDict as _JSONDict
+from .utils import types as _types
+
+__all__ = [
+    "BitrixAPIAccessDenied",
+    "BitrixAPIAllowedOnlyIntranetUser",
+    "BitrixAPIBadRequest",
+    "BitrixAPIError",
+    "BitrixAPIErrorBatchLengthExceeded",
+    "BitrixAPIErrorBatchMethodNotAllowed",
+    "BitrixAPIErrorManifestIsNotAvailable",
+    "BitrixAPIErrorOAuth",
+    "BitrixAPIErrorUnexpectedAnswer",
+    "BitrixAPIExpiredToken",
+    "BitrixAPIForbidden",
+    "BitrixAPIInsufficientScope",
+    "BitrixAPIInternalServerError",
+    "BitrixAPIInvalidArgValue",
+    "BitrixAPIInvalidCredentials",
+    "BitrixAPIInvalidRequest",
+    "BitrixAPIMethodConfirmDenied",
+    "BitrixAPIMethodConfirmWaiting",
+    "BitrixAPIMethodNotAllowed",
+    "BitrixAPINoAuthFound",
+    "BitrixAPINotFound",
+    "BitrixAPIOverloadLimit",
+    "BitrixAPIQueryLimitExceeded",
+    "BitrixAPIServiceUnavailable",
+    "BitrixAPIUnauthorized",
+    "BitrixAPIUserAccessError",
+    "BitrixOAuthException",
+    "BitrixOAuthInsufficientScope",
+    "BitrixOAuthInvalidClient",
+    "BitrixOAuthInvalidGrant",
+    "BitrixOAuthInvalidRequest",
+    "BitrixOAuthInvalidScope",
+    "BitrixOAuthRequestError",
+    "BitrixOAuthRequestTimeout",
+    "BitrixOauthWrongClient",
+    "BitrixRequestError",
+    "BitrixRequestTimeout",
+    "BitrixResponse302JSONDecodeError",
+    "BitrixResponse500JSONDecodeError",
+    "BitrixResponseJSONDecodeError",
+    "BitrixSDKException",
+    "BitrixValidationError",
+]
+
+
+class _HTTPResponse(abc.ABC):
+    """"""
+
+    STATUS_CODE: _HTTPStatus = NotImplemented
+
+    response: requests.Response
+
+    @property
+    def status_code(self) -> int:
+        """"""
+        return self.response.status_code
+
+
+class _HTTPResponseOK(_HTTPResponse):
+    """"""
+    STATUS_CODE = _HTTPStatus.OK
+
+
+class _HTTPResponseFound(_HTTPResponse):
+    """"""
+    STATUS_CODE = _HTTPStatus.FOUND
+
+
+class _HTTPResponseBadRequest(_HTTPResponse):
+    """"""
+    STATUS_CODE = _HTTPStatus.BAD_REQUEST
+
+
+class _HTTPResponseUnauthorized(_HTTPResponse):
+    """"""
+    STATUS_CODE = _HTTPStatus.UNAUTHORIZED
+
+
+class _HTTPResponseForbidden(_HTTPResponse):
+    """"""
+    STATUS_CODE = _HTTPStatus.FORBIDDEN
+
+
+class _HTTPResponseNotFound(_HTTPResponse):
+    """"""
+    STATUS_CODE = _HTTPStatus.NOT_FOUND
+
+
+class _HTTPResponseMethodNotAllowed(_HTTPResponse):
+    """"""
+    STATUS_CODE = _HTTPStatus.METHOD_NOT_ALLOWED
+
+
+class _HTTPResponseInternalError(_HTTPResponse):
+    """"""
+    STATUS_CODE = _HTTPStatus.INTERNAL_SERVER_ERROR
+
+
+class _HTTPResponseServiceUnavailable(_HTTPResponse):
+    """"""
+    STATUS_CODE = _HTTPStatus.SERVICE_UNAVAILABLE
 
 
 class BitrixSDKException(Exception):
-    """Base class for all bitrix API exceptions."""
+    """BaseEntity class for all bitrix API exceptions."""
 
     __slots__ = ("message",)
 
@@ -20,6 +125,10 @@ class BitrixSDKException(Exception):
 
 
 class BitrixOAuthException(BitrixSDKException):
+    """"""
+
+
+class BitrixValidationError(BitrixSDKException):
     """"""
 
 
@@ -37,23 +146,21 @@ class BitrixOAuthRequestError(BitrixRequestError, BitrixOAuthException):
     """"""
 
 
-class BitrixTimeout(BitrixRequestError):
+class BitrixRequestTimeout(BitrixRequestError):
     """"""
 
     __slots__ = ("timeout",)
-
-    STATUS_CODE: int = _HTTPStatus.GATEWAY_TIMEOUT
 
     def __init__(self, original_error: Exception, timeout: int):
         super().__init__(original_error, timeout)
         self.timeout = timeout
 
 
-class BitrixOAuthTimeout(BitrixTimeout, BitrixOAuthException):
+class BitrixOAuthRequestTimeout(BitrixRequestTimeout, BitrixOAuthException):
     """"""
 
 
-class BitrixResponseJSONDecodeError(BitrixRequestError):
+class BitrixResponseJSONDecodeError(BitrixRequestError, _HTTPResponse):
     """"""
 
     __slots__ = ("response",)
@@ -62,92 +169,88 @@ class BitrixResponseJSONDecodeError(BitrixRequestError):
         super().__init__(original_error, response)
         self.response = response
 
-    @property
-    def status_code(self) -> int:
-        """"""
-        return self.response.status_code
 
-
-class BitrixAPIError(BitrixSDKException):
+class BitrixResponse302JSONDecodeError(BitrixResponseJSONDecodeError, _HTTPResponseFound):
     """"""
+
+    @property
+    def redirect_url(self) -> typing.Optional[typing.Text]:
+        """"""
+        return self.response.headers.get("Location")
+
+    @property
+    def new_domain(self) -> typing.Optional[typing.Text]:
+        """"""
+        redirect_url = self.redirect_url
+        return redirect_url and _urlparse(redirect_url).hostname
+
+
+class BitrixResponse500JSONDecodeError(BitrixResponseJSONDecodeError, _HTTPResponseInternalError):
+    """"""
+
+
+class BitrixAPIError(BitrixSDKException, _HTTPResponse):
+    """"""
+
+    ERROR: typing.Text = NotImplemented
 
     __slots__ = ("json_response", "response")
 
-    def __init__(self, json_response: _JSONDict, response: requests.Response):
+    def __init__(self, json_response: _types.JSONDict, response: requests.Response):
         message = json_response.get("error_description", f"{self.__class__.__name__}: {response.text}")
         super().__init__(message, json_response, response)
         self.json_response = json_response
         self.response = response
 
     @property
-    def status_code(self) -> int:
-        """"""
-        return self.response.status_code
-
-    @property
     def error(self) -> typing.Text:
         """"""
-        return self.json_response.get("error")
+        return self.json_response.get("error", "")
 
     @property
     def error_description(self) -> typing.Text:
         """"""
-        return self.json_response.get("error_description")
+        return self.json_response.get("error_description", "")
 
 
 # Exceptions by status code
 
-class BitrixAPIBadRequest(BitrixAPIError):
+class BitrixAPIBadRequest(BitrixAPIError, _HTTPResponseBadRequest):
     """Bad Request."""
 
-    STATUS_CODE: int = _HTTPStatus.BAD_REQUEST
 
-
-class BitrixAPIUnauthorized(BitrixAPIError):
+class BitrixAPIUnauthorized(BitrixAPIError, _HTTPResponseUnauthorized):
     """Unauthorized."""
 
-    STATUS_CODE: int = _HTTPStatus.UNAUTHORIZED
 
-
-class BitrixAPIForbidden(BitrixAPIError):
+class BitrixAPIForbidden(BitrixAPIError, _HTTPResponseForbidden):
     """Forbidden."""
 
-    STATUS_CODE: int = _HTTPStatus.FORBIDDEN
 
-
-class BitrixAPINotFound(BitrixAPIError):
+class BitrixAPINotFound(BitrixAPIError, _HTTPResponseNotFound):
     """Not Found."""
-
-    STATUS_CODE: int = _HTTPStatus.NOT_FOUND
-    ERROR: typing.Text = "NOT_FOUND"
+    ERROR = "NOT_FOUND"
 
 
-class BitrixAPIMethodNotAllowed(BitrixAPIError):
+class BitrixAPIMethodNotAllowed(BitrixAPIError, _HTTPResponseMethodNotAllowed):
     """Method Not Allowed."""
 
-    STATUS_CODE: int = _HTTPStatus.METHOD_NOT_ALLOWED
 
-
-class BitrixAPIInternalServerError(BitrixAPIError):
+class BitrixAPIInternalServerError(BitrixAPIError, _HTTPResponseInternalError):
     """Internal server error."""
-
-    STATUS_CODE: int = _HTTPStatus.INTERNAL_SERVER_ERROR
-    ERROR: typing.Text = "INTERNAL_SERVER_ERROR"
+    ERROR = "INTERNAL_SERVER_ERROR"
 
 
-class BitrixAPIServiceUnavailable(BitrixAPIError):
+class BitrixAPIServiceUnavailable(BitrixAPIError, _HTTPResponseServiceUnavailable):
     """Service Unavailable."""
-
-    STATUS_CODE: int = _HTTPStatus.SERVICE_UNAVAILABLE
 
 
 # Exceptions by error
 
 # 200
 
-class BitrixOauthWrongClient(BitrixAPIError, BitrixOAuthException):
+class BitrixOauthWrongClient(BitrixAPIError, BitrixOAuthException, _HTTPResponseOK):
     """Wrong client"""
-
     ERROR = "WRONG_CLIENT"
 
 
@@ -155,133 +258,124 @@ class BitrixOauthWrongClient(BitrixAPIError, BitrixOAuthException):
 
 class BitrixAPIErrorBatchLengthExceeded(BitrixAPIBadRequest):
     """Max batch length exceeded."""
-
-    ERROR: typing.Text = "ERROR_BATCH_LENGTH_EXCEEDED"
+    ERROR = "ERROR_BATCH_LENGTH_EXCEEDED"
 
 
 class BitrixAPIInvalidArgValue(BitrixAPIBadRequest):
     """"""
-
-    ERROR: typing.Text = "INVALID_ARG_VALUE"
+    ERROR = "INVALID_ARG_VALUE"
 
 
 class BitrixAPIInvalidRequest(BitrixAPIBadRequest):
     """Https required."""
-
-    ERROR: typing.Text = "INVALID_REQUEST"
+    ERROR = "INVALID_REQUEST"
 
 
 class BitrixOAuthInvalidRequest(BitrixAPIInvalidRequest, BitrixOAuthException):
-    """An incorrectly formatted authorization request was provided"""
+    """An incorrectly formatted authorization requests was provided"""
 
 
 class BitrixOAuthInvalidClient(BitrixAPIBadRequest, BitrixOAuthException):
     """Invalid client data was provided. The application may not be installed in Bitrix24"""
-
     ERROR = "INVALID_CLIENT"
 
 
 class BitrixOAuthInvalidGrant(BitrixAPIBadRequest, BitrixOAuthException):
     """Invalid authorization tokens were provided when obtaining access_token. This occurs during renewal or initial acquisition"""
-
     ERROR = "INVALID_GRANT"
 
 
 # 401
 
+class BitrixAPIErrorOAuth(BitrixAPIUnauthorized):
+    """Application not installed."""
+    ERROR = "ERROR_OAUTH"
+
+
 class BitrixAPIExpiredToken(BitrixAPIUnauthorized):
     """The access token provided has expired."""
+    ERROR = "EXPIRED_TOKEN"
 
-    ERROR: typing.Text = "EXPIRED_TOKEN"
+
+class BitrixAPIMethodConfirmWaiting(BitrixAPIUnauthorized):
+    """Waiting for confirmation."""
+    ERROR = "METHOD_CONFIRM_WAITING"
 
 
 class BitrixAPINoAuthFound(BitrixAPIUnauthorized):
     """Wrong authorization data."""
-
-    ERROR: typing.Text = "NO_AUTH_FOUND"
-
-
-class BitrixAPIErrorOAUTH(BitrixAPIUnauthorized):
-    """Application not installed."""
-
-    ERROR: typing.Text = "ERROR_OAUTH"
+    ERROR = "NO_AUTH_FOUND"
 
 
 # 403
 
 class BitrixAPIAccessDenied(BitrixAPIForbidden):
     """REST API is available only on commercial plans."""
-
-    ERROR: typing.Text = "ACCESS_DENIED"
+    ERROR = "ACCESS_DENIED"
 
 
 class BitrixAPIAllowedOnlyIntranetUser(BitrixAPIForbidden):
     """"""
-
-    ERROR: typing.Text = "ALLOWED_ONLY_INTRANET_USER"
+    ERROR = "ALLOWED_ONLY_INTRANET_USER"
 
 
 class BitrixAPIInsufficientScope(BitrixAPIForbidden):
     """The request requires higher privileges than provided by the webhook token."""
+    ERROR = "INSUFFICIENT_SCOPE"
 
-    ERROR: typing.Text = "INSUFFICIENT_SCOPE"
+
+class BitrixAPIInvalidCredentials(BitrixAPIForbidden):
+    """Invalid requests credentials."""
+    ERROR = "INVALID_CREDENTIALS"
+
+
+class BitrixAPIMethodConfirmDenied(BitrixAPIForbidden):
+    """Method call denied."""
+    ERROR = "METHOD_CONFIRM_DENIED"
+
+
+class BitrixAPIUserAccessError(BitrixAPIForbidden):
+    """The user does not have acfcess to the application."""
+    ERROR = "USER_ACCESS_ERROR"
 
 
 class BitrixOAuthInvalidScope(BitrixAPIForbidden, BitrixOAuthException):
     """Access permissions requested exceed those specified in the application card"""
-
-    ERROR: typing.Text = "INVALID_SCOPE"
+    ERROR = "INVALID_SCOPE"
 
 
 class BitrixOAuthInsufficientScope(BitrixAPIInsufficientScope, BitrixOAuthException):
     """Access permissions requested exceed those specified in the application card"""
 
 
-class BitrixAPIInvalidCredentials(BitrixAPIForbidden):
-    """Invalid request credentials."""
-
-    ERROR: typing.Text = "INVALID_CREDENTIALS"
-
-
-class BitrixAPIUserAccessError(BitrixAPIForbidden):
-    """The user does not have acfcess to the application."""
-
-    ERROR: typing.Text = "USER_ACCESS_ERROR"
-
-
 # 404
 
 class BitrixAPIErrorManifestIsNotAvailable(BitrixAPINotFound):
     """Manifest is not available"""
-
-    ERROR: typing.Text = "ERROR_MANIFEST_IS_NOT_AVAILABLE"
+    ERROR = "ERROR_MANIFEST_IS_NOT_AVAILABLE"
 
 
 # 405
 
 class BitrixAPIErrorBatchMethodNotAllowed(BitrixAPIMethodNotAllowed):
     """Method is not allowed for batch usage."""
-
-    ERROR: typing.Text = "ERROR_BATCH_METHOD_NOT_ALLOWED"
+    ERROR = "ERROR_BATCH_METHOD_NOT_ALLOWED"
 
 
 # 500
 
 class BitrixAPIErrorUnexpectedAnswer(BitrixAPIInternalServerError):
-    """Server returned an unexpected response."""
-
-    ERROR: typing.Text = "ERROR_UNEXPECTED_ANSWER"
+    """Server returned an unexpected responses."""
+    ERROR = "ERROR_UNEXPECTED_ANSWER"
 
 
 # 503
 
 class BitrixAPIOverloadLimit(BitrixAPIServiceUnavailable):
     """REST API is blocked due to overload."""
-
-    ERROR: typing.Text = "OVERLOAD_LIMIT"
+    ERROR = "OVERLOAD_LIMIT"
 
 
 class BitrixAPIQueryLimitExceeded(BitrixAPIServiceUnavailable):
     """Too many requests."""
-
-    ERROR: typing.Text = "QUERY_LIMIT_EXCEEDED"
+    ERROR = "QUERY_LIMIT_EXCEEDED"

@@ -1,7 +1,7 @@
 from typing import Any, Dict
 
 from b24pysdk import Client
-from b24pysdk.bitrix_api.classes.request.bitrix_api_request import BitrixAPIRequest
+from b24pysdk.bitrix_api.requests import BitrixAPIRequest
 
 
 def make_time() -> Dict[str, Any]:
@@ -20,7 +20,7 @@ class DummyToken:
         self.batch_calls = []
         self.batches_calls = []
 
-    def call_batch(self, methods, *, halt=False, ignore_size_limit=False, timeout=None, **kwargs):
+    def call_batch(self, methods, *, halt=False, ignore_size_limit=False, timeout=None):
         self.batch_calls.append({
             "methods": methods,
             "halt": halt,
@@ -30,11 +30,11 @@ class DummyToken:
         # Minimal valid batch JSON
         # Normalize result structure depending on mapping/sequence
         if isinstance(methods, dict):
-            result = {k: {} for k in methods.keys()}
-            result_error = {k: None for k in methods.keys()}
-            result_total = {k: 0 for k in methods.keys()}
-            result_next = {k: 0 for k in methods.keys()}
-            result_time = {k: make_time() for k in methods.keys()}
+            result = {key: {} for key in methods}
+            result_error = dict.fromkeys(methods.keys())
+            result_total = dict.fromkeys(methods.keys(), 0)
+            result_next = dict.fromkeys(methods.keys(), 0)
+            result_time = {key: make_time() for key in methods}
         else:
             n = len(methods)
             result = [{} for _ in range(n)]
@@ -54,7 +54,7 @@ class DummyToken:
             "time": make_time(),
         }
 
-    def call_batches(self, methods, *, halt=False, timeout=None, **kwargs):
+    def call_batches(self, methods, *, halt=False, timeout=None):
         self.batches_calls.append({
             "methods": methods,
             "halt": halt,

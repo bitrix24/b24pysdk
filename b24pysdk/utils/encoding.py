@@ -1,11 +1,14 @@
 import typing
 import urllib.parse as _parser
 
-from .types import JSONDict as _JSONDict
-from .types import JSONList as _JSONList
+from . import types as _types
+
+__all__ = [
+    "encode_params",
+]
 
 
-def _force_str(value: typing.Any) -> typing.Text:
+def __force_str(value: typing.Any) -> typing.Text:
     """"""
 
     if isinstance(value, str):
@@ -16,7 +19,7 @@ def _force_str(value: typing.Any) -> typing.Text:
         return str(value)
 
 
-def encode_params(params: typing.Optional[typing.Union[_JSONDict, _JSONList]]) -> typing.Text:
+def encode_params(params: typing.Optional[typing.Union[_types.JSONDict, _types.JSONList]]) -> typing.Text:
     """
     Recursively converts list/tuple/dict to string that can be understood by Bitrix API
 
@@ -52,7 +55,7 @@ def encode_params(params: typing.Optional[typing.Union[_JSONDict, _JSONList]]) -
 
         if not isinstance(values, typing.Iterable) or isinstance(values, (str, bytes)):
             # scalar values
-            encoded_values = "" if values is None else _parser.quote_plus(_force_str(values))
+            encoded_values = "" if values is None else _parser.quote_plus(__force_str(values))
 
             return [f"{outer_key}={encoded_values}"]
 
@@ -68,7 +71,7 @@ def encode_params(params: typing.Optional[typing.Union[_JSONDict, _JSONList]]) -
         # recursively converts inner keys
         for inner_key, value in items:
             # only inner key is converted, because outer key can contain square brackets which need to be preserved
-            quoted_key = _parser.quote_plus(_force_str(inner_key))
+            quoted_key = _parser.quote_plus(__force_str(inner_key))
 
             if outer_key is not None:
                 full_key = f"{outer_key}[{quoted_key}]"

@@ -2,7 +2,7 @@ import datetime as dt
 
 import pytest
 
-from b24pysdk.bitrix_api.classes import BitrixAPITimeResponse
+from b24pysdk.bitrix_api.responses import BitrixAPITimeResponse
 
 
 def test_response_time_from_dict_and_to_dict():
@@ -28,5 +28,5 @@ def test_response_time_from_dict_and_to_dict():
 
     # Round-trip via to_dict
     d = rt.to_dict()
-    # dataclasses.asdict converts datetimes to isoformat? It preserves objects; check fields presence
+    # dataasdict converts datetimes to isoformat? It preserves objects; check fields presence
     assert set(d.keys()) >= {"start", "finish", "duration", "processing", "date_start", "date_finish"}

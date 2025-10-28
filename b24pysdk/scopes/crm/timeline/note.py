@@ -1,12 +1,13 @@
-from typing import TYPE_CHECKING, Text
+from typing import Text
 
-from ....bitrix_api.classes import BitrixAPIRequest
+from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
-from ..base_crm import BaseCRM
+from .._base_crm import BaseCRM
 
-if TYPE_CHECKING:
-    from .timeline import Timeline
+__all__ = [
+    "Note",
+]
 
 
 class Note(BaseCRM):
@@ -14,10 +15,6 @@ class Note(BaseCRM):
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/note/index.html
     """
-
-    def __init__(self, timeline: "Timeline"):
-        super().__init__(scope=timeline._scope)
-        self._path = self._get_path(timeline)
 
     @type_checker
     def get(
@@ -61,7 +58,7 @@ class Note(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.get,
+            api_wrapper=self.get,
             params=params,
             timeout=timeout,
         )
@@ -106,7 +103,7 @@ class Note(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.delete,
+            api_wrapper=self.delete,
             params=params,
             timeout=timeout,
         )
@@ -155,7 +152,7 @@ class Note(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.save,
+            api_wrapper=self.save,
             params=params,
             timeout=timeout,
         )

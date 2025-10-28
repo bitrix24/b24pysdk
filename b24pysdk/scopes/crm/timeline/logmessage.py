@@ -1,12 +1,13 @@
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
-from ....bitrix_api.classes import BitrixAPIRequest
+from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
-from ..base_crm import BaseCRM
+from .._base_crm import BaseCRM
 
-if TYPE_CHECKING:
-    from .timeline import Timeline
+__all__ = [
+    "Logmessage",
+]
 
 
 class Logmessage(BaseCRM):
@@ -14,10 +15,6 @@ class Logmessage(BaseCRM):
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/logmessage/index.html
     """
-
-    def __init__(self, timeline: "Timeline"):
-        super().__init__(timeline._scope)
-        self._path = self._get_path(timeline)
 
     @type_checker
     def add(
@@ -132,7 +129,7 @@ class Logmessage(BaseCRM):
             params["start"] = start
 
         return self._make_bitrix_api_request(
-            api_method=self.list,
+            api_wrapper=self.list,
             params=params,
             timeout=timeout,
         )

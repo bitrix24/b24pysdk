@@ -1,9 +1,13 @@
 from typing import Optional, Text
 
-from ....bitrix_api.classes import BitrixAPIRequest
+from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
-from ..item.details.base_configuration import BaseConfiguration
+from ..item.details.configuration.base_configuration import BaseConfiguration
+
+__all__ = [
+    "Configuration",
+]
 
 
 class Configuration(BaseConfiguration):

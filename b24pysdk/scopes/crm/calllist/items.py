@@ -1,12 +1,13 @@
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
-from ....bitrix_api.classes import BitrixAPIRequest
+from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
-from ..base_crm import BaseCRM
+from .._base_crm import BaseCRM
 
-if TYPE_CHECKING:
-    from .calllist import Calllist
+__all__ = [
+    "Items",
+]
 
 
 class Items(BaseCRM):
@@ -15,13 +16,10 @@ class Items(BaseCRM):
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/call-list/index.html
     """
 
-    def __init__(self, calllist: "Calllist"):
-        super().__init__(calllist._scope)
-        self._path = self._get_path(calllist)
-
     @type_checker
     def get(
             self,
+            *,
             list_id: int,
             filter: Optional[JSONDict] = None,
             timeout: Timeout = None,
@@ -51,7 +49,7 @@ class Items(BaseCRM):
             params["FILTER"] = filter
 
         return self._make_bitrix_api_request(
-            api_method=self.get,
+            api_wrapper=self.get,
             params=params,
             timeout=timeout,
         )

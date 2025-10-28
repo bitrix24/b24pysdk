@@ -1,7 +1,5 @@
 from typing import IO, Dict, Optional, Text, Tuple
 
-import requests
-
 from ...utils.types import JSONDict, Timeout
 from ..requesters import BitrixAPIRequester
 
@@ -15,14 +13,14 @@ def call(
         max_retries: Optional[int] = None,
         initial_retry_delay: Optional[float] = None,
         retry_delay_increment: Optional[float] = None,
-) -> requests.Response:
+) -> JSONDict:
     """
     Performs a call to the Bitrix API
 
     Args:
-        url: url to which the request should be sent
+        url: url to which the requests should be sent
         params: API method parameters
-        files: files attached to the request
+        files: files attached to the requests
         timeout: timeout in seconds
         max_retries: maximum number of retries that will occur when server is not responding
         initial_retry_delay: initial delay between retries in seconds
@@ -31,8 +29,8 @@ def call(
     Returns:
         Response returned by the API server
     Raises:
-            BitrixRequestError: if failed to establish HTTP connection
-            BitrixTimeout: if the request timed out
+        BitrixRequestError: if failed to establish HTTP connection
+        BitrixRequestTimeout: if the requests timed out
     """
     return BitrixAPIRequester(
         url=url,

@@ -1,6 +1,6 @@
 from typing import Any, Dict
 
-from b24pysdk.bitrix_api.classes.request.bitrix_api_request import BitrixAPIRequest
+from b24pysdk.bitrix_api.requests import BitrixAPIRequest
 
 
 class DummyToken:
@@ -38,7 +38,7 @@ def test_bitrix_api_request_deferred_call_and_result():
     assert req.result == {"a": 1}
     assert len(token.calls) == 1
 
-    # Accessing time uses cached response, no extra call
+    # Accessing time uses cached responses, no extra call
     _ = req.time
     assert len(token.calls) == 1
 

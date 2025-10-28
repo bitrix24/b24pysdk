@@ -1,9 +1,13 @@
 from typing import Iterable, Optional, Text
 
-from ...bitrix_api.classes import BitrixAPIRequest
+from ...bitrix_api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
-from .base_crm import BaseCRM
+from ._base_crm import BaseCRM
+
+__all__ = [
+    "Orderentity",
+]
 
 
 class Orderentity(BaseCRM):
@@ -135,7 +139,7 @@ class Orderentity(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.delete_by_filter,
+            api_wrapper=self.delete_by_filter,
             params=params,
             timeout=timeout,
         )
@@ -159,6 +163,6 @@ class Orderentity(BaseCRM):
             Instance of BitrixAPIRequest
         """
         return self._make_bitrix_api_request(
-            api_method=self.get_fields,
+            api_wrapper=self.get_fields,
             timeout=timeout,
         )

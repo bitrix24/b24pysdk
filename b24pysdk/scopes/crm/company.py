@@ -1,12 +1,17 @@
+from functools import cached_property
 from typing import Iterable, Optional, Text
 
-from ...bitrix_api.classes import BitrixAPIRequest
+from ...bitrix_api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
+from ._relationships import Contact
 from ._userfield import Userfield
-from .details.details import Details
+from .details import Details
 from .item.base_item import BaseItem
-from .relationships import Contact
+
+__all__ = [
+    "Company",
+]
 
 
 class Company(BaseItem):
@@ -16,22 +21,17 @@ class Company(BaseItem):
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/companies/index.html
     """
 
-    ENTITY_TYPE_ID = 4
-    ENTITY_TYPE_NAME = "COMPANY"
-    ENTITY_TYPE_ABBR = "CO"
-    USER_FIELD_ENTITY_ID = "CRM_COMPANY"
-
-    @property
+    @cached_property
     def contact(self) -> Contact:
         """"""
         return Contact(self)
 
-    @property
+    @cached_property
     def details(self) -> "Details":
         """"""
         return Details(self)
 
-    @property
+    @cached_property
     def userfield(self) -> Userfield:
         """"""
         return Userfield(self)

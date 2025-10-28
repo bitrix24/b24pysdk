@@ -1,9 +1,13 @@
 from typing import Optional
 
-from ...bitrix_api.classes import BitrixAPIRequest
+from ...bitrix_api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
-from .base_crm import BaseCRM
+from ._base_crm import BaseCRM
+
+__all__ = [
+    "Type",
+]
 
 
 class Type(BaseCRM):
@@ -105,7 +109,7 @@ class Type(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.get_by_entity_type_id,
+            api_wrapper=self.get_by_entity_type_id,
             params=params,
             timeout=timeout,
         )

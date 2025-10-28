@@ -1,19 +1,17 @@
-from typing import TYPE_CHECKING
+from functools import cached_property
 
-from ..scope import Scope
+from .._base_scope import BaseScope
 from .api import API
-
-if TYPE_CHECKING:
-    from ... import Client
 
 __all__ = [
     "Socialnetwork",
 ]
 
 
-class Socialnetwork(Scope):
+class Socialnetwork(BaseScope):
     """"""
 
-    def __init__(self, client: "Client"):
-        super().__init__(client)
-        self.api = API(self)
+    @cached_property
+    def api(self) -> API:
+        """"""
+        return API(self)

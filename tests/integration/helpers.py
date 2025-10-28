@@ -1,8 +1,9 @@
 import os
-from typing import Optional
+from typing import Optional, Text
 from urllib.parse import urlparse
 
 from b24pysdk import BitrixApp, BitrixToken, BitrixWebhook, Client
+from b24pysdk.bitrix_api.responses import BitrixAPIResponse
 
 WEBHOOK_PARTS_COUNT = 2
 
@@ -112,3 +113,21 @@ def make_client_from_env(prefer: str = "webhook") -> Client:
         except MissingCredentials as e:
             errors.append(str(e))
     raise MissingCredentials("; ".join(errors))
+
+
+def call_method(
+        client: Client,
+        api_method: Text,
+        *args,
+        **kwargs,
+) -> BitrixAPIResponse:
+    """"""
+
+    scope, *parts = api_method.split(".")
+
+    obj = getattr(client, scope)
+
+    for attr in parts:
+        obj = getattr(obj, attr)
+
+    return obj(*args, **kwargs).call()

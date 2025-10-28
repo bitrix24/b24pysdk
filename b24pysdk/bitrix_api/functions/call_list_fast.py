@@ -1,14 +1,12 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Callable, Dict, Final, Generator, Iterable, Optional, Text, Tuple, Union
+from typing import Callable, Dict, Final, Generator, Iterable, Literal, Optional, Text, Tuple, Union
 
 from ..._constants import MAX_BATCH_SIZE
-from ...utils.types import B24BatchRequestData, JSONDict, JSONList, Timeout
+from ...utils.types import B24BatchMethodTuple, JSONDict, JSONList, Timeout
+from ..protocols import BitrixTokenProtocol
 from ._base_caller import BaseCaller
 from .call_batch import call_batch
 from .call_method import call_method
-
-if TYPE_CHECKING:
-    from ..bitrix_token import AbstractBitrixToken
 
 
 class _ListFastCaller(BaseCaller):
@@ -68,7 +66,7 @@ class _ListFastCaller(BaseCaller):
             descending: bool = False,
             limit: Optional[int] = None,
             timeout: Timeout = None,
-            bitrix_token: Optional["AbstractBitrixToken"] = None,
+            bitrix_token: Optional["BitrixTokenProtocol"] = None,
             **kwargs,
     ):
         super().__init__(
@@ -125,7 +123,7 @@ class _ListFastCaller(BaseCaller):
         return order_pattern or self._DEFAULT_ORDER_PATTERN
 
     @property
-    def _cmp(self) -> Text:
+    def _cmp(self) -> Literal[">", "<"]:
         """"""
         return (">", "<")[self._descending]
 
@@ -140,7 +138,7 @@ class _ListFastCaller(BaseCaller):
         return f"{self._cmp}{self._dynamic_request_id_field}"
 
     @property
-    def _sorting(self) -> Text:
+    def _sorting(self) -> Literal["ASC", "DESC"]:
         """"""
         return ("ASC", "DESC")[self._descending]
 
@@ -247,15 +245,15 @@ class _ListFastCaller(BaseCaller):
             dict(start=self._START),
         )
 
-    def _generate_batch_methods(self) -> Dict[Text, B24BatchRequestData]:
+    def _generate_batch_methods(self) -> Dict[Text, B24BatchMethodTuple]:
         """
         Generates list of methods, using call_list_fast() api_method and params, adding filter by ID
 
         Returns:
-            dict of B24BatchRequestData, ready to be used by call_batches()
+            dict of B24BatchMethodTuple, ready to be used by call_batches()
         """
 
-        methods: Dict[Text, B24BatchRequestData] = dict()
+        methods: Dict[Text, B24BatchMethodTuple] = dict()
 
         for index in range(self._MAX_BATCH_SIZE):
             method_params = self._generate_method_params(index=index)
@@ -295,14 +293,14 @@ class _ListFastCaller(BaseCaller):
                 **self._kwargs,
         )
 
-    def _extract_response_id_field(self, result_value: JSONDict):
+    def _extract_response_id_field(self, result_value: JSONDict) -> Text:
         """"""
 
         for key in result_value:
             if key.upper() == self._DEFAULT_ID_FIELD:
                 return key
 
-        raise ValueError("ID key is not found in Bitrix response!")
+        raise ValueError("ID key is not found in Bitrix responses!")
 
     def _update_last_id(self, new_last_id: int):
         """"""
@@ -367,7 +365,7 @@ def call_list_fast(
         descending: bool = False,
         limit: Optional[int] = None,
         timeout: Timeout = None,
-        bitrix_token: Optional["AbstractBitrixToken"] = None,
+        bitrix_token: Optional["BitrixTokenProtocol"] = None,
         **kwargs,
 ) -> JSONDict:
     """

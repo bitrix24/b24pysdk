@@ -1,16 +1,16 @@
 from typing import Optional, Text
 
-from ..bitrix_api.classes import BitrixAPIRequest
+from ..bitrix_api.requests import BitrixAPIRequest
 from ..utils.functional import type_checker
 from ..utils.types import Timeout
-from .scope import Scope
+from ._base_scope import BaseScope
 
 __all__ = [
     "Department",
 ]
 
 
-class Department(Scope):
+class Department(BaseScope):
     """Class for managing departments.
 
     Documentation: https://apidocs.bitrix24.com/api-reference/departments/index.html
@@ -19,6 +19,7 @@ class Department(Scope):
     @type_checker
     def fields(
             self,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -36,7 +37,7 @@ class Department(Scope):
         """
 
         return self._make_bitrix_api_request(
-            api_method=self.fields,
+            api_wrapper=self.fields,
             timeout=timeout,
         )
 
@@ -45,6 +46,7 @@ class Department(Scope):
             self,
             name: Text,
             parent: int,
+            *,
             sort: Optional[int] = None,
             uf_head: Optional[int] = None,
             timeout: Timeout = None,
@@ -83,7 +85,7 @@ class Department(Scope):
             params["UF_HEAD"] = uf_head
 
         return self._make_bitrix_api_request(
-            api_method=self.add,
+            api_wrapper=self.add,
             params=params,
             timeout=timeout,
         )
@@ -91,6 +93,7 @@ class Department(Scope):
     @type_checker
     def get(
             self,
+            *,
             sort: Optional[Text] = None,
             order: Optional[Text] = None,
             bitrix_id: Optional[int] = None,
@@ -152,7 +155,7 @@ class Department(Scope):
             params["START"] = start
 
         return self._make_bitrix_api_request(
-            api_method=self.get,
+            api_wrapper=self.get,
             params=params,
             timeout=timeout,
         )
@@ -161,6 +164,7 @@ class Department(Scope):
     def update(
             self,
             bitrix_id: int,
+            *,
             name: Optional[Text] = None,
             sort: Optional[int] = None,
             parent: Optional[int] = None,
@@ -208,7 +212,7 @@ class Department(Scope):
             params["UF_HEAD"] = uf_head
 
         return self._make_bitrix_api_request(
-            api_method=self.update,
+            api_wrapper=self.update,
             params=params,
             timeout=timeout,
         )
@@ -217,6 +221,7 @@ class Department(Scope):
     def delete(
             self,
             bitrix_id: int,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -240,7 +245,7 @@ class Department(Scope):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.delete,
+            api_wrapper=self.delete,
             params=params,
             timeout=timeout,
         )

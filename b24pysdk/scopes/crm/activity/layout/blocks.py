@@ -1,12 +1,11 @@
-from typing import TYPE_CHECKING
-
-from .....bitrix_api.classes import BitrixAPIRequest
+from .....bitrix_api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
 from .....utils.types import JSONDict, Timeout
-from ...base_crm import BaseCRM
+from ..._base_crm import BaseCRM
 
-if TYPE_CHECKING:
-    from .layout import Layout
+__all__ = [
+    "Blocks",
+]
 
 
 class Blocks(BaseCRM):
@@ -14,10 +13,6 @@ class Blocks(BaseCRM):
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/layout-blocks/index.html
     """
-
-    def __init__(self, layout: "Layout"):
-        super().__init__(layout._scope)
-        self._path = self._get_path(layout)
 
     @type_checker
     def get(
@@ -55,7 +50,7 @@ class Blocks(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.get,
+            api_wrapper=self.get,
             params=params,
             timeout=timeout,
         )
@@ -99,7 +94,7 @@ class Blocks(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.set,
+            api_wrapper=self.set,
             params=params,
             timeout=timeout,
         )
@@ -140,7 +135,7 @@ class Blocks(BaseCRM):
         }
 
         return self._make_bitrix_api_request(
-            api_method=self.delete,
+            api_wrapper=self.delete,
             params=params,
             timeout=timeout,
         )

@@ -1,11 +1,16 @@
+from functools import cached_property
 from typing import Iterable, Optional, Text
 
-from ...bitrix_api.classes import BitrixAPIRequest
+from ...bitrix_api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
 from ._productrows import Productrows
 from ._userfield import Userfield
 from .item.base_item import BaseItem
+
+__all__ = [
+    "Quote",
+]
 
 
 class Quote(BaseItem):
@@ -14,17 +19,12 @@ class Quote(BaseItem):
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/quote/index.html
     """
 
-    ENTITY_TYPE_ID = 7
-    ENTITY_TYPE_NAME = "QUOTE"
-    ENTITY_TYPE_ABBR = "Q"
-    USER_FIELD_ENTITY_ID = "CRM_QUOTE"
-
-    @property
+    @cached_property
     def productrows(self) -> Productrows:
         """"""
         return Productrows(self)
 
-    @property
+    @cached_property
     def userfield(self) -> Userfield:
         """"""
         return Userfield(self)

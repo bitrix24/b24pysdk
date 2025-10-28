@@ -1,12 +1,13 @@
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
-from ....bitrix_api.classes import BitrixAPIRequest
+from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
-from ..base_crm import BaseCRM
+from .._base_crm import BaseCRM
 
-if TYPE_CHECKING:
-    from .item import Item
+__all__ = [
+    "Delivery",
+]
 
 
 class Delivery(BaseCRM):
@@ -14,10 +15,6 @@ class Delivery(BaseCRM):
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/delivery/index.html
     """
-
-    def __init__(self, item: "Item"):
-        super().__init__(item._scope)
-        self._path = self._get_path(item)
 
     @type_checker
     def get(
@@ -105,7 +102,7 @@ class Delivery(BaseCRM):
             params["order"] = order
 
         return self._make_bitrix_api_request(
-            api_method=self.list,
+            api_wrapper=self.list,
             params=params,
             timeout=timeout,
         )

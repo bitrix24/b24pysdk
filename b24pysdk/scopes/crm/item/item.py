@@ -1,6 +1,7 @@
+from functools import cached_property
 from typing import Iterable, Optional, Text
 
-from ....bitrix_api.classes import BitrixAPIRequest
+from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import B24Bool, JSONDict, Timeout
 from .base_item import BaseItem
@@ -17,23 +18,23 @@ class Item(BaseItem):
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/index.html
     """
 
-    @property
-    def delivery(self) -> "Delivery":
+    @cached_property
+    def delivery(self) -> Delivery:
         """"""
         return Delivery(self)
 
-    @property
-    def details(self) -> "Details":
+    @cached_property
+    def details(self) -> Details:
         """"""
         return Details(self)
 
-    @property
-    def payment(self) -> "Payment":
+    @cached_property
+    def payment(self) -> Payment:
         """"""
         return Payment(self)
 
-    @property
-    def productrow(self) -> "Productrow":
+    @cached_property
+    def productrow(self) -> Productrow:
         """"""
         return Productrow(self)
 
@@ -54,7 +55,7 @@ class Item(BaseItem):
         Args:
             entity_type_id: Identifier of the system or custom type whose element we want to retrieve;
 
-            use_original_uf_names: This parameter controls the format of custom field names in the response;
+            use_original_uf_names: This parameter controls the format of custom field names in the responses;
 
             timeout: Timeout in seconds.
 
@@ -84,7 +85,7 @@ class Item(BaseItem):
 
         To create an object, you need to pass the appropriate parameters, including the object type and its information: name, description, contact details, and other specifics.
 
-        Upon successful execution of the request, a new object is created.
+        Upon successful execution of the requests, a new object is created.
 
         Args:
             fields: Object format:
@@ -101,7 +102,7 @@ class Item(BaseItem):
 
             entity_type_id: Identifier of the system or user-defined type whose element we want to create;
 
-            use_original_uf_names: This parameter controls the format of custom field names in the response;
+            use_original_uf_names: This parameter controls the format of custom field names in the responses;
 
             timeout: Timeout in seconds.
 
@@ -135,7 +136,7 @@ class Item(BaseItem):
 
             entity_type_id: Identifier of the system or user-defined type whose item we want to retrieve;
 
-            use_original_uf_names: This parameter is used to control the format of custom field names in the response;
+            use_original_uf_names: This parameter is used to control the format of custom field names in the responses;
 
             timeout: Timeout in seconds.
 
@@ -202,7 +203,7 @@ class Item(BaseItem):
 
             start: This parameter is used to manage pagination;
 
-            use_original_uf_names: This parameter controls the format of user field names in the request and response;
+            use_original_uf_names: This parameter controls the format of user field names in the requests and responses;
 
             timeout: Timeout in seconds.
 
@@ -252,7 +253,7 @@ class Item(BaseItem):
 
             entity_type_id: Identifier of the system or user-defined type whose item we want to change;
 
-            use_original_uf_names: Parameter to control the format of custom field names in the request and response;
+            use_original_uf_names: Parameter to control the format of custom field names in the requests and responses;
 
             timeout: Timeout in seconds.
 
@@ -333,7 +334,7 @@ class Item(BaseItem):
 
             entity_type_id: Identifier of the system or custom type for which the item needs to be created;
 
-            use_original_uf_names: Parameter to control the format of custom field names in the request and response;
+            use_original_uf_names: Parameter to control the format of custom field names in the requests and responses;
 
             timeout: Timeout in seconds.
 
@@ -350,7 +351,7 @@ class Item(BaseItem):
             params["useOriginalUfNames"] = B24Bool(use_original_uf_names).to_str()
 
         return self._make_bitrix_api_request(
-            api_method=self.import_,
+            api_wrapper=self.import_,
             params=params,
             timeout=timeout,
         )
@@ -375,7 +376,7 @@ class Item(BaseItem):
 
             entity_type_id: Identifier of the system or custom type for which the item needs to be created;
 
-            use_original_uf_names: Parameter to control the format of custom field names in the request and response;
+            use_original_uf_names: Parameter to control the format of custom field names in the requests and responses;
 
             timeout: Timeout in seconds.
 
@@ -395,7 +396,7 @@ class Item(BaseItem):
             params["useOriginalUfNames"] = B24Bool(use_original_uf_names).to_str()
 
         return self._make_bitrix_api_request(
-            api_method=self.batch_import,
+            api_wrapper=self.batch_import,
             params=params,
             timeout=timeout,
         )

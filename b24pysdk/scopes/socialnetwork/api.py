@@ -1,11 +1,17 @@
-from ..base import Base
+from functools import cached_property
+
+from .._base_entity import BaseEntity
 from .workgroup import Workgroup
 
+__all__ = [
+    "API",
+]
 
-class API(Base):
+
+class API(BaseEntity):
     """"""
 
-    @property
+    @cached_property
     def workgroup(self) -> Workgroup:
         """"""
         return Workgroup(self)
