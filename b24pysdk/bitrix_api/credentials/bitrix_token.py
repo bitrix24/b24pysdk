@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 from functools import cached_property, wraps
 from typing import TYPE_CHECKING, Callable, Dict, Final, Mapping, Optional, Sequence, Text, overload
 
@@ -26,7 +25,7 @@ def _bitrix_app_required(func: Callable):
     return wrapper
 
 
-class AbstractBitrixToken(ABC):
+class AbstractBitrixToken:
     """"""
 
     _AUTO_REFRESH: bool = True
@@ -50,43 +49,8 @@ class AbstractBitrixToken(ABC):
     portal_domain_changed_signal: BitrixSignalInstance = BitrixSignalInstance.create_signal(PortalDomainChangedEvent)
     """"""
 
-    @abstractmethod
-    def __init__(self, *args, **kwargs):
-        """"""
-        super().__init__(*args, **kwargs)
-
     def __str__(self):
         return f"<{'Webhook' if self.is_webhook else 'Application'} token of portal {self.domain}>"
-
-    @classmethod
-    def from_renewed_oauth_token(
-            cls,
-            renewed_oauth_token: "RenewedOAuthToken",
-            bitrix_app: "AbstractBitrixApp",
-    ) -> "AbstractBitrixToken":
-        """"""
-        oauth_token = renewed_oauth_token.oauth_token
-        return cls(
-            domain=renewed_oauth_token.portal_domain,
-            auth_token=oauth_token.access_token,
-            refresh_token=oauth_token.refresh_token,
-            bitrix_app=bitrix_app,
-        )
-
-    @classmethod
-    def from_oauth_placement_data(
-            cls,
-            oauth_placement_data: "OAuthPlacementData",
-            bitrix_app: "AbstractBitrixApp",
-    ) -> "AbstractBitrixToken":
-        """"""
-        oauth_token = oauth_placement_data.oauth_token
-        return cls(
-            domain=oauth_placement_data.domain,
-            auth_token=oauth_token.access_token,
-            refresh_token=oauth_token.refresh_token,
-            bitrix_app=bitrix_app,
-        )
 
     @property
     def is_webhook(self) -> bool:
@@ -356,7 +320,7 @@ class AbstractBitrixToken(ABC):
         )
 
 
-class AbstractBitrixTokenLocal(AbstractBitrixToken, ABC):
+class AbstractBitrixTokenLocal(AbstractBitrixToken):
     """"""
 
     bitrix_app: AbstractBitrixAppLocal
@@ -371,34 +335,6 @@ class AbstractBitrixTokenLocal(AbstractBitrixToken, ABC):
     def domain(self, domain: Text):
         """"""
         self.bitrix_app.domain = domain
-
-    @classmethod
-    def from_renewed_oauth_token(
-            cls,
-            renewed_oauth_token: "RenewedOAuthToken",
-            bitrix_app: "AbstractBitrixAppLocal",
-    ) -> "AbstractBitrixTokenLocal":
-        """"""
-        oauth_token = renewed_oauth_token.oauth_token
-        return cls(
-            auth_token=oauth_token.access_token,
-            refresh_token=oauth_token.refresh_token,
-            bitrix_app=bitrix_app,
-        )
-
-    @classmethod
-    def from_oauth_placement_data(
-            cls,
-            oauth_placement_data: "OAuthPlacementData",
-            bitrix_app: "AbstractBitrixAppLocal",
-    ) -> "AbstractBitrixTokenLocal":
-        """"""
-        oauth_token = oauth_placement_data.oauth_token
-        return cls(
-            auth_token=oauth_token.access_token,
-            refresh_token=oauth_token.refresh_token,
-            bitrix_app=bitrix_app,
-        )
 
 
 class BitrixToken(AbstractBitrixToken):
@@ -417,6 +353,36 @@ class BitrixToken(AbstractBitrixToken):
         self.refresh_token = refresh_token
         self.bitrix_app = bitrix_app
 
+    @classmethod
+    def from_renewed_oauth_token(
+            cls,
+            renewed_oauth_token: "RenewedOAuthToken",
+            bitrix_app: "AbstractBitrixApp",
+    ) -> "BitrixToken":
+        """"""
+        oauth_token = renewed_oauth_token.oauth_token
+        return cls(
+            domain=renewed_oauth_token.portal_domain,
+            auth_token=oauth_token.access_token,
+            refresh_token=oauth_token.refresh_token,
+            bitrix_app=bitrix_app,
+        )
+
+    @classmethod
+    def from_oauth_placement_data(
+            cls,
+            oauth_placement_data: "OAuthPlacementData",
+            bitrix_app: "AbstractBitrixApp",
+    ) -> "BitrixToken":
+        """"""
+        oauth_token = oauth_placement_data.oauth_token
+        return cls(
+            domain=oauth_placement_data.domain,
+            auth_token=oauth_token.access_token,
+            refresh_token=oauth_token.refresh_token,
+            bitrix_app=bitrix_app,
+        )
+
 
 class BitrixTokenLocal(AbstractBitrixTokenLocal):
     """"""
@@ -431,6 +397,34 @@ class BitrixTokenLocal(AbstractBitrixTokenLocal):
         self.auth_token = auth_token
         self.refresh_token = refresh_token
         self.bitrix_app = bitrix_app
+
+    @classmethod
+    def from_renewed_oauth_token(
+            cls,
+            renewed_oauth_token: "RenewedOAuthToken",
+            bitrix_app: "AbstractBitrixAppLocal",
+    ) -> "BitrixTokenLocal":
+        """"""
+        oauth_token = renewed_oauth_token.oauth_token
+        return cls(
+            auth_token=oauth_token.access_token,
+            refresh_token=oauth_token.refresh_token,
+            bitrix_app=bitrix_app,
+        )
+
+    @classmethod
+    def from_oauth_placement_data(
+            cls,
+            oauth_placement_data: "OAuthPlacementData",
+            bitrix_app: "AbstractBitrixAppLocal",
+    ) -> "BitrixTokenLocal":
+        """"""
+        oauth_token = oauth_placement_data.oauth_token
+        return cls(
+            auth_token=oauth_token.access_token,
+            refresh_token=oauth_token.refresh_token,
+            bitrix_app=bitrix_app,
+        )
 
 
 class BitrixWebhook(BitrixToken):

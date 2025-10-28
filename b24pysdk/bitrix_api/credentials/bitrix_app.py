@@ -1,11 +1,10 @@
-from abc import ABC, abstractmethod
 from typing import Text
 
 from ..requesters import BitrixOAuthRequester
 from .renewed_oauth_token import RenewedOAuthToken
 
 
-class AbstractBitrixApp(ABC):
+class AbstractBitrixApp:
     """"""
 
     client_id: Text = NotImplemented
@@ -13,11 +12,6 @@ class AbstractBitrixApp(ABC):
 
     client_secret: Text = NotImplemented
     """"""
-
-    @abstractmethod
-    def __init__(self, *args, **kwargs):
-        """"""
-        super().__init__(*args, **kwargs)
 
     @property
     def is_local(self) -> bool:
@@ -33,7 +27,7 @@ class AbstractBitrixApp(ABC):
         return RenewedOAuthToken.from_dict(BitrixOAuthRequester(self).refresh_oauth_token(refresh_token))
 
 
-class AbstractBitrixAppLocal(AbstractBitrixApp, ABC):
+class AbstractBitrixAppLocal(AbstractBitrixApp):
     """"""
 
     domain: Text
@@ -63,7 +57,6 @@ class BitrixAppLocal(AbstractBitrixAppLocal):
             client_id: Text,
             client_secret: Text,
     ):
-
         self.domain = domain
         self.client_id = client_id
         self.client_secret = client_secret
