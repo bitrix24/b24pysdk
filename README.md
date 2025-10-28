@@ -28,6 +28,18 @@ Install from PyPI:
 pip install b24pysdk
 ```
 
+## Migration from b24pysdk v0.1.0a1 to v0.2.0a1
+
+If you started using the library with version 0.1.0a1, the following notes describe the key differences you need to account for when upgrading:
+
+1. If you used `BitrixTimeout` or `BitrixOAuthTimeout`, make sure to update them to their new names — `BitrixRequestTimeout` and `BitrixOAuthRequestTimeout` respectively.
+2. When using the Config class, you should now pass arguments with the `default_` prefix, such as `default_initial_retry_delay` or `default_max_retries`.
+3. The `B24BoolStr` class has been removed from `b24pysdk.utils.types`. Use `B24BoolLit` from `b24pysdk.constants` instead.
+4. The `B24BatchMethodTuple` help type has been added to `b24pysdk.utils.types` instead `B24BatchRequestData`.
+5. The Requests and Responses classes are now available under the following paths:
+   - `from b24pysdk.bitrix_api.requests import *`
+   - `from b24pysdk.bitrix_api.responses import *`
+
 ### Test environment (Docker-only, no local installs)
 
 Local development and tests run inside Docker containers only. Nothing is installed to your host Python.
@@ -277,29 +289,35 @@ You can tweak default timeouts and retry behavior using `Config`:
 
 ```python
 from b24pysdk import Config
+from b24pysdk.log import StreamLogger 
+
+logger = StreamLogger()
 
 cfg = Config()
-cfg.default_timeout = 30            # seconds or (connect_timeout, read_timeout)
-cfg.max_retries = 3                 # number of retries on transient errors
-cfg.initial_retry_delay = 0.5       # seconds
-cfg.retry_delay_increment = 0.5     # seconds
+cfg.configure(
+    default_timeout=10,                 # seconds or (connect_timeout, read_timeout)
+    default_max_retries=3,              # number of retries on transient errors
+    default_initial_retry_delay=1,    # seconds
+    default_retry_delay_increment=0,  # seconds
+    logger=logger,                     
+)
 ```
 
 ### Error handling
 
 Common exceptions you may want to handle:
 
-- `BitrixRequestError` / `BitrixTimeout`: network and timeout issues
+- `BitrixRequestError` / `BitrixRequestTimeout`: network and timeout issues
 - `BitrixAPIError`: API responded with an error (check `error` and `error_description`)
 - `BitrixAPIExpiredToken`: access token expired; for `BitrixToken` B24PySDK can auto-refresh
 
 ```python
-from b24pysdk.error import BitrixAPIError, BitrixTimeout
+from b24pysdk.error import BitrixAPIError, BitrixRequestTimeout
 
 try:
     request = client.crm.deal.get(bitrix_id=2)
     print(request.result)
-except BitrixTimeout:
+except BitrixRequestTimeout:
     # retry or log
     pass
 except BitrixAPIError as e:
@@ -313,134 +331,32 @@ When using these abstract classes, the programmer is responsible for declaring t
 
 Examples of the available abstract classes are `AbstractBitrixApp`, `AbstractBitrixAppLocal`, `AbstractBitrixToken` and `AbstractBitrixTokenLocal`.
 
+- AbstractBitrixApp: This class serves as the foundational blueprint for all Bitrix applications within the library. It outlines the essential credentials such as client_id and client_secret, which are crucial for authenticating applications with Bitrix24. By abstracting these components, it allows developers to focus on building their application logic while ensuring adherence to necessary authentication protocols.
+- AbstractBitrixAppLocal: An extension of the AbstractBitrixApp, this class incorporates additional support specific to applications running within a predefined domain. This class is tailored to manage local instances of Bitrix applications, encapsulating both global application behavior and domain-specific settings, thereby streamlining application setup within a specific environment.
+- AbstractBitrixToken: This class is designed to handle the complexities of managing authentication tokens for Bitrix24 API access. It provides a robust interface for ensuring tokens are current and valid, offering capabilities to automatically refresh them as needed. This abstraction allows for seamless API interaction; developers can make authenticated requests without delving into the intricacies of token lifecycle management.
+- AbstractBitrixTokenLocal: Building on AbstractBitrixToken, this class adapts token management to work in tandem with local Bitrix applications. It ensures that token operations are tightly integrated with the domain-specific applications represented by AbstractBitrixAppLocal. The focus here is to facilitate a smooth, localized experience when managing authentication and interaction with Bitrix24 services, ensuring that both token and application settings are synchronized within a local context.
 
-## Use Cases
 
-### Add (Create a Record)
+## Events subscription
 
-You can add any Bitrix24 entity like CRM deals, user records, etc.
-Example: Adding a new deal in CRM
+Sometimes, when working with Bitrix24 through the SDK, it is necessary to react to internal changes within the client — for example, when an OAuth token expires and the SDK automatically obtains a new one, or when the Bitrix24 portal domain changes (which may happen if the portal is moved to another subdomain).
 
-```python
-deal_data = {
-                "TITLE":"New Deal #1",
-                "TYPE_ID":"COMPLEX",
-                "CATEGORY_ID":0,
-                "STAGE_ID":"PREPARATION",
-                "IS_RECURRING":"N",
-                "IS_RETURN_CUSTOMER":"Y",
-                "IS_REPEATED_APPROACH":"Y",
-                "PROBABILITY":99,
-                "CURRENCY_ID":"EUR",
-                "OPPORTUNITY":1000000,
-                "IS_MANUAL_OPPORTUNITY":"Y",
-                "TAX_VALUE":0.10,
-                "COMPANY_ID":9,
-                "CONTACT_IDS":[84,83],
-                "OPENED":"Y",
-                "CLOSED":"N",
-                "COMMENTS":"Example comment",
-                "SOURCE_ID":"CALLBACK",
-                "SOURCE_DESCRIPTION":"Additional information about the source",
-                "ADDITIONAL_INFO":"Additional information",
-                "UTM_SOURCE":"google",
-                "UTM_MEDIUM":"CPC",
-                "PARENT_ID_1220":22,
-                "UF_CRM_1721244482250":"Hello world!"
-            }
-request = client.crm.deal.add(fields=deal_data)
-print("Id: ", request.result)
-```
+To handle such situations, the SDK provides an **event mechanism** that allows you to subscribe to and process specific events.
 
-### Get (Retrieve a Record)
+There are two key events you can listen to:
 
-With get method you can fetch details for a specific entity by ID or unique key and get its field values.
-Example: Retrieve specific deal details
+* **`OAuthTokenRenewedEvent`** — triggered when the authorization token (`access_token`) has been refreshed. This can be useful if you need to persist the new token in your database or logs.
 
-```python
-request = client.crm.deal.get(bitrix_id=5)
-deal_info = request.result
-print(deal_info["TITLE"], deal_info["STAGE_ID"])
-```
+* **`PortalDomainChangedEvent`** — triggered when the Bitrix24 portal domain has changed (for example, from `example.bitrix24.com` to `newexample.bitrix24.com`). This event can be used to update your application configuration or notify users about the domain change.
 
-### Fields
+## Logging Utilities
 
-There is a method .fields() that provides fields of entities.
-Example: Get a lable of the userfield.
+The log module within the b24pysdk offers a suite of logging utilities designed to facilitate seamless integration with logging frameworks. It includes different logger implementations to cater to various logging needs:
 
-```python
-request = client.crm.deal.fields()
-fields = request.result
-print(fields["UF_CRM_1758877091066"]["listLabel"])
-```
+- `AbstractLogger`: Defines the interface for all logger implementations, ensuring a consistent logging strategy across different modules.
+- `BaseLogger`: Provides a fundamental implementation of the logging interface, offering a starting point for creating custom loggers.
+- `NullLogger`: Implements a no-op logger that can be used in environments where logging is not required, effectively silencing all log outputs.
+- `StreamLogger`: A concrete implementation for sending log outputs directly to the console or other stream handlers, useful for real-time log monitoring.
 
-### Update
 
-Modify details of a specific entity by ID.
-Example: Update a deal's title and move to another stage
-
-```python
-update_data = {"TITLE":"New deal title!", "STAGE_ID":"WON",}
-request = client.crm.deal.update(bitrix_id=5, fields=update_data)
-if request.result:
-    print("Deal updated successfully.")
-```
-
-### Delete
-
-To remove an entity permanently from the records you can use method .delete().
-Example: Delete a particular deal
-
-```python
-request = client.crm.deal.delete(bitrix_id=5)
-if request.result:
-    print("Deal deleted successfully.")
-```
-
-### Handling lists
-#### .list()
-
-Retrieve up to 50 deals with optional filters.
-Example: Obtain a list of CRM deals on 
-
-```python
-select = ["ID","TITLE","TYPE_ID","CATEGORY_ID","STAGE_ID","OPPORTUNITY","IS_MANUAL_OPPORTUNITY","ASSIGNED_BY_ID","DATE_CREATE"]
-filter = {
-            "=%TITLE":"%a","CATEGORY_ID":1,
-            "TYPE_ID":"COMPLEX",
-            "STAGE_ID":"C1:NEW",">OPPORTUNITY":10000,
-            "<=OPPORTUNITY":20000,
-            "IS_MANUAL_OPPORTUNITY":"Y"
-        }
-order = {
-            "TITLE":"ASC",
-            "OPPORTUNITY":"ASC"
-        }
-request = client.crm.deal.list(select=select, filter=filter, order=order)
-deals = request.result
-print(deals)
-```
-
-#### .as_list()
-
-Retrieve all pages of a list request.
-Example: Retrieve more than 50 deals.
-
-```python
-request = client.crm.deal.list()
-all_deals = request.as_list().result
-for deal in all_deals:
-    print(deal["TITLE"])
-```
-
-#### .as_list_fast()
-
-Optimized retrieval for very large datasets that returns generator for working with the result.
-Example: Efficiently retrieve a large dataset of deals.
-
-```python
-request = client.crm.deal.list()
-deal_iterator = request.as_list_fast().result
-for deal in deal_iterator:
-    print(deal["TITLE"])
-```
+The logging utilities in b24pysdk enhance observability into API interactions, error tracking, and performance monitoring by offering detailed and configurable logging options. The modular design allows developers to customize and extend the logging functionalities as needed.
