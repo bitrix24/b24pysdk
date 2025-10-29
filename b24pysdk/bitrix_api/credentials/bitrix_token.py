@@ -1,4 +1,4 @@
-from functools import cached_property, wraps
+from functools import wraps
 from typing import TYPE_CHECKING, Any, Callable, Dict, Final, Mapping, Optional, Sequence, Text, overload
 
 from ..._config import Config
@@ -68,7 +68,7 @@ class AbstractBitrixToken:
             bitrix_token=self,
         )
 
-    @cached_property
+    @property
     def _config(self):
         return Config()
 
