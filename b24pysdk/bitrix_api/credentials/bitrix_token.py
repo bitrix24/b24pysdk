@@ -1,5 +1,5 @@
 from functools import cached_property, wraps
-from typing import TYPE_CHECKING, Callable, Dict, Final, Mapping, Optional, Sequence, Text, overload
+from typing import TYPE_CHECKING, Any, Callable, Dict, Final, Mapping, Optional, Sequence, Text, overload
 
 from ..._config import Config
 from ...error import BitrixAPIExpiredToken, BitrixResponse302JSONDecodeError
@@ -100,7 +100,7 @@ class AbstractBitrixToken:
     @_bitrix_app_required
     def get_app_info(self) -> "BitrixAppInfoResponse":
         """"""
-        return self._execute_with_retries(self.bitrix_app.get_app_info, self.auth_token)
+        return self._execute_with_retries(lambda: self.bitrix_app.get_app_info(self.auth_token))
 
     def _refresh_and_set_oauth_token(self):
         """"""
@@ -127,29 +127,23 @@ class AbstractBitrixToken:
 
         return True
 
-    def _execute_with_retries(self, func: Callable, *args, **kwargs):
+    def _execute_with_retries(self, call_func: Callable[[], Any]):
         """"""
 
         try:
-            return func(*args, **kwargs)
+            return call_func()
 
         except BitrixResponse302JSONDecodeError as error:
             if self._check_and_change_domain(error.new_domain):
                 self._config.logger.info(
                     "Domain changed, retrying request",
-                    context=dict(
-                        old_domain=self.domain,
-                        new_domain=error.new_domain,
-                    ),
+                    context=dict(old_domain=self.domain, new_domain=error.new_domain),
                 )
-                return func(*args, **kwargs)
+                return call_func()
             else:
                 self._config.logger.warning(
                     "Caught BitrixResponse302JSONDecodeError, but domain did not change!",
-                    context=dict(
-                        old_domain=self.domain,
-                        new_domain=error.new_domain,
-                    ),
+                    context=dict(old_domain=self.domain, new_domain=error.new_domain),
                 )
                 raise
 
@@ -157,32 +151,20 @@ class AbstractBitrixToken:
             if self._AUTO_REFRESH and not self.is_webhook:
                 self._config.logger.info(
                     "Token expired, auto-refreshing token",
-                    context=dict(
-                        domain=self.domain,
-                        auto_refresh=self._AUTO_REFRESH,
-                        is_webhook=self.is_webhook,
-                    ),
+                    context=dict(domain=self.domain, auto_refresh=self._AUTO_REFRESH, is_webhook=self.is_webhook),
                 )
                 self._refresh_and_set_oauth_token()
-                return func(*args, **kwargs)
+                return call_func()
             else:
                 self._config.logger.warning(
                     "Token expired, but auto-refresh disabled!",
-                    context=dict(
-                        domain=self.domain,
-                        is_webhook=self.is_webhook,
-                        auto_refresh=self._AUTO_REFRESH,
-                    ),
+                    context=dict(domain=self.domain, auto_refresh=self._AUTO_REFRESH, is_webhook=self.is_webhook),
                 )
                 raise
 
     def _call_with_retries(self, call_func: Callable, parameters: Dict) -> JSONDict:
         """"""
-        return self._execute_with_retries(
-            call_func,
-            **self._auth_data,
-            **parameters,
-        )
+        return self._execute_with_retries(lambda: call_func(**self._auth_data, **parameters))
 
     def call_method(
             self,
