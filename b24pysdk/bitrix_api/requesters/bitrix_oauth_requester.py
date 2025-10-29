@@ -1,5 +1,4 @@
-from functools import wraps
-from typing import Callable, Dict, Final, Optional, Text
+from typing import Dict, Final, Optional, Text
 
 import requests
 
@@ -16,16 +15,6 @@ from ..protocols import BitrixOAuthProtocol
 from ._base_requester import BaseRequester
 
 
-def _bitrix_oauth_required(func: Callable):
-    """"""
-    @wraps(func)
-    def wrapper(self: "BitrixOAuthRequester", *args, **kwargs):
-        if not getattr(self, "_bitrix_oauth", None):
-            raise AttributeError("'bitrix_oauth' is not defined")
-        return func(self, *args, **kwargs)
-    return wrapper
-
-
 class BitrixOAuthRequester(BaseRequester):
     """"""
 
@@ -39,7 +28,7 @@ class BitrixOAuthRequester(BaseRequester):
 
     def __init__(
             self,
-            bitrix_oauth: Optional[BitrixOAuthProtocol] = None,
+            bitrix_oauth: BitrixOAuthProtocol,
             *,
             timeout: Timeout = None,
             max_retries: Optional[int] = None,
@@ -92,7 +81,6 @@ class BitrixOAuthRequester(BaseRequester):
         except BitrixAPIInsufficientScope as error:
             raise BitrixOAuthInsufficientScope(response=error.response, json_response=error.json_response) from error
 
-    @_bitrix_oauth_required
     def get_oauth_token(self, code: Text) -> JSONDict:
         """"""
 
@@ -105,7 +93,6 @@ class BitrixOAuthRequester(BaseRequester):
 
         return self._parse_response(self._get(url=self._OUATH_URL, params=params))
 
-    @_bitrix_oauth_required
     def refresh_oauth_token(self, refresh_token: Text) -> JSONDict:
         """"""
 

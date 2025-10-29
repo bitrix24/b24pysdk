@@ -5,7 +5,7 @@ from ..responses import B24APIBatchResult, BitrixAPIBatchResponse
 from .bitrix_api_request import BitrixAPIRequest
 
 if TYPE_CHECKING:
-    from ..bitrix_token import AbstractBitrixToken
+    from ..credentials import AbstractBitrixToken
 
 
 class BitrixAPIBatchesRequest(BitrixAPIRequest):

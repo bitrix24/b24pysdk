@@ -43,7 +43,10 @@ class OAuthPlacementData:
             member_id = placement_data["member_id"]
             status = B24AppStatus(placement_data["status"])
             placement = placement_data.get("PLACEMENT")
-            placement_options = placement_data.get("PLACEMENT_OPTIONS") and json.loads(placement_data["PLACEMENT_OPTIONS"])
+            placement_options = placement_data.get("PLACEMENT_OPTIONS")
+
+            if placement_options and isinstance(placement_options, str):
+                placement_options = json.loads(placement_options)
 
             return cls(
                 oauth_token=oauth_token,

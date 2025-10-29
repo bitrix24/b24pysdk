@@ -11,6 +11,7 @@ from .bitrix_app import AbstractBitrixApp, AbstractBitrixAppLocal
 from .oauth_token import OAuthToken
 
 if TYPE_CHECKING:
+    from ..responses import BitrixAppInfoResponse
     from .oauth_placememt_data import OAuthPlacementData
     from .renewed_oauth_token import RenewedOAuthToken
 
@@ -20,7 +21,7 @@ def _bitrix_app_required(func: Callable):
     @wraps(func)
     def wrapper(self: "AbstractBitrixToken", *args, **kwargs):
         if not getattr(self, "bitrix_app", None):
-            raise AttributeError(f"'bitrix_app' is not defined for token of portal {self.domain}")
+            raise AttributeError(f"'bitrix_app' is not defined for {self}")
         return func(self, *args, **kwargs)
     return wrapper
 
@@ -40,7 +41,7 @@ class AbstractBitrixToken:
     refresh_token: Optional[Text] = NotImplemented
     """"""
 
-    bitrix_app: Optional[AbstractBitrixApp] = NotImplemented
+    bitrix_app: Optional[AbstractBitrixApp]
     """"""
 
     oauth_token_renewed_signal: BitrixSignalInstance = BitrixSignalInstance.create_signal(OAuthTokenRenewedEvent)
@@ -96,6 +97,11 @@ class AbstractBitrixToken:
         """"""
         return self.bitrix_app.refresh_oauth_token(refresh_token=self.refresh_token)
 
+    @_bitrix_app_required
+    def get_app_info(self) -> "BitrixAppInfoResponse":
+        """"""
+        return self._execute_with_retries(self.bitrix_app.get_app_info, self.auth_token)
+
     def _refresh_and_set_oauth_token(self):
         """"""
 
@@ -121,15 +127,11 @@ class AbstractBitrixToken:
 
         return True
 
-    def _call_with_retries(
-            self,
-            call_func: Callable,
-            parameters: Dict,
-    ) -> JSONDict:
+    def _execute_with_retries(self, func: Callable, *args, **kwargs):
         """"""
 
         try:
-            return call_func(**self._auth_data, **parameters)
+            return func(*args, **kwargs)
 
         except BitrixResponse302JSONDecodeError as error:
             if self._check_and_change_domain(error.new_domain):
@@ -140,7 +142,7 @@ class AbstractBitrixToken:
                         new_domain=error.new_domain,
                     ),
                 )
-                return call_func(**self._auth_data, **parameters)
+                return func(*args, **kwargs)
             else:
                 self._config.logger.warning(
                     "Caught BitrixResponse302JSONDecodeError, but domain did not change!",
@@ -162,7 +164,7 @@ class AbstractBitrixToken:
                     ),
                 )
                 self._refresh_and_set_oauth_token()
-                return call_func(**self._auth_data, **parameters)
+                return func(*args, **kwargs)
             else:
                 self._config.logger.warning(
                     "Token expired, but auto-refresh disabled!",
@@ -173,6 +175,14 @@ class AbstractBitrixToken:
                     ),
                 )
                 raise
+
+    def _call_with_retries(self, call_func: Callable, parameters: Dict) -> JSONDict:
+        """"""
+        return self._execute_with_retries(
+            call_func,
+            **self._auth_data,
+            **parameters,
+        )
 
     def call_method(
             self,

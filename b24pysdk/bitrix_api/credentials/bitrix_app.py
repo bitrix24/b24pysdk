@@ -1,6 +1,7 @@
 from typing import Text
 
 from ..requesters import BitrixOAuthRequester
+from ..responses import BitrixAppInfoResponse
 from .renewed_oauth_token import RenewedOAuthToken
 
 
@@ -25,6 +26,10 @@ class AbstractBitrixApp:
     def refresh_oauth_token(self, refresh_token: Text) -> RenewedOAuthToken:
         """"""
         return RenewedOAuthToken.from_dict(BitrixOAuthRequester(self).refresh_oauth_token(refresh_token))
+
+    def get_app_info(self, auth_token: Text) -> BitrixAppInfoResponse:
+        """"""
+        return BitrixAppInfoResponse.from_dict(BitrixOAuthRequester(self).get_app_info(auth_token))
 
 
 class AbstractBitrixAppLocal(AbstractBitrixApp):
