@@ -40,31 +40,9 @@ jobs:
           ruff --version
           ruff check .
 
-      - name: Detect changed paths
-        id: filter
-        uses: dorny/paths-filter@v3.0.2
-        with:
-          filters: |
-            scope_crm:
-              - 'b24pysdk/scopes/crm/**'
-              - 'tests/integration/crm/**'
-            scope_user:
-              - 'b24pysdk/scopes/user/**'
-              - 'tests/integration/user/**'
-
-      - name: Run crm tests
-        if: ${{ steps.filter.outputs.scope_crm == 'true' }}
+      - name: Run unit tests
         run: |
-          pytest tests/integration/crm/ -v  --disable-warnings --maxfail=1
-
-      - name: Run user tests
-        if: ${{ steps.filter.outputs.scope_user == 'true' }}
-        run: |
-          pytest tests/integration/user/ -v  --disable-warnings --maxfail=1
-
-      - name: Run mandatory tests
-        run: |
-          pytest tests/ --ignore=tests/integration/ -v --disable-warnings --maxfail=1
+          pytest tests -m "unit"
 
   docker-ci:
     runs-on: ubuntu-latest
@@ -91,33 +69,138 @@ jobs:
           filters: |
             scope_crm:
               - 'b24pysdk/scopes/crm/**'
-              - 'tests/integration/crm/**'
+              - 'tests/integration/scopes/crm/**'
             scope_user:
               - 'b24pysdk/scopes/user/**'
-              - 'tests/integration/user/**'
+              - 'tests/integration/scopes/user/**'
+            scope_access:
+              - 'b24pysdk/scopes/access.py'
+              - 'tests/integration/scopes/test_access.py'
+            scope_department:
+              - 'b24pysdk/scopes/department.py'
+              - 'tests/integration/scopes/test_department.py'
+            scope_events:
+              - 'b24pysdk/scopes/events.py'
+              - 'tests/integration/scopes/test_events.py'
+            scope_feature:
+              - 'b24pysdk/scopes/feature.py'
+              - 'tests/integration/scopes/test_feature.py'
+            scope_method:
+              - 'b24pysdk/scopes/method.py'
+              - 'tests/integration/scopes/test_method.py'
+            scope_profile:
+              - 'b24pysdk/scopes/profile.py'
+              - 'tests/integration/scopes/test_profile.py'
+            scope_scope:
+              - 'b24pysdk/scopes/scope.py'
+              - 'tests/integration/scopes/scope_profile.py'
+            scope_server:
+              - 'b24pysdk/scopes/server.py'
+              - 'tests/integration/scopes/test_server.py'
 
-      - name: Run crm tests in Docker
+      - name: Run scope crm tests in Docker
         if: ${{ steps.filter.outputs.scope_crm == 'true' }}
         run: |
           docker run --rm \
             -e B24_DOMAIN=$B24_DOMAIN \
             -e B24_WEBHOOK=$B24_WEBHOOK \
             b24pysdk-ci \
-            pytest tests/integration/crm/ -v --disable-warnings --maxfail=1
+            pytest -m "crm"
 
-      - name: Run user tests in Docker
+      - name: Run scope user tests in Docker
         if: ${{ steps.filter.outputs.scope_user == 'true' }}
         run: |
           docker run --rm \
             -e B24_DOMAIN=$B24_DOMAIN \
             -e B24_WEBHOOK=$B24_WEBHOOK \
             b24pysdk-ci \
-            pytest tests/integration/user/ -v --disable-warnings --maxfail=1
+            pytest -m "user"
 
-      - name: Run mandatory tests in Docker
+      - name: Run scope access tests in Docker
+        if: ${{ steps.filter.outputs.scope_access == 'true' }}
         run: |
           docker run --rm \
             -e B24_DOMAIN=$B24_DOMAIN \
             -e B24_WEBHOOK=$B24_WEBHOOK \
             b24pysdk-ci \
-            pytest tests/ --ignore=tests/integration/ -v --disable-warnings --maxfail=1
+            pytest -m "access"
+
+      - name: Run scope department tests in Docker
+        if: ${{ steps.filter.outputs.scope_department == 'true' }}
+        run: |
+          docker run --rm \
+            -e B24_DOMAIN=$B24_DOMAIN \
+            -e B24_WEBHOOK=$B24_WEBHOOK \
+            b24pysdk-ci \
+            pytest -m "department"
+
+      - name: Run scope events tests in Docker
+        if: ${{ steps.filter.outputs.scope_events == 'true' }}
+        run: |
+          docker run --rm \
+            -e B24_DOMAIN=$B24_DOMAIN \
+            -e B24_WEBHOOK=$B24_WEBHOOK \
+            b24pysdk-ci \
+            pytest -m "events"
+
+      - name: Run scope feature tests in Docker
+        if: ${{ steps.filter.outputs.scope_feature == 'true' }}
+        run: |
+          docker run --rm \
+            -e B24_DOMAIN=$B24_DOMAIN \
+            -e B24_WEBHOOK=$B24_WEBHOOK \
+            b24pysdk-ci \
+            pytest -m "feature"
+
+      - name: Run scope method tests in Docker
+        if: ${{ steps.filter.outputs.scope_method == 'true' }}
+        run: |
+          docker run --rm \
+            -e B24_DOMAIN=$B24_DOMAIN \
+            -e B24_WEBHOOK=$B24_WEBHOOK \
+            b24pysdk-ci \
+            pytest -m "method"
+
+      - name: Run scope placement tests in Docker
+        if: ${{ steps.filter.outputs.scope_placement == 'true' }}
+        run: |
+          docker run --rm \
+            -e B24_DOMAIN=$B24_DOMAIN \
+            -e B24_WEBHOOK=$B24_WEBHOOK \
+            b24pysdk-ci \
+            pytest -m "placement"
+
+      - name: Run scope profile tests in Docker
+        if: ${{ steps.filter.outputs.scope_profile == 'true' }}
+        run: |
+          docker run --rm \
+            -e B24_DOMAIN=$B24_DOMAIN \
+            -e B24_WEBHOOK=$B24_WEBHOOK \
+            b24pysdk-ci \
+            pytest -m "profile"
+
+      - name: Run scope scope tests in Docker
+        if: ${{ steps.filter.outputs.scope_scope == 'true' }}
+        run: |
+          docker run --rm \
+            -e B24_DOMAIN=$B24_DOMAIN \
+            -e B24_WEBHOOK=$B24_WEBHOOK \
+            b24pysdk-ci \
+            pytest -m "scope"
+
+      - name: Run scope server tests in Docker
+        if: ${{ steps.filter.outputs.scope_server == 'true' }}
+        run: |
+          docker run --rm \
+            -e B24_DOMAIN=$B24_DOMAIN \
+            -e B24_WEBHOOK=$B24_WEBHOOK \
+            b24pysdk-ci \
+            pytest -m "server"
+
+      - name: Run unit tests in Docker
+        run: |
+          docker run --rm \
+            -e B24_DOMAIN=$B24_DOMAIN \
+            -e B24_WEBHOOK=$B24_WEBHOOK \
+            b24pysdk-ci \
+            pytest -m "unit"

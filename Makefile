@@ -5,6 +5,10 @@ PYTHON_VERSION ?= 3.12
 CI_IMAGE ?= b24pysdk-ci
 # Dev image (no sources baked) for local iterative dev with bind mounts
 DEV_IMAGE ?= b24pysdk-dev
+# Test image for your local tests
+TEST_IMAGE ?= b24pysdk-test
+M ?=
+TEST_PATH ?=
 
 # If .env.local exists, use it; otherwise use .env; else none
 ENV_FILE := $(firstword $(wildcard .env.local .env))
@@ -24,6 +28,7 @@ help: ## Show this help
 	@echo "  ensure-ci-image  Build CI image only if missing"
 	@echo "  test-ci        Run baked CI image (rarely needed locally)"
 	@echo "  shell-ci       Interactive shell in CI image"
+	@echo "  test-scope    Run tests with path or marker (e.g., M='integration')"
 
 # Build once: CI image (kept for parity with CI)
 build-ci:
@@ -41,6 +46,9 @@ shell-ci: ensure-ci-image
 build-dev:
 	docker build -f docker/dev.Dockerfile -t $(DEV_IMAGE) --build-arg PYTHON_VERSION=$(PYTHON_VERSION) .
 
+build-test:
+	docker build -f docker/test.Dockerfile -t $(TEST_IMAGE) --build-arg PYTHON_VERSION=$(PYTHON_VERSION) .
+
 # Build dev image only if it's missing
 ensure-dev-image:
 	@docker image inspect $(DEV_IMAGE) > /dev/null 2>&1 || \
@@ -51,55 +59,49 @@ ensure-ci-image:
 	@docker image inspect $(CI_IMAGE) > /dev/null 2>&1 || \
 	  docker build -f docker/ci.Dockerfile -t $(CI_IMAGE) --build-arg PYTHON_VERSION=$(PYTHON_VERSION) .
 
-# Mount repo; install package in editable mode; run tests. No rebuild on code change.
-test: ensure-dev-image
+# Run all tests in the project
+test-all: build-test
 	docker run --rm -t \
-	  -v "$(PWD):/work" \
-	  -w /work \
-	  $(DEV_IMAGE) \
-	  bash -lc "pip install -e .[test] && pytest -q"
+		--env-file .env.local \
+		$(TEST_IMAGE)
 
-# Run only integration tests; uses .env automatically if present
-test-int: ensure-dev-image
-	@if [ -n "$(ENV_FILE)" ]; then echo "Using env file: $(ENV_FILE)"; fi
-	docker run --rm -t $(ENV_FILE_FLAG) \
-	  -v "$(PWD):/work" \
-	  -w /work \
-	  $(DEV_IMAGE) \
-	  bash -lc "pip install -e .[test] && pytest -m integration -vv -rA"
-
-# Run integration tests with webhook creds provided via variables
-# Usage: make test-int-webhook B24_DOMAIN=... B24_WEBHOOK=...
-test-int-webhook: ensure-dev-image
-	@if [ -z "$(B24_DOMAIN)" ] || [ -z "$(B24_WEBHOOK)" ]; then \
-	  echo "Set B24_DOMAIN and B24_WEBHOOK variables"; exit 2; \
-	fi
+# Run tests located in the tests/integration directory
+test-integration: build-test
 	docker run --rm -t \
-	  -e B24_PREFER=webhook \
-	  -e B24_DOMAIN="$(B24_DOMAIN)" \
-	  -e B24_WEBHOOK="$(B24_WEBHOOK)" \
-	  -v "$(PWD):/work" \
-	  -w /work \
-	  $(DEV_IMAGE) \
-	  bash -lc "pip install -e .[test] && pytest -q -m integration"
+		--env-file .env.local \
+		$(TEST_IMAGE) tests/integration
 
-# Run integration tests with OAuth creds provided via variables
-# Usage: make test-int-oauth B24_DOMAIN=... B24_CLIENT_ID=... B24_CLIENT_SECRET=... B24_ACCESS_TOKEN=... [B24_REFRESH_TOKEN=...]
-test-int-oauth: ensure-dev-image
-	@if [ -z "$(B24_DOMAIN)" ] || [ -z "$(B24_CLIENT_ID)" ] || [ -z "$(B24_CLIENT_SECRET)" ] || [ -z "$(B24_ACCESS_TOKEN)" ]; then \
-	  echo "Set B24_DOMAIN, B24_CLIENT_ID, B24_CLIENT_SECRET, B24_ACCESS_TOKEN (and optionally B24_REFRESH_TOKEN)"; exit 2; \
-	fi
+# Run integration tests with AUTH_TYPE set to webhook
+test-integration-webhook: build-test
 	docker run --rm -t \
-	  -e B24_PREFER=oauth \
-	  -e B24_DOMAIN="$(B24_DOMAIN)" \
-	  -e B24_CLIENT_ID="$(B24_CLIENT_ID)" \
-	  -e B24_CLIENT_SECRET="$(B24_CLIENT_SECRET)" \
-	  -e B24_ACCESS_TOKEN="$(B24_ACCESS_TOKEN)" \
-	  -e B24_REFRESH_TOKEN="$(B24_REFRESH_TOKEN)" \
-	  -v "$(PWD):/work" \
-	  -w /work \
-	  $(DEV_IMAGE) \
-	  bash -lc "pip install -e .[test] && pytest -q -m integration"
+		--env-file .env.local \
+		-e PREFER_AUTH_TYPE=webhook \
+		$(TEST_IMAGE) tests/integration
+
+# Run integration tests with AUTH_TYPE set to oauth
+test-integration-oauth: build-test
+	docker run --rm -t \
+		--env-file .env.local \
+		-e PREFER_AUTH_TYPE=oauth \
+		$(TEST_IMAGE) tests/integration
+
+# Execute all unit tests located in the tests/integration/unit directory
+test-unit: build-test
+	docker run --rm -t \
+		--env-file .env.local \
+		$(TEST_IMAGE) tests/integration/unit
+
+# Run tests filtered by a specific pytest marker
+test-marker: build-test
+	docker run --rm -t \
+		--env-file .env.local \
+		$(TEST_IMAGE) -m $(M)
+
+# Run tests located at a specific path provided as an argument
+test-path: build-test
+	docker run --rm -t \
+		--env-file .env.local \
+		$(TEST_IMAGE) $(TEST_PATH)
 
 # Mount repo; run linter on host files. No rebuild on code change.
 lint: ensure-dev-image
