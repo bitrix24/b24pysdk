@@ -37,3 +37,6 @@ htmlcov/
 # Mac/Linux
 .DS_Store
 Thumbs.db
+
+#Tokens from tests
+tests/oauth_data.json
