@@ -14,6 +14,9 @@ class AbstractBitrixApp:
     client_secret: Text = NotImplemented
     """"""
 
+    def __str__(self):
+        return f"<{('Market', 'Local')[self.is_local]} {self.__class__.__name__} with client_id={self.client_id}>"
+
     @property
     def is_local(self) -> bool:
         """"""

@@ -1,3 +1,4 @@
+from datetime import datetime
 from functools import wraps
 from typing import TYPE_CHECKING, Any, Callable, Dict, Final, Mapping, Optional, Sequence, Text, overload
 
@@ -11,8 +12,9 @@ from .bitrix_app import AbstractBitrixApp, AbstractBitrixAppLocal
 from .oauth_token import OAuthToken
 
 if TYPE_CHECKING:
+    from ..._client import Client
     from ..responses import BitrixAppInfoResponse
-    from .oauth_placememt_data import OAuthPlacementData
+    from .oauth_placement_data import OAuthPlacementData
     from .renewed_oauth_token import RenewedOAuthToken
 
 
@@ -20,8 +22,8 @@ def _bitrix_app_required(func: Callable):
     """"""
     @wraps(func)
     def wrapper(self: "AbstractBitrixToken", *args, **kwargs):
-        if not getattr(self, "bitrix_app", None):
-            raise AttributeError(f"'bitrix_app' is not defined for {self}")
+        if self.bitrix_app is NotImplemented:
+            raise AttributeError(f"'bitrix_app' is not implimented for {self}")
         return func(self, *args, **kwargs)
     return wrapper
 
@@ -41,7 +43,13 @@ class AbstractBitrixToken:
     refresh_token: Optional[Text] = NotImplemented
     """"""
 
-    bitrix_app: Optional[AbstractBitrixApp]
+    expires: Optional[datetime] = NotImplemented
+    """"""
+
+    expires_in: Optional[int] = NotImplemented
+    """"""
+
+    bitrix_app: Optional[AbstractBitrixApp] = NotImplemented
     """"""
 
     oauth_token_renewed_signal: BitrixSignalInstance = BitrixSignalInstance.create_signal(OAuthTokenRenewedEvent)
@@ -51,7 +59,7 @@ class AbstractBitrixToken:
     """"""
 
     def __str__(self):
-        return f"<{'Webhook' if self.is_webhook else 'Application'} token of portal {self.domain}>"
+        return f"<{('Application', 'Webhook')[self.is_webhook]} token of portal {self.domain}>"
 
     @property
     def is_webhook(self) -> bool:
@@ -73,12 +81,23 @@ class AbstractBitrixToken:
         return Config()
 
     @property
+    def is_one_off(self) -> bool:
+        """"""
+        return self.refresh_token is None
+
+    @property
+    def has_expired(self) -> Optional[bool]:
+        """"""
+        return self.expires and self.expires <= datetime.now(tz=self._config.tzinfo)
+
+    @property
     def oauth_token(self) -> OAuthToken:
         """"""
         return OAuthToken(
             access_token=self.auth_token,
             refresh_token=self.refresh_token,
-            expires=None,
+            expires=self.expires,
+            expires_in=self.expires_in,
         )
 
     @oauth_token.setter
@@ -86,6 +105,13 @@ class AbstractBitrixToken:
         """"""
         self.auth_token = oauth_token.access_token
         self.refresh_token = oauth_token.refresh_token
+        self.expires = oauth_token.expires
+        self.expires_in = oauth_token.expires_in
+
+    def get_client(self, **kwargs) -> "Client":
+        """"""
+        from ..._client import Client
+        return Client(self, **kwargs)
 
     @_bitrix_app_required
     def get_oauth_token(self, code: Text) -> "RenewedOAuthToken":
@@ -127,40 +153,79 @@ class AbstractBitrixToken:
 
         return True
 
-    def _execute_with_retries(self, call_func: Callable[[], Any]):
+    def _execute_with_retries(self, func: Callable[[], Any]):
         """"""
 
         try:
-            return call_func()
+            if self.has_expired:
+                raise BitrixAPIExpiredToken
+
+            return func()
 
         except BitrixResponse302JSONDecodeError as error:
             if self._check_and_change_domain(error.new_domain):
                 self._config.logger.info(
                     "Domain changed, retrying request",
-                    context=dict(old_domain=self.domain, new_domain=error.new_domain),
+                    context=dict(
+                        bitrix_token=str(self),
+                        old_domain=self.domain,
+                        new_domain=error.new_domain,
+                    ),
                 )
-                return call_func()
+                return func()
             else:
                 self._config.logger.warning(
                     "Caught BitrixResponse302JSONDecodeError, but domain did not change!",
-                    context=dict(old_domain=self.domain, new_domain=error.new_domain),
+                    context=dict(
+                        bitrix_token=str(self),
+                        old_domain=self.domain,
+                        new_domain=error.new_domain,
+                    ),
                 )
                 raise
 
         except BitrixAPIExpiredToken:
-            if self._AUTO_REFRESH and not self.is_webhook:
-                self._config.logger.info(
-                    "Token expired, auto-refreshing token",
-                    context=dict(domain=self.domain, auto_refresh=self._AUTO_REFRESH, is_webhook=self.is_webhook),
-                )
-                self._refresh_and_set_oauth_token()
-                return call_func()
-            else:
+            if not self._AUTO_REFRESH:
                 self._config.logger.warning(
-                    "Token expired, but auto-refresh disabled!",
-                    context=dict(domain=self.domain, auto_refresh=self._AUTO_REFRESH, is_webhook=self.is_webhook),
+                    "Token expired: auto-refresh is disabled",
+                    context=dict(
+                        bitrix_token=str(self),
+                        bitrix_app=str(self.bitrix_app),
+                    ),
                 )
                 raise
+
+            if self.is_webhook:
+                self._config.logger.warning(
+                    "Token expired: cannot refresh token for webhook",
+                    context=dict(
+                        bitrix_token=str(self),
+                        bitrix_app=str(self.bitrix_app),
+                    ),
+                )
+                raise
+
+            if self.is_one_off:
+                self._config.logger.warning(
+                    "Token expired: cannot refresh one-off token",
+                    context=dict(
+                        bitrix_token=str(self),
+                        bitrix_app=str(self.bitrix_app),
+                    ),
+                )
+                raise
+
+            self._config.logger.info(
+                "Token expired: refreshing token",
+                context=dict(
+                    bitrix_token=str(self),
+                    bitrix_app=str(self.bitrix_app),
+                ),
+            )
+
+            self._refresh_and_set_oauth_token()
+
+            return func()
 
     def _call_with_retries(self, call_func: Callable, parameters: Dict) -> JSONDict:
         """"""
@@ -170,7 +235,6 @@ class AbstractBitrixToken:
             self,
             api_method: Text,
             params: Optional[JSONDict] = None,
-            *,
             timeout: Timeout = None,
             **kwargs,
     ) -> JSONDict:
@@ -189,7 +253,6 @@ class AbstractBitrixToken:
     def call_batch(
             self,
             methods: Mapping[Key, B24BatchMethodTuple],
-            *,
             halt: bool = False,
             ignore_size_limit: bool = False,
             timeout: Timeout = None,
@@ -200,7 +263,6 @@ class AbstractBitrixToken:
     def call_batch(
             self,
             methods: Sequence[B24BatchMethodTuple],
-            *,
             halt: bool = False,
             ignore_size_limit: bool = False,
             timeout: Timeout = None,
@@ -210,7 +272,6 @@ class AbstractBitrixToken:
     def call_batch(
             self,
             methods: B24BatchMethods,
-            *,
             halt: bool = False,
             ignore_size_limit: bool = False,
             timeout: Timeout = None,
@@ -232,7 +293,6 @@ class AbstractBitrixToken:
     def call_batches(
             self,
             methods: Mapping[Key, B24BatchMethodTuple],
-            *,
             halt: bool = False,
             timeout: Timeout = None,
             **kwargs,
@@ -242,7 +302,6 @@ class AbstractBitrixToken:
     def call_batches(
             self,
             methods: Sequence[B24BatchMethodTuple],
-            *,
             halt: bool = False,
             timeout: Timeout = None,
             **kwargs,
@@ -251,7 +310,6 @@ class AbstractBitrixToken:
     def call_batches(
             self,
             methods: B24BatchMethods,
-            *,
             halt: bool = False,
             timeout: Timeout = None,
             **kwargs,
@@ -271,7 +329,6 @@ class AbstractBitrixToken:
             self,
             api_method: Text,
             params: Optional[JSONDict] = None,
-            *,
             limit: Optional[int] = None,
             timeout: Timeout = None,
             **kwargs,
@@ -292,7 +349,6 @@ class AbstractBitrixToken:
             self,
             api_method: Text,
             params: Optional[JSONDict] = None,
-            *,
             descending: bool = False,
             limit: Optional[int] = None,
             timeout: Timeout = None,
@@ -315,7 +371,7 @@ class AbstractBitrixToken:
 class AbstractBitrixTokenLocal(AbstractBitrixToken):
     """"""
 
-    bitrix_app: AbstractBitrixAppLocal
+    bitrix_app: AbstractBitrixAppLocal = NotImplemented
     """"""
 
     @property
@@ -338,11 +394,15 @@ class BitrixToken(AbstractBitrixToken):
             domain: Text,
             auth_token: Text,
             refresh_token: Optional[Text] = None,
+            expires: Optional[datetime] = None,
+            expires_in: Optional[int] = None,
             bitrix_app: Optional[AbstractBitrixApp] = None,
     ):
         self.domain = domain
         self.auth_token = auth_token
         self.refresh_token = refresh_token
+        self.expires = expires
+        self.expires_in = expires_in
         self.bitrix_app = bitrix_app
 
     @classmethod
@@ -357,6 +417,8 @@ class BitrixToken(AbstractBitrixToken):
             domain=renewed_oauth_token.portal_domain,
             auth_token=oauth_token.access_token,
             refresh_token=oauth_token.refresh_token,
+            expires=oauth_token.expires,
+            expires_in=oauth_token.expires_in,
             bitrix_app=bitrix_app,
         )
 
@@ -372,6 +434,8 @@ class BitrixToken(AbstractBitrixToken):
             domain=oauth_placement_data.domain,
             auth_token=oauth_token.access_token,
             refresh_token=oauth_token.refresh_token,
+            expires=oauth_token.expires,
+            expires_in=oauth_token.expires_in,
             bitrix_app=bitrix_app,
         )
 
@@ -384,10 +448,14 @@ class BitrixTokenLocal(AbstractBitrixTokenLocal):
             *,
             auth_token: Text,
             refresh_token: Optional[Text] = None,
+            expires: Optional[datetime] = None,
+            expires_in: Optional[int] = None,
             bitrix_app: AbstractBitrixAppLocal,
     ):
         self.auth_token = auth_token
         self.refresh_token = refresh_token
+        self.expires = expires
+        self.expires_in = expires_in
         self.bitrix_app = bitrix_app
 
     @classmethod
@@ -401,6 +469,8 @@ class BitrixTokenLocal(AbstractBitrixTokenLocal):
         return cls(
             auth_token=oauth_token.access_token,
             refresh_token=oauth_token.refresh_token,
+            expires=oauth_token.expires,
+            expires_in=oauth_token.expires_in,
             bitrix_app=bitrix_app,
         )
 
@@ -415,6 +485,8 @@ class BitrixTokenLocal(AbstractBitrixTokenLocal):
         return cls(
             auth_token=oauth_token.access_token,
             refresh_token=oauth_token.refresh_token,
+            expires=oauth_token.expires,
+            expires_in=oauth_token.expires_in,
             bitrix_app=bitrix_app,
         )
 

@@ -1,11 +1,10 @@
 from dataclasses import asdict, dataclass
-from typing import Dict, List, Optional, Text
+from typing import Any, Dict, List, Mapping, Optional, Text
 from urllib.parse import urlparse
 
 from ..._constants import PYTHON_VERSION as _PV
 from ...constants import B24AppStatus
 from ...error import BitrixValidationError
-from ...utils.types import JSONDict
 from .oauth_token import OAuthToken
 
 _DATACLASS_KWARGS = {"eq": False, "frozen": True}
@@ -23,6 +22,7 @@ class RenewedOAuthToken:
 
     oauth_token: OAuthToken
     member_id: Text
+    user_id: int
     client_endpoint: Text
     server_endpoint: Text
     domain: Text
@@ -31,11 +31,12 @@ class RenewedOAuthToken:
     application_token: Optional[Text] = None
 
     @classmethod
-    def from_dict(cls, renewed_oauth_token_payload: JSONDict) -> "RenewedOAuthToken":
+    def from_dict(cls, renewed_oauth_token_payload: Mapping[Text, Any]) -> "RenewedOAuthToken":
         try:
             return cls(
                 oauth_token=OAuthToken.from_dict(renewed_oauth_token_payload),
                 member_id=renewed_oauth_token_payload["member_id"],
+                user_id=int(renewed_oauth_token_payload["user_id"]),
                 client_endpoint=renewed_oauth_token_payload["client_endpoint"],
                 server_endpoint=renewed_oauth_token_payload["server_endpoint"],
                 domain=renewed_oauth_token_payload["domain"],

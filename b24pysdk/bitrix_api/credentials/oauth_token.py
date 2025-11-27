@@ -1,10 +1,10 @@
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
-from typing import Dict, Optional, Text
+from typing import Any, Dict, Mapping, Optional, Text
 
+from ..._config import Config
 from ..._constants import PYTHON_VERSION as _PV
 from ...error import BitrixValidationError
-from ...utils.types import JSONDict
 
 _DATACLASS_KWARGS = {"eq": False, "frozen": True}
 
@@ -25,13 +25,13 @@ class OAuthToken:
     expires_in: Optional[int] = None
 
     @classmethod
-    def from_dict(cls, oauth_token_payload: JSONDict) -> "OAuthToken":
+    def from_dict(cls, oauth_token_payload: Mapping[Text, Any]) -> "OAuthToken":
         """"""
         try:
             return cls(
                 access_token=oauth_token_payload["access_token"],
-                refresh_token=oauth_token_payload["refresh_token"],
-                expires=datetime.fromtimestamp(int(oauth_token_payload["expires"])).astimezone(),
+                refresh_token=oauth_token_payload.get("refresh_token"),
+                expires=datetime.fromtimestamp(int(oauth_token_payload["expires"]), tz=Config().tzinfo),
                 expires_in=int(oauth_token_payload["expires_in"]),
             )
         except KeyError as error:
@@ -40,14 +40,14 @@ class OAuthToken:
             raise cls.ValidationError(f"Invalid OAuth token payload: {error}") from error
 
     @classmethod
-    def from_placement_data(cls, placement_data: JSONDict) -> "OAuthToken":
+    def from_placement_data(cls, placement_data: Mapping[Text, Any]) -> "OAuthToken":
         """"""
 
         try:
             access_token = placement_data["AUTH_ID"]
             refresh_token = placement_data["REFRESH_ID"]
             expires_in = int(placement_data["AUTH_EXPIRES"])
-            expires = datetime.now().astimezone() + timedelta(seconds=expires_in)
+            expires = datetime.now(tz=Config().tzinfo) + timedelta(seconds=expires_in)
 
             return cls(
                 access_token=access_token,
@@ -65,12 +65,12 @@ class OAuthToken:
     @property
     def is_one_off(self) -> bool:
         """"""
-        return bool(self.refresh_token)
+        return self.refresh_token is None
 
     @property
     def has_expired(self) -> Optional[bool]:
         """"""
-        return self.expires and self.expires <= datetime.now().astimezone()
+        return self.expires and self.expires <= datetime.now(tz=Config().tzinfo)
 
     def to_dict(self) -> Dict:
         return asdict(self)

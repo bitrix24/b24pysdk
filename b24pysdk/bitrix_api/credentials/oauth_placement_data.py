@@ -1,12 +1,15 @@
 import json
 from dataclasses import asdict, dataclass
-from typing import Dict, Literal, Optional, Text, cast
+from typing import TYPE_CHECKING, Any, Dict, Mapping, Optional, Text
 
 from ..._constants import PYTHON_VERSION as _PV
-from ...constants import B24AppStatus
+from ...constants import B24AppStatus, Protocol
 from ...error import BitrixValidationError
 from ...utils.types import JSONDict
 from .oauth_token import OAuthToken
+
+if TYPE_CHECKING:
+    from ..responses import B24AppInfoResult
 
 _DATACLASS_KWARGS = {"eq": False, "frozen": True}
 
@@ -23,21 +26,21 @@ class OAuthPlacementData:
 
     oauth_token: OAuthToken
     domain: Text
-    protocol: Literal[0, 1]
+    protocol: Protocol
     lang: Text
     app_sid: Text
     member_id: Text
     status: B24AppStatus
-    placement: Optional[Text]
-    placement_options: Optional[JSONDict]
+    placement: Optional[Text] = None
+    placement_options: Optional[JSONDict] = None
 
     @classmethod
-    def from_dict(cls, placement_data: JSONDict) -> "OAuthPlacementData":
+    def from_dict(cls, placement_data: Mapping[Text, Any]) -> "OAuthPlacementData":
         try:
             oauth_token = OAuthToken.from_placement_data(placement_data)
 
             domain = placement_data["DOMAIN"]
-            protocol = int(placement_data["PROTOCOL"])
+            protocol = Protocol(int(placement_data["PROTOCOL"]))
             lang = placement_data["LANG"]
             app_sid = placement_data["APP_SID"]
             member_id = placement_data["member_id"]
@@ -51,7 +54,7 @@ class OAuthPlacementData:
             return cls(
                 oauth_token=oauth_token,
                 domain=domain,
-                protocol=cast(Literal[0, 1], protocol),
+                protocol=protocol,
                 lang=lang,
                 app_sid=app_sid,
                 member_id=member_id,
@@ -65,6 +68,21 @@ class OAuthPlacementData:
 
         except Exception as error:
             raise cls.ValidationError(f"Invalid placement data: {error}") from error
+
+    def validate_against_app_info(
+            self,
+            app_info: "B24AppInfoResult",
+            user_id: Optional[int] = None,
+    ) -> bool:
+        """"""
+        if all((
+                self.member_id == app_info.install.member_id,
+                self.domain == app_info.install.domain,
+                user_id is None or user_id == app_info.user_id,
+        )):
+            return True
+        else:
+            raise self.ValidationError("Invalid placement data")
 
     def to_dict(self) -> Dict:
         return asdict(self)
