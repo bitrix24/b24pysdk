@@ -10,6 +10,7 @@ from .utils import types as _types
 __all__ = [
     "BitrixAPIAccessDenied",
     "BitrixAPIAllowedOnlyIntranetUser",
+    "BitrixAPIAuthorizationError",
     "BitrixAPIBadRequest",
     "BitrixAPIError",
     "BitrixAPIErrorBatchLengthExceeded",
@@ -34,6 +35,7 @@ __all__ = [
     "BitrixAPIServiceUnavailable",
     "BitrixAPIUnauthorized",
     "BitrixAPIUserAccessError",
+    "BitrixAPIWrongAuthType",
     "BitrixOAuthException",
     "BitrixOAuthInsufficientScope",
     "BitrixOAuthInvalidClient",
@@ -46,6 +48,7 @@ __all__ = [
     "BitrixRequestError",
     "BitrixRequestTimeout",
     "BitrixResponse302JSONDecodeError",
+    "BitrixResponse403JSONDecodeError",
     "BitrixResponse500JSONDecodeError",
     "BitrixResponseJSONDecodeError",
     "BitrixSDKException",
@@ -143,11 +146,17 @@ class BitrixRequestError(BitrixSDKException):
 
 
 class BitrixOAuthRequestError(BitrixRequestError, BitrixOAuthException):
-    """"""
+    """An error occurred during an OAuth operation.
+
+    This exception typically occurs when there is an issue with the OAuth request, possibly due to incorrect parameters or network-related issues.
+    """
 
 
 class BitrixRequestTimeout(BitrixRequestError):
-    """"""
+    """A timeout occurred while waiting for an API response.
+
+    Raised when the server takes too long to respond, often indicating network congestion or server-side delays.
+    """
 
     __slots__ = ("timeout",)
 
@@ -183,6 +192,10 @@ class BitrixResponse302JSONDecodeError(BitrixResponseJSONDecodeError, _HTTPRespo
         """"""
         redirect_url = self.redirect_url
         return redirect_url and _urlparse(redirect_url).hostname
+
+
+class BitrixResponse403JSONDecodeError(BitrixResponseJSONDecodeError, _HTTPResponseForbidden):
+    """"""
 
 
 class BitrixResponse500JSONDecodeError(BitrixResponseJSONDecodeError, _HTTPResponseInternalError):
@@ -228,12 +241,18 @@ class BitrixAPIForbidden(BitrixAPIError, _HTTPResponseForbidden):
 
 
 class BitrixAPINotFound(BitrixAPIError, _HTTPResponseNotFound):
-    """Not Found."""
+    """Not Found.
+
+    Raised when the specified resource cannot be located on the server.
+    """
     ERROR = "NOT_FOUND"
 
 
 class BitrixAPIMethodNotAllowed(BitrixAPIError, _HTTPResponseMethodNotAllowed):
-    """Method Not Allowed."""
+    """Method Not Allowed.
+
+    Indicates that the HTTP method used in the request is not allowed for the requested resource.
+    """
 
 
 class BitrixAPIInternalServerError(BitrixAPIError, _HTTPResponseInternalError):
@@ -242,7 +261,10 @@ class BitrixAPIInternalServerError(BitrixAPIError, _HTTPResponseInternalError):
 
 
 class BitrixAPIServiceUnavailable(BitrixAPIError, _HTTPResponseServiceUnavailable):
-    """Service Unavailable."""
+    """Service Unavailable.
+
+    Raised when the API service is temporarily unavailable, often due to maintenance or server overload.
+    """
 
 
 # Exceptions by error
@@ -257,17 +279,26 @@ class BitrixOauthWrongClient(BitrixAPIError, BitrixOAuthException, _HTTPResponse
 # 400
 
 class BitrixAPIErrorBatchLengthExceeded(BitrixAPIBadRequest):
-    """Max batch length exceeded."""
+    """Max batch length exceeded.
+
+    Raised when the number of operations in a batch exceeds the allowable maximum length.
+    """
     ERROR = "ERROR_BATCH_LENGTH_EXCEEDED"
 
 
 class BitrixAPIInvalidArgValue(BitrixAPIBadRequest):
-    """"""
+    """Invalid argument value provided.
+
+    Raised when one or more arguments in the request contain invalid values, which the server cannot process.
+    """
     ERROR = "INVALID_ARG_VALUE"
 
 
 class BitrixAPIInvalidRequest(BitrixAPIBadRequest):
-    """Https required."""
+    """Https required.
+
+    Indicates the request was formatted incorrectly, often requiring an HTTPS connection rather than HTTP.
+    """
     ERROR = "INVALID_REQUEST"
 
 
@@ -281,29 +312,53 @@ class BitrixOAuthInvalidClient(BitrixAPIBadRequest, BitrixOAuthException):
 
 
 class BitrixOAuthInvalidGrant(BitrixAPIBadRequest, BitrixOAuthException):
-    """Invalid authorization tokens were provided when obtaining access_token. This occurs during renewal or initial acquisition"""
+    """Invalid authorization tokens were provided when obtaining access_token.
+
+    This occurs during renewal or initial acquisition, indicating the provided tokens cannot be validated.
+    """
     ERROR = "INVALID_GRANT"
 
 
 # 401
 
+class BitrixAPIAuthorizationError(BitrixAPIUnauthorized):
+    """Unable to authorize user.
+
+    This exception indicates a failure to authenticate the user, potentially due to missing or incorrect credentials.
+    """
+    ERROR = "AUTHORIZATION_ERROR"
+
+
 class BitrixAPIErrorOAuth(BitrixAPIUnauthorized):
-    """Application not installed."""
+    """Application not installed.
+
+    Indicates that the operation cannot proceed because the application is not installed in the Bitrix environment.
+    """
     ERROR = "ERROR_OAUTH"
 
 
 class BitrixAPIExpiredToken(BitrixAPIUnauthorized):
-    """The access token provided has expired."""
+    """The access token provided has expired.
+
+    This exception is raised when a request is made using an OAuth token that has exceeded its validity period.
+    Handling this properly often involves refreshing the token to regain access as per the OAuth 2.0 logic.
+    """
     ERROR = "EXPIRED_TOKEN"
 
 
 class BitrixAPIMethodConfirmWaiting(BitrixAPIUnauthorized):
-    """Waiting for confirmation."""
+    """Waiting for confirmation.
+
+    Raised when an API call requires a user to confirm their action, and the confirmation is still pending.
+    """
     ERROR = "METHOD_CONFIRM_WAITING"
 
 
 class BitrixAPINoAuthFound(BitrixAPIUnauthorized):
-    """Wrong authorization data."""
+    """Wrong authorization data.
+
+    This exception signals that no valid authentication was found in the request context.
+    """
     ERROR = "NO_AUTH_FOUND"
 
 
@@ -320,17 +375,26 @@ class BitrixAPIAllowedOnlyIntranetUser(BitrixAPIForbidden):
 
 
 class BitrixAPIInsufficientScope(BitrixAPIForbidden):
-    """The request requires higher privileges than provided by the webhook token."""
+    """The request requires higher privileges than provided by the webhook token.
+
+    Raised when an operation requires more permissions than the current token's access level allows.
+    """
     ERROR = "INSUFFICIENT_SCOPE"
 
 
 class BitrixAPIInvalidCredentials(BitrixAPIForbidden):
-    """Invalid requests credentials."""
+    """Invalid request credentials.
+
+    Indicates the credentials provided in the request are not valid for accessing the requested resource or action.
+    """
     ERROR = "INVALID_CREDENTIALS"
 
 
 class BitrixAPIMethodConfirmDenied(BitrixAPIForbidden):
-    """Method call denied."""
+    """Method call denied.
+
+    Raised when a confirmation-required method is denied by the user.
+    """
     ERROR = "METHOD_CONFIRM_DENIED"
 
 
@@ -339,8 +403,16 @@ class BitrixAPIUserAccessError(BitrixAPIForbidden):
     ERROR = "USER_ACCESS_ERROR"
 
 
+class BitrixAPIWrongAuthType(BitrixAPIForbidden):
+    """Current authorization type is denied for this method."""
+    ERROR = "WRONG_AUTH_TYPE"
+
+
 class BitrixOAuthInvalidScope(BitrixAPIForbidden, BitrixOAuthException):
-    """Access permissions requested exceed those specified in the application card"""
+    """Access permissions requested exceed those specified in the application card.
+
+    This occurs when the scope of access specified in the OAuth request is greater than what is allowed by the application configuration.
+    """
     ERROR = "INVALID_SCOPE"
 
 
@@ -351,31 +423,46 @@ class BitrixOAuthInsufficientScope(BitrixAPIInsufficientScope, BitrixOAuthExcept
 # 404
 
 class BitrixAPIErrorManifestIsNotAvailable(BitrixAPINotFound):
-    """Manifest is not available"""
+    """Manifest is not available.
+
+    Raised when a requested manifest file cannot be located or retrieved from the Bitrix server.
+    """
     ERROR = "ERROR_MANIFEST_IS_NOT_AVAILABLE"
 
 
 # 405
 
 class BitrixAPIErrorBatchMethodNotAllowed(BitrixAPIMethodNotAllowed):
-    """Method is not allowed for batch usage."""
+    """Method is not allowed for batch usage.
+
+    Raised when a specific method cannot be used within a batch operation.
+    """
     ERROR = "ERROR_BATCH_METHOD_NOT_ALLOWED"
 
 
 # 500
 
 class BitrixAPIErrorUnexpectedAnswer(BitrixAPIInternalServerError):
-    """Server returned an unexpected responses."""
+    """Server returned an unexpected response.
+
+    Raised when the server's response is not in the expected format, which can occur during server-side issues.
+    """
     ERROR = "ERROR_UNEXPECTED_ANSWER"
 
 
 # 503
 
 class BitrixAPIOverloadLimit(BitrixAPIServiceUnavailable):
-    """REST API is blocked due to overload."""
+    """REST API is blocked due to overload.
+
+    Raised when the API service blocks further requests, typically due to traffic exceeding safe operational limits.
+    """
     ERROR = "OVERLOAD_LIMIT"
 
 
 class BitrixAPIQueryLimitExceeded(BitrixAPIServiceUnavailable):
-    """Too many requests."""
+    """Too many requests.
+
+    Raised when the number of API requests exceeds the allowed limit, prompting the client to slow down the request rate.
+    """
     ERROR = "QUERY_LIMIT_EXCEEDED"
