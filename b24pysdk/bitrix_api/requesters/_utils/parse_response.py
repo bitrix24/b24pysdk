@@ -6,6 +6,7 @@ from requests.exceptions import HTTPError, JSONDecodeError
 from ....error import (
     BitrixAPIAccessDenied,
     BitrixAPIAllowedOnlyIntranetUser,
+    BitrixAPIAuthorizationError,
     BitrixAPIBadRequest,
     BitrixAPIError,
     BitrixAPIErrorBatchLengthExceeded,
@@ -30,11 +31,13 @@ from ....error import (
     BitrixAPIServiceUnavailable,
     BitrixAPIUnauthorized,
     BitrixAPIUserAccessError,
+    BitrixAPIWrongAuthType,
     BitrixOAuthInvalidClient,
     BitrixOAuthInvalidGrant,
     BitrixOAuthInvalidScope,
     BitrixOauthWrongClient,
     BitrixResponse302JSONDecodeError,
+    BitrixResponse403JSONDecodeError,
     BitrixResponse500JSONDecodeError,
     BitrixResponseJSONDecodeError,
 )
@@ -50,6 +53,7 @@ _EXCEPTIONS_BY_ERROR: Dict[Text, Type[BitrixAPIError]] = {
     "INVALID_GRANT": BitrixOAuthInvalidGrant,
     "INVALID_REQUEST": BitrixAPIInvalidRequest,
     # 401
+    "AUTHORIZATION_ERROR": BitrixAPIAuthorizationError,
     "ERROR_OAUTH": BitrixAPIErrorOAuth,
     "EXPIRED_TOKEN": BitrixAPIExpiredToken,
     "METHOD_CONFIRM_WAITING": BitrixAPIMethodConfirmWaiting,
@@ -61,6 +65,7 @@ _EXCEPTIONS_BY_ERROR: Dict[Text, Type[BitrixAPIError]] = {
     "INVALID_CREDENTIALS": BitrixAPIInvalidCredentials,
     "METHOD_CONFIRM_DENIED": BitrixAPIMethodConfirmDenied,
     "USER_ACCESS_ERROR": BitrixAPIUserAccessError,
+    "WRONG_AUTH_TYPE": BitrixAPIWrongAuthType,
     "INVALID_SCOPE": BitrixOAuthInvalidScope,
     # 404
     "NOT_FOUND": BitrixAPINotFound,
@@ -89,6 +94,7 @@ _EXCEPTIONS_BY_STATUS_CODE: Dict[int, Type[BitrixAPIError]] = {
 
 _EXCEPTIONS_BY_JSON_DECODE_RESPONSE_STATUS_CODE: Dict[int, Type[BitrixResponseJSONDecodeError]] = {
     302: BitrixResponse302JSONDecodeError,
+    403: BitrixResponse403JSONDecodeError,
     500: BitrixResponse500JSONDecodeError,
 }
 

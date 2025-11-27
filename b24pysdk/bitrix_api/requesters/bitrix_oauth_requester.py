@@ -91,7 +91,24 @@ class BitrixOAuthRequester(BaseRequester):
             "code": code,
         }
 
-        return self._parse_response(self._get(url=self._OUATH_URL, params=params))
+        self._config.logger.debug(
+            "start get_oauth_token",
+            context=dict(
+                bitrix_oauth=str(self._bitrix_oauth),
+                code=code,
+            ),
+        )
+
+        json_response = self._parse_response(self._get(url=self._OUATH_URL, params=params))
+
+        self._config.logger.debug(
+            "finish get_oauth_token",
+            context=dict(
+                json_response=json_response,
+            ),
+        )
+
+        return json_response
 
     def refresh_oauth_token(self, refresh_token: Text) -> JSONDict:
         """"""
@@ -103,7 +120,24 @@ class BitrixOAuthRequester(BaseRequester):
             "refresh_token": refresh_token,
         }
 
-        return self._parse_response(self._get(url=self._OUATH_URL, params=params))
+        self._config.logger.debug(
+            "start refresh_oauth_token",
+            context=dict(
+                bitrix_oauth=str(self._bitrix_oauth),
+                refresh_token=refresh_token,
+            ),
+        )
+
+        json_response = self._parse_response(self._get(url=self._OUATH_URL, params=params))
+
+        self._config.logger.debug(
+            "finish refresh_oauth_token",
+            context=dict(
+                json_response=json_response,
+            ),
+        )
+
+        return json_response
 
     def get_app_info(self, auth_token: Text) -> JSONDict:
         """"""
@@ -112,4 +146,22 @@ class BitrixOAuthRequester(BaseRequester):
             "auth": auth_token,
         }
 
-        return self._parse_response(self._get(url=self._REST_URL, params=params))
+        self._config.logger.debug(
+            "start get_app_info",
+            context=dict(
+                bitrix_oauth=str(self._bitrix_oauth),
+                auth_token=auth_token,
+            ),
+        )
+
+        json_response = self._parse_response(self._get(url=self._REST_URL, params=params))
+
+        self._config.logger.debug(
+            "finish get_app_info",
+            context=dict(
+                result=json_response.get("result"),
+                time=json_response.get("time"),
+            ),
+        )
+
+        return json_response
