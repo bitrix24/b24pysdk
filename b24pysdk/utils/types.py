@@ -1,5 +1,21 @@
 import typing
 
+__all__ = [
+    "B24APIResult",
+    "B24AppStatusLiteral",
+    "B24BatchMethodTuple",
+    "B24BatchMethods",
+    "B24Bool",
+    "B24BoolLiteral",
+    "DefaultTimeout",
+    "JSONDict",
+    "JSONList",
+    "Key",
+    "Number",
+    "Timeout",
+    "UserTypeIDLiteral",
+]
+
 JSONDict = typing.Dict[typing.Text, typing.Any]
 """A dictionary with string keys and values of any type, typically used for JSON data structures."""
 
@@ -40,6 +56,43 @@ B24BatchMethodTuple = typing.Tuple[typing.Text, typing.Optional[JSONDict]]
 B24BatchMethods = typing.Union[typing.Mapping[Key, B24BatchMethodTuple], typing.Sequence[B24BatchMethodTuple]]
 """"""
 
+UserTypeIDLiteral = typing.Literal[
+    "string",
+    "integer",
+    "double",
+    "date",
+    "datetime",
+    "boolean",
+    "file",
+    "enumeration",
+    "url",
+    "address",
+    "money",
+    "iblock_section",
+    "iblock_element",
+    "employee",
+    "crm",
+    "crm_status",
+]
+"""Literal type ID for Bitrix24 user field types:
+'string'          — string
+'integer'         — integer
+'double'          — double/float
+'date'            — date
+'datetime'        — date with time
+'boolean'         — yes/no
+'file'            — file
+'enumeration'     — list/enumeration
+'url'             — URL/link
+'address'         — Google Maps address
+'money'           — money/currency
+'iblock_section'  — iblock section reference
+'iblock_element'  — iblock element reference
+'employee'        — employee/user reference
+'crm'             — CRM entity reference
+'crm_status'      — CRM status reference
+"""
+
 
 class B24Bool:
     """Represents a B24 boolean value with a specific literal mapping."""
@@ -58,7 +111,7 @@ class B24Bool:
 
     def __init__(
             self,
-            value: typing.Optional[typing.Union["B24Bool", B24BoolLiteral, bool]],
+            value: typing.Optional[typing.Union["B24Bool", typing.Annotated[typing.Text, B24BoolLiteral], bool]],
     ):
         self._value = self._normalize(value)
 
@@ -73,7 +126,7 @@ class B24Bool:
 
     def __eq__(
             self,
-            value: typing.Optional[typing.Union["B24Bool", B24BoolLiteral, bool]],
+            value: typing.Optional[typing.Union["B24Bool", typing.Annotated[typing.Text, B24BoolLiteral], bool]],
     ):
         return self._value == self._normalize(value)
 
@@ -83,7 +136,7 @@ class B24Bool:
     @classmethod
     def _normalize(
             cls,
-            value: typing.Optional[typing.Union["B24Bool", B24BoolLiteral, bool]],
+            value: typing.Optional[typing.Union["B24Bool", typing.Annotated[typing.Text, B24BoolLiteral], bool]],
     ) -> typing.Optional[bool]:
         """Normalize input value to a boolean for B24Bool."""
 
@@ -110,7 +163,7 @@ class B24Bool:
     @value.setter
     def value(
             self,
-            value: typing.Optional[typing.Union["B24Bool", B24BoolLiteral, bool]],
+            value: typing.Optional[typing.Union["B24Bool", typing.Annotated[typing.Text, B24BoolLiteral], bool]],
     ):
         """Set the internal boolean value."""
         self._value = self._normalize(value)
