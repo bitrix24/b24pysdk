@@ -2,6 +2,7 @@ from dataclasses import asdict, dataclass
 from datetime import datetime
 from typing import Dict, Optional
 
+from ..._config import Config
 from ..._constants import PYTHON_VERSION as _PV
 from ...utils.types import JSONDict
 
@@ -33,7 +34,7 @@ class BitrixAPITimeResponse:
             processing=json_response["processing"],
             date_start=datetime.fromisoformat(json_response["date_start"]),
             date_finish=datetime.fromisoformat(json_response["date_finish"]),
-            operating_reset_at=json_response.get("operating_reset_at") and datetime.fromtimestamp(json_response["operating_reset_at"]).astimezone(),
+            operating_reset_at=json_response.get("operating_reset_at") and datetime.fromtimestamp(json_response["operating_reset_at"], tz=Config().tzinfo),
             operating=json_response.get("operating"),
         )
 
