@@ -1,5 +1,7 @@
 import threading
 import typing
+from datetime import datetime, timezone
+from datetime import tzinfo as _tzinfo
 
 from .constants import DEFAULT_INITIAL_RETRY_DELAY, DEFAULT_MAX_RETRIES, DEFAULT_RETRY_DELAY_INCREMENT, DEFAULT_TIMEOUT
 from .log import AbstractLogger, NullLogger
@@ -15,6 +17,7 @@ class _LocalConfig:
         "default_retry_delay_increment",
         "default_timeout",
         "logger",
+        "tzinfo",
     )
 
     default_initial_retry_delay: Number
@@ -22,6 +25,7 @@ class _LocalConfig:
     default_retry_delay_increment: Number
     default_timeout: DefaultTimeout
     logger: AbstractLogger
+    tzinfo: _tzinfo
 
     def __init__(self):
         self.default_initial_retry_delay: Number = DEFAULT_INITIAL_RETRY_DELAY
@@ -29,6 +33,26 @@ class _LocalConfig:
         self.default_retry_delay_increment: Number = DEFAULT_RETRY_DELAY_INCREMENT
         self.default_timeout: DefaultTimeout = DEFAULT_TIMEOUT
         self.logger = NullLogger()
+
+        self.__set_default_tzinfo()
+
+    def __set_default_tzinfo(self):
+        try:
+            tzinfo = datetime.now().astimezone().tzinfo
+        except OSError as error:
+            self.logger.warning(
+                "Failed to detect system tzinfo, falling back to UTC",
+                context={
+                   "error": error,
+                },
+            )
+            tzinfo = timezone.utc
+        else:
+            if tzinfo is None:
+                self.logger.warning("Failed to detect system tzinfo, falling back to UTC")
+                tzinfo = timezone.utc
+
+        self.tzinfo = tzinfo
 
 
 class Config:
@@ -57,6 +81,7 @@ class Config:
             default_timeout: Timeout = None,
             logger: typing.Optional[AbstractLogger] = None,
             log_level: typing.Optional[int] = None,
+            tzinfo: typing.Optional[_tzinfo] = None,
     ):
         """"""
 
@@ -78,6 +103,9 @@ class Config:
         if log_level is not None:
             self.log_level = log_level
 
+        if tzinfo is not None:
+            self.tzinfo = tzinfo
+
     @property
     def default_initial_retry_delay(self) -> Number:
         """Initial delay between retries in seconds"""
@@ -86,10 +114,8 @@ class Config:
     @default_initial_retry_delay.setter
     def default_initial_retry_delay(self, value: Number):
         """"""
-
         if not (isinstance(value, (int, float)) and value > 0):
             raise ValueError("Initial_retry_delay must be a positive number")
-
         self._config.default_initial_retry_delay = value
 
     @property
@@ -100,10 +126,8 @@ class Config:
     @default_max_retries.setter
     def default_max_retries(self, value: int):
         """"""
-
         if not (isinstance(value, int) and value >= 1):
             raise ValueError("Max_retries must be a positive integer (>= 1)")
-
         self._config.default_max_retries = value
 
     @property
@@ -114,10 +138,8 @@ class Config:
     @default_retry_delay_increment.setter
     def default_retry_delay_increment(self, value: Number):
         """"""
-
         if not (isinstance(value, (int, float)) and value >= 0):
             raise ValueError("Retry_delay_increment must be a positive number")
-
         self._config.default_retry_delay_increment = value
 
     @property
@@ -128,10 +150,8 @@ class Config:
     @default_timeout.setter
     def default_timeout(self, value: DefaultTimeout):
         """"""
-
         if not (isinstance(value, (int, float)) and value > 0):
             raise ValueError("Default_timeout must be a positive number or a tuple of two positive numbers (connect_timeout, read_timeout)")
-
         self._config.default_timeout = value
 
     @property
@@ -142,10 +162,8 @@ class Config:
     @logger.setter
     def logger(self, value: AbstractLogger):
         """"""
-
         if not isinstance(value, AbstractLogger):
             raise TypeError("Logger must be an instance of AbstractLogger")
-
         self._config.logger = value
 
     @property
@@ -167,3 +185,15 @@ class Config:
             )
 
         self._config.logger.set_level(value)
+
+    @property
+    def tzinfo(self) -> _tzinfo:
+        """"""
+        return self._config.tzinfo
+
+    @tzinfo.setter
+    def tzinfo(self, value: _tzinfo):
+        """"""
+        if not isinstance(value, _tzinfo):
+            raise TypeError("tzinfo must be an instance of datetime.tzinfo")
+        self._config.tzinfo = value
