@@ -32,10 +32,15 @@ dev = [
     "ruff==0.12.1",
 ]
 test = [
-  "pytest>=7",
-  "pytest-cov>=4",
-  "pytest-mock>=3",
-  "pytest-dependency>=0.5.1",
+    "environs>=11.0.0",
+    "fastapi",
+    "pytest>=7",
+    "pytest-cov>=4",
+    "pytest-dependency>=0.5.1",
+    "pytest-mock>=3",
+    "python-multipart",
+    "uvicorn",
+    "fastapi[standard]"
 ]
 
 [tool.setuptools.packages.find]
@@ -100,6 +105,7 @@ ignore = [
     "T201",
     "TID252",   # https://docs.astral.sh/ruff/rules/relative-imports
     "TRY003",   # https://docs.astral.sh/ruff/rules/raise-vanilla-args/
+    "TRY301",   # https://docs.astral.sh/ruff/rules/raise-within-try/
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -111,9 +117,25 @@ quote-style = "double"
 [tool.pytest.ini_options]
 addopts = "-q"
 markers = [
-  "integration: marks tests that hit real Bitrix24 API (deselect with -m 'not integration')",
+    "access: mark a test as related to access operations",
+    "crm: mark a test as related to crm operations",
+    "crm_deal: mark a test as related to crm.deal operations",
+    "department: mark a test as related to department operations",
+    "events: mark a test as related to events operations",
+    "feature: mark a test as related to feature operations",
+    "integration: marks tests that hit real Bitrix24 API (deselect with -m 'not integration')",
+    "method",
+    "oauth_only: mark test to run only if OAuth credentials are available",
+    "placement: mark a test as related to placement operations",
+    "profile: mark a test as related to profile operations",
+    "server: mark a test as related to server operations",
+    "scope",
+    "unit",
+    "user: mark a test as related to user operations",
+    "user_option: mark a test as related to user option operations",
+    "user_userfield: mark a test as related to user userfield operations",
 ]
 testpaths = [
-  "tests",
+    "tests",
 ]
 python_files = ["test_*.py", "*_test.py"]
