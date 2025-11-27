@@ -1,6 +1,7 @@
-from typing import TYPE_CHECKING, Dict, Optional, Text, Tuple
+from typing import TYPE_CHECKING, Dict, Optional, Text, Tuple, Union
 
 from ...utils.types import B24APIResult, JSONDict, Timeout
+from ..protocols import BitrixTokenFullProtocol
 from ..responses import BitrixAPIResponse, BitrixAPITimeResponse
 
 if TYPE_CHECKING:
@@ -13,7 +14,7 @@ class BitrixAPIRequest:
 
     __slots__ = ("_api_method", "_bitrix_token", "_kwargs", "_params", "_response", "_timeout")
 
-    _bitrix_token: "AbstractBitrixToken"
+    _bitrix_token: Union["AbstractBitrixToken", BitrixTokenFullProtocol]
     _api_method: Text
     _params: Optional[JSONDict]
     _timeout: Timeout
@@ -23,7 +24,7 @@ class BitrixAPIRequest:
     def __init__(
             self,
             *,
-            bitrix_token: "AbstractBitrixToken",
+            bitrix_token: Union["AbstractBitrixToken", BitrixTokenFullProtocol],
             api_method: Text,
             params: Optional[JSONDict] = None,
             timeout: Timeout = None,
@@ -54,7 +55,7 @@ class BitrixAPIRequest:
         return self._api_method, self._params
 
     @property
-    def bitrix_token(self) -> "AbstractBitrixToken":
+    def bitrix_token(self) -> Union["AbstractBitrixToken", BitrixTokenFullProtocol]:
         """"""
         return self._bitrix_token
 
