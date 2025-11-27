@@ -1,12 +1,11 @@
 import logging
-from abc import ABC
 from typing import Any, Iterable, List, Mapping, Optional, Text, Type
 
 from ..version import SDK_NAME
 from .abstract_logger import AbstractLogger
 
 
-class BaseLogger(AbstractLogger, ABC):
+class BaseLogger(AbstractLogger):
     """"""
 
     _DEFAULT_HANDLER_TYPE: Type[logging.Handler]

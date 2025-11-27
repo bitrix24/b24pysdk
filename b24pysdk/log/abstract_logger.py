@@ -1,9 +1,8 @@
 import logging
-from abc import ABC, abstractmethod
 from typing import Any, ClassVar, Dict, Mapping, Optional, Text
 
 
-class AbstractLogger(ABC):
+class AbstractLogger:
     """"""
 
     NOTSET = logging.NOTSET
@@ -23,26 +22,26 @@ class AbstractLogger(ABC):
     }
 
     @property
-    @abstractmethod
-    def level(self) -> int: ...
+    def level(self) -> int:
+        raise NotImplementedError
 
-    @abstractmethod
-    def debug(self, message: Text, context: Optional[Mapping[Text, Any]] = None): ...
+    def debug(self, message: Text, context: Optional[Mapping[Text, Any]] = None):
+        raise NotImplementedError
 
-    @abstractmethod
-    def info(self, message: Text, context: Optional[Mapping[Text, Any]] = None): ...
+    def info(self, message: Text, context: Optional[Mapping[Text, Any]] = None):
+        raise NotImplementedError
 
-    @abstractmethod
-    def warning(self, message: Text, context: Optional[Mapping[Text, Any]] = None): ...
+    def warning(self, message: Text, context: Optional[Mapping[Text, Any]] = None):
+        raise NotImplementedError
 
-    @abstractmethod
-    def error(self, message: Text, context: Optional[Mapping[Text, Any]] = None): ...
+    def error(self, message: Text, context: Optional[Mapping[Text, Any]] = None):
+        raise NotImplementedError
 
-    @abstractmethod
-    def critical(self, message: Text, context: Optional[Mapping[Text, Any]] = None): ...
+    def critical(self, message: Text, context: Optional[Mapping[Text, Any]] = None):
+        raise NotImplementedError
 
-    @abstractmethod
-    def log(self, level: int, message: Text, context: Optional[Mapping[Text, Any]] = None): ...
+    def log(self, level: int, message: Text, context: Optional[Mapping[Text, Any]] = None):
+        raise NotImplementedError
 
-    @abstractmethod
-    def set_level(self, level: int): ...
+    def set_level(self, level: int):
+        raise NotImplementedError
