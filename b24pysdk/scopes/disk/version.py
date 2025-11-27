@@ -1,32 +1,32 @@
-from functools import cached_property
-
 from ...bitrix_api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import Timeout
-from .._base_scope import BaseScope
-from .option import Option
+from .._base_entity import BaseEntity
 
 __all__ = [
-    "App",
+    "Version",
 ]
 
 
-class App(BaseScope):
+class Version(BaseEntity):
     """"""
 
-    @cached_property
-    def option(self) -> Option:
-        """"""
-        return Option(self)
-
     @type_checker
-    def info(
+    def get(
             self,
+            bitrix_id: int,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
+
+        params = {
+            "id": bitrix_id,
+        }
+
         return self._make_bitrix_api_request(
-            api_wrapper=self.info,
+            api_wrapper=self.get,
+            params=params,
             timeout=timeout,
         )
+

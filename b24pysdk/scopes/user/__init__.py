@@ -5,6 +5,7 @@ from ...bitrix_api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
 from .._base_scope import BaseScope
+from .option import Option
 from .userfield import Userfield
 
 __all__ = [
@@ -14,6 +15,11 @@ __all__ = [
 
 class User(BaseScope):
     """"""
+
+    @cached_property
+    def option(self) -> Option:
+        """"""
+        return Option(self)
 
     @cached_property
     def userfield(self) -> Userfield:
@@ -97,18 +103,6 @@ class User(BaseScope):
         )
 
     @type_checker
-    def current(
-            self,
-            *,
-            timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """"""
-        return self._make_bitrix_api_request(
-            api_wrapper=self.current,
-            timeout=timeout,
-        )
-
-    @type_checker
     def search(
             self,
             *,
@@ -141,6 +135,18 @@ class User(BaseScope):
         return self._make_bitrix_api_request(
             api_wrapper=self.search,
             params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def current(
+            self,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+        return self._make_bitrix_api_request(
+            api_wrapper=self.current,
             timeout=timeout,
         )
 

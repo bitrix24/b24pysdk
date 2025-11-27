@@ -1,5 +1,5 @@
 from functools import cached_property
-from typing import Iterable, Literal, Optional, Text
+from typing import Annotated, Iterable, Literal, Optional, Text
 
 from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
@@ -27,7 +27,7 @@ class Calllist(BaseCRM):
     def add(
             self,
             *,
-            entity_type: Literal["CONTACT", "COMPANY"],
+            entity_type: Annotated[Text, Literal["CONTACT", "COMPANY"]],
             entities: Iterable[int],
             webform_id: Optional[int] = None,
             timeout: Timeout = None,
@@ -201,7 +201,7 @@ class Calllist(BaseCRM):
             self,
             *,
             list_id: int,
-            entity_type: Literal["CONTACT", "COMPANY"],
+            entity_type: Annotated[Text, Literal["CONTACT", "COMPANY"]],
             entities: Iterable[int],
             webform_id: Optional[int] = None,
             timeout: Timeout = None,

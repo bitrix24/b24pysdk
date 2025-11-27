@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Callable, Optional, Text, Union
 
+from ..bitrix_api.protocols import BitrixTokenFullProtocol
 from ..bitrix_api.requests import BitrixAPIRequest
 from ..utils.functional import Classproperty
 from ..utils.types import JSONDict, Timeout
 
 if TYPE_CHECKING:
     from .. import Client
-    from ..bitrix_api.credentials import AbstractBitrixToken
 
 
 class BaseContext(ABC):
@@ -29,7 +29,7 @@ class BaseContext(ABC):
         raise NotImplementedError
 
     @property
-    def _bitrix_token(self) -> "AbstractBitrixToken":
+    def _bitrix_token(self) -> BitrixTokenFullProtocol:
         """"""
         return getattr(self._context, "_bitrix_token")
 
@@ -62,10 +62,13 @@ class BaseContext(ABC):
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
+
+        if timeout:
+            self._kwargs["timeout"] = timeout
+
         return BitrixAPIRequest(
             bitrix_token=self._bitrix_token,
             api_method=self._get_api_method(api_wrapper),
             params=params,
-            timeout=timeout,
             **self._kwargs,
         )

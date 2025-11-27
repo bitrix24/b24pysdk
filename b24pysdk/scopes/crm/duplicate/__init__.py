@@ -1,5 +1,5 @@
 from functools import cached_property
-from typing import Iterable, Literal, Optional, Text
+from typing import Annotated, Iterable, Literal, Optional, Text
 
 from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
@@ -27,9 +27,9 @@ class Duplicate(BaseCRM):
     def find_by_comm(
             self,
             *,
-            type: Literal["EMAIL", "PHONE"],
+            type: Annotated[Text, Literal["EMAIL", "PHONE"]],
             values: Iterable[Text],
-            entity_type: Optional[Literal["LEAD", "CONTACT", "COMPANY"]] = None,
+            entity_type: Optional[Annotated[Text, Literal["LEAD", "CONTACT", "COMPANY"]]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get leads, contacts, and companies with matching data

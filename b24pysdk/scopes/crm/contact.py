@@ -27,7 +27,7 @@ class Contact(BaseItem):
         return Company(self)
 
     @cached_property
-    def details(self) -> "Details":
+    def details(self) -> Details:
         """"""
         return Details(self)
 

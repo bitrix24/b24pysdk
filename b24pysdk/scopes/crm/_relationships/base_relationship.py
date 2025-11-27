@@ -12,7 +12,7 @@ class BaseRelationship(BaseCRM):
     Contact-CRM entity bindings, where the CRM entity can be a Lead, Deal, or Company."""
 
     @cached_property
-    def items(self) -> "Items":
+    def items(self) -> Items:
         """"""
         return Items(self)
 

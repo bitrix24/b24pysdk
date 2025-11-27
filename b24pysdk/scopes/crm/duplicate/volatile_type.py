@@ -1,4 +1,4 @@
-from typing import Literal, Optional, Text
+from typing import Annotated, Literal, Optional, Text
 
 from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
@@ -20,7 +20,7 @@ class VolatileType(BaseCRM):
     def fields(
             self,
             *,
-            entity_type_id: Optional[Literal[1, 3, 4]] = None,
+            entity_type_id: Optional[Annotated[Text, Literal[1, 3, 4]]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of fields for duplicate search
@@ -82,7 +82,7 @@ class VolatileType(BaseCRM):
     def register(
             self,
             *,
-            entity_type_id: Literal[1, 3, 4],
+            entity_type_id: Annotated[Text, Literal[1, 3, 4]],
             field_code: Text,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
