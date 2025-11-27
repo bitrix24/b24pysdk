@@ -1,5 +1,19 @@
 from ..utils import enum as _enum
 
+__all__ = [
+    "CRMSettinsgMode",
+    "EntityTypeAbbr",
+    "EntityTypeID",
+    "EntityTypeName",
+    "UserFieldEntityID",
+]
+
+
+class CRMSettinsgMode(_enum.IntEnum):
+    """"""
+    CLASSIC = 1
+    SIMPLE = 2
+
 
 class EntityTypeAbbr(_enum.StrEnum):
     """Enumeration of CRM entity type abbreviations used in Bitrix24 CRM system."""
@@ -13,7 +27,7 @@ class EntityTypeAbbr(_enum.StrEnum):
     ORDER = "O"
 
 
-class EntityTypeId(_enum.IntEnum):
+class EntityTypeID(_enum.IntEnum):
     """Enumeration of CRM entity type IDs corresponding to Bitrix24 entities."""
     LEAD = 1
     DEAL = 2
@@ -37,7 +51,7 @@ class EntityTypeName(_enum.StrEnum):
     ORDER = "ORDER"
 
 
-class UserFieldEntityId(_enum.StrEnum):
+class UserFieldEntityID(_enum.StrEnum):
     """Enumeration of user field entity IDs for CRM entities in Bitrix24, used for custom fields identification."""
     LEAD = "CRM_LEAD"
     DEAL = "CRM_DEAL"

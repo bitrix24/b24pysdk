@@ -10,6 +10,8 @@ __all__ = [
     "DEFAULT_TIMEOUT",
     "B24AppStatus",
     "B24BoolLit",
+    "Protocol",
+    "UserTypeID",
 ]
 
 
@@ -69,4 +71,30 @@ class B24BoolLit(_enum.StrEnum):
     DEFAULT = "D"
 
     def __bool__(self):
-        return bool(_types.B24Bool(typing.cast(_types.B24BoolLiteral, self)))
+        return bool(_types.B24Bool(self))
+
+
+class Protocol(_enum.IntEnum):
+    """"""
+    HTTP = 0
+    HTTPS = 1
+
+
+class UserTypeID(_enum.StrEnum):
+    """Enum type ID for Bitrix24 user field types."""
+    STRING = "string"
+    INTEGER = "integer"
+    DOUBLE = "double"
+    DATE = "date"
+    DATETIME = "datetime"
+    BOOLEAN = "boolean"
+    FILE = "file"
+    ENUMERATION = "enumeration"
+    URL = "url"
+    ADDRESS = "address"
+    MONEY = "money"
+    IBLOCK_SECTION = "iblock_section"
+    IBLOCK_ELEMENT = "iblock_element"
+    EMPLOYEE = "employee"
+    CRM = "crm"
+    CRM_STATUS = "crm_status"
