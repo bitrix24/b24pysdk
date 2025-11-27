@@ -439,8 +439,8 @@ class MyBitrixToken(BitrixToken):
         self.portal_domain_changed_signal.connect(self.portal_domain_changed_handler)
         
     def oauth_token_renewed_handler(self, event: OAuthTokenRenewedEvent):
-        print(self, f'Renewed oauth token: {event.renewed_oauth_token}')
+        print(self, f"Renewed oauth token: {event.renewed_oauth_token}")
         
     def portal_domain_changed_handler(self, event: PortalDomainChangedEvent):
-        print(self, f'Old domain: {event.old_domain}, new domain: {event.new_domain}')
+        print(self, f"Old domain: {event.old_domain}, new domain: {event.new_domain}")
 ```
