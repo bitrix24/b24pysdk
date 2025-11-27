@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Callable, Dict, Final, Generator, Iterable, Literal, Optional, Text, Tuple, Union
+from typing import TYPE_CHECKING, Callable, Dict, Final, Generator, Iterable, Literal, Optional, Text, Tuple, Union
 
 from ..._constants import MAX_BATCH_SIZE
 from ...utils.types import B24BatchMethodTuple, JSONDict, JSONList, Timeout
@@ -7,6 +7,9 @@ from ..protocols import BitrixTokenProtocol
 from ._base_caller import BaseCaller
 from .call_batch import call_batch
 from .call_method import call_method
+
+if TYPE_CHECKING:
+    from ..credentials import AbstractBitrixToken
 
 
 class _ListFastCaller(BaseCaller):
@@ -23,7 +26,7 @@ class _ListFastCaller(BaseCaller):
         "tasks.task": "ID",
     }
 
-    _ORDER_PATTERNS: Final[Dict] = {
+    _ORDER_PATTERNS: Final[Dict[Text, Callable[[Text, Text], JSONDict]]] = {
         "department": staticmethod(lambda id_field, sorting: {"SORT": id_field, "ORDER": sorting}),
         "user": staticmethod(lambda id_field, sorting: {"SORT": id_field, "ORDER": sorting}),
         "user.userfield": _DEFAULT_ORDER_PATTERN,
@@ -66,7 +69,7 @@ class _ListFastCaller(BaseCaller):
             descending: bool = False,
             limit: Optional[int] = None,
             timeout: Timeout = None,
-            bitrix_token: Optional["BitrixTokenProtocol"] = None,
+            bitrix_token: Optional[Union["AbstractBitrixToken", BitrixTokenProtocol]] = None,
             **kwargs,
     ):
         super().__init__(
@@ -81,7 +84,7 @@ class _ListFastCaller(BaseCaller):
         )
         self._descending = descending
         self._limit = limit
-        self._now_datetime = datetime.now().astimezone()
+        self._now_datetime = datetime.now(tz=self._config.tzinfo)
         self._time = dict(
             start=self._timesampt,
             finish=self._timesampt,
@@ -365,7 +368,7 @@ def call_list_fast(
         descending: bool = False,
         limit: Optional[int] = None,
         timeout: Timeout = None,
-        bitrix_token: Optional["BitrixTokenProtocol"] = None,
+        bitrix_token: Optional[Union["AbstractBitrixToken", BitrixTokenProtocol]] = None,
         **kwargs,
 ) -> JSONDict:
     """

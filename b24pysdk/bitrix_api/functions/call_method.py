@@ -1,9 +1,12 @@
-from typing import Optional, Text
+from typing import TYPE_CHECKING, Optional, Text, Union
 
 from ...utils.types import JSONDict, Timeout
 from ..protocols import BitrixTokenProtocol
 from ._base_caller import BaseCaller
 from .call import call
+
+if TYPE_CHECKING:
+    from ..credentials import AbstractBitrixToken
 
 
 class _MethodCaller(BaseCaller):
@@ -17,7 +20,7 @@ class _MethodCaller(BaseCaller):
             api_method: Text,
             params: Optional[JSONDict] = None,
             timeout: Timeout = None,
-            bitrix_token: Optional["BitrixTokenProtocol"] = None,
+            bitrix_token: Optional[Union["AbstractBitrixToken", BitrixTokenProtocol]] = None,
             **kwargs,
     ):
         super().__init__(
@@ -55,6 +58,7 @@ class _MethodCaller(BaseCaller):
             "start call_method",
             context=dict(
                 domain=self._domain,
+                is_webhook=self._is_webhook,
                 method=self._api_method,
                 parameters=self._params,
             ),
@@ -68,8 +72,8 @@ class _MethodCaller(BaseCaller):
         self._config.logger.debug(
             "finish call_method",
             context=dict(
-                result=json_response["result"],
-                time=json_response["time"],
+                result=json_response.get("result"),
+                time=json_response.get("time"),
             ),
         )
         return json_response
@@ -83,7 +87,7 @@ def call_method(
         api_method: Text,
         params: Optional[JSONDict] = None,
         timeout: Timeout = None,
-        bitrix_token: Optional["BitrixTokenProtocol"] = None,
+        bitrix_token: Optional[Union["AbstractBitrixToken", BitrixTokenProtocol]] = None,
         **kwargs,
 ) -> JSONDict:
     """

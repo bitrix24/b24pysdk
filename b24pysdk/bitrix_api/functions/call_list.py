@@ -1,4 +1,4 @@
-from typing import Final, Iterable, List, Mapping, Optional, Text, Tuple
+from typing import TYPE_CHECKING, Final, Iterable, List, Mapping, Optional, Text, Tuple, Union
 
 from ..._constants import MAX_BATCH_SIZE
 from ...utils.types import B24BatchMethodTuple, JSONDict, JSONList, Timeout
@@ -6,6 +6,9 @@ from ..protocols import BitrixTokenProtocol
 from ._base_caller import BaseCaller
 from .call_batches import call_batches
 from .call_method import call_method
+
+if TYPE_CHECKING:
+    from ..credentials import AbstractBitrixToken
 
 
 class _ListCaller(BaseCaller):
@@ -31,7 +34,7 @@ class _ListCaller(BaseCaller):
             params: Optional[JSONDict] = None,
             limit: Optional[int] = None,
             timeout: Timeout = None,
-            bitrix_token: Optional["BitrixTokenProtocol"] = None,
+            bitrix_token: Optional[Union["AbstractBitrixToken", BitrixTokenProtocol]] = None,
             **kwargs,
     ):
         super().__init__(
@@ -225,9 +228,13 @@ class _ListCaller(BaseCaller):
         self._time = response["time"]
 
         next_step = response.get("next")
+        total = response.get("total")
 
-        total = response.get("total") or 0
-        total = min(total, self._limit) if self._limit else total
+        if total is None:
+            total = len(result)
+
+        if self._limit:
+            total = min(total, self._limit)
 
         if next_step:
             batch_response = self._fetch_batches_response(
@@ -251,7 +258,7 @@ def call_list(
         params: Optional[JSONDict] = None,
         limit: Optional[int] = None,
         timeout: Timeout = None,
-        bitrix_token: Optional["BitrixTokenProtocol"] = None,
+        bitrix_token: Optional[Union["AbstractBitrixToken", BitrixTokenProtocol]] = None,
         **kwargs,
 ) -> JSONDict:
     """

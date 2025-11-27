@@ -1,10 +1,13 @@
-from typing import Dict, Final, List, Mapping, Optional, Sequence, Text, Tuple, Union, overload
+from typing import TYPE_CHECKING, Dict, Final, List, Mapping, Optional, Sequence, Text, Tuple, Union, overload
 
 from ..._constants import MAX_BATCH_SIZE
 from ...utils.types import B24BatchMethods, B24BatchMethodTuple, JSONDict, JSONList, Key, Timeout
 from ..protocols import BitrixTokenProtocol
 from ._base_caller import BaseCaller
 from .call_batch import call_batch
+
+if TYPE_CHECKING:
+    from ..credentials import AbstractBitrixToken
 
 
 class _BatchesCaller(BaseCaller):
@@ -28,7 +31,7 @@ class _BatchesCaller(BaseCaller):
             methods: B24BatchMethods,
             halt: bool = False,
             timeout: Timeout = None,
-            bitrix_token: Optional["BitrixTokenProtocol"] = None,
+            bitrix_token: Optional[Union["AbstractBitrixToken", BitrixTokenProtocol]] = None,
             **kwargs,
     ):
         super().__init__(
@@ -171,7 +174,7 @@ def call_batches(
         methods: B24BatchMethods,
         halt: bool = False,
         timeout: Timeout = None,
-        bitrix_token: Optional["BitrixTokenProtocol"] = None,
+        bitrix_token: Optional[Union["AbstractBitrixToken", BitrixTokenProtocol]] = None,
         **kwargs,
 ) -> JSONDict:
     """

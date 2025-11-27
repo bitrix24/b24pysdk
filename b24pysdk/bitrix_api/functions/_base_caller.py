@@ -1,9 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Optional, Text
+from typing import TYPE_CHECKING, Dict, Optional, Text, Union
 
 from ..._config import Config
 from ...utils.types import JSONDict, Timeout
 from ..protocols import BitrixTokenProtocol
+
+if TYPE_CHECKING:
+    from ..credentials import AbstractBitrixToken
 
 
 class BaseCaller(ABC):
@@ -28,7 +31,7 @@ class BaseCaller(ABC):
     _api_method: Text
     _params: JSONDict
     _timeout: Timeout
-    _bitrix_token: Optional["BitrixTokenProtocol"]
+    _bitrix_token: Optional[Union["AbstractBitrixToken", BitrixTokenProtocol]]
     _kwargs: Dict
 
     def __init__(
@@ -40,7 +43,7 @@ class BaseCaller(ABC):
             api_method: Text,
             params: Optional[JSONDict] = None,
             timeout: Timeout = None,
-            bitrix_token: Optional["BitrixTokenProtocol"] = None,
+            bitrix_token: Optional[Union["AbstractBitrixToken", BitrixTokenProtocol]] = None,
             **kwargs,
     ):
         self._config = Config()
