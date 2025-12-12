@@ -1,11 +1,14 @@
 import threading
 import typing
-from datetime import datetime, timezone
-from datetime import tzinfo as _tzinfo
+from datetime import date, datetime, timezone, tzinfo
 
 from .constants import DEFAULT_INITIAL_RETRY_DELAY, DEFAULT_MAX_RETRIES, DEFAULT_RETRY_DELAY_INCREMENT, DEFAULT_TIMEOUT
 from .log import AbstractLogger, NullLogger
 from .utils.types import DefaultTimeout, Number, Timeout
+
+__all__ = [
+    "Config",
+]
 
 
 class _LocalConfig:
@@ -17,7 +20,7 @@ class _LocalConfig:
         "default_retry_delay_increment",
         "default_timeout",
         "logger",
-        "tzinfo",
+        "tz",
     )
 
     default_initial_retry_delay: Number
@@ -25,7 +28,7 @@ class _LocalConfig:
     default_retry_delay_increment: Number
     default_timeout: DefaultTimeout
     logger: AbstractLogger
-    tzinfo: _tzinfo
+    tz: tzinfo
 
     def __init__(self):
         self.default_initial_retry_delay: Number = DEFAULT_INITIAL_RETRY_DELAY
@@ -34,11 +37,11 @@ class _LocalConfig:
         self.default_timeout: DefaultTimeout = DEFAULT_TIMEOUT
         self.logger = NullLogger()
 
-        self.__set_default_tzinfo()
+        self.__set_default_tz()
 
-    def __set_default_tzinfo(self):
+    def __set_default_tz(self):
         try:
-            tzinfo = datetime.now().astimezone().tzinfo
+            tz = datetime.now().astimezone().tzinfo
         except OSError as error:
             self.logger.warning(
                 "Failed to detect system tzinfo, falling back to UTC",
@@ -46,13 +49,13 @@ class _LocalConfig:
                    "error": error,
                 },
             )
-            tzinfo = timezone.utc
+            tz = timezone.utc
         else:
-            if tzinfo is None:
+            if tz is None:
                 self.logger.warning("Failed to detect system tzinfo, falling back to UTC")
-                tzinfo = timezone.utc
+                tz = timezone.utc
 
-        self.tzinfo = tzinfo
+        self.tz = tz
 
 
 class Config:
@@ -81,7 +84,7 @@ class Config:
             default_timeout: Timeout = None,
             logger: typing.Optional[AbstractLogger] = None,
             log_level: typing.Optional[int] = None,
-            tzinfo: typing.Optional[_tzinfo] = None,
+            tz: typing.Optional[tzinfo] = None,
     ):
         """"""
 
@@ -103,8 +106,8 @@ class Config:
         if log_level is not None:
             self.log_level = log_level
 
-        if tzinfo is not None:
-            self.tzinfo = tzinfo
+        if tz is not None:
+            self.tz = tz
 
     @property
     def default_initial_retry_delay(self) -> Number:
@@ -187,13 +190,40 @@ class Config:
         self._config.logger.set_level(value)
 
     @property
-    def tzinfo(self) -> _tzinfo:
+    def tz(self) -> tzinfo:
         """"""
-        return self._config.tzinfo
+        return self._config.tz
 
-    @tzinfo.setter
-    def tzinfo(self, value: _tzinfo):
+    @tz.setter
+    def tz(self, value: tzinfo):
         """"""
-        if not isinstance(value, _tzinfo):
+        if not isinstance(value, tzinfo):
             raise TypeError("tzinfo must be an instance of datetime.tzinfo")
-        self._config.tzinfo = value
+        self._config.tz = value
+
+    def get_local_date(
+            self,
+            *,
+            dt: typing.Optional[datetime] = None,
+            tz: typing.Optional[tzinfo] = None,
+    ) -> date:
+        """"""
+        return self.get_local_datetime(dt=dt, tz=tz).date()
+
+    def get_local_datetime(
+            self,
+            *,
+            dt: typing.Optional[datetime] = None,
+            tz: typing.Optional[tzinfo] = None,
+    ) -> datetime:
+        """"""
+
+        if tz is None:
+            tz = self.tz
+
+        if dt is None:
+            dt = datetime.now(tz=tz)
+        else:
+            dt = dt.astimezone(tz=tz)
+
+        return dt
