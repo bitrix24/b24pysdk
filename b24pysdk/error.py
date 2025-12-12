@@ -5,7 +5,8 @@ from urllib.parse import urlparse as _urlparse
 
 import requests
 
-from .utils import types as _types
+if typing.TYPE_CHECKING:
+    from .utils.types import JSONDict as _JSONDict
 
 __all__ = [
     "BitrixAPIAccessDenied",
@@ -131,7 +132,7 @@ class BitrixOAuthException(BitrixSDKException):
     """"""
 
 
-class BitrixValidationError(BitrixSDKException):
+class BitrixValidationError(BitrixSDKException, ValueError):
     """"""
 
 
@@ -209,7 +210,7 @@ class BitrixAPIError(BitrixSDKException, _HTTPResponse):
 
     __slots__ = ("json_response", "response")
 
-    def __init__(self, json_response: _types.JSONDict, response: requests.Response):
+    def __init__(self, json_response: "_JSONDict", response: requests.Response):
         message = json_response.get("error_description", f"{self.__class__.__name__}: {response.text}")
         super().__init__(message, json_response, response)
         self.json_response = json_response
