@@ -1,6 +1,6 @@
-from typing import Generator, Optional
+from typing import Optional
 
-from ...utils.types import JSONDict, JSONList
+from ...utils.types import JSONDict, JSONDictGenerator, JSONList
 from ..responses import BitrixAPIListFastResponse, BitrixAPIListResponse
 from .bitrix_api_request import BitrixAPIRequest
 
@@ -104,7 +104,7 @@ class BitrixAPIListFastRequest(BitrixAPIListRequest):
         return self._response or self.call()
 
     @property
-    def result(self) -> Generator[JSONDict, None, None]:
+    def result(self) -> JSONDictGenerator:
         """"""
         return self.response.result
 

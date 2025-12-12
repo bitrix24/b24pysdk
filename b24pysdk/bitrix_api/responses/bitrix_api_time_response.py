@@ -34,7 +34,7 @@ class BitrixAPITimeResponse:
             processing=json_response["processing"],
             date_start=datetime.fromisoformat(json_response["date_start"]),
             date_finish=datetime.fromisoformat(json_response["date_finish"]),
-            operating_reset_at=json_response.get("operating_reset_at") and datetime.fromtimestamp(json_response["operating_reset_at"], tz=Config().tzinfo),
+            operating_reset_at=json_response.get("operating_reset_at") and datetime.fromtimestamp(json_response["operating_reset_at"], tz=Config().tz),
             operating=json_response.get("operating"),
         )
 

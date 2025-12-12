@@ -1,8 +1,8 @@
 from dataclasses import InitVar, dataclass, field
-from typing import Dict, Generator, Literal
+from typing import Dict, Literal
 
 from ..._constants import PYTHON_VERSION as _PV
-from ...utils.types import JSONDict, JSONList
+from ...utils.types import JSONDict, JSONDictGenerator, JSONList
 from .bitrix_api_response import BitrixAPIResponse
 from .bitrix_api_time_response import BitrixAPITimeResponse
 
@@ -39,7 +39,7 @@ class BitrixAPIListResponse(BitrixAPIResponse):
 class BitrixAPIListFastResponse(BitrixAPIListResponse):
     """"""
 
-    result: Generator[JSONDict, None, None]
+    result: JSONDictGenerator
     time: InitVar[JSONDict]
     _time: JSONDict = field(init=False)
 
