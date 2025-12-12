@@ -20,7 +20,7 @@ You must not deviate in any way from this manual.
 
 The class creation manual is located in the file:
 
-AI-DEV-README.md
+AI-SCOPES-CREATION-README.md
 
 Write me the full version of the class code, implemented strictly according to the instructions in the manual above and incorporating ALL previously selected API methods — each of which must satisfy the selection criteria.
 **Ensure that the class includes methods for all identified API endpoints matching the pattern. Do not limit the implementation to a subset; the final class must represent a complete client for the specified scope based on the documentation.** 

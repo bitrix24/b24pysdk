@@ -22,7 +22,7 @@ You must not deviate in any way from this manual.
 
 The class creation manual is located in the file:
 
-AI-DOC-CREATION.md , you have to read it.
+AI-SCOPES-DOC-CREATION-README.md , you have to read it.
 
 Write me the complete class code with full documentation, implemented strictly according to the instructions in the manual above. 
 **Include both the complete source code AND comprehensive docstring fragments for all appropriate methods. Do not omit any code or use placeholders like # ...**

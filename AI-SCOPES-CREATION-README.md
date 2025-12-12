@@ -200,7 +200,7 @@ class Workgroup(BaseEntity):
 
 - **Decorator:** Annotate every public wrapper with `@type_checker` to enforce runtime validation. When methods delegate to other wrappers, apply the decorator only at the entry point to avoid redundant validation.
 - **Result Formation:**
-    - Assemble the `params` dictionary using native Python primitives (`int`, `float`, `bool`, `None`), standard typing hints (`Optional`, `Text`, `Iterable`), and SDK-specific helper types from `b24pysdk/utils/types` (`Timeout`, `JSONDict`, `B24Bool`, etc.) when special formatting is required.
+    - Assemble the `params` dictionary using native Python primitives (`int`, `float`, `bool`, `None`), standard typing hints (`Optional`, `Text`, `Iterable`), and SDK-specific helper types from `b24pysdk/utils/types` (`Timeout`, `JSONDict`, `B24Bool`, etc.) when special formatting is required. All SDK-specific helper types described in chapter 7.
     - Invoke `self._make_bitrix_api_request(...)`, providing:
       - `api_wrapper` — the current Python method, enabling `_get_api_method` to compute the REST method name.
       - `params` — omit when the endpoint accepts no payload.
@@ -210,11 +210,11 @@ class Workgroup(BaseEntity):
 **Example:**
 ```python
 # b24pysdk/scopes/socialnetwork/workgroup.py
-from typing import Iterable, Optional, Text
+from typing import Iterable, Optional, Text, Union
 
 from ...bitrix_api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import B24Bool, JSONDict, Timeout
+from ...utils.types import B24BoolStrict, JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -250,7 +250,7 @@ class Workgroup(BaseEntity):
             *,
             filter: Optional[JSONDict] = None,
             select: Optional[Iterable[Text]] = None,
-            is_admin: Optional[bool] = None,
+            is_admin: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -267,7 +267,7 @@ class Workgroup(BaseEntity):
             params["select"] = select
 
         if is_admin is not None:
-            params["IS_ADMIN"] = B24Bool(is_admin).to_str()
+            params["IS_ADMIN"] = B24BoolStrict(is_admin).to_b24()
 
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
@@ -278,7 +278,75 @@ class Workgroup(BaseEntity):
 
 ---
 
-### 7. Possible Development Nuances
+### 7. SDK-Specific Helper Types
+
+The SDK provides a set of helper types in the `b24pysdk/utils/types` module. These types should be used in parameter annotations instead of basic Python types when special data processing for Bitrix24 is required.
+
+#### Basic Type Aliases
+
+- **`JSONDict`** — Dictionary with string keys for representing JSON structures  
+- **`JSONList`** — List of `JSONDict` items for object arrays  
+- **`JSONDictGenerator`** — Generator yielding `JSONDict` items  
+- **`Key`** — Dictionary key (either `int` or `str`)  
+- **`Number`** — Numeric value (`float` or `int`)  
+- **`Timeout`** — Optional request timeout (single number or `(connect, read)` tuple)  
+- **`DefaultTimeout`** — Default timeout specification  
+
+#### Bitrix24-Specific Types
+
+- **`B24APIResult`** — API call result type (`JSONDict`, `JSONList`, `bool`, or `None`)  
+- **`B24AppStatusLiteral`** — Literal strings for Bitrix24 application statuses: `"F"` (Free), `"D"` (Demo), `"T"` (Trial), `"P"` (Paid), `"L"` (Local), `"S"` (Subscription)  
+- **`B24BatchMethodTuple`** — Tuple `(api_method, params)` for batch requests  
+- **`B24BatchMethods`** — Collection of batch methods (`Mapping` or `Sequence` of tuples)  
+- **`UserTypeIDLiteral`** — Literal strings for CRM user field types: `"string"`, `"integer"`, `"double"`, `"date"`, `"datetime"`, `"boolean"`, `"file"`, `"enumeration"`, `"url"`, `"address"`, `"money"`, `"iblock_section"`, `"iblock_element"`, `"employee"`, `"crm"`, `"crm_status"`  
+
+#### Validation Wrapper Classes
+
+###### **`B24Bool`** — Three-state Bitrix24 Boolean
+Represents the ternary logic used by Bitrix24 (`"Y"`/`"N"`/`"D"`).
+
+**Conversion mapping:**
+- `True` → `"Y"` (Yes)
+- `False` → `"N"` (No)  
+- `None` → `"D"` (Default)
+
+**Methods:**
+- `from_b24(literal: B24BoolLiteral) -> B24Bool` — Create from Bitrix24 string
+- `to_b24() -> B24BoolLiteral` — Convert to Bitrix24 API format
+
+##### **`B24BoolStrict`** — Strict Two-state Boolean (inherits `B24Bool`)
+Only allows `"Y"` or `"N"` values (excludes `"D"`). Supports mathematical operations and comparisons.
+
+**Additional features:**
+- `value` property returns native Python `bool`
+- Use when `"D"` (Default) is not permitted by the API endpoint
+
+##### **`DocumentType`** — Immutable Document Type Tuple
+Represents a Bitrix24 document type as a 3-element tuple.
+
+**Structure:** `(module: str, document: str, entity: str)`  
+**Validation:** Ensures exactly 3 string elements  
+**Methods:** `to_b24() -> List[str]` for API serialization  
+**Typing:** For parameters that will be validated using this class, specify the type as `Sequence[Text]`
+
+##### **`B24File`** — File Attachment Wrapper
+Represents a file for upload as a 2-element tuple.
+
+**Structure:** `(filename: str, base64_content: str)`  
+**Validation:** Ensures exactly 2 string elements  
+**Methods:** `to_b24() -> List[str]` for API serialization  
+**Typing:** For parameters that will be validated using this class, specify the type as `Sequence[Text]`
+
+##### When using validation classes, convert parameters to the required value using `to_b24()`. Example:
+
+```python
+document_type: Optional[Sequence[Text]] = None,
+
+if document_type is not None:
+    params["DOCUMENT_TYPE"] = DocumentType(document_type).to_b24()
+```
+
+### 8. Possible Development Nuances
 
 - 1\. When creating new scopes, conform to the established style prevalent in existing modules:
   - List function parameters one per line.
@@ -291,7 +359,7 @@ class Workgroup(BaseEntity):
 
 - 2\. Handle boolean parameters expected as `Y`/`N` by:
   - Annotating the parameter as `bool`.
-  - Converting the value with `B24Bool(<bool_value>).to_b24()` or `.to_str()` before transmission.
+  - Converting the value with `B24Bool(<bool_value>).to_b24()` before transmission.
   
 - 3\. List all mandatory parameters before the `*` separator; place optional keyword-only parameters afterwards and retrieve them with `dict.get("<param_name>")` rather than direct indexing.
   

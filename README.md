@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 # Bitrix24 REST API Python SDK
 
 ================
@@ -125,11 +127,15 @@ from b24pysdk import BitrixWebhook
 bitrix_token = BitrixWebhook(domain="example.bitrix24.com", auth_token="user_id/webhook_key")
 ```
 
-2. Using a temporary OAuth 2.0 authorization token: <https://apidocs.bitrix24.com/api-reference/oauth/index.html>
+2. Using a temporary OAuth 2.0 authorization token: <https://apidocs.bitrix24.com/settings/oauth/index.html>
 
 For any type of apps:
 ```python
 from b24pysdk import BitrixToken, BitrixApp
+from b24pysdk import Config
+from datetime import timedelta
+
+cfg = Config()
 
 bitrix_app = BitrixApp(client_id="app_code", client_secret="app_key")
 
@@ -138,6 +144,8 @@ bitrix_token = BitrixToken(
     auth_token="auth_token_of_the_app",
     refresh_token="refresh_token_of_the_app",  # optional parameter
     bitrix_app=bitrix_app,
+    expires_in=3600,  # optional parameter
+    expires=(Config().get_local_datetime() + timedelta(seconds=3600)) # optional parameter
 )
 ```
 
@@ -164,6 +172,25 @@ The `Client` is your entry point to the API. All supported methods are available
 from b24pysdk import Client
 
 client = Client(bitrix_token)
+```
+
+If you do not want to import Client you can use get_client() method and get Client instance from authenticator without writing import statement.
+
+```python
+from b24pysdk import BitrixToken, BitrixApp
+
+bitrix_app = BitrixApp(client_id="app_code", client_secret="app_key")
+
+bitrix_token = BitrixToken(
+    domain="example.bitrix24.com",
+    auth_token="auth_token_of_the_app",
+    bitrix_app=bitrix_app,
+)
+
+client = bitrix_token.get_client()
+
+request = client.crm.deal.update(bitrix_id=10, fields={"TITLE": "New title"})
+print(f'Updated successfully: {request.result}')
 ```
 
 For example, to get a description of deal fields you can call the `crm.deal.fields` method:
@@ -290,16 +317,18 @@ You can tweak default timeouts and retry behavior using `Config`:
 ```python
 from b24pysdk import Config
 from b24pysdk.log import StreamLogger 
+from datetime import timezone, timedelta
 
 logger = StreamLogger()
 
 cfg = Config()
 cfg.configure(
-    default_timeout=10,                 # seconds or (connect_timeout, read_timeout)
-    default_max_retries=3,              # number of retries on transient errors
-    default_initial_retry_delay=1,    # seconds
-    default_retry_delay_increment=0,  # seconds
-    logger=logger,                     
+    default_timeout=10,                        # seconds or (connect_timeout, read_timeout)
+    default_max_retries=3,                     # number of retries on transient errors
+    default_initial_retry_delay=1,             # seconds
+    default_retry_delay_increment=0,           # seconds
+    logger=logger,
+    tz=timezone(offset=timedelta(hours=2)),    # set timezone to UTC+2 (default to system if not specified)
 )
 ```
 
@@ -360,3 +389,48 @@ The log module within the b24pysdk offers a suite of logging utilities designed 
 
 
 The logging utilities in b24pysdk enhance observability into API interactions, error tracking, and performance monitoring by offering detailed and configurable logging options. The modular design allows developers to customize and extend the logging functionalities as needed.
+
+## Using Bitrix24 constants
+
+For convenience use constant classes like EntityTypeAbbr or UserType from constants module.
+
+```python
+from b24pysdk.constants.crm import EntityTypeID
+
+try:
+    request = client.crm.item.fields(
+        entity_type_id=EntityTypeID.DEAL,    # use constants for default CRM entities
+        use_original_uf_names="N",
+    ).result
+    print(request["webformId"]["title"])
+except BitrixAPIError as error:
+    print(f"API Bitrix error {error.error: {error}}")
+except Exception as error:
+    print(f"Error: {error}")
+```
+
+
+## Validation classes
+
+When working with received data from Bitrix24 you can use built-in validation. There are validation classes like:
+
+1. `OAuthPlacementData` - app loading data validation when someone interact with you app or built-in;
+2. `OAuthEventData` - validate event data from Bitrix24;
+3. `OAuthWorkflowData` - workflow results validation.
+
+With all validators above you should pass dictionary received from Bitrix24. 
+
+
+```python
+from b24pysdk.bitrix_api.credentials.oauth_placement_data import OAuthPlacementData
+
+# get placement_data from Bitrix24
+
+try:
+    oauth_placement_data = OAuthPlacementData.from_dict(placement_data)
+    print("OAuthPlacementData created successfully.")
+    print(oauth_placement_data)
+except OAuthPlacementData.ValidationError as e:
+    print(f"Validation error: {e}")
+```
+

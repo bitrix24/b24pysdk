@@ -20,7 +20,10 @@ b24pysdk/
 │   ├── responses/             # API function utilities and methods
 │   └── signals/               # Handling different request types
 ├── constants/                 # Constant definitions
-│   └── crm.py                 # Constant definitions for CRM scope
+│   ├── crm.py                 # Constant definitions for CRM scope
+│   ├── event.py               # Constant definitions for Event scope
+│   ├── user.py                # Constant definitions for User scope
+│   └── userfield.py           # Constant definitions for Userfield scope
 ├── log/                       # Logging utilities
 │   ├── abstract_logger.py     # Logger interface required to implement
 │   ├── base_logger.py         # Abstract logger class with basic logger interface implementation
@@ -28,11 +31,17 @@ b24pysdk/
 │   └── stream_logger.py       # Base logger implementation for console logging
 ├── scopes/                    # Implemented API scopes (CRM, User, etc.)
 │   ├── app/                   # App related scope module
+│   ├── biconnector/           # BI Connector related scope module
+│   ├── bizproc/               # Workflow related scope module
+│   ├── calendar/              # Calendar related scope module
 │   ├── crm/                   # CRM related scope modules
+│   ├── entity/                # Data storage related scope module
+│   ├── event/                 # Event related scope module
 │   ├── user/                  # User management scope modules
 │   ├── socialnetwork/         # Social network related scope modules
 │   ├── access.py              # Access related scope module
 │   ├── department.py          # Department related scope module
+│   ├── events.py              # Events related scope module
 │   ├── feature.py             # Fearure related scope module
 │   ├── method.py              # Method related scope module
 │   ├── profile.py             # Profile related scope module
@@ -278,6 +287,7 @@ BitrixSDKException (Exception)
 │   │   └─ BitrixOAuthRequestTimeout
 │   └─ BitrixResponseJSONDecodeError (_HTTPResponse)
 │       ├─ BitrixResponse302JSONDecodeError (_HTTPResponseFound)
+│       ├─ BitrixResponse403JSONDecodeError (_HTTPResponseForbidden)
 │       └─ BitrixResponse500JSONDecodeError (_HTTPResponseInternalError)
 ├─ BitrixAPIError (_HTTPResponse)
 │   ├─ BitrixAPIBadRequest (_HTTPResponseBadRequest)
@@ -291,6 +301,7 @@ BitrixSDKException (Exception)
 │   │   ├─ BitrixAPIExpiredToken
 │   │   ├─ BitrixAPINoAuthFound
 │   │   ├─ BitrixAPIErrorOAuth
+│   │   ├─ BitrixAPIAuthorizationError
 │   │   └─ BitrixAPIMethodConfirmWaiting
 │   ├─ BitrixAPIForbidden (_HTTPResponseForbidden)
 │   │   ├─ BitrixAPIAccessDenied
@@ -300,6 +311,7 @@ BitrixSDKException (Exception)
 │   │   ├─ BitrixOAuthInsufficientScope (BitrixOAuthException)
 │   │   ├─ BitrixAPIInvalidCredentials
 │   │   ├─ BitrixAPIUserAccessError
+│   │   ├─ BitrixAPIWrongAuthType
 │   │   └─ BitrixAPIMethodConfirmDenied
 │   ├─ BitrixAPINotFound (_HTTPResponseNotFound)
 │   │   └─ BitrixAPIErrorManifestIsNotAvailable
