@@ -63,7 +63,9 @@ ensure-ci-image:
 test-all: build-test
 	docker run --rm -t \
 		--env-file .env.local \
-		$(TEST_IMAGE)
+		$(TEST_IMAGE) \
+		--cov=b24pysdk \
+		tests/
 
 # Run tests located in the tests/integration directory
 test-integration: build-test
