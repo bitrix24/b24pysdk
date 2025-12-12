@@ -88,6 +88,9 @@ jobs:
             scope_method:
               - 'b24pysdk/scopes/method.py'
               - 'tests/integration/scopes/test_method.py'
+            scope_placement:
+              - 'b24pysdk/scopes/placement.py'
+              - 'tests/integration/scopes/test_placement.py'
             scope_profile:
               - 'b24pysdk/scopes/profile.py'
               - 'tests/integration/scopes/test_profile.py'
