@@ -38,5 +38,6 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
-#Tokens from tests
+# Tests
 tests/oauth_data.json
+tests/constants_local.py
