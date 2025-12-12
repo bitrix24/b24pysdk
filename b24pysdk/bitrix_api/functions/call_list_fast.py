@@ -1,8 +1,8 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Callable, Dict, Final, Generator, Iterable, Literal, Optional, Text, Tuple, Union
+from typing import TYPE_CHECKING, Callable, Dict, Final, Iterable, Literal, Optional, Text, Tuple, Union
 
 from ..._constants import MAX_BATCH_SIZE
-from ...utils.types import B24BatchMethodTuple, JSONDict, JSONList, Timeout
+from ...utils.types import B24BatchMethodTuple, JSONDict, JSONDictGenerator, JSONList, Timeout
 from ..protocols import BitrixTokenProtocol
 from ._base_caller import BaseCaller
 from .call_batch import call_batch
@@ -84,7 +84,7 @@ class _ListFastCaller(BaseCaller):
         )
         self._descending = descending
         self._limit = limit
-        self._now_datetime = datetime.now(tz=self._config.tzinfo)
+        self._now_datetime = self._config.get_local_datetime()
         self._time = dict(
             start=self._timesampt,
             finish=self._timesampt,
@@ -214,7 +214,7 @@ class _ListFastCaller(BaseCaller):
         if isinstance(result, list):
             return wrapper, result
         else:
-            raise TypeError(f"API method '{self._api_method}' is not a list method!")
+            raise TypeError(f"Bitrix API method {self._api_method!r} is not a list-type method!")
 
     def _get_path(self, index: int) -> Text:
         """"""
@@ -316,7 +316,7 @@ class _ListFastCaller(BaseCaller):
                 "This can lead to an infinite generation loop!",
             )
 
-    def _generate_result(self) -> Generator[JSONDict, None, None]:
+    def _generate_result(self) -> JSONDictGenerator:
         """"""
 
         response = self._fetch_first_response()

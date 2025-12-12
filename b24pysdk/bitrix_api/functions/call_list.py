@@ -175,7 +175,7 @@ class _ListCaller(BaseCaller):
         if isinstance(result, list):
             return result
         else:
-            raise TypeError(f"API method '{self._api_method}' is not a list method!")
+            raise TypeError(f"Bitrix API method {self._api_method!r} is not a list-type method!")
 
     def _unwrap_batch_result(self, batch_result: JSONDict) -> JSONList:
         """"""
@@ -233,10 +233,17 @@ class _ListCaller(BaseCaller):
         if total is None:
             total = len(result)
 
+            message = (
+                f"Bitrix API method {self._api_method!r} did not return a 'total' field. "
+                "The method is likely not a list-type method and you should use call_method instead of call_list."
+            )
+
+            self._config.logger.warning(message)
+
         if self._limit:
             total = min(total, self._limit)
 
-        if next_step:
+        if next_step and (self._limit is None or total < self._limit):
             batch_response = self._fetch_batches_response(
                 methods=self._generate_methods_for_batch(
                     next_step=next_step,
