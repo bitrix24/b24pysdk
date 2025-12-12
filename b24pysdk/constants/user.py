@@ -8,13 +8,13 @@ __all__ = [
 
 class PersonalGender(_enum.StrEnum):
     """"""
+    EMPTY = ""
     FEMALE = "F"
     MALE = "M"
-    EMPTY = ""
 
 
 class UserType(_enum.StrEnum):
     """"""
+    EMAIL = "email"
     EMPLOYEE = "employee"
     EXTRANET = "extranet"
-    EMAIL = "email"
