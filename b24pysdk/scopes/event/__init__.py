@@ -1,5 +1,5 @@
 from functools import cached_property
-from typing import Optional, Text
+from typing import Annotated, Literal, Optional, Text
 
 from ...bitrix_api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
@@ -27,7 +27,7 @@ class Event(BaseScope):
             handler: Text,
             *,
             auth_type: Optional[int] = None,
-            event_type: Optional[Text] = None,
+            event_type: Optional[Annotated[Text, Literal["offline", "online"]]] = None,
             auth_connector: Optional[Text] = None,
             options: Optional[Text] = None,
             timeout: Timeout = None,
@@ -76,7 +76,7 @@ class Event(BaseScope):
             handler: Text,
             *,
             auth_type: Optional[int] = None,
-            event_type: Optional[Text] = None,
+            event_type: Optional[Annotated[Text, Literal["offline", "online"]]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""

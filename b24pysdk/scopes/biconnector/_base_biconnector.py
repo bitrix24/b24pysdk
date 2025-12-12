@@ -1,19 +1,31 @@
-from typing import Optional
+from abc import abstractmethod
+from typing import Iterable, Optional, Text
 
 from ...bitrix_api.requests import BitrixAPIRequest
-from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
-    "BaseBiconnectorEntity",
+    "BaseBiconnector",
 ]
 
 
-class BaseBiconnectorEntity(BaseEntity):
+class BaseBiconnector(BaseEntity):
     """"""
 
-    @type_checker
+    @abstractmethod
+    def fields(
+            self,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+        return self._make_bitrix_api_request(
+            api_wrapper=self.fields,
+            timeout=timeout,
+        )
+
+    @abstractmethod
     def add(
             self,
             fields: JSONDict,
@@ -32,26 +44,7 @@ class BaseBiconnectorEntity(BaseEntity):
             timeout=timeout,
         )
 
-    @type_checker
-    def delete(
-            self,
-            bitrix_id: int,
-            *,
-            timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """"""
-
-        params = {
-            "id": bitrix_id,
-        }
-
-        return self._make_bitrix_api_request(
-            api_wrapper=self.delete,
-            params=params,
-            timeout=timeout,
-        )
-
-    @type_checker
+    @abstractmethod
     def get(
             self,
             bitrix_id: int,
@@ -70,7 +63,42 @@ class BaseBiconnectorEntity(BaseEntity):
             timeout=timeout,
         )
 
-    @type_checker
+    @abstractmethod
+    def list(
+            self,
+            *,
+            select: Optional[Iterable[Text]] = None,
+            filter: Optional[JSONDict] = None,
+            order: Optional[JSONDict] = None,
+            page: Optional[int] = None,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params = dict()
+
+        if select is not None:
+            if select.__class__ is not list:
+                select = list(select)
+
+            params["select"] = select
+
+        if filter is not None:
+            params["filter"] = filter
+
+        if order is not None:
+            params["order"] = order
+
+        if page is not None:
+            params["page"] = page
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.list,
+            params=params,
+            timeout=timeout,
+        )
+
+    @abstractmethod
     def update(
             self,
             bitrix_id: int,
@@ -91,35 +119,21 @@ class BaseBiconnectorEntity(BaseEntity):
             timeout=timeout,
         )
 
-    @type_checker
-    def list(
+    @abstractmethod
+    def delete(
             self,
+            bitrix_id: int,
             *,
-            filter: Optional[JSONDict] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
-
-        if filter is not None:
-            params["filter"] = filter
+        params = {
+            "id": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.list,
+            api_wrapper=self.delete,
             params=params,
-            timeout=timeout,
-        )
-
-    @type_checker
-    def fields(
-            self,
-            *,
-            timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """"""
-
-        return self._make_bitrix_api_request(
-            api_wrapper=self.fields,
             timeout=timeout,
         )

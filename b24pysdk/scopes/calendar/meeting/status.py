@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Status(BaseEntity):
-    """"""
+    """Handle operations related to Bitrix24 meeting status.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/calendar/
+    """
 
     @type_checker
     def get(
@@ -20,7 +23,21 @@ class Status(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Retrieve the participation status of the current user in a calendar event.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/calendar/calendar-event/calendar-meeting-status-get.html
+
+        This method retrieves the participation status of the current user in the event.
+
+        Args:
+            event_id: The ID of the event;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            An instance of BitrixAPIRequest containing the user participation status.
+        """
 
         params = {
             "eventId": event_id,
@@ -40,7 +57,23 @@ class Status(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Set the participation status in an event for the current user.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/calendar/calendar-event/calendar-meeting-status-set.html
+
+        This method sets the participation status in an event for the current user.
+
+        Args:
+            event_id: The ID of the event;
+
+            status: The new participation status to set;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            An instance of BitrixAPIRequest confirming the status update.
+        """
 
         params = {
             "eventId": event_id,
@@ -52,4 +85,3 @@ class Status(BaseEntity):
             params=params,
             timeout=timeout,
         )
-

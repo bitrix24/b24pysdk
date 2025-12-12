@@ -11,7 +11,11 @@ __all__ = [
 
 
 class Accessibility(BaseEntity):
-    """"""
+    """
+    Handle operations related to Bitrix24 calendar user accessibility.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/calendar/
+    """
 
     @type_checker
     def get(
@@ -22,7 +26,22 @@ class Accessibility(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Retrieve the accessibility of specified users within a date range.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/calendar/calendar-event/calendar-accessibility-get.html
+
+        This method retrieves the availability of users from the list.
+
+        Args:
+            users: List of user IDs whose availability is being checked;
+            from_date: The start date in format 'YYYY-MM-DD';
+            to: The end date in format 'YYYY-MM-DD';
+            timeout: Timeout for the request in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         if users.__class__ is not list:
             users = list(users)

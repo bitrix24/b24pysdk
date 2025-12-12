@@ -91,4 +91,3 @@ class Resource(BaseEntity):
             params=params,
             timeout=timeout,
         )
-

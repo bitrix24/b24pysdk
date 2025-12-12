@@ -1,9 +1,9 @@
 from functools import cached_property
-from typing import Optional, Text
+from typing import Optional, Text, Union
 
 from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import B24Bool, JSONDict, Timeout
+from ....utils.types import B24BoolStrict, JSONDict, Timeout
 from ..._base_entity import BaseEntity
 from .property import Property
 
@@ -52,12 +52,12 @@ class Item(BaseEntity):
         )
 
     @type_checker
-    def add(
+    def add(  # noqa: C901
             self,
             entity: Text,
             name: Text,
             *,
-            active: Optional[bool] = None,
+            active: Optional[Union[bool, B24BoolStrict]] = None,
             date_active_from: Optional[Text] = None,
             date_active_to: Optional[Text] = None,
             sort: Optional[int] = None,
@@ -76,19 +76,36 @@ class Item(BaseEntity):
             "ENTITY": entity,
             "NAME": name,
         }
-        self._apply_common_fields(
-            params,
-            active=active,
-            date_active_from=date_active_from,
-            date_active_to=date_active_to,
-            sort=sort,
-            preview_picture=preview_picture,
-            preview_text=preview_text,
-            detail_picture=detail_picture,
-            detail_text=detail_text,
-            code=code,
-            section=section,
-        )
+
+        if active is not None:
+            params["ACTIVE"] = B24BoolStrict(active).to_b24()
+
+        if date_active_from is not None:
+            params["DATE_ACTIVE_FROM"] = date_active_from
+
+        if date_active_to is not None:
+            params["DATE_ACTIVE_TO"] = date_active_to
+
+        if sort is not None:
+            params["SORT"] = sort
+
+        if preview_picture is not None:
+            params["PREVIEW_PICTURE"] = preview_picture
+
+        if preview_text is not None:
+            params["PREVIEW_TEXT"] = preview_text
+
+        if detail_picture is not None:
+            params["DETAIL_PICTURE"] = detail_picture
+
+        if detail_text is not None:
+            params["DETAIL_TEXT"] = detail_text
+
+        if code is not None:
+            params["CODE"] = code
+
+        if section is not None:
+            params["SECTION"] = section
 
         if property_values is not None:
             params["PROPERTY_VALUES"] = property_values
@@ -100,14 +117,14 @@ class Item(BaseEntity):
         )
 
     @type_checker
-    def update(
+    def update(  # noqa: C901
             self,
             entity: Text,
             bitrix_id: int,
             property_values: JSONDict,
             *,
             name: Optional[Text] = None,
-            active: Optional[bool] = None,
+            active: Optional[Union[bool, B24BoolStrict]] = None,
             date_active_from: Optional[Text] = None,
             date_active_to: Optional[Text] = None,
             sort: Optional[int] = None,
@@ -130,19 +147,35 @@ class Item(BaseEntity):
         if name is not None:
             params["NAME"] = name
 
-        self._apply_common_fields(
-            params,
-            active=active,
-            date_active_from=date_active_from,
-            date_active_to=date_active_to,
-            sort=sort,
-            preview_picture=preview_picture,
-            preview_text=preview_text,
-            detail_picture=detail_picture,
-            detail_text=detail_text,
-            code=code,
-            section=section,
-        )
+        if active is not None:
+            params["ACTIVE"] = B24BoolStrict(active).to_b24()
+
+        if date_active_from is not None:
+            params["DATE_ACTIVE_FROM"] = date_active_from
+
+        if date_active_to is not None:
+            params["DATE_ACTIVE_TO"] = date_active_to
+
+        if sort is not None:
+            params["SORT"] = sort
+
+        if preview_picture is not None:
+            params["PREVIEW_PICTURE"] = preview_picture
+
+        if preview_text is not None:
+            params["PREVIEW_TEXT"] = preview_text
+
+        if detail_picture is not None:
+            params["DETAIL_PICTURE"] = detail_picture
+
+        if detail_text is not None:
+            params["DETAIL_TEXT"] = detail_text
+
+        if code is not None:
+            params["CODE"] = code
+
+        if section is not None:
+            params["SECTION"] = section
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,
@@ -170,40 +203,3 @@ class Item(BaseEntity):
             params=params,
             timeout=timeout,
         )
-
-    @staticmethod
-    def _apply_common_fields(
-            params: JSONDict,
-            *,
-            active: Optional[bool] = None,
-            date_active_from: Optional[Text] = None,
-            date_active_to: Optional[Text] = None,
-            sort: Optional[int] = None,
-            preview_picture: Optional[JSONDict] = None,
-            preview_text: Optional[Text] = None,
-            detail_picture: Optional[JSONDict] = None,
-            detail_text: Optional[Text] = None,
-            code: Optional[Text] = None,
-            section: Optional[int] = None,
-    ) -> None:
-        """"""
-
-        mapping = [
-            ("ACTIVE", active, lambda value: B24Bool(value).to_str()),
-            ("DATE_ACTIVE_FROM", date_active_from, None),
-            ("DATE_ACTIVE_TO", date_active_to, None),
-            ("SORT", sort, None),
-            ("PREVIEW_PICTURE", preview_picture, None),
-            ("PREVIEW_TEXT", preview_text, None),
-            ("DETAIL_PICTURE", detail_picture, None),
-            ("DETAIL_TEXT", detail_text, None),
-            ("CODE", code, None),
-            ("SECTION", section, None),
-        ]
-
-        for key, value, transformer in mapping:
-            if value is None:
-                continue
-
-            params[key] = transformer(value) if transformer is not None else value
-

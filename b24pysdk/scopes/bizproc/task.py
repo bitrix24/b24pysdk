@@ -1,4 +1,4 @@
-from typing import Iterable, Optional, Text
+from typing import Iterable, Optional, Text, Union
 
 from ...bitrix_api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
@@ -14,10 +14,45 @@ class Task(BaseEntity):
     """"""
 
     @type_checker
+    def list(
+            self,
+            *,
+            select: Optional[Iterable[Text]] = None,
+            filter: Optional[JSONDict] = None,
+            order: Optional[JSONDict] = None,
+            start: Optional[int] = None,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params = dict()
+
+        if select is not None:
+            if select.__class__ is not list:
+                select = list(select)
+
+            params["SELECT"] = select
+
+        if filter is not None:
+            params["FILTER"] = filter
+
+        if order is not None:
+            params["ORDER"] = order
+
+        if start is not None:
+            params["START"] = start
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.list,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
     def complete(
             self,
-            task_id: Text,
-            status: Text,
+            task_id: int,
+            status: Union[Text, int],
             *,
             comment: Optional[Text] = None,
             fields: Optional[JSONDict] = None,
@@ -45,13 +80,16 @@ class Task(BaseEntity):
     @type_checker
     def delegate(
             self,
-            task_ids: Iterable,
+            task_ids: Iterable[int],
             from_user_id: int,
             to_user_id: int,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
+
+        if task_ids.__class__ is not list:
+            task_ids = list(task_ids)
 
         params = {
             "TASK_IDS": task_ids,

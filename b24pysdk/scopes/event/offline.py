@@ -22,6 +22,7 @@ class Offline(BaseEntity):
             limit: Optional[int] = None,
             clear: Optional[bool] = None,
             process_id: Optional[Text] = None,
+            auth_connector: Optional[Text] = None,
             error: Optional[bool] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
@@ -43,6 +44,9 @@ class Offline(BaseEntity):
 
         if process_id is not None:
             params["process_id"] = process_id
+
+        if auth_connector is not None:
+            params["auth_connector"] = auth_connector
 
         if error is not None:
             params["error"] = int(error)
@@ -99,11 +103,13 @@ class Offline(BaseEntity):
         if bitrix_id is not None:
             if bitrix_id.__class__ is not list:
                 bitrix_id = list(bitrix_id)
+
             params["id"] = bitrix_id
 
         if message_id is not None:
             if message_id.__class__ is not list:
                 message_id = list(message_id)
+
             params["message_id"] = message_id
 
         return self._make_bitrix_api_request(
@@ -129,6 +135,7 @@ class Offline(BaseEntity):
         if message_id is not None:
             if message_id.__class__ is not list:
                 message_id = list(message_id)
+
             params["message_id"] = message_id
 
         return self._make_bitrix_api_request(

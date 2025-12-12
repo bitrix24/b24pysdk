@@ -18,7 +18,7 @@ class Property(BaseEntity):
             self,
             entity: Text,
             *,
-            property_code: Optional[Text] = None,
+            property: Optional[Text] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -27,8 +27,8 @@ class Property(BaseEntity):
             "ENTITY": entity,
         }
 
-        if property_code is not None:
-            params["PROPERTY"] = property_code
+        if property is not None:
+            params["PROPERTY"] = property
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
@@ -40,9 +40,9 @@ class Property(BaseEntity):
     def add(
             self,
             entity: Text,
-            property_code: Text,
+            property: Text,
             name: Text,
-            type_: Text,
+            type: Text,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
@@ -50,9 +50,9 @@ class Property(BaseEntity):
 
         params = {
             "ENTITY": entity,
-            "PROPERTY": property_code,
+            "PROPERTY": property,
             "NAME": name,
-            "TYPE": type_,
+            "TYPE": type,
         }
 
         return self._make_bitrix_api_request(
@@ -65,18 +65,18 @@ class Property(BaseEntity):
     def update(
             self,
             entity: Text,
-            property_code: Text,
+            property: Text,
             *,
             property_new: Optional[Text] = None,
             name: Optional[Text] = None,
-            type_: Optional[Text] = None,
+            type: Optional[Text] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
         params = {
             "ENTITY": entity,
-            "PROPERTY": property_code,
+            "PROPERTY": property,
         }
 
         if property_new is not None:
@@ -85,8 +85,8 @@ class Property(BaseEntity):
         if name is not None:
             params["NAME"] = name
 
-        if type_ is not None:
-            params["TYPE"] = type_
+        if type is not None:
+            params["TYPE"] = type
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,
@@ -98,7 +98,7 @@ class Property(BaseEntity):
     def delete(
             self,
             entity: Text,
-            property_code: Text,
+            property: Text,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
@@ -106,7 +106,7 @@ class Property(BaseEntity):
 
         params = {
             "ENTITY": entity,
-            "PROPERTY": property_code,
+            "PROPERTY": property,
         }
 
         return self._make_bitrix_api_request(

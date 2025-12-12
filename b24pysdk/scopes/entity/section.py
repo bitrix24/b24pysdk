@@ -1,8 +1,8 @@
-from typing import Optional, Text
+from typing import Optional, Text, Union
 
 from ...bitrix_api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import B24Bool, JSONDict, Timeout
+from ...utils.types import B24BoolStrict, JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -81,7 +81,7 @@ class Section(BaseEntity):
             name: Text,
             *,
             description: Optional[Text] = None,
-            active: Optional[bool] = None,
+            active: Optional[Union[bool, B24BoolStrict]] = None,
             sort: Optional[int] = None,
             picture: Optional[JSONDict] = None,
             detail_picture: Optional[JSONDict] = None,
@@ -127,7 +127,7 @@ class Section(BaseEntity):
             params["DESCRIPTION"] = description
 
         if active is not None:
-            params["ACTIVE"] = B24Bool(active).to_str()
+            params["ACTIVE"] = B24BoolStrict(active).to_b24()
 
         if sort is not None:
             params["SORT"] = sort
@@ -155,7 +155,7 @@ class Section(BaseEntity):
             *,
             name: Optional[Text] = None,
             description: Optional[Text] = None,
-            active: Optional[bool] = None,
+            active: Optional[Union[bool, B24BoolStrict]] = None,
             sort: Optional[int] = None,
             picture: Optional[JSONDict] = None,
             detail_picture: Optional[JSONDict] = None,
@@ -206,7 +206,7 @@ class Section(BaseEntity):
             params["DESCRIPTION"] = description
 
         if active is not None:
-            params["ACTIVE"] = B24Bool(active).to_str()
+            params["ACTIVE"] = B24BoolStrict(active).to_b24()
 
         if sort is not None:
             params["SORT"] = sort

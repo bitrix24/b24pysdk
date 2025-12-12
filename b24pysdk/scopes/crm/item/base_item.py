@@ -1,8 +1,8 @@
 from abc import ABC
-from typing import Iterable, Optional, Text
+from typing import Iterable, Optional, Text, Union
 
 from ....bitrix_api.requests import BitrixAPIRequest
-from ....utils.types import B24Bool, JSONDict, Timeout
+from ....utils.types import B24BoolStrict, JSONDict, Timeout
 from .._base_crm import BaseCRM
 
 
@@ -17,7 +17,7 @@ class BaseItem(BaseCRM, ABC):
             self,
             *,
             entity_type_id: Optional[int] = None,
-            use_original_uf_names: Optional[bool] = None,
+            use_original_uf_names: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get fields of CRM item.
@@ -41,7 +41,7 @@ class BaseItem(BaseCRM, ABC):
             params["entityTypeId"] = entity_type_id
 
         if use_original_uf_names is not None:
-            params["originalUfNames"] = B24Bool(use_original_uf_names).to_str()
+            params["originalUfNames"] = B24BoolStrict(use_original_uf_names).to_b24()
 
         return self._make_bitrix_api_request(
             api_wrapper=self._fields,
@@ -54,7 +54,7 @@ class BaseItem(BaseCRM, ABC):
             fields: JSONDict,
             *,
             entity_type_id: Optional[int] = None,
-            use_original_uf_names: Optional[bool] = None,
+            use_original_uf_names: Optional[Union[bool, B24BoolStrict]] = None,
             extra_params: Optional[JSONDict] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
@@ -103,7 +103,7 @@ class BaseItem(BaseCRM, ABC):
             params["entityTypeId"] = entity_type_id
 
         if use_original_uf_names is not None:
-            params["useOriginalUfNames"] = B24Bool(use_original_uf_names).to_str()
+            params["useOriginalUfNames"] = B24BoolStrict(use_original_uf_names).to_b24()
 
         if extra_params is not None:
             params["params"] = extra_params
@@ -119,7 +119,7 @@ class BaseItem(BaseCRM, ABC):
             bitrix_id: int,
             *,
             entity_type_id: Optional[int] = None,
-            use_original_uf_names: Optional[bool] = None,
+            use_original_uf_names: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get an item by ID.
@@ -147,7 +147,7 @@ class BaseItem(BaseCRM, ABC):
             params["entityTypeId"] = entity_type_id
 
         if use_original_uf_names is not None:
-            params["useOriginalUfNames"] = B24Bool(use_original_uf_names).to_str()
+            params["useOriginalUfNames"] = B24BoolStrict(use_original_uf_names).to_b24()
 
         return self._make_bitrix_api_request(
             api_wrapper=self._get,
@@ -163,7 +163,7 @@ class BaseItem(BaseCRM, ABC):
             filter: Optional[JSONDict] = None,
             order: Optional[JSONDict] = None,
             start: Optional[int] = None,
-            use_original_uf_names: Optional[bool] = None,
+            use_original_uf_names: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of CRM elements.
@@ -234,7 +234,7 @@ class BaseItem(BaseCRM, ABC):
             params["start"] = start
 
         if use_original_uf_names is not None:
-            params["useOriginalUfNames"] = B24Bool(use_original_uf_names).to_str()
+            params["useOriginalUfNames"] = B24BoolStrict(use_original_uf_names).to_b24()
 
         return self._make_bitrix_api_request(
             api_wrapper=self._list,
@@ -248,7 +248,7 @@ class BaseItem(BaseCRM, ABC):
             fields: JSONDict,
             *,
             entity_type_id: Optional[int] = None,
-            use_original_uf_names: Optional[bool] = None,
+            use_original_uf_names: Optional[Union[bool, B24BoolStrict]] = None,
             extra_params: Optional[JSONDict] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
@@ -296,7 +296,7 @@ class BaseItem(BaseCRM, ABC):
             params["entityTypeId"] = entity_type_id
 
         if use_original_uf_names is not None:
-            params["useOriginalUfNames"] = B24Bool(use_original_uf_names).to_str()
+            params["useOriginalUfNames"] = B24BoolStrict(use_original_uf_names).to_b24()
 
         if extra_params is not None:
             params["params"] = extra_params

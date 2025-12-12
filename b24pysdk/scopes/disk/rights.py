@@ -16,27 +16,28 @@ class Rights(BaseEntity):
     @type_checker
     def get_tasks(
             self,
-            bitrix_id: int,
             *,
+            bitrix_id: Optional[int] = None,
             name: Optional[Text] = None,
-            start: Optional[Text] = None,
             title: Optional[Text] = None,
+            start: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {
-            "ID": bitrix_id,
-        }
+        params = dict()
+
+        if bitrix_id is not None:
+            params["ID"] = bitrix_id
 
         if name is not None:
             params["NAME"] = name
 
-        if start is not None:
-            params["START"] = start
-
         if title is not None:
             params["TITLE"] = title
+
+        if start is not None:
+            params["START"] = start
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get_tasks,

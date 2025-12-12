@@ -51,4 +51,3 @@ class Calendar(BaseScope):
     def user(self) -> User:
         """"""
         return User(self)
-

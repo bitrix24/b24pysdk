@@ -1,8 +1,8 @@
-from typing import Optional, Text
+from typing import Optional, Sequence, Text
 
 from ...bitrix_api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import JSONDict, Timeout
+from ...utils.types import B24File, JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -375,7 +375,7 @@ class File(BaseEntity):
     def uploadversion(
             self,
             bitrix_id: int,
-            file_content: Text,
+            file_content: Sequence[Text],
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
@@ -395,9 +395,10 @@ class File(BaseEntity):
             Instance of BitrixAPIRequest.
 
         """
+
         params = {
             "id": bitrix_id,
-            "fileContent": file_content,
+            "fileContent": B24File(file_content).to_b24(),
         }
 
         return self._make_bitrix_api_request(

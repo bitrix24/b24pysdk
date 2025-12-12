@@ -1,9 +1,9 @@
 from functools import cached_property
-from typing import Iterable, Optional, Text
+from typing import Iterable, Optional, Text, Union
 
 from ....bitrix_api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import B24Bool, JSONDict, Timeout
+from ....utils.types import B24BoolStrict, JSONDict, Timeout
 from .base_item import BaseItem
 from .delivery import Delivery
 from .details import Details
@@ -43,7 +43,7 @@ class Item(BaseItem):
             self,
             *,
             entity_type_id: int,
-            use_original_uf_names: Optional[bool] = None,
+            use_original_uf_names: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get fields of CRM item.
@@ -74,7 +74,7 @@ class Item(BaseItem):
             fields: JSONDict,
             *,
             entity_type_id: int,
-            use_original_uf_names: Optional[bool] = None,
+            use_original_uf_names: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Create a new CRM entity.
@@ -122,7 +122,7 @@ class Item(BaseItem):
             bitrix_id: int,
             *,
             entity_type_id: int,
-            use_original_uf_names: Optional[bool] = None,
+            use_original_uf_names: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get an item by ID.
@@ -159,7 +159,7 @@ class Item(BaseItem):
             filter: Optional[JSONDict] = None,
             order: Optional[JSONDict] = None,
             start: Optional[int] = None,
-            use_original_uf_names: Optional[bool] = None,
+            use_original_uf_names: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of CRM elements.
@@ -227,7 +227,7 @@ class Item(BaseItem):
             fields: JSONDict,
             *,
             entity_type_id: int,
-            use_original_uf_names: Optional[bool] = None,
+            use_original_uf_names: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update CRM item.
@@ -304,7 +304,7 @@ class Item(BaseItem):
             fields: JSONDict,
             *,
             entity_type_id: int,
-            use_original_uf_names: Optional[bool] = None,
+            use_original_uf_names: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Import a single record
@@ -348,7 +348,7 @@ class Item(BaseItem):
         }
 
         if use_original_uf_names is not None:
-            params["useOriginalUfNames"] = B24Bool(use_original_uf_names).to_str()
+            params["useOriginalUfNames"] = B24BoolStrict(use_original_uf_names).to_b24()
 
         return self._make_bitrix_api_request(
             api_wrapper=self.import_,
@@ -362,7 +362,7 @@ class Item(BaseItem):
             data: Iterable[JSONDict],
             *,
             entity_type_id: int,
-            use_original_uf_names: Optional[bool] = None,
+            use_original_uf_names: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Import a batch of CRM records.
@@ -393,7 +393,7 @@ class Item(BaseItem):
         }
 
         if use_original_uf_names is not None:
-            params["useOriginalUfNames"] = B24Bool(use_original_uf_names).to_str()
+            params["useOriginalUfNames"] = B24BoolStrict(use_original_uf_names).to_b24()
 
         return self._make_bitrix_api_request(
             api_wrapper=self.batch_import,

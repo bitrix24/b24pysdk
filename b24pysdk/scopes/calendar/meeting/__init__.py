@@ -15,4 +15,3 @@ class Meeting(BaseEntity):
     def status(self) -> Status:
         """"""
         return Status(self)
-

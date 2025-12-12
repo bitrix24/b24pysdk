@@ -1,5 +1,7 @@
 from .access import Access
 from .app import App
+from .biconnector import Biconnector
+from .bizproc import Bizproc
 from .calendar import Calendar
 from .crm import CRM
 from .department import Department
@@ -20,6 +22,8 @@ __all__ = [
     "CRM",
     "Access",
     "App",
+    "Biconnector",
+    "Bizproc",
     "Calendar",
     "Department",
     "Disk",

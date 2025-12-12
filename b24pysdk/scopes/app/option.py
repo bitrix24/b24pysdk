@@ -1,8 +1,8 @@
-from typing import Optional, Text
+from typing import Dict, Optional, Text
 
 from ...bitrix_api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import JSONDict, Timeout
+from ...utils.types import Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -11,7 +11,11 @@ __all__ = [
 
 
 class Option(BaseEntity):
-    """"""
+    """
+    Handle operations related to Bitrix24 options.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/common/settings/
+    """
 
     @type_checker
     def get(
@@ -20,7 +24,21 @@ class Option(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Retrieve the current value of a specified option.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/common/settings/app-option-get.html
+
+        This method fetches the option's value bound to the application. If the parameter is not passed,
+        it returns all recorded properties.
+
+        Args:
+            option: The name of the option to retrieve. One of the keys set by app.option.set. Optional.
+            timeout: Timeout for the request in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest representing the ongoing request.
+        """
 
         params = dict()
 
@@ -36,11 +54,25 @@ class Option(BaseEntity):
     @type_checker
     def set(
             self,
-            options: JSONDict,
+            options: Dict,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Set values for one or more options in Bitrix24.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/common/settings/app-option-set.html
+
+        This method associates data with the application. If an option with a new key is passed, it will be
+        recorded, and if an existing key is passed, its value will be updated.
+
+        Args:
+            options: Object format containing keys and values where keys are option names and values are their corresponding new settings. Required.
+            timeout: Timeout for the request in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest representing the ongoing request.
+        """
 
         params = {
             "options": options,

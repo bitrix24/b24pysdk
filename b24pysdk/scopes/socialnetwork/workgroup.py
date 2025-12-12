@@ -1,8 +1,8 @@
-from typing import Iterable, Optional, Text
+from typing import Iterable, Optional, Text, Union
 
 from ...bitrix_api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import B24Bool, JSONDict, Timeout
+from ...utils.types import B24BoolStrict, JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -55,7 +55,7 @@ class Workgroup(BaseEntity):
             *,
             filter: Optional[JSONDict] = None,
             select: Optional[Iterable[Text]] = None,
-            is_admin: Optional[bool] = None,
+            is_admin: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Retrieve a list of workgroups based on provided filters.
@@ -89,7 +89,7 @@ class Workgroup(BaseEntity):
             params["select"] = select
 
         if is_admin is not None:
-            params["IS_ADMIN"] = B24Bool(is_admin).to_str()
+            params["IS_ADMIN"] = B24BoolStrict(is_admin).to_b24()
 
         return self._make_bitrix_api_request(
             api_wrapper=self.list,

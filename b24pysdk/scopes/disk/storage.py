@@ -1,8 +1,8 @@
-from typing import Iterable, Optional, Text
+from typing import Iterable, Optional, Sequence, Text
 
 from ...bitrix_api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import B24Bool, JSONDict, Timeout
+from ...utils.types import B24Bool, B24File, JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -265,7 +265,7 @@ class Storage(BaseEntity):
     def uploadfile(
             self,
             bitrix_id: int,
-            file_content: bytes,
+            file_content: Sequence[Text],
             data: JSONDict,
             *,
             generate_unique_name: Optional[bool] = None,
@@ -294,12 +294,12 @@ class Storage(BaseEntity):
 
         params = {
             "id": bitrix_id,
-            "fileContent": file_content,
+            "fileContent": B24File(file_content).to_b24(),
             "data": data,
         }
 
         if generate_unique_name is not None:
-            params["generateUniqueName"] = B24Bool(generate_unique_name).to_str()
+            params["generateUniqueName"] = B24Bool(generate_unique_name).to_b24()
 
         if rights is not None:
             if rights.__class__ is not list:

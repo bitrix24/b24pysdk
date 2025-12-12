@@ -8,6 +8,10 @@ from .utils.types import JSONDict, Key, Timeout
 if TYPE_CHECKING:
     from .bitrix_api.requests import BitrixAPIRequest
 
+__all__ = [
+    "Client",
+]
+
 
 class Client:
     """"""
@@ -17,6 +21,8 @@ class Client:
         "_kwargs",
         "access",
         "app",
+        "biconnector",
+        "bizproc",
         "calendar",
         "crm",
         "department",
@@ -38,6 +44,8 @@ class Client:
     _kwargs: JSONDict
     access: scopes.Access
     app: scopes.App
+    biconnector: scopes.Biconnector
+    bizproc: scopes.Bizproc
     calendar: scopes.Calendar
     crm: scopes.CRM
     department: scopes.Department
@@ -65,6 +73,8 @@ class Client:
 
         self.access = scopes.Access(self)
         self.app = scopes.App(self)
+        self.biconnector = scopes.Biconnector(self)
+        self.bizproc = scopes.Bizproc(self)
         self.calendar = scopes.Calendar(self)
         self.crm = scopes.CRM(self)
         self.department = scopes.Department(self)
@@ -87,7 +97,10 @@ class Client:
             self._kwargs["timeout"] = timeout
 
     def __str__(self):
-        return f"<Client of portal {self._bitrix_token.domain}>"
+        if hasattr(self._bitrix_token, "domain"):
+            return f"<{self.__class__.__name__} of portal {self._bitrix_token.domain}>"
+        else:
+            return repr(self)
 
     def __repr__(self):
         return f"{self.__class__.__name__}(bitrix_token={self._bitrix_token})"

@@ -15,4 +15,3 @@ class User(BaseEntity):
     def settings(self) -> Settings:
         """"""
         return Settings(self)
-
