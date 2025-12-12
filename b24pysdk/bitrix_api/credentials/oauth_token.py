@@ -31,7 +31,7 @@ class OAuthToken:
             return cls(
                 access_token=oauth_token_payload["access_token"],
                 refresh_token=oauth_token_payload.get("refresh_token"),
-                expires=datetime.fromtimestamp(int(oauth_token_payload["expires"]), tz=Config().tzinfo),
+                expires=datetime.fromtimestamp(int(oauth_token_payload["expires"]), tz=Config().tz),
                 expires_in=int(oauth_token_payload["expires_in"]),
             )
         except KeyError as error:
@@ -47,7 +47,7 @@ class OAuthToken:
             access_token = placement_data["AUTH_ID"]
             refresh_token = placement_data["REFRESH_ID"]
             expires_in = int(placement_data["AUTH_EXPIRES"])
-            expires = datetime.now(tz=Config().tzinfo) + timedelta(seconds=expires_in)
+            expires = Config().get_local_datetime() + timedelta(seconds=expires_in)
 
             return cls(
                 access_token=access_token,
@@ -70,7 +70,7 @@ class OAuthToken:
     @property
     def has_expired(self) -> Optional[bool]:
         """"""
-        return self.expires and self.expires <= datetime.now(tz=Config().tzinfo)
+        return self.expires and self.expires <= Config().get_local_datetime()
 
     def to_dict(self) -> Dict:
         return asdict(self)

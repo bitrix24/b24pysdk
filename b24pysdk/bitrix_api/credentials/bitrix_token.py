@@ -88,7 +88,7 @@ class AbstractBitrixToken:
     @property
     def has_expired(self) -> Optional[bool]:
         """"""
-        return self.expires and self.expires <= datetime.now(tz=self._config.tzinfo)
+        return self.expires and self.expires <= self._config.get_local_datetime()
 
     @property
     def oauth_token(self) -> OAuthToken:
@@ -139,6 +139,51 @@ class AbstractBitrixToken:
             renewed_oauth_token=renewed_oauth_token,
         ))
 
+    def __expired_token_handler(self) -> bool:
+        """"""
+
+        if not self._AUTO_REFRESH:
+            self._config.logger.warning(
+                "Token expired: auto-refresh is disabled",
+                context=dict(
+                    bitrix_token=str(self),
+                    bitrix_app=str(self.bitrix_app),
+                ),
+            )
+            return False
+
+        if self.is_webhook:
+            self._config.logger.warning(
+                "Token expired: cannot refresh token for webhook",
+                context=dict(
+                    bitrix_token=str(self),
+                    bitrix_app=str(self.bitrix_app),
+                ),
+            )
+            return False
+
+        if self.is_one_off:
+            self._config.logger.warning(
+                "Token expired: cannot refresh one-off token",
+                context=dict(
+                    bitrix_token=str(self),
+                    bitrix_app=str(self.bitrix_app),
+                ),
+            )
+            return False
+
+        self._config.logger.info(
+            "Token expired: refreshing token",
+            context=dict(
+                bitrix_token=str(self),
+                bitrix_app=str(self.bitrix_app),
+            ),
+        )
+
+        self._refresh_and_set_oauth_token()
+
+        return True
+
     def _check_and_change_domain(self, new_domain: Text) -> bool:
         if not new_domain or new_domain == self.domain:
             return False
@@ -158,7 +203,7 @@ class AbstractBitrixToken:
 
         try:
             if self.has_expired:
-                raise BitrixAPIExpiredToken
+                self.__expired_token_handler()
 
             return func()
 
@@ -185,47 +230,9 @@ class AbstractBitrixToken:
                 raise
 
         except BitrixAPIExpiredToken:
-            if not self._AUTO_REFRESH:
-                self._config.logger.warning(
-                    "Token expired: auto-refresh is disabled",
-                    context=dict(
-                        bitrix_token=str(self),
-                        bitrix_app=str(self.bitrix_app),
-                    ),
-                )
-                raise
-
-            if self.is_webhook:
-                self._config.logger.warning(
-                    "Token expired: cannot refresh token for webhook",
-                    context=dict(
-                        bitrix_token=str(self),
-                        bitrix_app=str(self.bitrix_app),
-                    ),
-                )
-                raise
-
-            if self.is_one_off:
-                self._config.logger.warning(
-                    "Token expired: cannot refresh one-off token",
-                    context=dict(
-                        bitrix_token=str(self),
-                        bitrix_app=str(self.bitrix_app),
-                    ),
-                )
-                raise
-
-            self._config.logger.info(
-                "Token expired: refreshing token",
-                context=dict(
-                    bitrix_token=str(self),
-                    bitrix_app=str(self.bitrix_app),
-                ),
-            )
-
-            self._refresh_and_set_oauth_token()
-
-            return func()
+            if self.__expired_token_handler():
+                return func()
+            raise
 
     def _call_with_retries(self, call_func: Callable, parameters: Dict) -> JSONDict:
         """"""

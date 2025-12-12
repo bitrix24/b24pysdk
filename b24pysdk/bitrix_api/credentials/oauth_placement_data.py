@@ -69,20 +69,15 @@ class OAuthPlacementData:
         except Exception as error:
             raise cls.ValidationError(f"Invalid placement data: {error}") from error
 
-    def validate_against_app_info(
-            self,
-            app_info: "B24AppInfoResult",
-            user_id: Optional[int] = None,
-    ) -> bool:
+    def to_dict(self) -> Dict:
+        return asdict(self)
+
+    def validate_against_app_info(self, app_info: "B24AppInfoResult") -> bool:
         """"""
         if all((
                 self.member_id == app_info.install.member_id,
                 self.domain == app_info.install.domain,
-                user_id is None or user_id == app_info.user_id,
         )):
             return True
         else:
             raise self.ValidationError("Invalid placement data")
-
-    def to_dict(self) -> Dict:
-        return asdict(self)

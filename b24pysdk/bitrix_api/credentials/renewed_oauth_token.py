@@ -1,11 +1,14 @@
 from dataclasses import asdict, dataclass
-from typing import Any, Dict, List, Mapping, Optional, Text
+from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Text
 from urllib.parse import urlparse
 
 from ..._constants import PYTHON_VERSION as _PV
 from ...constants import B24AppStatus
 from ...error import BitrixValidationError
 from .oauth_token import OAuthToken
+
+if TYPE_CHECKING:
+    from ..responses import B24AppInfoResult
 
 _DATACLASS_KWARGS = {"eq": False, "frozen": True}
 
@@ -56,3 +59,14 @@ class RenewedOAuthToken:
 
     def to_dict(self) -> Dict:
         return asdict(self)
+
+    def validate_against_app_info(self, app_info: "B24AppInfoResult") -> bool:
+        """"""
+        if all((
+                self.member_id == app_info.install.member_id,
+                self.portal_domain == app_info.install.domain,
+                self.user_id == app_info.user_id,
+        )):
+            return True
+        else:
+            raise self.ValidationError("Invalid renewed oauth token")

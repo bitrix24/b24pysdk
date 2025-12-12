@@ -1,6 +1,6 @@
 from dataclasses import asdict, dataclass
 from datetime import datetime
-from typing import Any, Dict, List, Mapping, Optional, Text
+from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Text
 
 from ..._config import Config
 from ..._constants import PYTHON_VERSION as _PV
@@ -9,6 +9,9 @@ from ...error import BitrixValidationError
 from ...utils.types import JSONDict
 from ._utils import parse_flattened_keys
 from .renewed_oauth_token import RenewedOAuthToken
+
+if TYPE_CHECKING:
+    from ..responses import B24AppInfoResult
 
 _DATACLASS_KWARGS = {"eq": False, "frozen": True}
 
@@ -46,7 +49,7 @@ class OAuthWorkflowData:
             event_token = parsed_workflow_data["event_token"]
             use_subscription = bool(B24BoolLit(parsed_workflow_data["use_subscription"]))
             timeout_duration = int(parsed_workflow_data["timeout_duration"])
-            ts = datetime.fromtimestamp(int(parsed_workflow_data["ts"]), tz=Config().tzinfo)
+            ts = datetime.fromtimestamp(int(parsed_workflow_data["ts"]), tz=Config().tz)
             auth = RenewedOAuthToken.from_dict(parsed_workflow_data["auth"])
             properties = parsed_workflow_data.get("properties")
 
@@ -72,3 +75,9 @@ class OAuthWorkflowData:
     def to_dict(self) -> Dict:
         return asdict(self)
 
+    def validate_against_app_info(self, app_info: "B24AppInfoResult") -> bool:
+        """"""
+        try:
+            return self.auth.validate_against_app_info(app_info)
+        except self.auth.ValidationError as error:
+            raise self.ValidationError("Invalid oauth workflow data") from error
