@@ -83,10 +83,10 @@ class _TypeChecker:
     def _handlers(self) -> typing.Dict[typing.Any, _HandlerType]:
         """"""
         return {
-            typing.Annotated: self._handle_annotated,
-            typing.Any: self._handle_any,
-            typing.Literal: self._handle_literal,
-            typing.Union: self._handle_union,
+            typing.Annotated: self._annotated_handler,
+            typing.Any: self._any_handler,
+            typing.Literal: self._literal_handler,
+            typing.Union: self._union_handler,
         }
 
     @property
@@ -126,7 +126,7 @@ class _TypeChecker:
 
     # ------------------------------------- Handlers -------------------------------------
 
-    def _handle_annotated(
+    def _annotated_handler(
             self,
             value: typing.Any,
             expected_type: typing.Type,
@@ -150,12 +150,12 @@ class _TypeChecker:
         return True
 
     @staticmethod
-    def _handle_any(*_) -> bool:
+    def _any_handler(*_) -> bool:
         """Handler for Any: always True."""
         return True
 
     @staticmethod
-    def _handle_literal(
+    def _literal_handler(
             value: typing.Any,
             expected_type: typing.Type,
             param_name: typing.Text,
@@ -172,7 +172,7 @@ class _TypeChecker:
             f"but got {value!r}",
         )
 
-    def _handle_union(
+    def _union_handler(
             self,
             value: typing.Any,
             expected_type: typing.Type,
