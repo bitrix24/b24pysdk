@@ -6,8 +6,6 @@ from ...utils.types import B24BatchMethods, B24BatchMethodTuple, JSONDict, Key, 
 class BitrixTokenProtocol(Protocol):
     """"""
 
-    domain: Text
-
     def call_method(
             self,
             api_method: Text,
