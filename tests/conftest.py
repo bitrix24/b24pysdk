@@ -2,16 +2,11 @@ import pytest
 from _pytest.cacheprovider import Cache
 from _pytest.fixtures import SubRequest
 
-from b24pysdk import Client, Config
-from b24pysdk.log import StreamLogger
+from b24pysdk import Client
 from tests.integration.helpers import make_client_from_env
 
 from .env_config import EnvConfig
 from .error import MissingCredentials
-
-Config().configure(
-    logger=StreamLogger(),
-)
 
 env_config = EnvConfig()
 

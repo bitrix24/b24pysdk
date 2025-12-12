@@ -5,19 +5,17 @@ from typing import Annotated, Literal, Text
 from b24pysdk import BitrixApp, BitrixToken, BitrixWebhook, Client
 from b24pysdk.bitrix_api.events import OAuthTokenRenewedEvent
 
+from ..constants import OAUTH_DATA_FILE
 from ..env_config import EnvConfig
 from ..error import MissingCredentials
 
 env_config = EnvConfig()
 
-_CURRENT_DIR_PATH: Path = Path(__file__).parent
-_OAUTH_FILE_PATH: Path = _CURRENT_DIR_PATH.parent / "oauth_data.json"
-
 
 def _save_token_to_oauth_json(event: OAuthTokenRenewedEvent):
     oauth_token = event.renewed_oauth_token.oauth_token
 
-    with Path.open(_OAUTH_FILE_PATH, "w", encoding="utf-8") as file:
+    with Path(OAUTH_DATA_FILE).open("w", encoding="utf-8") as file:
         json.dump(
             oauth_token.to_dict(),
             file,
@@ -57,6 +55,8 @@ def _make_client_from_oauth() -> Client:
         auth_token=env_config.access_token,
         refresh_token=env_config.refresh_token,
         bitrix_app=bitrix_app,
+        expires=env_config.expires,
+        expires_in=env_config.expires_in,
     )
 
     bitrix_token.oauth_token_renewed_signal.connect(_save_token_to_oauth_json)
@@ -70,4 +70,4 @@ def make_client_from_env(auth_type: Annotated[Text, Literal["webhook", "oauth"]]
     elif auth_type == "oauth":
         return _make_client_from_oauth()
     else:
-        raise ValueError(f"Incorrect 'auth_type': {auth_type}")
+        raise ValueError(f"Incorrect 'auth_type': {auth_type!r}")

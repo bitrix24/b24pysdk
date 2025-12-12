@@ -2,11 +2,12 @@ import json
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Text
+from typing import Annotated, Literal, Optional, Text
 
 from environs import Env
 
 from b24pysdk import Config
+from b24pysdk.log import StreamLogger
 
 from .constants import ENV_FILE, OAUTH_DATA_FILE, AuthType
 from .error import InvalidCredentials
@@ -14,6 +15,10 @@ from .error import InvalidCredentials
 __all__ = [
     "EnvConfig",
 ]
+
+Config().configure(
+    logger=StreamLogger(),
+)
 
 
 class EnvConfig:
@@ -26,6 +31,8 @@ class EnvConfig:
         "client_id",
         "client_secret",
         "domain",
+        "expires",
+        "expires_in",
         "prefer_auth_type",
         "refresh_token",
         "webhook_token",
@@ -35,6 +42,8 @@ class EnvConfig:
     client_id: Text
     client_secret: Text
     domain: Text
+    expires: Optional[datetime]
+    expires_in: Optional[datetime]
     prefer_auth_type: AuthType
     refresh_token: Text
     webhook_token: Text
@@ -61,6 +70,8 @@ class EnvConfig:
         self.client_secret = self._validate_credential(env.str("B24_CLIENT_SECRET", default=""), name="B24_CLIENT_SECRET")
         self.access_token = self._validate_credential(env.str("B24_ACCESS_TOKEN", default=""), name="B24_ACCESS_TOKEN")
         self.refresh_token = self._validate_credential(env.str("B24_REFRESH_TOKEN", default=""), name="B24_REFRESH_TOKEN")
+        self.expires = self._validate_expires(env.str("B24_EXPIRES", default=None))
+        self.expires_in = self._validate_expires_in(env.int("B24_EXPIRES_IN", default=None))
         self.prefer_auth_type = self._validate_prefer_auth_type(env.str("B24_PREFER_AUTH_TYPE", default=""))
 
         oauth_data_file_path = Path(oauth_data_file)
@@ -69,26 +80,26 @@ class EnvConfig:
             with Path.open(oauth_data_file_path, "r", encoding="utf-8") as file:
                 oauth_data = json.load(file)
 
-                access_token = oauth_data.get("access_token")
-                refresh_token = oauth_data.get("refresh_token")
-                expires = oauth_data.get("expires")
+                access_token = self._validate_credential(oauth_data.get("access_token"), name="access_token")
+                refresh_token = self._validate_credential(oauth_data.get("refresh_token"), name="refresh_token")
+                expires = self._validate_expires(oauth_data.get("expires"))
+                expires_in = self._validate_expires_in(oauth_data.get("expires_in"))
 
                 if access_token and refresh_token:
-                    self.access_token = self._validate_credential(access_token, name="B24_ACCESS_TOKEN")
-                    self.refresh_token = self._validate_credential(refresh_token, name="B24_REFRESH_TOKEN")
+                    self.access_token = access_token
+                    self.refresh_token = refresh_token
+                    self.expires = expires
+                    self.expires_in = expires_in
 
-                if expires:
-                    expires_dt = datetime.fromisoformat(expires)
-
-                    if datetime.now(tz=Config().tzinfo) > expires_dt:
-                        Config().logger.warning("The access token has expired, use the application_bridge to refresh the OAuth.")
+                    if expires and Config().get_local_datetime() > expires:
+                        Config().logger.warning("The access token has expired, use the application_bridge to refresh the OAuth token.")
 
     @staticmethod
     def _validate_domain(domain: Text) -> Text:
         if not domain:
             return domain
 
-        if not re.match(r"^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", domain):
+        if not (isinstance(domain, str) and re.match(r"^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", domain)):
             raise InvalidCredentials(f"Invalid 'B24_DOMAIN' format: {domain!r}")
 
         return domain
@@ -100,7 +111,7 @@ class EnvConfig:
 
         webhook_token = webhook_token.strip().strip("/")
 
-        if not re.match(r"^\d+/[a-zA-Z0-9]+$", webhook_token):
+        if not (isinstance(webhook_token, str) and re.match(r"^\d+/[a-zA-Z0-9]+$", webhook_token)):
             raise InvalidCredentials(f"'B24_WEBHOOK' must be in format 'user_id/hook_key': {webhook_token!r}")
 
         return webhook_token
@@ -110,17 +121,47 @@ class EnvConfig:
         if not credential:
             return credential
 
-        if not re.match(r"^[a-zA-Z0-9.]+$", credential):
+        if not (isinstance(credential, str) and re.match(r"^[a-zA-Z0-9.]+$", credential)):
             raise InvalidCredentials(f"Invalid {name!r} format: {credential!r}")
 
         return credential
 
     @staticmethod
-    def _validate_prefer_auth_type(prefer_auth_type: Text) -> AuthType:
+    def _validate_prefer_auth_type(prefer_auth_type: Annotated[Text, Literal["", "oauth", "webhook"]]) -> AuthType:
         try:
             return AuthType(prefer_auth_type)
         except ValueError as error:
             raise InvalidCredentials(f"Invalid 'B24_PREFER_AUTH_TYPE' format: {prefer_auth_type!r}") from error
+
+    @staticmethod
+    def _validate_expires(expires:  Optional[Text]) -> Optional[datetime]:
+        if not expires:
+            return None
+
+        if not isinstance(expires, str):
+            raise InvalidCredentials(f"'expires' must be a string, got {type(expires).__name__!r}")
+
+        try:
+            expires_dt = datetime.fromisoformat(expires)
+        except ValueError as error:
+            raise InvalidCredentials(
+                f"'expires' must be in ISO 8601 format (e.g. '2025-11-28 21:09:16+03:00'), got {expires!r}",
+            ) from error
+
+        return expires_dt
+
+    @staticmethod
+    def _validate_expires_in(expires_in: Optional[int]) -> Optional[int]:
+        if expires_in is None:
+            return None
+
+        if type(expires_in) is not int:
+            raise InvalidCredentials(f"'expires_in' must be an integer, got {type(expires_in).__name__!r}")
+
+        if expires_in <= 0:
+            raise InvalidCredentials(f"'expires_in' must be a positive integer, got {expires_in!r}")
+
+        return expires_in
 
     @property
     def are_webhook_credentials_available(self) -> bool:

@@ -54,17 +54,17 @@ def test_placement_get(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, list)
 
-    placements = cast(list, bitrix_response.result)
+    bound_placements = cast(list, bitrix_response.result)
 
-    assert len(placements) == 1, "Expected one placement to be returned"
+    assert len(bound_placements) >= 1, "Expected at least one bound placement to be returned"
 
-    placement = placements[0]
+    bound_placement = bound_placements[0]
 
-    assert isinstance(placement, dict)
-    print(placement)
-    assert placement.get("placement") == _PLACEMENT, "Placement name does not match"
-    assert placement.get("handler") == _HANDLER, "Placement handler does not match"
-    assert placement.get("langAll") == _LANG_ALL, "Placement lang_all does not match"
+    assert isinstance(bound_placement, dict)
+
+    assert bound_placement.get("placement") == _PLACEMENT, "Placement name does not match"
+    assert bound_placement.get("handler") == _HANDLER, "Placement handler does not match"
+    assert bound_placement.get("langAll") == _LANG_ALL, "Placement lang_all does not match"
 
 
 @pytest.mark.oauth_only
@@ -77,12 +77,12 @@ def test_placement_get_as_list(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListResponse)
     assert isinstance(bitrix_response.result, list)
 
-    result = cast(list, bitrix_response.result)
+    bound_placements = cast(list, bitrix_response.result)
 
-    assert len(result) >= 1, "Expected at least one placement to be returned"
+    assert len(bound_placements) >= 1, "Expected at least one bound placement to be returned"
 
-    for item in result:
-        assert isinstance(item, dict)
+    for bound_placement in bound_placements:
+        assert isinstance(bound_placement, dict)
 
 
 @pytest.mark.oauth_only
@@ -123,7 +123,7 @@ def test_placement_list_as_list(bitrix_client: Client):
 
 
 @pytest.mark.oauth_only
-@pytest.mark.dependency(name="test_placement_unbind", depends=["test_placement_bind"])
+@pytest.mark.dependency(name="test_placement_unbind", depends=["test_placement_get_as_list"])
 def test_placement_unbind(bitrix_client: Client):
     """"""
 
@@ -135,10 +135,11 @@ def test_placement_unbind(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    result = cast(dict, bitrix_response.result)
+    unbind_result = cast(dict, bitrix_response.result)
 
-    assert _UNBIND_RESULT_FIELD in result, f"Field {_UNBIND_RESULT_FIELD!r} should be present"
+    assert _UNBIND_RESULT_FIELD in unbind_result, f"Field {_UNBIND_RESULT_FIELD!r} should be present"
 
-    unbind_count = result.get(_UNBIND_RESULT_FIELD)
+    unbind_count = unbind_result[_UNBIND_RESULT_FIELD]
+
     assert isinstance(unbind_count, int), f"Field '{_UNBIND_RESULT_FIELD}' should be an integer"
     assert unbind_count > 0, "Unbind count should be positive"

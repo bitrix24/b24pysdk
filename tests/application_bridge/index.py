@@ -6,12 +6,9 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import FileResponse, JSONResponse
 
 from b24pysdk.bitrix_api.credentials import OAuthPlacementData
+from tests.constants import OAUTH_DATA_FILE
 
 app = FastAPI()
-
-_CURRENT_DIR_PATH: Path = Path(__file__).parent
-_HTML_FILE_PATH: Path = _CURRENT_DIR_PATH / "index.html"
-_OAUTH_FILE_PATH: Path = _CURRENT_DIR_PATH.parent / "oauth_data.json"
 
 
 @app.post("/")
@@ -21,8 +18,9 @@ async def index(request: Request):
 
         placement_data = {**form_data, **request.query_params}
         oauth_placement_data = OAuthPlacementData.from_dict(placement_data)
+        oauth_file_path = Path(__file__).parent.parent.parent / OAUTH_DATA_FILE
 
-        with Path.open(_OAUTH_FILE_PATH, "w", encoding="utf-8") as file:
+        with Path(oauth_file_path).open("w", encoding="utf-8") as file:
             json.dump(
                 oauth_placement_data.oauth_token.to_dict(),
                 file,
@@ -32,7 +30,7 @@ async def index(request: Request):
             )
 
         return FileResponse(
-            path=_HTML_FILE_PATH,
+            path="index.html",
             media_type="text/html",
         )
 

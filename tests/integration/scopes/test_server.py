@@ -15,11 +15,11 @@ pytestmark = [
 def test_server_time(bitrix_client: Client):
     """"""
 
-    start_dt = datetime.now(tz=Config().tzinfo)
+    start_dt = Config().get_local_datetime()
 
     bitrix_response = bitrix_client.server.time().response
 
-    end_dt = datetime.now(tz=Config().tzinfo)
+    end_dt = Config().get_local_datetime()
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, str), "Server time result should be a str"

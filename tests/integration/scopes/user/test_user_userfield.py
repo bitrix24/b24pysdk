@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Generator, Text, cast
 
 import pytest
@@ -6,8 +5,9 @@ from _pytest.cacheprovider import Cache
 
 from b24pysdk import Client, Config
 from b24pysdk.bitrix_api.responses import BitrixAPIListFastResponse, BitrixAPIListResponse, BitrixAPIResponse
-from b24pysdk.constants import B24BoolLit, UserTypeID
-from b24pysdk.utils.types import JSONDict
+from b24pysdk.constants import B24BoolLit
+from b24pysdk.constants.userfield import UserTypeID
+from b24pysdk.utils.types import JSONDict, JSONDictGenerator
 
 from ....constants import SDK_NAME
 
@@ -39,7 +39,7 @@ _SETTINGS: JSONDict = {
 def test_user_userfield_add(bitrix_client: Client, cache: Cache):
     """Test adding a new user field and ensuring the field is created successfully."""
 
-    user_userfield_field_name = f"UF_USR_B24PYSDK_{int(datetime.now(tz=Config().tzinfo).timestamp() * (10 ** 6))}"
+    user_userfield_field_name = f"UF_USR_{SDK_NAME.upper()}_{int(Config().get_local_datetime().timestamp() * (10 ** 6))}"
 
     bitrix_response = bitrix_client.user.userfield.add(
         fields={
@@ -161,7 +161,7 @@ def test_user_userfield_list_as_list_fast(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListFastResponse)
     assert isinstance(bitrix_response.result, Generator)
 
-    user_userfields = cast(Generator[list, None, None], bitrix_response.result)
+    user_userfields = cast(JSONDictGenerator, bitrix_response.result)
 
     last_user_userfield_id = None
 
@@ -178,7 +178,7 @@ def test_user_userfield_list_as_list_fast(bitrix_client: Client):
             last_user_userfield_id = user_userfield_id
 
 
-@pytest.mark.dependency(name="test_user_userfield_delete", depends=["test_user_userfield_add"])
+@pytest.mark.dependency(name="test_user_userfield_delete", depends=["test_user_userfield_list_as_list_fast"])
 def test_user_userfield_delete(bitrix_client: Client, cache: Cache):
     """Test deleting a specific user field and ensuring the field is removed."""
 

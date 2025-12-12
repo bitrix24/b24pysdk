@@ -1,4 +1,4 @@
-from typing import cast
+from typing import List, Text, cast
 
 import pytest
 
@@ -10,19 +10,19 @@ pytestmark = [
     pytest.mark.access,
 ]
 
-_KEYS = ["G2", "AU"]
+_ACCESS: List[Text] = ["G2", "AU"]
 
 
 def test_name(bitrix_client: Client):
     """"""
 
-    bitrix_response = bitrix_client.access.name(access=["G2", "AU"]).response
+    bitrix_response = bitrix_client.access.name(access=_ACCESS).response
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
+    assert isinstance(bitrix_response.result, dict), "Name result should be a dict"
 
     names = cast(dict, bitrix_response.result)
-    assert isinstance(names, dict), "Events should be a dict"
 
-    for key in _KEYS:
-        assert key in names, f"Key {key!r} should be present in result"
-        assert names[key], f"Value for key {key!r} should not be empty"
+    for access in _ACCESS:
+        assert access in names, f"Access {access!r} should be present in result"
+        assert isinstance(names[access], dict), f"Value for key {access!r} should be a dictionary"

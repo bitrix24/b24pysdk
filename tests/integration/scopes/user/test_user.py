@@ -7,8 +7,9 @@ from _pytest.cacheprovider import Cache
 from b24pysdk import Client, Config
 from b24pysdk.bitrix_api.responses import BitrixAPIListFastResponse, BitrixAPIListResponse, BitrixAPIResponse
 from b24pysdk.constants.user import PersonalGender
+from b24pysdk.utils.types import JSONDictGenerator
 
-from ....constants import SDK_NAME
+from ....constants import HEAD_DEPARTMENT_ID, SDK_NAME
 
 pytestmark = [
     pytest.mark.integration,
@@ -20,14 +21,13 @@ _FIELDS: Tuple[Text, ...] = ("ID", "XML_ID", "ACTIVE", "NAME", "LAST_NAME", "EMA
 
 _NAME: Text = "Test"
 _LAST_NAME: Text = SDK_NAME
-_UF_DEPARTMENT: List = [1]
-
+_UF_DEPARTMENT: List = [HEAD_DEPARTMENT_ID]
 _ACTIVE: bool = False
 _PERSONAL_GENDER: PersonalGender = PersonalGender.MALE
 _PERSONAL_PROFESSION: Text = f"{SDK_NAME}-Developer"
-_PERSONAL_BIRTHDAY: date = datetime.now(tz=Config().tzinfo).date()
+_PERSONAL_BIRTHDAY: date = Config().get_local_date()
 
-_ACCESS: List = ["AU", "G2"]
+_ACCESS: List[Text] = ["AU", "G2"]
 
 
 def test_user_fields(bitrix_client: Client):
@@ -49,7 +49,7 @@ def test_user_fields(bitrix_client: Client):
 def test_user_add(bitrix_client: Client, cache: Cache):
     """Test addition of a new user and validate successful creation."""
 
-    email: Text = f"{int(datetime.now(tz=Config().tzinfo).timestamp() * (10 ** 6))}@pysdktest.com"
+    email: Text = f"{int(Config().get_local_datetime().timestamp() * (10 ** 6))}@pysdktest.com"
 
     bitrix_response = bitrix_client.user.add(
         fields={
@@ -129,7 +129,7 @@ def test_user_get_as_list_fast(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListFastResponse)
     assert isinstance(bitrix_response.result, Generator)
 
-    users = cast(Generator[list, None, None], bitrix_response.result)
+    users = cast(JSONDictGenerator, bitrix_response.result)
 
     last_user_id = None
 
@@ -236,7 +236,7 @@ def test_user_search_as_list_fast(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListFastResponse)
     assert isinstance(bitrix_response.result, Generator)
 
-    users = cast(Generator[list, None, None], bitrix_response.result)
+    users = cast(JSONDictGenerator, bitrix_response.result)
 
     last_user_id = None
 
