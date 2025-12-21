@@ -34,6 +34,7 @@ class Client:
         "method",
         "placement",
         "profile",
+        "sale",
         "scope",
         "server",
         "socialnetwork",
@@ -57,6 +58,7 @@ class Client:
     method: scopes.Method
     placement: scopes.Placement
     profile: scopes.Profile
+    sale: scopes.Sale
     scope: scopes.Scope
     server: scopes.Server
     socialnetwork: scopes.Socialnetwork
@@ -86,6 +88,7 @@ class Client:
         self.method = scopes.Method(self)
         self.placement = scopes.Placement(self)
         self.profile = scopes.Profile(self)
+        self.sale = scopes.Sale(self)
         self.scope = scopes.Scope(self)
         self.server = scopes.Server(self)
         self.socialnetwork = scopes.Socialnetwork(self)

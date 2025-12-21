@@ -13,6 +13,7 @@ from .feature import Feature
 from .method import Method
 from .placement import Placement
 from .profile import Profile
+from .sale import Sale
 from .scope import Scope
 from .server import Server
 from .socialnetwork import Socialnetwork
@@ -34,6 +35,7 @@ __all__ = [
     "Method",
     "Placement",
     "Profile",
+    "Sale",
     "Scope",
     "Server",
     "Socialnetwork",
