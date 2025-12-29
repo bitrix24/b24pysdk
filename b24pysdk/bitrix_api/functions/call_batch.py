@@ -53,6 +53,10 @@ class _BatchCaller(BaseCaller):
         """"""
         if len(methods) > self._MAX_BATCH_SIZE:
             if self._ignore_size_limit:
+
+                message = f"Batch size {len(methods)} exceeds limit {MAX_BATCH_SIZE}. Truncating to first {MAX_BATCH_SIZE} requests."
+                self._config.logger.warning(message)
+
                 return methods[:self._MAX_BATCH_SIZE]
             else:
                 raise ValueError(f"Maximum batch size is {MAX_BATCH_SIZE}!")

@@ -388,7 +388,7 @@ class Folder(BaseEntity):
             self,
             bitrix_id: int,
             file_content: Sequence[Text],
-            data: Optional[Iterable[Dict]],
+            data: JSONDict,
             *,
             generate_unique_name: Optional[bool] = None,
             rights: Optional[Iterable[Dict]] = None,
