@@ -34,6 +34,13 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
                     reason="Missing OAuth credentials",
                 )),
             ]
+        elif "webhook_only" in metafunc.definition.keywords:
+            clients = [
+                pytest.param("webhook", id="webhook", marks=pytest.mark.skipif(
+                    not env_config.are_webhook_credentials_available,
+                    reason="Missing webhook credentials",
+                )),
+            ]
         else:
             clients = [
                 pytest.param("webhook", id="webhook"),

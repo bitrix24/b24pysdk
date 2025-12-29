@@ -7,11 +7,24 @@ B24_DOMAIN=b24-e4f2d1.bitrix24.com
 B24_WEBHOOK=13/dd5w3aldjdu4twfk
 B24_CLIENT_ID=local.672f30763b63d4.04393872
 B24_CLIENT_SECRET=rdsfdcc6RtwHlkFng5145gGdhebdh8mXl12QjaD112frtBSL16
-PREFER_AUTH_TYPE=WEBHOOK
+B24_PREFER_AUTH_TYPE=webhook
+
+# Only if you're running the integration tests directly, without first running tests/application_bridge/index.py
+B24_ACCESS_TOKEN=b0872d69007e1212107f3e254fb7f1gdsgdv11297667cf03e675caa
+B24_REFRESH_TOKEN=a00655dgghd5tfd25df256fd52e5f1f5d60d44b7bd193be0a98869
+B24_EXPIRES=2025-11-28 21:09:16+03:00
+B24_EXPIRES_IN=3600
 ```
+
+**Important Notes:**
+
+- When installing the application on the portal, it is recommended to specify all scopes for the correct operation of tests
+
+- Tests are designed assuming that the webhook/application token will have administrator privileges
+
 2. Run tests/application_bridge/index.py:
     - In your IDE: Right-click on the file and select "Run"
-    - Via command line (from the tests/application_bridge directory):
+    - Via command line:
     ```bash
     fastapi dev tests/application_bridge/index.py
     ```
@@ -31,6 +44,10 @@ PREFER_AUTH_TYPE=WEBHOOK
   ```bash
   pytest
   ```
+- Run all tests with code coverage check:
+  ```bash
+  pytest --cov=b24pysdk tests/
+  ```
 - Run tests without detailed error output:
   ```bash
   pytest --tb=no
@@ -47,7 +64,7 @@ PREFER_AUTH_TYPE=WEBHOOK
 #### Running via Docker
 The project defines a make target (`Makefile`) for running scope tests inside a Docker container with parameterization:
 
-- Run all tests in the project:
+- Run all tests in the project with code coverage check:
   ```bash
   make test-all
   ```

@@ -42,4 +42,4 @@ class AuthType(_enum.StrEnum):
 
 
 with suppress(ImportError):
-    from .constants_local import *  # noqa: F403
+    from .constants_local import *  # noqa: F401, F403, RUF100
