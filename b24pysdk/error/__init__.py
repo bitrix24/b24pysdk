@@ -48,6 +48,7 @@ __all__ = [
     "BitrixAPIOverloadLimit",
     "BitrixAPIQueryLimitExceeded",
     "BitrixAPIServiceUnavailable",
+    "BitrixAPITooManyRequests",
     "BitrixAPIUnauthorized",
     "BitrixAPIUserAccessError",
     "BitrixAPIWrongAuthType",
@@ -65,6 +66,7 @@ __all__ = [
     "BitrixResponse302JSONDecodeError",
     "BitrixResponse403JSONDecodeError",
     "BitrixResponse500JSONDecodeError",
+    "BitrixResponseError",
     "BitrixResponseJSONDecodeError",
     "BitrixSDKException",
     "BitrixValidationError",
@@ -89,21 +91,22 @@ class BitrixSDKException(Exception):
 class BitrixOAuthException(BitrixSDKException):
     """"""
 
+    __slots__ = ()
+
 
 class BitrixValidationError(BitrixSDKException, ValueError):
     """"""
+
+    __slots__ = ()
 
 
 class BitrixRequestError(BitrixSDKException):
     """A Connection error occurred."""
 
-    __slots__ = ("original_error",)
-
-    original_error: Exception
+    __slots__ = ()
 
     def __init__(self, original_error: Exception, *args):
         super().__init__(f"{self.__class__.__name__}: {original_error}", original_error, *args)
-        self.original_error = original_error
 
 
 class BitrixOAuthRequestError(BitrixRequestError, BitrixOAuthException):
@@ -111,6 +114,8 @@ class BitrixOAuthRequestError(BitrixRequestError, BitrixOAuthException):
 
     This exception typically occurs when there is an issue with the OAuth request, possibly due to incorrect parameters or network-related issues.
     """
+
+    __slots__ = ()
 
 
 class BitrixRequestTimeout(BitrixRequestError):
@@ -131,19 +136,36 @@ class BitrixRequestTimeout(BitrixRequestError):
 class BitrixOAuthRequestTimeout(BitrixRequestTimeout, BitrixOAuthException):
     """"""
 
+    __slots__ = ()
 
-class BitrixResponseJSONDecodeError(BitrixRequestError, HTTPResponse):
-    """"""
+
+class BitrixResponseError(BitrixSDKException, HTTPResponse):
+    """Base class for errors when a response was received."""
 
     __slots__ = ("response",)
 
-    def __init__(self, original_error: Exception, response: requests.Response):
-        super().__init__(original_error, response)
+    def __init__(self, message: typing.Text, response: requests.Response):
+        super().__init__(message, response)
         self.response = response
+
+
+class BitrixResponseJSONDecodeError(BitrixResponseError):
+    """"""
+
+    __slots__ = ()
+
+    def __init__(self, response: requests.Response):
+        message = (
+            f"{self.__class__.__name__}: failed to decode response "
+            f"{response.status_code} for url: {response.url}"
+        )
+        super().__init__(message, response)
 
 
 class BitrixResponse302JSONDecodeError(BitrixResponseJSONDecodeError, HTTPResponseFound):
     """"""
+
+    __slots__ = ()
 
     @property
     def redirect_url(self) -> typing.Optional[typing.Text]:
@@ -160,15 +182,19 @@ class BitrixResponse302JSONDecodeError(BitrixResponseJSONDecodeError, HTTPRespon
 class BitrixResponse403JSONDecodeError(BitrixResponseJSONDecodeError, HTTPResponseForbidden):
     """"""
 
+    __slots__ = ()
+
 
 class BitrixResponse500JSONDecodeError(BitrixResponseJSONDecodeError, HTTPResponseInternalError):
     """"""
 
+    __slots__ = ()
 
-class BaseBitrixAPIError(BitrixSDKException, HTTPResponse):
+
+class BaseBitrixAPIError(BitrixResponseError):
     """"""
 
-    __slots__ = ("json_response", "response")
+    __slots__ = ("json_response",)
 
     json_response: "_types.JSONDict"
 
@@ -180,10 +206,9 @@ class BaseBitrixAPIError(BitrixSDKException, HTTPResponse):
         else:
             message = json_response.get("error_description", f"{self.__class__.__name__}: {response.text}")
 
-        super().__init__(message, json_response, response)
+        super().__init__(message, response)
 
         self.json_response = json_response
-        self.response = response
 
 
 # ------------------------ Exceptions for API v1 and v2 ------------------------
@@ -212,13 +237,19 @@ class BitrixAPIError(BaseBitrixAPIError):
 class BitrixAPIBadRequest(BitrixAPIError, HTTPResponseBadRequest):
     """Bad Request."""
 
+    __slots__ = ()
+
 
 class BitrixAPIUnauthorized(BitrixAPIError, HTTPResponseUnauthorized):
     """Unauthorized."""
 
+    __slots__ = ()
+
 
 class BitrixAPIForbidden(BitrixAPIError, HTTPResponseForbidden):
     """Forbidden."""
+
+    __slots__ = ()
 
 
 class BitrixAPINotFound(BitrixAPIError, HTTPResponseNotFound):
@@ -228,6 +259,8 @@ class BitrixAPINotFound(BitrixAPIError, HTTPResponseNotFound):
     """
     ERROR = "NOT_FOUND"
 
+    __slots__ = ()
+
 
 class BitrixAPIMethodNotAllowed(BitrixAPIError, HTTPResponseMethodNotAllowed):
     """Method Not Allowed.
@@ -235,10 +268,20 @@ class BitrixAPIMethodNotAllowed(BitrixAPIError, HTTPResponseMethodNotAllowed):
     Indicates that the HTTP method used in the request is not allowed for the requested resource.
     """
 
+    __slots__ = ()
+
+
+class BitrixAPITooManyRequests(BitrixAPIError, HTTPResponseTooManyRequests):
+    """Too Many Requests."""
+
+    __slots__ = ()
+
 
 class BitrixAPIInternalServerError(BitrixAPIError, HTTPResponseInternalError):
     """Internal server error."""
     ERROR = "INTERNAL_SERVER_ERROR"
+
+    __slots__ = ()
 
 
 class BitrixAPIServiceUnavailable(BitrixAPIError, HTTPResponseServiceUnavailable):
@@ -246,6 +289,8 @@ class BitrixAPIServiceUnavailable(BitrixAPIError, HTTPResponseServiceUnavailable
 
     Raised when the API service is temporarily unavailable, often due to maintenance or server overload.
     """
+
+    __slots__ = ()
 
 
 # Exceptions by error
@@ -255,6 +300,8 @@ class BitrixAPIServiceUnavailable(BitrixAPIError, HTTPResponseServiceUnavailable
 class BitrixOauthWrongClient(BitrixAPIError, BitrixOAuthException, HTTPResponseOK):
     """Wrong client"""
     ERROR = "WRONG_CLIENT"
+
+    __slots__ = ()
 
 
 # 400
@@ -266,6 +313,8 @@ class BitrixAPIErrorBatchLengthExceeded(BitrixAPIBadRequest):
     """
     ERROR = "ERROR_BATCH_LENGTH_EXCEEDED"
 
+    __slots__ = ()
+
 
 class BitrixAPIInvalidArgValue(BitrixAPIBadRequest):
     """Invalid argument value provided.
@@ -273,6 +322,8 @@ class BitrixAPIInvalidArgValue(BitrixAPIBadRequest):
     Raised when one or more arguments in the request contain invalid values, which the server cannot process.
     """
     ERROR = "INVALID_ARG_VALUE"
+
+    __slots__ = ()
 
 
 class BitrixAPIInvalidRequest(BitrixAPIBadRequest):
@@ -282,14 +333,20 @@ class BitrixAPIInvalidRequest(BitrixAPIBadRequest):
     """
     ERROR = "INVALID_REQUEST"
 
+    __slots__ = ()
+
 
 class BitrixOAuthInvalidRequest(BitrixAPIInvalidRequest, BitrixOAuthException):
     """An incorrectly formatted authorization requests was provided"""
+
+    __slots__ = ()
 
 
 class BitrixOAuthInvalidClient(BitrixAPIBadRequest, BitrixOAuthException):
     """Invalid client data was provided. The application may not be installed in Bitrix24"""
     ERROR = "INVALID_CLIENT"
+
+    __slots__ = ()
 
 
 class BitrixOAuthInvalidGrant(BitrixAPIBadRequest, BitrixOAuthException):
@@ -298,6 +355,8 @@ class BitrixOAuthInvalidGrant(BitrixAPIBadRequest, BitrixOAuthException):
     This occurs during renewal or initial acquisition, indicating the provided tokens cannot be validated.
     """
     ERROR = "INVALID_GRANT"
+
+    __slots__ = ()
 
 
 # 401
@@ -309,6 +368,8 @@ class BitrixAPIAuthorizationError(BitrixAPIUnauthorized):
     """
     ERROR = "AUTHORIZATION_ERROR"
 
+    __slots__ = ()
+
 
 class BitrixAPIErrorOAuth(BitrixAPIUnauthorized):
     """Application not installed.
@@ -316,6 +377,8 @@ class BitrixAPIErrorOAuth(BitrixAPIUnauthorized):
     Indicates that the operation cannot proceed because the application is not installed in the Bitrix environment.
     """
     ERROR = "ERROR_OAUTH"
+
+    __slots__ = ()
 
 
 class BitrixAPIExpiredToken(BitrixAPIUnauthorized):
@@ -326,6 +389,8 @@ class BitrixAPIExpiredToken(BitrixAPIUnauthorized):
     """
     ERROR = "EXPIRED_TOKEN"
 
+    __slots__ = ()
+
 
 class BitrixAPIMethodConfirmWaiting(BitrixAPIUnauthorized):
     """Waiting for confirmation.
@@ -333,6 +398,8 @@ class BitrixAPIMethodConfirmWaiting(BitrixAPIUnauthorized):
     Raised when an API call requires a user to confirm their action, and the confirmation is still pending.
     """
     ERROR = "METHOD_CONFIRM_WAITING"
+
+    __slots__ = ()
 
 
 class BitrixAPINoAuthFound(BitrixAPIUnauthorized):
@@ -342,6 +409,8 @@ class BitrixAPINoAuthFound(BitrixAPIUnauthorized):
     """
     ERROR = "NO_AUTH_FOUND"
 
+    __slots__ = ()
+
 
 # 403
 
@@ -349,10 +418,14 @@ class BitrixAPIAccessDenied(BitrixAPIForbidden):
     """REST API is available only on commercial plans."""
     ERROR = "ACCESS_DENIED"
 
+    __slots__ = ()
+
 
 class BitrixAPIAllowedOnlyIntranetUser(BitrixAPIForbidden):
     """"""
     ERROR = "ALLOWED_ONLY_INTRANET_USER"
+
+    __slots__ = ()
 
 
 class BitrixAPIInsufficientScope(BitrixAPIForbidden):
@@ -362,6 +435,8 @@ class BitrixAPIInsufficientScope(BitrixAPIForbidden):
     """
     ERROR = "INSUFFICIENT_SCOPE"
 
+    __slots__ = ()
+
 
 class BitrixAPIInvalidCredentials(BitrixAPIForbidden):
     """Invalid request credentials.
@@ -369,6 +444,8 @@ class BitrixAPIInvalidCredentials(BitrixAPIForbidden):
     Indicates the credentials provided in the request are not valid for accessing the requested resource or action.
     """
     ERROR = "INVALID_CREDENTIALS"
+
+    __slots__ = ()
 
 
 class BitrixAPIMethodConfirmDenied(BitrixAPIForbidden):
@@ -378,15 +455,21 @@ class BitrixAPIMethodConfirmDenied(BitrixAPIForbidden):
     """
     ERROR = "METHOD_CONFIRM_DENIED"
 
+    __slots__ = ()
+
 
 class BitrixAPIUserAccessError(BitrixAPIForbidden):
     """The user does not have acfcess to the application."""
     ERROR = "USER_ACCESS_ERROR"
 
+    __slots__ = ()
+
 
 class BitrixAPIWrongAuthType(BitrixAPIForbidden):
     """Current authorization type is denied for this method."""
     ERROR = "WRONG_AUTH_TYPE"
+
+    __slots__ = ()
 
 
 class BitrixOAuthInvalidScope(BitrixAPIForbidden, BitrixOAuthException):
@@ -396,9 +479,13 @@ class BitrixOAuthInvalidScope(BitrixAPIForbidden, BitrixOAuthException):
     """
     ERROR = "INVALID_SCOPE"
 
+    __slots__ = ()
+
 
 class BitrixOAuthInsufficientScope(BitrixAPIInsufficientScope, BitrixOAuthException):
     """Access permissions requested exceed those specified in the application card"""
+
+    __slots__ = ()
 
 
 # 404
@@ -410,6 +497,8 @@ class BitrixAPIErrorManifestIsNotAvailable(BitrixAPINotFound):
     """
     ERROR = "ERROR_MANIFEST_IS_NOT_AVAILABLE"
 
+    __slots__ = ()
+
 
 # 405
 
@@ -420,12 +509,16 @@ class BitrixAPIErrorBatchMethodNotAllowed(BitrixAPIMethodNotAllowed):
     """
     ERROR = "ERROR_BATCH_METHOD_NOT_ALLOWED"
 
+    __slots__ = ()
+
 
 # 429
 
 class BitrixAPIOperationTimeLimit(BitrixAPIError, HTTPResponseTooManyRequests):
     """Method is blocked due to operation time limit."""
     ERROR = "OPERATION_TIME_LIMIT"
+
+    __slots__ = ()
 
 
 # 500
@@ -437,6 +530,8 @@ class BitrixAPIErrorUnexpectedAnswer(BitrixAPIInternalServerError):
     """
     ERROR = "ERROR_UNEXPECTED_ANSWER"
 
+    __slots__ = ()
+
 
 # 503
 
@@ -447,6 +542,8 @@ class BitrixAPIOverloadLimit(BitrixAPIServiceUnavailable):
     """
     ERROR = "OVERLOAD_LIMIT"
 
+    __slots__ = ()
+
 
 class BitrixAPIQueryLimitExceeded(BitrixAPIServiceUnavailable):
     """Too many requests.
@@ -454,3 +551,5 @@ class BitrixAPIQueryLimitExceeded(BitrixAPIServiceUnavailable):
     Raised when the number of API requests exceeds the allowed limit, prompting the client to slow down the request rate.
     """
     ERROR = "QUERY_LIMIT_EXCEEDED"
+
+    __slots__ = ()

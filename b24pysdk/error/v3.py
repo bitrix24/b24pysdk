@@ -1,7 +1,6 @@
 from dataclasses import asdict, dataclass
+from functools import cached_property
 from typing import Dict, List, Optional, Text
-
-import requests
 
 from .._constants import PYTHON_VERSION as _PV
 from ..utils.types import JSONDict
@@ -59,22 +58,24 @@ class Error:
 class BitrixAPIError(BaseBitrixAPIError):
     """Bitrix v3 API error"""
 
-    __slots__ = ("error",)
+    __slots__ = ()
 
-    error: Error
+    @cached_property
+    def error(self) -> Error:
+        """"""
+        return Error.from_dict(self.json_response["error"])
 
-    def __init__(self, json_response: JSONDict, response: requests.Response):
-        super().__init__(json_response, response)
-        self.error = Error.from_dict(json_response["error"])
-
-    @property
+    @cached_property
     def code(self) -> Text:
+        """"""
         return self.error.code
 
-    @property
+    @cached_property
     def validation(self) -> Optional[List[Validation]]:
+        """"""
         return self.error.validation
 
-    @property
+    @cached_property
     def has_validation(self) -> bool:
+        """"""
         return bool(self.validation)
