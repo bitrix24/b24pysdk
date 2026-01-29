@@ -10,7 +10,7 @@ from .scopes import v3 as scopes_v3
 
 # noinspection PyProtectedMember
 from .scopes._base_context import BaseContext
-from .utils.types import B24APIVersionLiteral, JSONDict, Key, Timeout
+from .utils.types import B24APIVersionLiteral, JSONDict, Key, Number, Timeout
 
 if TYPE_CHECKING:
     from .bitrix_api.requests import AbstractBitrixAPIRequest
@@ -373,8 +373,8 @@ class ClientV3(BaseClient):
             *,
             timeout: Timeout = None,
             max_retries: Optional[int] = None,
-            initial_retry_delay: Optional[float] = None,
-            retry_delay_increment: Optional[float] = None,
+            initial_retry_delay: Optional[Number] = None,
+            retry_delay_increment: Optional[Number] = None,
             **kwargs,
     ):
         super().__init__(
@@ -399,8 +399,8 @@ def Client(
         prefer_version: Literal[2] = B24APIVersion.V2,
         timeout: Timeout = None,
         max_retries: Optional[int] = None,
-        initial_retry_delay: Optional[float] = None,
-        retry_delay_increment: Optional[float] = None,
+        initial_retry_delay: Optional[Number] = None,
+        retry_delay_increment: Optional[Number] = None,
         **kwargs,
 ) -> ClientV2: ...
 
@@ -413,8 +413,8 @@ def Client(
         prefer_version: Literal[1],
         timeout: Timeout = None,
         max_retries: Optional[int] = None,
-        initial_retry_delay: Optional[float] = None,
-        retry_delay_increment: Optional[float] = None,
+        initial_retry_delay: Optional[Number] = None,
+        retry_delay_increment: Optional[Number] = None,
         **kwargs,
 ) -> ClientV1: ...
 
@@ -427,8 +427,8 @@ def Client(
         prefer_version: Literal[3],
         timeout: Timeout = None,
         max_retries: Optional[int] = None,
-        initial_retry_delay: Optional[float] = None,
-        retry_delay_increment: Optional[float] = None,
+        initial_retry_delay: Optional[Number] = None,
+        retry_delay_increment: Optional[Number] = None,
         **kwargs,
 ) -> ClientV3: ...
 
@@ -440,8 +440,8 @@ def Client(  # noqa: N802
         prefer_version: B24APIVersionLiteral = B24APIVersion.V2,
         timeout: Timeout = None,
         max_retries: Optional[int] = None,
-        initial_retry_delay: Optional[float] = None,
-        retry_delay_increment: Optional[float] = None,
+        initial_retry_delay: Optional[Number] = None,
+        retry_delay_increment: Optional[Number] = None,
         **kwargs,
 ) -> BaseClient:
     """Factory class to create the appropriate Client version."""
