@@ -1,13 +1,16 @@
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Callable, Optional, Text, Union
+from typing import TYPE_CHECKING, Callable, Optional, Text, Type, TypeVar, Union
 
-from ..bitrix_api.protocols import BitrixTokenFullProtocol
-from ..bitrix_api.requests import BitrixAPIRequest
-from ..utils.functional import Classproperty
+from ..bitrix_api.requests import AbstractBitrixAPIRequest, BitrixAPIRequest
+from ..protocols import BitrixTokenFullProtocol
+from ..utils.functional import classproperty
 from ..utils.types import JSONDict, Timeout
 
 if TYPE_CHECKING:
-    from .. import Client
+    from ..client import BaseClient
+
+
+_BARQT = TypeVar("_BARQT", bound=AbstractBitrixAPIRequest)
 
 
 class BaseContext(ABC):
@@ -18,13 +21,14 @@ class BaseContext(ABC):
     def __str__(self):
         return self._path
 
-    @Classproperty
+    # noinspection PyMethodParameters
+    @classproperty
     def _name(cls) -> Text:
         return cls.__name__.lower()
 
     @property
     @abstractmethod
-    def _context(self) -> Union["BaseContext", "Client"]:
+    def _context(self) -> Union["BaseContext", "BaseClient"]:
         """"""
         raise NotImplementedError
 
@@ -48,7 +52,7 @@ class BaseContext(ABC):
     def __to_camel_case(snake_str: Text) -> Text:
         """Converts Python methods names to camelCase to be used in _get_api_method"""
         first, *parts = snake_str.split("_")
-        return "".join([first.lower(), *(part.title() for part in parts)])
+        return "".join((first.lower(), *(part.title() for part in parts)))
 
     def _get_api_method(self, api_wrapper: Callable) -> Text:
         """"""
@@ -60,15 +64,19 @@ class BaseContext(ABC):
             api_wrapper: Callable,
             params: Optional[JSONDict] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+            bitrix_api_request_type: Type[_BARQT] = BitrixAPIRequest,
+            **kwargs,
+    ) -> _BARQT:
         """"""
 
-        if timeout:
-            self._kwargs["timeout"] = timeout
+        kwargs = self._kwargs | kwargs
 
-        return BitrixAPIRequest(
+        if timeout:
+            kwargs["timeout"] = timeout
+
+        return bitrix_api_request_type(
             bitrix_token=self._bitrix_token,
             api_method=self._get_api_method(api_wrapper),
             params=params,
-            **self._kwargs,
+            **kwargs,
         )

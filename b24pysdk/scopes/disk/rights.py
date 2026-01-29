@@ -1,5 +1,3 @@
-from typing import Optional, Text
-
 from ...bitrix_api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import Timeout
@@ -11,37 +9,35 @@ __all__ = [
 
 
 class Rights(BaseEntity):
-    """"""
+    """
+    Handle operations related to Bitrix24 Disk rights.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/disk/rights/index.html
+    """
 
     @type_checker
     def get_tasks(
             self,
             *,
-            bitrix_id: Optional[int] = None,
-            name: Optional[Text] = None,
-            title: Optional[Text] = None,
-            start: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Retrieve the list of access levels (tasks) available for assigning Disk rights.
 
-        params = dict()
+        Documentation: https://apidocs.bitrix24.com/api-reference/disk/rights/disk-rights-get-tasks.html
 
-        if bitrix_id is not None:
-            params["ID"] = bitrix_id
+        This method calls disk.rights.getTasks to obtain access level definitions that can be used when assigning permissions.
 
-        if name is not None:
-            params["NAME"] = name
+        Args:
+            timeout: Timeout in seconds;
 
-        if title is not None:
-            params["TITLE"] = title
-
-        if start is not None:
-            params["START"] = start
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get_tasks,
-            params=params,
             timeout=timeout,
         )
+
 

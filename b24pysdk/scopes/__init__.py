@@ -1,3 +1,4 @@
+from . import _v3 as v3
 from .access import Access
 from .app import App
 from .biconnector import Biconnector
@@ -13,6 +14,7 @@ from .feature import Feature
 from .method import Method
 from .placement import Placement
 from .profile import Profile
+from .sale import Sale
 from .scope import Scope
 from .server import Server
 from .socialnetwork import Socialnetwork
@@ -34,8 +36,10 @@ __all__ = [
     "Method",
     "Placement",
     "Profile",
+    "Sale",
     "Scope",
     "Server",
     "Socialnetwork",
     "User",
+    "v3",
 ]
