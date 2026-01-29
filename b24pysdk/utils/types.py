@@ -4,14 +4,15 @@ from ..error import BitrixValidationError
 
 __all__ = [
     "B24APIResult",
+    "B24APIVersionLiteral",
     "B24AppStatusLiteral",
-    "B24BatchMethodTuple",
-    "B24BatchMethods",
     "B24Bool",
     "B24BoolLiteral",
     "B24BoolStrict",
     "B24BoolStrictLiteral",
     "B24File",
+    "B24RequestTuple",
+    "B24Requests",
     "DefaultTimeout",
     "DocumentType",
     "JSONDict",
@@ -47,6 +48,9 @@ Timeout = typing.Optional[DefaultTimeout]
 B24APIResult = typing.Optional[typing.Union[JSONDict, JSONList, bool]]
 """Represents the result of a Bitrix24 API call, which can be a dictionary, a list of dictionaries, or a boolean."""
 
+B24APIVersionLiteral = typing.Literal[1, 2, 3]
+"""Supported Bitrix API versions."""
+
 B24AppStatusLiteral = typing.Literal["F", "D", "T", "P", "L", "S"]
 """Literal type for Bitrix24 application status codes:\n
 "F" - Free\n
@@ -63,10 +67,10 @@ B24BoolLiteral = typing.Literal["D", "N", "Y"]
 B24BoolStrictLiteral = typing.Literal["N", "Y"]
 """"""
 
-B24BatchMethodTuple = typing.Tuple[typing.Text, typing.Optional[JSONDict]]
+B24RequestTuple = typing.Tuple[typing.Text, typing.Optional[JSONDict]]
 """Tuple containing a REST API method name and its optional parameters - (api_method, params)."""
 
-B24BatchMethods = typing.Union[typing.Mapping[Key, B24BatchMethodTuple], typing.Sequence[B24BatchMethodTuple]]
+B24Requests = typing.Union[typing.Mapping[Key, B24RequestTuple], typing.Sequence[B24RequestTuple]]
 """"""
 
 UserTypeIDLiteral = typing.Literal[

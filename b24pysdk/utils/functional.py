@@ -2,12 +2,13 @@ import functools
 import typing
 
 __all__ = [
-    "Classproperty",
+    "classproperty",
     "type_checker",
 ]
 
 
-class Classproperty:
+# noinspection PyPep8Naming
+class classproperty:  # noqa: N801
     """
     Decorator that converts a method with a single cls argument into a property
     that can be accessed directly from the class.
