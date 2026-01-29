@@ -1,14 +1,27 @@
-import abc
 import typing
-from http import HTTPStatus as _HTTPStatus
 from urllib.parse import urlparse as _urlparse
 
 import requests
 
+from ._http_response import (
+    HTTPResponse,
+    HTTPResponseBadRequest,
+    HTTPResponseForbidden,
+    HTTPResponseFound,
+    HTTPResponseInternalError,
+    HTTPResponseMethodNotAllowed,
+    HTTPResponseNotFound,
+    HTTPResponseOK,
+    HTTPResponseServiceUnavailable,
+    HTTPResponseTooManyRequests,
+    HTTPResponseUnauthorized,
+)
+
 if typing.TYPE_CHECKING:
-    from .utils.types import JSONDict as _JSONDict
+    from ..utils import types as _types
 
 __all__ = [
+    "BaseBitrixAPIError",
     "BitrixAPIAccessDenied",
     "BitrixAPIAllowedOnlyIntranetUser",
     "BitrixAPIAuthorizationError",
@@ -31,6 +44,7 @@ __all__ = [
     "BitrixAPIMethodNotAllowed",
     "BitrixAPINoAuthFound",
     "BitrixAPINotFound",
+    "BitrixAPIOperationTimeLimit",
     "BitrixAPIOverloadLimit",
     "BitrixAPIQueryLimitExceeded",
     "BitrixAPIServiceUnavailable",
@@ -57,68 +71,12 @@ __all__ = [
 ]
 
 
-class _HTTPResponse(abc.ABC):
-    """"""
-
-    STATUS_CODE: _HTTPStatus = NotImplemented
-
-    response: requests.Response
-
-    @property
-    def status_code(self) -> int:
-        """"""
-        return self.response.status_code
-
-
-class _HTTPResponseOK(_HTTPResponse):
-    """"""
-    STATUS_CODE = _HTTPStatus.OK
-
-
-class _HTTPResponseFound(_HTTPResponse):
-    """"""
-    STATUS_CODE = _HTTPStatus.FOUND
-
-
-class _HTTPResponseBadRequest(_HTTPResponse):
-    """"""
-    STATUS_CODE = _HTTPStatus.BAD_REQUEST
-
-
-class _HTTPResponseUnauthorized(_HTTPResponse):
-    """"""
-    STATUS_CODE = _HTTPStatus.UNAUTHORIZED
-
-
-class _HTTPResponseForbidden(_HTTPResponse):
-    """"""
-    STATUS_CODE = _HTTPStatus.FORBIDDEN
-
-
-class _HTTPResponseNotFound(_HTTPResponse):
-    """"""
-    STATUS_CODE = _HTTPStatus.NOT_FOUND
-
-
-class _HTTPResponseMethodNotAllowed(_HTTPResponse):
-    """"""
-    STATUS_CODE = _HTTPStatus.METHOD_NOT_ALLOWED
-
-
-class _HTTPResponseInternalError(_HTTPResponse):
-    """"""
-    STATUS_CODE = _HTTPStatus.INTERNAL_SERVER_ERROR
-
-
-class _HTTPResponseServiceUnavailable(_HTTPResponse):
-    """"""
-    STATUS_CODE = _HTTPStatus.SERVICE_UNAVAILABLE
-
-
 class BitrixSDKException(Exception):
-    """BaseEntity class for all bitrix API exceptions."""
+    """Base class for all bitrix API exceptions."""
 
     __slots__ = ("message",)
+
+    message: typing.Text
 
     def __init__(self, message: typing.Text, *args):
         super().__init__(message, *args)
@@ -141,6 +99,8 @@ class BitrixRequestError(BitrixSDKException):
 
     __slots__ = ("original_error",)
 
+    original_error: Exception
+
     def __init__(self, original_error: Exception, *args):
         super().__init__(f"{self.__class__.__name__}: {original_error}", original_error, *args)
         self.original_error = original_error
@@ -161,7 +121,9 @@ class BitrixRequestTimeout(BitrixRequestError):
 
     __slots__ = ("timeout",)
 
-    def __init__(self, original_error: Exception, timeout: int):
+    timeout: "_types.DefaultTimeout"
+
+    def __init__(self, original_error: Exception, timeout: "_types.DefaultTimeout"):
         super().__init__(original_error, timeout)
         self.timeout = timeout
 
@@ -170,7 +132,7 @@ class BitrixOAuthRequestTimeout(BitrixRequestTimeout, BitrixOAuthException):
     """"""
 
 
-class BitrixResponseJSONDecodeError(BitrixRequestError, _HTTPResponse):
+class BitrixResponseJSONDecodeError(BitrixRequestError, HTTPResponse):
     """"""
 
     __slots__ = ("response",)
@@ -180,7 +142,7 @@ class BitrixResponseJSONDecodeError(BitrixRequestError, _HTTPResponse):
         self.response = response
 
 
-class BitrixResponse302JSONDecodeError(BitrixResponseJSONDecodeError, _HTTPResponseFound):
+class BitrixResponse302JSONDecodeError(BitrixResponseJSONDecodeError, HTTPResponseFound):
     """"""
 
     @property
@@ -195,26 +157,44 @@ class BitrixResponse302JSONDecodeError(BitrixResponseJSONDecodeError, _HTTPRespo
         return redirect_url and _urlparse(redirect_url).hostname
 
 
-class BitrixResponse403JSONDecodeError(BitrixResponseJSONDecodeError, _HTTPResponseForbidden):
+class BitrixResponse403JSONDecodeError(BitrixResponseJSONDecodeError, HTTPResponseForbidden):
     """"""
 
 
-class BitrixResponse500JSONDecodeError(BitrixResponseJSONDecodeError, _HTTPResponseInternalError):
+class BitrixResponse500JSONDecodeError(BitrixResponseJSONDecodeError, HTTPResponseInternalError):
     """"""
 
 
-class BitrixAPIError(BitrixSDKException, _HTTPResponse):
+class BaseBitrixAPIError(BitrixSDKException, HTTPResponse):
     """"""
-
-    ERROR: typing.Text = NotImplemented
 
     __slots__ = ("json_response", "response")
 
-    def __init__(self, json_response: "_JSONDict", response: requests.Response):
-        message = json_response.get("error_description", f"{self.__class__.__name__}: {response.text}")
+    json_response: "_types.JSONDict"
+
+    def __init__(self, json_response: "_types.JSONDict", response: requests.Response):
+        error = json_response.get("error")
+
+        if isinstance(error, dict):
+            message = error.get("message", f"{self.__class__.__name__}: {response.text}")
+        else:
+            message = json_response.get("error_description", f"{self.__class__.__name__}: {response.text}")
+
         super().__init__(message, json_response, response)
+
         self.json_response = json_response
         self.response = response
+
+
+# ------------------------ Exceptions for API v1 and v2 ------------------------
+
+
+class BitrixAPIError(BaseBitrixAPIError):
+    """"""
+
+    ERROR: typing.ClassVar[typing.Text] = NotImplemented
+
+    __slots__ = ()
 
     @property
     def error(self) -> typing.Text:
@@ -229,19 +209,19 @@ class BitrixAPIError(BitrixSDKException, _HTTPResponse):
 
 # Exceptions by status code
 
-class BitrixAPIBadRequest(BitrixAPIError, _HTTPResponseBadRequest):
+class BitrixAPIBadRequest(BitrixAPIError, HTTPResponseBadRequest):
     """Bad Request."""
 
 
-class BitrixAPIUnauthorized(BitrixAPIError, _HTTPResponseUnauthorized):
+class BitrixAPIUnauthorized(BitrixAPIError, HTTPResponseUnauthorized):
     """Unauthorized."""
 
 
-class BitrixAPIForbidden(BitrixAPIError, _HTTPResponseForbidden):
+class BitrixAPIForbidden(BitrixAPIError, HTTPResponseForbidden):
     """Forbidden."""
 
 
-class BitrixAPINotFound(BitrixAPIError, _HTTPResponseNotFound):
+class BitrixAPINotFound(BitrixAPIError, HTTPResponseNotFound):
     """Not Found.
 
     Raised when the specified resource cannot be located on the server.
@@ -249,19 +229,19 @@ class BitrixAPINotFound(BitrixAPIError, _HTTPResponseNotFound):
     ERROR = "NOT_FOUND"
 
 
-class BitrixAPIMethodNotAllowed(BitrixAPIError, _HTTPResponseMethodNotAllowed):
+class BitrixAPIMethodNotAllowed(BitrixAPIError, HTTPResponseMethodNotAllowed):
     """Method Not Allowed.
 
     Indicates that the HTTP method used in the request is not allowed for the requested resource.
     """
 
 
-class BitrixAPIInternalServerError(BitrixAPIError, _HTTPResponseInternalError):
+class BitrixAPIInternalServerError(BitrixAPIError, HTTPResponseInternalError):
     """Internal server error."""
     ERROR = "INTERNAL_SERVER_ERROR"
 
 
-class BitrixAPIServiceUnavailable(BitrixAPIError, _HTTPResponseServiceUnavailable):
+class BitrixAPIServiceUnavailable(BitrixAPIError, HTTPResponseServiceUnavailable):
     """Service Unavailable.
 
     Raised when the API service is temporarily unavailable, often due to maintenance or server overload.
@@ -272,7 +252,7 @@ class BitrixAPIServiceUnavailable(BitrixAPIError, _HTTPResponseServiceUnavailabl
 
 # 200
 
-class BitrixOauthWrongClient(BitrixAPIError, BitrixOAuthException, _HTTPResponseOK):
+class BitrixOauthWrongClient(BitrixAPIError, BitrixOAuthException, HTTPResponseOK):
     """Wrong client"""
     ERROR = "WRONG_CLIENT"
 
@@ -439,6 +419,13 @@ class BitrixAPIErrorBatchMethodNotAllowed(BitrixAPIMethodNotAllowed):
     Raised when a specific method cannot be used within a batch operation.
     """
     ERROR = "ERROR_BATCH_METHOD_NOT_ALLOWED"
+
+
+# 429
+
+class BitrixAPIOperationTimeLimit(BitrixAPIError, HTTPResponseTooManyRequests):
+    """Method is blocked due to operation time limit."""
+    ERROR = "OPERATION_TIME_LIMIT"
 
 
 # 500
