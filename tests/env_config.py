@@ -31,6 +31,7 @@ class EnvConfig:
         "client_id",
         "client_secret",
         "domain",
+        "expired_token",
         "expires",
         "expires_in",
         "prefer_auth_type",
@@ -45,6 +46,7 @@ class EnvConfig:
     expires: Optional[datetime]
     expires_in: Optional[datetime]
     prefer_auth_type: AuthType
+    expired_token: Optional[Text]
     refresh_token: Text
     webhook_token: Text
 
@@ -69,6 +71,7 @@ class EnvConfig:
         self.client_id = self._validate_credential(env.str("B24_CLIENT_ID", default=""), name="B24_CLIENT_ID")
         self.client_secret = self._validate_credential(env.str("B24_CLIENT_SECRET", default=""), name="B24_CLIENT_SECRET")
         self.access_token = self._validate_credential(env.str("B24_ACCESS_TOKEN", default=""), name="B24_ACCESS_TOKEN")
+        self.expired_token = self._validate_credential(env.str("B24_EXPIRED_TOKEN", default=""), name="B24_EXPIRED_TOKEN")
         self.refresh_token = self._validate_credential(env.str("B24_REFRESH_TOKEN", default=""), name="B24_REFRESH_TOKEN")
         self.expires = self._validate_expires(env.str("B24_EXPIRES", default=None))
         self.expires_in = self._validate_expires_in(env.int("B24_EXPIRES_IN", default=None))

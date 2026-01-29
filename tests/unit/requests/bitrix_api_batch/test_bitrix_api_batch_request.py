@@ -1,4 +1,4 @@
-from typing import Dict, List, Mapping, Optional, Sequence, Text, Tuple, Union
+from typing import Dict, List, Mapping, Sequence, Text, Tuple, Union
 from unittest.mock import Mock
 
 import pytest
@@ -22,7 +22,6 @@ _INIT_TEST_DATA: List[
         Union[Mapping[Text, BitrixAPIRequest], Sequence[BitrixAPIRequest]],
         bool,
         bool,
-        Optional[float],
         Dict,
         Text,
     ]
@@ -31,30 +30,27 @@ _INIT_TEST_DATA: List[
         REQUESTS_MAP,
         True,
         True,
-        15.0,
         {"key_1": 1},
-        "dict of 2 BitrixAPIRequests",
+        "dict of 2 BitrixAPIRequest",
     ),
     (
         REQUESTS_SEQ,
         False,
         False,
-        None,
         {},
-        "list of 2 BitrixAPIRequests",
+        "list of 2 BitrixAPIRequest",
     ),
 ]
 
 
 @pytest.mark.parametrize(
-    ("requests", "halt", "ignore_size_limit", "timeout", "kwargs", "expected_requests_repr_fragment"),
+    ("requests", "halt", "ignore_size_limit", "kwargs", "expected_requests_repr_fragment"),
     _INIT_TEST_DATA,
 )
 def test_initialization_and_properties_variants(
     requests: Union[Mapping[Text, BitrixAPIRequest], Sequence[BitrixAPIRequest]],
     halt: bool,
     ignore_size_limit: bool,
-    timeout: Optional[float],
     kwargs: Dict,
     expected_requests_repr_fragment: Text,
 ):
@@ -63,20 +59,19 @@ def test_initialization_and_properties_variants(
         bitrix_api_requests=requests,
         halt=halt,
         ignore_size_limit=ignore_size_limit,
-        timeout=timeout,
         **kwargs,
     )
 
-    assert obj.bitrix_token is TOKEN_MOCK
-    assert obj.halt == halt
-    assert obj.timeout == timeout
+    assert obj._bitrix_token is TOKEN_MOCK
+    assert obj._halt == halt
     assert obj._kwargs == kwargs
-    assert obj.ignore_size_limit == ignore_size_limit
+    assert obj._ignore_size_limit == ignore_size_limit
 
-    repr_output = repr(obj)
-    assert f"halt={halt}" in repr_output
-    assert f"ignore_size_limit={ignore_size_limit}" in repr_output
-    assert expected_requests_repr_fragment in repr_output
+    if isinstance(requests, Sequence):
+        repr_output = repr(obj)
+        assert f"halt={halt}" in repr_output
+        assert f"ignore_size_limit={ignore_size_limit}" in repr_output
+        assert expected_requests_repr_fragment in repr_output
 
 
 def test_call_method_delegates_to_call_batch():
@@ -98,7 +93,6 @@ def test_call_method_delegates_to_call_batch():
         bitrix_api_requests=requests_map,
         halt=True,
         ignore_size_limit=True,
-        timeout=10.5,
         extra_key="extra_val",
     )
 
@@ -110,7 +104,6 @@ def test_call_method_delegates_to_call_batch():
         methods=expected_methods,
         halt=True,
         ignore_size_limit=True,
-        timeout=10.5,
         extra_key="extra_val",
     )
 

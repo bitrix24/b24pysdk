@@ -20,7 +20,6 @@ pytestmark = [
 
 _LIST_FAST_CASE_1 = {
     "params": {"filter": {"ID": 1}},
-    "timeout": 10.0,
     "api_method": "crm.deal.list",
     "descending": True,
     "limit": 1000,
@@ -29,7 +28,6 @@ _LIST_FAST_CASE_1 = {
 
 _LIST_FAST_CASE_2 = {
     "params": None,
-    "timeout": None,
     "api_method": "user.get",
     "descending": False,
     "limit": None,
@@ -55,7 +53,6 @@ def test_initialization_and_properties_variants(request_case: Dict):
         bitrix_token=TOKEN_MOCK,
         api_method=request_case["api_method"],
         params=request_case["params"],
-        timeout=request_case["timeout"],
     )
 
     obj = BitrixAPIListFastRequest(
@@ -65,12 +62,11 @@ def test_initialization_and_properties_variants(request_case: Dict):
         **request_case["kwargs"],
     )
 
-    assert obj.bitrix_token is base_request.bitrix_token
-    assert obj.api_method == base_request.api_method
-    assert obj.params == base_request.params
-    assert obj.timeout == base_request.timeout
-    assert obj.descending == request_case["descending"]
-    assert obj.limit == request_case["limit"]
+    assert obj._bitrix_token is base_request._bitrix_token
+    assert obj._api_method == base_request._api_method
+    assert obj._params == base_request._params
+    assert obj._descending == request_case["descending"]
+    assert obj._limit == request_case["limit"]
 
     for key, value in request_case["kwargs"].items():
         assert obj._kwargs[key] == value
@@ -84,7 +80,6 @@ def test_call_method_success():
         bitrix_token=token_mock,
         api_method="crm.company.list",
         params=_LIST_FAST_CASE_1["params"],
-        timeout=_LIST_FAST_CASE_1["timeout"],
     )
 
     obj = BitrixAPIListFastRequest(
@@ -105,7 +100,6 @@ def test_call_method_success():
         params=_LIST_FAST_CASE_1["params"],
         descending=_LIST_FAST_CASE_1["descending"],
         limit=500,
-        timeout=_LIST_FAST_CASE_1["timeout"],
         **_LIST_FAST_CASE_1["kwargs"],
     )
 

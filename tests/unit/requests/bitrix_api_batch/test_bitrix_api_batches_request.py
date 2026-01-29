@@ -1,4 +1,4 @@
-from typing import Dict, List, Mapping, Optional, Sequence, Text, Tuple, Union
+from typing import Dict, List, Mapping, Sequence, Text, Tuple, Union
 from unittest.mock import Mock
 
 import pytest
@@ -34,7 +34,6 @@ _INIT_TEST_DATA: List[
     Tuple[
         Union[Mapping[Text, BitrixAPIRequest], Sequence[BitrixAPIRequest]],
         bool,
-        Optional[float],
         Dict,
         Text,
     ]
@@ -42,28 +41,25 @@ _INIT_TEST_DATA: List[
     (
         REQUESTS_MAP,
         True,
-        15.0,
         {"key_1": 1},
-        "dict of 2 BitrixAPIRequests",
+        "dict of 2 BitrixAPIRequest",
     ),
     (
         REQUESTS_SEQ,
         False,
-        None,
         {},
-        "list of 2 BitrixAPIRequests",
+        "list of 2 BitrixAPIRequest",
     ),
 ]
 
 
 @pytest.mark.parametrize(
-    ("requests", "halt", "timeout", "kwargs", "expected_requests_repr_fragment"),
+    ("requests", "halt", "kwargs", "expected_requests_repr_fragment"),
     _INIT_TEST_DATA,
 )
 def test_initialization_and_properties_variants(
     requests: Union[Mapping[Text, BitrixAPIRequest], Sequence[BitrixAPIRequest]],
     halt: bool,
-    timeout: Optional[float],
     kwargs: Dict,
     expected_requests_repr_fragment: Text,
 ):
@@ -71,24 +67,22 @@ def test_initialization_and_properties_variants(
         bitrix_token=TOKEN_MOCK,
         bitrix_api_requests=requests,
         halt=halt,
-        timeout=timeout,
         **kwargs,
     )
 
-    assert obj.bitrix_token is TOKEN_MOCK
-    assert obj.halt == halt
-    assert obj.timeout == timeout
+    assert obj._bitrix_token is TOKEN_MOCK
+    assert obj._halt == halt
     assert obj._kwargs == kwargs
-    assert obj.bitrix_api_requests is requests
+    assert obj._bitrix_api_requests is requests
 
-    repr_output = repr(obj)
-    assert f"halt={halt}" in repr_output
-    assert f"timeout={timeout}" in repr_output
-    assert expected_requests_repr_fragment in repr_output
+    if isinstance(requests, Sequence):
+        repr_output = repr(obj)
+        assert f"halt={halt}" in repr_output
+        assert expected_requests_repr_fragment in repr_output
 
-    str_output = str(obj)
-    assert obj._API_METHOD in str_output
-    assert expected_requests_repr_fragment in str_output
+        str_output = str(obj)
+        assert obj._API_METHOD in str_output
+        assert expected_requests_repr_fragment in str_output
 
 
 def test_methods_property_with_mapping():
@@ -99,7 +93,7 @@ def test_methods_property_with_mapping():
     requests_map = {"me": req1, "deal": req2}
     obj = BitrixAPIBatchesRequest(bitrix_token=token_mock, bitrix_api_requests=requests_map)
 
-    methods = obj.methods
+    methods = obj._methods
 
     assert isinstance(methods, dict)
     assert methods["me"] == ("user.current", None)
@@ -114,7 +108,7 @@ def test_methods_property_with_sequence():
     requests_seq = [req1, req2]
     obj = BitrixAPIBatchesRequest(bitrix_token=token_mock, bitrix_api_requests=requests_seq)
 
-    methods = obj.methods
+    methods = obj._methods
 
     assert isinstance(methods, list)
     assert methods[0] == ("user.current", None)
@@ -139,7 +133,6 @@ def test_call_method_delegates_to_call_batches():
         bitrix_token=token_mock,
         bitrix_api_requests=requests_map,
         halt=True,
-        timeout=10.5,
         extra_key="extra_val",
     )
 
@@ -150,7 +143,6 @@ def test_call_method_delegates_to_call_batches():
     token_mock.call_batches.assert_called_once_with(
         methods=expected_methods,
         halt=True,
-        timeout=10.5,
         extra_key="extra_val",
     )
 

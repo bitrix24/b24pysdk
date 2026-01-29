@@ -21,7 +21,7 @@ _FIELDS: Tuple[Text, ...] = ("ID", "XML_ID", "ACTIVE", "NAME", "LAST_NAME", "EMA
 
 _NAME: Text = "Test"
 _LAST_NAME: Text = SDK_NAME
-_UF_DEPARTMENT: List = [HEAD_DEPARTMENT_ID]
+_UF_DEPARTMENT: List[int] = [HEAD_DEPARTMENT_ID]
 _ACTIVE: bool = False
 _PERSONAL_GENDER: PersonalGender = PersonalGender.MALE
 _PERSONAL_PROFESSION: Text = f"{SDK_NAME}-Developer"

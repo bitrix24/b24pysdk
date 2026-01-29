@@ -4,7 +4,6 @@ from unittest.mock import Mock, patch
 import pytest
 import requests
 
-from b24pysdk.bitrix_api.protocols import BitrixOAuthProtocol
 from b24pysdk.bitrix_api.requesters.bitrix_oauth_requester import BitrixOAuthRequester
 from b24pysdk.error import (
     BitrixAPIInsufficientScope,
@@ -14,6 +13,7 @@ from b24pysdk.error import (
     BitrixOAuthRequestError,
     BitrixOAuthRequestTimeout,
 )
+from b24pysdk.protocols import BitrixOAuthProtocol
 
 pytestmark = [
     pytest.mark.unit,

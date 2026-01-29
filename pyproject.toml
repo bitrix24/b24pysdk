@@ -33,14 +33,13 @@ dev = [
 ]
 test = [
     "environs>=11.0.0",
-    "fastapi",
+    "fastapi[standard]",
     "pytest>=7",
     "pytest-cov>=4",
     "pytest-dependency>=0.5.1",
     "pytest-mock>=3",
     "python-multipart",
     "uvicorn",
-    "fastapi[standard]"
 ]
 
 [tool.setuptools.packages.find]

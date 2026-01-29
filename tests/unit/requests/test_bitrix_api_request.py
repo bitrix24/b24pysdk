@@ -19,28 +19,24 @@ pytestmark = [
 
 _REQUEST_CASE_1 = {
     "params": {"ID": 1, "select": ["ID", "NAME"]},
-    "timeout": 30.5,
     "kwargs": {"key_1": "value_1", "key_2": 123},
     "expected_str": "<BitrixAPIRequest user.get(ID=1, select=['ID', 'NAME'])>",
 }
 
 _REQUEST_CASE_2 = {
     "params": {"FIELDS": {"TITLE": "New Lead"}},
-    "timeout": 5.0,
     "kwargs": {"halt": True},
     "expected_str": "<BitrixAPIRequest crm.lead.add(FIELDS={'TITLE': 'New Lead'})>",
 }
 
 _REQUEST_CASE_3 = {
     "params": {},
-    "timeout": None,
     "kwargs": {},
     "expected_str": "<BitrixAPIRequest tasks.task.list()>",
 }
 
 _REQUEST_CASE_4 = {
     "params": None,
-    "timeout": None,
     "kwargs": {},
     "expected_str": "<BitrixAPIRequest user.get()>",
 }
@@ -75,10 +71,9 @@ _RESPONSE_JSON: JSONDict = {
 @pytest.mark.parametrize(("api_method", "request_case"), _INIT_TEST_DATA)
 def test_initialization_and_properties_variants(
         api_method: Text,
-        request_case: Dict,
+    request_case: Dict,
 ):
     params = request_case["params"]
-    timeout = request_case["timeout"]
     kwargs = request_case["kwargs"]
     expected_str = request_case["expected_str"]
 
@@ -86,14 +81,12 @@ def test_initialization_and_properties_variants(
         bitrix_token=TOKEN_MOCK,
         api_method=api_method,
         params=params,
-        timeout=timeout,
         **kwargs,
     )
 
-    assert obj.bitrix_token is TOKEN_MOCK
-    assert obj.api_method == api_method
-    assert obj.params == params
-    assert obj.timeout == timeout
+    assert obj._bitrix_token is TOKEN_MOCK
+    assert obj._api_method == api_method
+    assert obj._params == params
     assert obj._kwargs == kwargs
     assert obj._response is None
     assert obj._as_tuple == (api_method, params)
@@ -105,7 +98,6 @@ def test_repr_contains_all_fields():
         bitrix_token=TOKEN_MOCK,
         api_method="test_method",
         params={"key": "value"},
-        timeout=10,
     )
 
     repr_output = repr(obj)
@@ -114,7 +106,6 @@ def test_repr_contains_all_fields():
     assert "bitrix_token=" in repr_output
     assert "api_method='test_method'" in repr_output
     assert "params={'key': 'value'}" in repr_output
-    assert "timeout=10" in repr_output
 
 
 def test_call_method_success():
@@ -125,7 +116,6 @@ def test_call_method_success():
         bitrix_token=token_mock,
         api_method="some.method",
         params=_REQUEST_CASE_1["params"],
-        timeout=_REQUEST_CASE_1["timeout"],
         **_REQUEST_CASE_1["kwargs"],
     )
 
@@ -138,7 +128,6 @@ def test_call_method_success():
     token_mock.call_method.assert_called_once_with(
         api_method="some.method",
         params=_REQUEST_CASE_1["params"],
-        timeout=_REQUEST_CASE_1["timeout"],
         **_REQUEST_CASE_1["kwargs"],
     )
 
@@ -151,7 +140,6 @@ def test_response_property_calls_call_if_not_set():
         bitrix_token=token_mock,
         api_method="test.call",
         params=None,
-        timeout=None,
     )
 
     response = obj.response
@@ -172,7 +160,6 @@ def test_result_and_time_properties_access():
         bitrix_token=token_mock,
         api_method="get.data",
         params=None,
-        timeout=None,
     )
 
     result = obj.result

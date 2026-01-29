@@ -20,7 +20,6 @@ pytestmark = [
 
 _LIST_REQUEST_CASE_1: JSONDict = {
     "params": {"filter": {"ID": 1}},
-    "timeout": 10.0,
     "api_method": "crm.deal.list",
     "limit": 50,
     "kwargs": {"extra_opt": True},
@@ -29,7 +28,6 @@ _LIST_REQUEST_CASE_1: JSONDict = {
 
 _LIST_REQUEST_CASE_2: JSONDict = {
     "params": None,
-    "timeout": None,
     "api_method": "user.get",
     "limit": None,
     "kwargs": {},
@@ -58,7 +56,6 @@ def test_initialization_and_properties_variants(
         bitrix_token=TOKEN_MOCK,
         api_method=request_case["api_method"],
         params=request_case["params"],
-        timeout=request_case["timeout"],
     )
 
     obj = BitrixAPIListRequest(
@@ -67,11 +64,10 @@ def test_initialization_and_properties_variants(
         **request_case["kwargs"],
     )
 
-    assert obj.bitrix_token is base_request.bitrix_token
-    assert obj.api_method == base_request.api_method
-    assert obj.params == base_request.params
-    assert obj.timeout == base_request.timeout
-    assert obj.limit == request_case["limit"]
+    assert obj._bitrix_token is base_request._bitrix_token
+    assert obj._api_method == base_request._api_method
+    assert obj._params == base_request._params
+    assert obj._limit == request_case["limit"]
     assert expected_repr_substring in repr(obj)
 
     for key, value in request_case["kwargs"].items():
@@ -86,7 +82,6 @@ def test_call_method_success():
         bitrix_token=token_mock,
         api_method="crm.company.list",
         params=_LIST_REQUEST_CASE_1["params"],
-        timeout=_LIST_REQUEST_CASE_1["timeout"],
     )
 
     obj = BitrixAPIListRequest(
@@ -105,7 +100,6 @@ def test_call_method_success():
         api_method="crm.company.list",
         params=_LIST_REQUEST_CASE_1["params"],
         limit=_LIST_REQUEST_CASE_1["limit"],
-        timeout=_LIST_REQUEST_CASE_1["timeout"],
         **_LIST_REQUEST_CASE_1["kwargs"],
     )
 
