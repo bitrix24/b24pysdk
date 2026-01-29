@@ -1,4 +1,4 @@
-from datetime import timedelta
+﻿from datetime import timedelta
 
 # Bitrix24 REST API Python SDK
 
@@ -103,9 +103,9 @@ CI note:
 
 - Client — entry point for all Bitrix24 calls: `client.crm`, `client.user`, `client.department`, `client.socialnetwork`.
 - Authentication:
-  - BitrixWebhook — incoming webhook auth
-  - BitrixToken — OAuth 2.0 token auth (paired with BitrixApp)
-  - BitrixApp — your Bitrix24 app credentials (client_id, client_secret)
+  - BitrixWebhook - incoming webhook auth
+  - BitrixToken - OAuth 2.0 token auth (paired with BitrixApp)
+  - BitrixApp - your Bitrix24 app credentials (client_id, client_secret)
 - Responses expose `result` and `time` (including execution duration)
 
 ## Quickstart
@@ -167,12 +167,46 @@ bitrix_token = BitrixTokenLocal(
 ```
 
 
-The `Client` is your entry point to the API. All supported methods are available via properties on the created instance.
+#### Entry point
+The `Client` class is the main entry point to the Bitrix API.
+It acts as a factory that returns an API client instance depending on the selected Bitrix API version.
+The factory hands back subclasses of `BaseClient`, which is the shared entry point for Bitrix calls.
+
+Currently, Bitrix API supports multiple versions.
+The latest version is v3. The SDK supports both v3 the previous one.
+
+If the API version is not explicitly specified during client initialization, the SDK will use the default API version (currently v2).
 ```python
 from b24pysdk import Client
 
 client = Client(bitrix_token)
 ```
+In this case, the client will be initialized with the default API version.
+
+You can explicitly choose the Bitrix API version when creating the client:
+```python
+from b24pysdk import Client
+
+client = Client(bitrix_token, prefer_version=3)
+```
+
+The way SDK methods are resolved depends on the selected preferred API version.
+
+If you choose preferred API v3, the SDK works as follows:
+
+- If a method exists in Bitrix API v3 and has a wrapper in the SDK, the SDK will use the v3 wrapper.
+- If a method exists in Bitrix API v3 but does not have a v3-specific wrapper, the SDK will fall back to the wrapper from the previous API version (v2), if available.
+- If a method exists in Bitrix API but does not have any wrapper in the SDK, it can still be called directly using BitrixToken.
+
+This allows you to use API v3 immediately, even if not all methods have dedicated wrappers yet.
+
+API v3 note: refresh token flow is not available yet, so the SDK cannot auto-refresh v3 access tokens. Use webhook auth or issue new OAuth tokens manually until Bitrix enables refresh for v3.
+
+If API v2 is selected (explicitly or by default):
+- Only wrappers for API v2 are available.
+
+Wrappers implemented specifically for API v3 will not be accessible.
+
 
 If you do not want to import Client you can use get_client() method and get Client instance from authenticator without writing import statement.
 

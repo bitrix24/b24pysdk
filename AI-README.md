@@ -1,4 +1,4 @@
-# Architectural Analysis of Bitrix24 Python SDK
+﻿# Architectural Analysis of Bitrix24 Python SDK
 
 ## Project Overview
 
@@ -14,7 +14,6 @@ b24pysdk/
 │   ├── credentials/           # Core classes for requests, responses, events
 │   ├── events/                # Core classes for requests, responses, events
 │   ├── functions/             # API function utilities and methods
-│   ├── protocols/             # API function utilities and methods
 │   ├── requesters/            # Handling different request types
 │   ├── requests/              # API function utilities and methods
 │   ├── responses/             # API function utilities and methods
@@ -23,13 +22,22 @@ b24pysdk/
 │   ├── crm.py                 # Constant definitions for CRM scope
 │   ├── event.py               # Constant definitions for Event scope
 │   ├── user.py                # Constant definitions for User scope
-│   └── userfield.py           # Constant definitions for Userfield scope
+│   ├── userfield.py           # Constant definitions for Userfield scope
+│   └── version.py             # Constant definitions for API versions
+├── error/                     # Error handling and exceptions
+│   ├── _http_responce.py      # HTTP responces
+│   └── v3.py                  # Error handling for v3 Bitrix API
 ├── log/                       # Logging utilities
 │   ├── abstract_logger.py     # Logger interface required to implement
 │   ├── base_logger.py         # Abstract logger class with basic logger interface implementation
 │   ├── null_logger.py         # Null implementation of base logger
 │   └── stream_logger.py       # Base logger implementation for console logging
+├── protocols/                 # Interface for working with protocols
 ├── scopes/                    # Implemented API scopes (CRM, User, etc.)
+│   ├── _v3/                   # Bitrix API v3 module
+│   │   ├── main/              # Main related scope module for v3
+│   │   ├── rest/              # Rest related scope module for v3
+│   │   └── tasks/             # Tasks related scope module for v3
 │   ├── app/                   # App related scope module
 │   ├── biconnector/           # BI Connector related scope module
 │   ├── bizproc/               # Workflow related scope module
@@ -37,18 +45,19 @@ b24pysdk/
 │   ├── crm/                   # CRM related scope modules
 │   ├── entity/                # Data storage related scope module
 │   ├── event/                 # Event related scope module
-│   ├── user/                  # User management scope modules
+│   ├── sale/                  # Sale related scope modules
 │   ├── socialnetwork/         # Social network related scope modules
+│   ├── user/                  # User management scope modules
 │   ├── access.py              # Access related scope module
 │   ├── department.py          # Department related scope module
 │   ├── events.py              # Events related scope module
 │   ├── feature.py             # Fearure related scope module
 │   ├── method.py              # Method related scope module
+│   ├── placement.py           # Placement related scope module
 │   ├── profile.py             # Profile related scope module
 │   ├── scope.py               # Scope related scope module
 │   └── server.py              # Server related scope module
 ├── utils/                     # Utility functions and helpers
-├── error.py                   # Error handling and exceptions
 ├── _client.py                 # Client initialization and setup
 ├── _config.py                 # Configuration and settings management
 ├── _constants.py              # Constant values for internal use
@@ -61,6 +70,8 @@ b24pysdk/
 - **Python Requests**: Used underneath for REST API interactions.
 - **Core Client**: Manages token and API interaction, responsible for setting up different scopes.
 ### Key Components
+
+- **BaseClient**: Shared entry point returned by the Client factory; use it when you need to call Bitrix REST methods without SDK method wrappers and want to plug in manual `BitrixAPIRequest` objects.
 
 1. **Client**:
    - **CRM**: Manages customer relationship entities like deals, contacts.
@@ -265,8 +276,10 @@ except Exception as error:
     print(f"Error: {error}")
 ```
 ### Error handling
-#### Exception Handling (BitrixAPIError)
+#### Exception hierarchy
 
+
+Use `b24pysdk.error` for v1/v2 wrappers and `b24pysdk.error.v3` for the newer API surface.
 ```plaintext
 _HTTPResponse (ABC)
 ├─ _HTTPResponseOK (200)
@@ -276,11 +289,13 @@ _HTTPResponse (ABC)
 ├─ _HTTPResponseForbidden (403)
 ├─ _HTTPResponseNotFound (404)
 ├─ _HTTPResponseMethodNotAllowed (405)
+├─ _HTTPResponseTooManyRequests (429)
 ├─ _HTTPResponseInternalError (500)
 └─ _HTTPResponseServiceUnavailable (503)
 
 BitrixSDKException (Exception)
 ├─ BitrixOAuthException
+├─ BitrixValidationError (ValueError)
 ├─ BitrixRequestError
 │   ├─ BitrixOAuthRequestError
 │   ├─ BitrixRequestTimeout
@@ -289,47 +304,49 @@ BitrixSDKException (Exception)
 │       ├─ BitrixResponse302JSONDecodeError (_HTTPResponseFound)
 │       ├─ BitrixResponse403JSONDecodeError (_HTTPResponseForbidden)
 │       └─ BitrixResponse500JSONDecodeError (_HTTPResponseInternalError)
-├─ BitrixAPIError (_HTTPResponse)
-│   ├─ BitrixAPIBadRequest (_HTTPResponseBadRequest)
-│   │   ├─ BitrixAPIErrorBatchLengthExceeded
-│   │   ├─ BitrixAPIInvalidArgValue
-│   │   ├─ BitrixAPIInvalidRequest
-│   │   │   └─ BitrixOAuthInvalidRequest (BitrixOAuthException)
-│   │   ├─ BitrixOAuthInvalidClient (BitrixOAuthException)
-│   │   └─ BitrixOAuthInvalidGrant (BitrixOAuthException)
-│   ├─ BitrixAPIUnauthorized (_HTTPResponseUnauthorized)
-│   │   ├─ BitrixAPIExpiredToken
-│   │   ├─ BitrixAPINoAuthFound
-│   │   ├─ BitrixAPIErrorOAuth
-│   │   ├─ BitrixAPIAuthorizationError
-│   │   └─ BitrixAPIMethodConfirmWaiting
-│   ├─ BitrixAPIForbidden (_HTTPResponseForbidden)
-│   │   ├─ BitrixAPIAccessDenied
-│   │   ├─ BitrixAPIAllowedOnlyIntranetUser
-│   │   ├─ BitrixAPIInsufficientScope
-│   │   ├─ BitrixOAuthInvalidScope (BitrixOAuthException)
-│   │   ├─ BitrixOAuthInsufficientScope (BitrixOAuthException)
-│   │   ├─ BitrixAPIInvalidCredentials
-│   │   ├─ BitrixAPIUserAccessError
-│   │   ├─ BitrixAPIWrongAuthType
-│   │   └─ BitrixAPIMethodConfirmDenied
-│   ├─ BitrixAPINotFound (_HTTPResponseNotFound)
-│   │   └─ BitrixAPIErrorManifestIsNotAvailable
-│   ├─ BitrixAPIMethodNotAllowed (_HTTPResponseMethodNotAllowed)
-│   │   └─ BitrixAPIErrorBatchMethodNotAllowed
-│   ├─ BitrixAPIInternalServerError (_HTTPResponseInternalError)
-│   │   └─ BitrixAPIErrorUnexpectedAnswer
-│   ├─ BitrixAPIServiceUnavailable (_HTTPResponseServiceUnavailable)
-│   │   ├─ BitrixAPIOverloadLimit
-│   │   └─ BitrixAPIQueryLimitExceeded
-│   └─ BitrixOauthWrongClient (BitrixOAuthException, _HTTPResponseOK)
-└─ BitrixValidationError
+├─ BaseBitrixAPIError (_HTTPResponse)
+│   └─ BitrixAPIError (v1/v2, b24pysdk.error)
+│   │   ├─ BitrixAPIBadRequest (_HTTPResponseBadRequest)
+│   │   │   ├─ BitrixAPIErrorBatchLengthExceeded
+│   │   │   ├─ BitrixAPIInvalidArgValue
+│   │   │   ├─ BitrixAPIInvalidRequest
+│   │   │   │   └─ BitrixOAuthInvalidRequest (BitrixOAuthException)
+│   │   │   ├─ BitrixOAuthInvalidClient (BitrixOAuthException)
+│   │   │   └─ BitrixOAuthInvalidGrant (BitrixOAuthException)
+│   │   ├─ BitrixAPIUnauthorized (_HTTPResponseUnauthorized)
+│   │   │   ├─ BitrixAPIAuthorizationError
+│   │   │   ├─ BitrixAPIErrorOAuth
+│   │   │   ├─ BitrixAPIExpiredToken
+│   │   │   ├─ BitrixAPIMethodConfirmWaiting
+│   │   │   └─ BitrixAPINoAuthFound
+│   │   ├─ BitrixAPIForbidden (_HTTPResponseForbidden)
+│   │   │   ├─ BitrixAPIAccessDenied
+│   │   │   ├─ BitrixAPIAllowedOnlyIntranetUser
+│   │   │   ├─ BitrixAPIInsufficientScope
+│   │   │   │   └─ BitrixOAuthInsufficientScope
+│   │   │   ├─ BitrixAPIInvalidCredentials
+│   │   │   ├─ BitrixAPIMethodConfirmDenied
+│   │   │   ├─ BitrixAPIUserAccessError
+│   │   │   ├─ BitrixAPIWrongAuthType
+│   │   │   └─ BitrixOAuthInvalidScope (BitrixOAuthException)
+│   │   ├─ BitrixAPINotFound (_HTTPResponseNotFound)
+│   │   │   └─ BitrixAPIErrorManifestIsNotAvailable
+│   │   ├─ BitrixAPIMethodNotAllowed (_HTTPResponseMethodNotAllowed)
+│   │   │   └─ BitrixAPIErrorBatchMethodNotAllowed
+│   │   ├─ BitrixAPIOperationTimeLimit (_HTTPResponseTooManyRequests)
+│   │   ├─ BitrixAPIInternalServerError (_HTTPResponseInternalError)
+│   │   │   └─ BitrixAPIErrorUnexpectedAnswer
+│   │   ├─ BitrixAPIServiceUnavailable (_HTTPResponseServiceUnavailable)
+│   │   │   ├─ BitrixAPIOverloadLimit
+│   │   │   └─ BitrixAPIQueryLimitExceeded
+│   │   ├─ BitrixOauthWrongClient (BitrixOAuthException, _HTTPResponseOK)
+│   └─ BitrixAPIError (v3, b24pysdk.error.v3)
 ```
 
-
-Handles API errors gracefully, providing error descriptions for failed method calls.
+#### Handles API errors gracefully, providing error descriptions for failed method calls.
 
 ```python
+from b24pysdk.bitrix_api.credentials.bitrix_token import BitrixToken
 from b24pysdk import Client
 from b24pysdk.error import (
     BitrixAPIError,
@@ -341,8 +358,8 @@ from b24pysdk.error import (
     BitrixAPIInternalServerError,
     BitrixAPIServiceUnavailable
 )
-
-client = Client()
+bitrix_token = BitrixToken(domain="example.bitrix24.com", auth_token="user_id/webhook_key")
+client = Client(bitrix_token)
 
 try:
     request = client.crm.deal.get(bitrix_id=9999).result
@@ -362,6 +379,25 @@ except BitrixAPIBadRequest as e:
     print("Bad requests:", e)
 except BitrixAPIError as e:
     print("API Error:", e.error_description)
+```
+
+#### v3 error handling
+
+```python
+from b24pysdk.bitrix_api.credentials.bitrix_token import BitrixToken
+from b24pysdk import Client
+from b24pysdk.error.v3 import BitrixAPIError
+
+bitrix_token = BitrixToken(domain="example.bitrix24.com", auth_token="user_id/webhook_key")
+client = Client(bitrix_token, prefer_version=3)
+
+try:
+    response = client.tasks.task.get(bitrix_id=9999).result
+except BitrixAPIError as error:
+    print(error.code, error.error.message)
+    if error.has_validation:
+        for issue in error.validation:
+            print(f"{issue.field}: {issue.message}")
 ```
 
 ### Batch requests
@@ -440,7 +476,7 @@ By using `OAuthTokenRenewedEvent` and `PortalDomainChangedEvent` you can subscri
 
 ```python
 from b24pysdk import BitrixToken
-from ..events import OAuthTokenRenewedEvent, PortalDomainChangedEvent
+from b24pysdk.bitrix_api.events import OAuthTokenRenewedEvent, PortalDomainChangedEvent
 
 
 class MyBitrixToken(BitrixToken):
