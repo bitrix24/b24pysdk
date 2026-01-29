@@ -6,4 +6,4 @@ __all__ = [
 ]
 
 __title__: Final[Text] = "b24pysdk"
-__version__: Final[Text] = "0.3.0a1"
+__version__: Final[Text] = "0.4.0"
