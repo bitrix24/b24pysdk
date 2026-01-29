@@ -90,7 +90,7 @@ def test_get_raises_timeout(mock_request_with_retries):
 
     assert excinfo.type is BitrixOAuthRequestTimeout
     assert excinfo.value.timeout == timeout_val
-    assert isinstance(excinfo.value.original_error, requests.Timeout)
+    assert isinstance(excinfo.value.__cause__, requests.Timeout)
 
 
 @patch.object(BitrixOAuthRequester, "_request_with_retries")
@@ -102,7 +102,7 @@ def test_get_raises_request_error(mock_request_with_retries):
         obj._get(url="https://test.url", params={})
 
     assert excinfo.type is BitrixOAuthRequestError
-    assert isinstance(excinfo.value.original_error, requests.ConnectionError)
+    assert isinstance(excinfo.value.__cause__, requests.ConnectionError)
 
 
 def test_parse_response_converts_api_invalid_request():

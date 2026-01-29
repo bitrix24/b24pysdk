@@ -119,7 +119,7 @@ def test_post_raises_bitrix_request_timeout(mock_retries):
 
     assert excinfo.type is BitrixRequestTimeout
     assert excinfo.value.timeout == timeout_val
-    assert isinstance(excinfo.value.original_error, requests.Timeout)
+    assert isinstance(excinfo.value.__cause__, requests.Timeout)
 
 
 @patch.object(BitrixAPIRequester, "_request_with_retries")
@@ -132,7 +132,7 @@ def test_post_raises_bitrix_request_error(mock_retries):
         obj._post()
 
     assert excinfo.type is BitrixRequestError
-    assert isinstance(excinfo.value.original_error, requests.RequestException)
+    assert isinstance(excinfo.value.__cause__, requests.RequestException)
 
 
 def test_slots_defined():

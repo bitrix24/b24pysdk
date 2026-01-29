@@ -15,12 +15,11 @@ from b24pysdk.error import (
     BitrixAPIBadRequest,
     BitrixAPIError,
     # BitrixAPIErrorBatchLengthExceeded,
-    # BitrixAPIErrorBatchMethodNotAllowed,
+    BitrixAPIErrorBatchMethodNotAllowed,
     BitrixAPIErrorManifestIsNotAvailable,
     BitrixAPIErrorOAuth,
     BitrixAPIErrorUnexpectedAnswer,
     BitrixAPIExpiredToken,
-    BitrixAPIForbidden,
     BitrixAPIInsufficientScope,
     BitrixAPIInternalServerError,
     BitrixAPIInvalidArgValue,
@@ -28,7 +27,6 @@ from b24pysdk.error import (
     BitrixAPIMethodConfirmDenied,
     # BitrixAPIInvalidRequest,
     BitrixAPIMethodConfirmWaiting,
-    # BitrixAPIMethodNotAllowed,
     BitrixAPINoAuthFound,
     BitrixAPIOverloadLimit,
     BitrixAPIQueryLimitExceeded,
@@ -69,22 +67,22 @@ def _rest_url(path: Text) -> Text:
 
 def _assert_error_response(exc: BitrixAPIError, error_cls: Type[BitrixAPIError]):
     """Ensure HTTP status and error code (when available) match expected values."""
-    assert exc.status_code == error_cls.STATUS_CODE.value
+    assert exc.status_code == error_cls.STATUS_CODE
 
     expected_error = getattr(error_cls, "ERROR", NotImplemented)
     if exc.error and expected_error is not NotImplemented:
         assert exc.error.upper() == expected_error
 
 
-@pytest.mark.oauth_only
 def test_error_bitrix_api_bad_request(bitrix_client: Client):
-    """Expect BitrixAPIBadRequest for an invalid orderentity payload (works)."""
+    """Expect BitrixAPIBadRequest on CANCELED when sending to an inaccessible chat."""
 
-    bitrix_request = bitrix_client.crm.orderentity.add(
-        fields={
-            "orderId": 1,
-            "ownerId": 2,
-            "ownerTypeId": 1,
+    bitrix_request = BitrixAPIRequest(
+        bitrix_token=bitrix_client._bitrix_token,
+        api_method="im.message.add",
+        params={
+            "DIALOG_ID": "chat1111",
+            "MESSAGE": "test message",
         },
     )
 
@@ -96,7 +94,7 @@ def test_error_bitrix_api_bad_request(bitrix_client: Client):
 
 @pytest.mark.oauth_only
 def test_error_bitrix_api_unauthorized(bitrix_client: Client):
-    """Expect BitrixAPIUnauthorized on an OAuth call with insufficient rights (works)."""
+    """Expect BitrixAPIUnauthorized on an OAuth call with inadequate rights (works)."""
 
     bitrix_request = BitrixAPIRequest(
         bitrix_token=bitrix_client._bitrix_token,
@@ -108,11 +106,6 @@ def test_error_bitrix_api_unauthorized(bitrix_client: Client):
         _ = bitrix_request.response
 
     _assert_error_response(exc_info.value, BitrixAPIUnauthorized)
-
-
-def test_error_bitrix_api_forbidden():
-    """Needs portal admin to deny method confirmation per https://apidocs.bitrix24.com/api-reference/scopes/confirmation.html."""
-    pytest.skip(BitrixAPIForbidden.__name__)
 
 
 # def test_error_bitrix_api_not_found(bitrix_client: Client):
@@ -161,9 +154,16 @@ def test_error_bitrix_api_internal_server_error():
     pytest.skip(BitrixAPIInternalServerError.__name__)
 
 
-def test_error_bitrix_api_service_unavailable():
-    """No stable way to trigger BitrixAPIServiceUnavailable; kept skipped."""
-    pytest.skip(BitrixAPIServiceUnavailable.__name__)
+def test_error_bitrix_api_service_unavailable(bitrix_client: Client):
+    """Attempt to trigger BitrixAPIServiceUnavailable by issuing many requests."""
+    max_attempts = 500
+
+    for _ in range(max_attempts):
+        profile_response = bitrix_client.profile().response
+
+        with pytest.raises(BitrixAPIServiceUnavailable) as exc_info:
+            parse_response(profile_response)
+        _assert_error_response(exc_info.value, BitrixAPIServiceUnavailable)
 
 
 @pytest.mark.webhook_only
@@ -206,7 +206,7 @@ def test_error_bitrix_api_insufficient_scope():
 
 
 def test_error_bitrix_api_method_confirm_denied():
-    """Needs admin to explicitly deny confirmation, similar to the Forbidden scenario."""
+    """Needs portal admin to deny method confirmation per https://apidocs.bitrix24.com/api-reference/scopes/confirmation.html."""
     pytest.skip(BitrixAPIMethodConfirmDenied.__name__)
 
 
@@ -336,29 +336,23 @@ def test_error_bitrix_api_error_manifest_is_not_available():
     pytest.skip(BitrixAPIErrorManifestIsNotAvailable.__name__)
 
 
-# def test_error_bitrix_api_error_batch_method_not_allowed(bitrix_client: Client):
-#    """Doc says batching this method should fail, but call didn't return ERROR_BATCH_METHOD_NOT_ALLOWED."""
-#
-#    batch_url = f"https://{env_config.domain}/rest/{env_config.webhook_token}/batch"
-#
-#    response = requests.post(
-#        batch_url,
-#        json={
-#            "cmd": {
-#                "get_fields1": "tasks.api.scrum.kanban.getFields",
-#                "get_fields2": "tasks.api.scrum.kanban.getFields",
-#                "get_fields3": "tasks.api.scrum.kanban.getFields",
-#                "get_fields4": "tasks.api.scrum.kanban.getFields",
-#                "get_fields5": "tasks.api.scrum.kanban.getFields",
-#            }
-#        },
-#        headers=_JSON_HEADERS,
-#    )
-#
-#    with pytest.raises(BitrixAPIErrorBatchMethodNotAllowed) as exc_info:
-#        parse_response(response)
-#
-#    _assert_error_response(exc_info.value, BitrixAPIErrorBatchMethodNotAllowed)
+def test_error_bitrix_api_error_batch_method_not_allowed(bitrix_client: Client):
+    """Expect ERROR_BATCH_METHOD_NOT_ALLOWED when batching the batch method itself."""
+
+    batch_request = bitrix_client.call_batch(
+        {
+            "nested_batch": BitrixAPIRequest(
+                bitrix_token=bitrix_client._bitrix_token,
+                api_method="batch",
+                params={"cmd": {"profile": "profile"}},
+            ),
+        },
+    )
+
+    with pytest.raises(BitrixAPIErrorBatchMethodNotAllowed) as exc_info:
+        _ = batch_request.response
+
+    _assert_error_response(exc_info.value, BitrixAPIErrorBatchMethodNotAllowed)
 
 
 def test_error_bitrix_api_error_unexpected_answer():
