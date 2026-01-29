@@ -3,6 +3,7 @@ import typing
 from datetime import date, datetime, timezone, tzinfo
 
 from .constants import DEFAULT_INITIAL_RETRY_DELAY, DEFAULT_MAX_RETRIES, DEFAULT_RETRY_DELAY_INCREMENT, DEFAULT_TIMEOUT
+from .constants.version import API_V3_METHODS
 from .log import AbstractLogger, NullLogger
 from .utils.types import DefaultTimeout, Number, Timeout
 
@@ -15,6 +16,7 @@ class _LocalConfig:
     """"""
 
     __slots__ = (
+        "api_v3_methods",
         "default_initial_retry_delay",
         "default_max_retries",
         "default_retry_delay_increment",
@@ -23,6 +25,7 @@ class _LocalConfig:
         "tz",
     )
 
+    api_v3_methods: typing.Tuple[typing.Text, ...]
     default_initial_retry_delay: Number
     default_max_retries: int
     default_retry_delay_increment: Number
@@ -31,10 +34,11 @@ class _LocalConfig:
     tz: tzinfo
 
     def __init__(self):
-        self.default_initial_retry_delay: Number = DEFAULT_INITIAL_RETRY_DELAY
-        self.default_max_retries: int = DEFAULT_MAX_RETRIES
-        self.default_retry_delay_increment: Number = DEFAULT_RETRY_DELAY_INCREMENT
-        self.default_timeout: DefaultTimeout = DEFAULT_TIMEOUT
+        self.api_v3_methods = API_V3_METHODS
+        self.default_initial_retry_delay = DEFAULT_INITIAL_RETRY_DELAY
+        self.default_max_retries = DEFAULT_MAX_RETRIES
+        self.default_retry_delay_increment = DEFAULT_RETRY_DELAY_INCREMENT
+        self.default_timeout = DEFAULT_TIMEOUT
         self.logger = NullLogger()
 
         self.__set_default_tz()
@@ -78,6 +82,7 @@ class Config:
     def configure(
             self,
             *,
+            api_v3_methods: typing.Optional[typing.Iterable[typing.Text]] = None,
             default_initial_retry_delay: typing.Optional[Number] = None,
             default_max_retries: typing.Optional[int] = None,
             default_retry_delay_increment: typing.Optional[Number] = None,
@@ -87,6 +92,9 @@ class Config:
             tz: typing.Optional[tzinfo] = None,
     ):
         """"""
+
+        if api_v3_methods is not None:
+            self.api_v3_methods = api_v3_methods if isinstance(api_v3_methods, tuple) else tuple(api_v3_methods)
 
         if default_initial_retry_delay is not None:
             self.default_initial_retry_delay = default_initial_retry_delay
@@ -200,6 +208,29 @@ class Config:
         if not isinstance(value, tzinfo):
             raise TypeError("tzinfo must be an instance of datetime.tzinfo")
         self._config.tz = value
+
+    @property
+    def api_v3_methods(self) -> typing.Tuple[typing.Text, ...]:
+        """"""
+        return self._config.api_v3_methods
+
+    @api_v3_methods.setter
+    def api_v3_methods(self, value: typing.Iterable[typing.Text]):
+        """"""
+
+        if not isinstance(value, typing.Iterable):
+            raise TypeError("api_v3_methods must be an iterable of strings")
+
+        methods = value if isinstance(value, tuple) else tuple(value)
+
+        if not all(isinstance(method, str) for method in methods):
+            raise TypeError("All api_v3_methods entries must be strings")
+
+        self._config.api_v3_methods = methods
+
+    def is_api_v3_method(self, api_method: typing.Text) -> bool:
+        """"""
+        return api_method in self.api_v3_methods
 
     def get_local_date(
             self,
