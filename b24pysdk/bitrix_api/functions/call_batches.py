@@ -1,13 +1,11 @@
-from typing import TYPE_CHECKING, Dict, Final, List, Mapping, Optional, Sequence, Text, Tuple, Union, overload
+from typing import Dict, Final, List, Mapping, Optional, Sequence, Text, Tuple, Union, overload
 
 from ..._constants import MAX_BATCH_SIZE
-from ...utils.types import B24BatchMethods, B24BatchMethodTuple, JSONDict, JSONList, Key, Timeout
-from ..protocols import BitrixTokenProtocol
+from ...constants.version import B24APIVersion
+from ...protocols import BitrixTokenProtocol
+from ...utils.types import B24APIVersionLiteral, B24Requests, B24RequestTuple, JSONDict, JSONList, Key, Timeout
 from ._base_caller import BaseCaller
 from .call_batch import call_batch
-
-if TYPE_CHECKING:
-    from ..credentials import AbstractBitrixToken
 
 
 class _BatchesCaller(BaseCaller):
@@ -19,7 +17,7 @@ class _BatchesCaller(BaseCaller):
 
     __slots__ = ("_halt", "_methods")
 
-    _methods: B24BatchMethods
+    _methods: B24Requests
     _halt: bool
 
     def __init__(
@@ -28,10 +26,10 @@ class _BatchesCaller(BaseCaller):
             domain: Text,
             auth_token: Text,
             is_webhook: bool,
-            methods: B24BatchMethods,
+            methods: B24Requests,
             halt: bool = False,
-            timeout: Timeout = None,
-            bitrix_token: Optional[Union["AbstractBitrixToken", BitrixTokenProtocol]] = None,
+            prefer_version: B24APIVersionLiteral = B24APIVersion.V2,
+            bitrix_token: Optional[BitrixTokenProtocol] = None,
             **kwargs,
     ):
         super().__init__(
@@ -39,14 +37,14 @@ class _BatchesCaller(BaseCaller):
             auth_token=auth_token,
             is_webhook=is_webhook,
             api_method=self._API_METHOD,
-            timeout=timeout,
             bitrix_token=bitrix_token,
             **kwargs,
         )
         self._methods = methods
         self._halt = halt
+        self._kwargs["prefer_version"] = prefer_version
 
-    def _fetch_batch_response(self, methods: B24BatchMethods) -> JSONDict:
+    def _fetch_batch_response(self, methods: B24Requests) -> JSONDict:
         """"""
         return call_batch(
             domain=self._domain,
@@ -54,11 +52,11 @@ class _BatchesCaller(BaseCaller):
             is_webhook=self._is_webhook,
             methods=methods,
             halt=self._halt,
-            timeout=self._timeout,
+            bitrix_token=self._bitrix_token,
             **self._kwargs,
         )
 
-    def _get_flat_methods(self) -> List[Tuple[Key, B24BatchMethodTuple]]:
+    def _get_flat_methods(self) -> List[Tuple[Key, B24RequestTuple]]:
         """"""
         if isinstance(self._methods, Mapping):
             return list(self._methods.items())
@@ -125,7 +123,7 @@ class _BatchesCaller(BaseCaller):
         if total_methods <= self._MAX_BATCH_SIZE:
             return self._fetch_batch_response(methods=self._methods)
 
-        flat_methods: List[Tuple[Key, B24BatchMethodTuple]] = self._get_flat_methods()
+        flat_methods: List[Tuple[Key, B24RequestTuple]] = self._get_flat_methods()
 
         batch_responses: JSONList = list()
 
@@ -146,8 +144,9 @@ def call_batches(
         domain: Text,
         auth_token: Text,
         is_webhook: bool,
-        methods: Mapping[Key, B24BatchMethodTuple],
+        methods: Mapping[Key, B24RequestTuple],
         halt: bool = False,
+        prefer_version: B24APIVersionLiteral = B24APIVersion.V2,
         timeout: Timeout = None,
         **kwargs,
 ) -> JSONDict: ...
@@ -159,8 +158,9 @@ def call_batches(
         domain: Text,
         auth_token: Text,
         is_webhook: bool,
-        methods: Sequence[B24BatchMethodTuple],
+        methods: Sequence[B24RequestTuple],
         halt: bool = False,
+        prefer_version: B24APIVersionLiteral = B24APIVersion.V2,
         timeout: Timeout = None,
         **kwargs,
 ) -> JSONDict: ...
@@ -171,10 +171,11 @@ def call_batches(
         domain: Text,
         auth_token: Text,
         is_webhook: bool,
-        methods: B24BatchMethods,
+        methods: B24Requests,
         halt: bool = False,
         timeout: Timeout = None,
-        bitrix_token: Optional[Union["AbstractBitrixToken", BitrixTokenProtocol]] = None,
+        prefer_version: B24APIVersionLiteral = B24APIVersion.V2,
+        bitrix_token: Optional[BitrixTokenProtocol] = None,
         **kwargs,
 ) -> JSONDict:
     """
@@ -191,6 +192,7 @@ def call_batches(
                 If the collection provided is a mapping, its keys are used to assosiate methods with their respective results.
         halt: whether to halt the sequence of requests in case of an error
         timeout: timeout in seconds
+        prefer_version: preferred API version to resolve the batch method against
         bitrix_token:
 
     Returns:
@@ -203,6 +205,7 @@ def call_batches(
         methods=methods,
         halt=halt,
         timeout=timeout,
+        prefer_version=prefer_version,
         bitrix_token=bitrix_token,
         **kwargs,
     ).call()

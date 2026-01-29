@@ -1,10 +1,11 @@
 from datetime import datetime
 from functools import wraps
-from typing import TYPE_CHECKING, Any, Callable, Dict, Final, Mapping, Optional, Sequence, Text, overload
+from typing import TYPE_CHECKING, Any, Callable, Final, Literal, Mapping, Optional, Sequence, Text, Tuple, overload
 
 from ..._config import Config
+from ...constants.version import B24APIVersion
 from ...error import BitrixAPIExpiredToken, BitrixResponse302JSONDecodeError
-from ...utils.types import B24BatchMethods, B24BatchMethodTuple, JSONDict, Key, Timeout
+from ...utils.types import B24APIVersionLiteral, B24Requests, B24RequestTuple, JSONDict, Key, Timeout
 from ..events import OAuthTokenRenewedEvent, PortalDomainChangedEvent
 from ..functions import call_batch, call_batches, call_list, call_list_fast, call_method
 from ..signals import BitrixSignalInstance
@@ -12,7 +13,7 @@ from .bitrix_app import AbstractBitrixApp, AbstractBitrixAppLocal
 from .oauth_token import OAuthToken
 
 if TYPE_CHECKING:
-    from ..._client import Client
+    from ...client import BaseClient, ClientV1, ClientV2, ClientV3
     from ..responses import BitrixAppInfoResponse
     from .oauth_placement_data import OAuthPlacementData
     from .renewed_oauth_token import RenewedOAuthToken
@@ -29,7 +30,7 @@ def _bitrix_app_required(func: Callable):
 
 
 class AbstractBitrixToken:
-    """"""
+    """Base token wrapper with retry logic, token refresh, and client helpers."""
 
     _AUTO_REFRESH: bool = True
     """"""
@@ -67,7 +68,7 @@ class AbstractBitrixToken:
         return not bool(getattr(self, "bitrix_app", None))
 
     @property
-    def _auth_data(self) -> Dict:
+    def _auth_data(self) -> JSONDict:
         """"""
         return dict(
             domain=self.domain,
@@ -108,25 +109,54 @@ class AbstractBitrixToken:
         self.expires = oauth_token.expires
         self.expires_in = oauth_token.expires_in
 
-    def get_client(self, **kwargs) -> "Client":
+    @overload
+    def get_client(
+            self,
+            *,
+            prefer_version: Literal[2] = B24APIVersion.V2,
+            **kwargs,
+    ) -> "ClientV2": ...
+
+    @overload
+    def get_client(
+            self,
+            *,
+            prefer_version: Literal[1],
+            **kwargs,
+    ) -> "ClientV1": ...
+
+    @overload
+    def get_client(
+            self,
+            *,
+            prefer_version: Literal[3],
+            **kwargs,
+    ) -> "ClientV3": ...
+
+    def get_client(
+            self,
+            *,
+            prefer_version: B24APIVersionLiteral = B24APIVersion.V2,
+            **kwargs,
+    ) -> "BaseClient":
         """"""
-        from ..._client import Client
-        return Client(self, **kwargs)
+        from ...client import Client
+        return Client(self, prefer_version=prefer_version, **kwargs)
 
     @_bitrix_app_required
-    def get_oauth_token(self, code: Text) -> "RenewedOAuthToken":
+    def get_oauth_token(self, code: Text, **kwargs) -> "RenewedOAuthToken":
         """"""
-        return self.bitrix_app.get_oauth_token(code=code)
+        return self.bitrix_app.get_oauth_token(code=code, **kwargs)
 
     @_bitrix_app_required
-    def refresh_oauth_token(self) -> "RenewedOAuthToken":
+    def refresh_oauth_token(self, **kwargs) -> "RenewedOAuthToken":
         """"""
-        return self.bitrix_app.refresh_oauth_token(refresh_token=self.refresh_token)
+        return self.bitrix_app.refresh_oauth_token(refresh_token=self.refresh_token, **kwargs)
 
     @_bitrix_app_required
-    def get_app_info(self) -> "BitrixAppInfoResponse":
+    def get_app_info(self, **kwargs) -> "BitrixAppInfoResponse":
         """"""
-        return self._execute_with_retries(lambda: self.bitrix_app.get_app_info(self.auth_token))
+        return self._execute_with_retries(lambda: self.bitrix_app.get_app_info(self.auth_token, **kwargs))
 
     def _refresh_and_set_oauth_token(self):
         """"""
@@ -234,7 +264,7 @@ class AbstractBitrixToken:
                 return func()
             raise
 
-    def _call_with_retries(self, call_func: Callable, parameters: Dict) -> JSONDict:
+    def _call_with_retries(self, call_func: Callable[..., JSONDict], parameters: JSONDict) -> JSONDict:
         """"""
         return self._execute_with_retries(lambda: call_func(**self._auth_data, **parameters))
 
@@ -243,15 +273,28 @@ class AbstractBitrixToken:
             api_method: Text,
             params: Optional[JSONDict] = None,
             timeout: Timeout = None,
+            prefer_version: B24APIVersionLiteral = B24APIVersion.V2,
             **kwargs,
     ) -> JSONDict:
-        """"""
+        """
+        Call a single Bitrix REST API method with automatic retries and token refresh.
+
+        Args:
+            api_method: API method name, e.g. crm.deal.add.
+            params: API method parameters.
+            timeout: Request timeout in seconds.
+            prefer_version: Preferred API version to resolve the method against.
+
+        Returns:
+            API response payload.
+        """
         return self._call_with_retries(
             call_func=call_method,
             parameters=dict(
                 api_method=api_method,
                 params=params,
                 timeout=timeout,
+                prefer_version=prefer_version,
                 **kwargs,
             ),
         )
@@ -259,32 +302,47 @@ class AbstractBitrixToken:
     @overload
     def call_batch(
             self,
-            methods: Mapping[Key, B24BatchMethodTuple],
+            methods: Mapping[Key, B24RequestTuple],
             halt: bool = False,
             ignore_size_limit: bool = False,
             timeout: Timeout = None,
+            prefer_version: B24APIVersionLiteral = B24APIVersion.V2,
             **kwargs,
     ) -> JSONDict: ...
 
     @overload
     def call_batch(
             self,
-            methods: Sequence[B24BatchMethodTuple],
+            methods: Sequence[B24RequestTuple],
             halt: bool = False,
             ignore_size_limit: bool = False,
             timeout: Timeout = None,
+            prefer_version: B24APIVersionLiteral = B24APIVersion.V2,
             **kwargs,
     ) -> JSONDict: ...
 
     def call_batch(
             self,
-            methods: B24BatchMethods,
+            methods: B24Requests,
             halt: bool = False,
             ignore_size_limit: bool = False,
             timeout: Timeout = None,
+            prefer_version: B24APIVersionLiteral = B24APIVersion.V2,
             **kwargs,
     ) -> JSONDict:
-        """"""
+        """
+        Call multiple API methods in a single batch request with retries.
+
+        Args:
+            methods: Batch methods collection.
+            halt: Stop on first error if True.
+            ignore_size_limit: Truncate instead of raising when batch size exceeds limit.
+            timeout: Request timeout in seconds.
+            prefer_version: Preferred API version to resolve the batch method against.
+
+        Returns:
+            Batch response payload.
+        """
         return self._call_with_retries(
             call_func=call_batch,
             parameters=dict(
@@ -292,6 +350,7 @@ class AbstractBitrixToken:
                 halt=halt,
                 ignore_size_limit=ignore_size_limit,
                 timeout=timeout,
+                prefer_version=prefer_version,
                 **kwargs,
             ),
         )
@@ -299,35 +358,50 @@ class AbstractBitrixToken:
     @overload
     def call_batches(
             self,
-            methods: Mapping[Key, B24BatchMethodTuple],
+            methods: Mapping[Key, B24RequestTuple],
             halt: bool = False,
             timeout: Timeout = None,
+            prefer_version: B24APIVersionLiteral = B24APIVersion.V2,
             **kwargs,
     ) -> JSONDict: ...
 
     @overload
     def call_batches(
             self,
-            methods: Sequence[B24BatchMethodTuple],
+            methods: Sequence[B24RequestTuple],
             halt: bool = False,
             timeout: Timeout = None,
+            prefer_version: B24APIVersionLiteral = B24APIVersion.V2,
             **kwargs,
     ) -> JSONDict: ...
 
     def call_batches(
             self,
-            methods: B24BatchMethods,
+            methods: B24Requests,
             halt: bool = False,
             timeout: Timeout = None,
+            prefer_version: B24APIVersionLiteral = B24APIVersion.V2,
             **kwargs,
     ) -> JSONDict:
-        """"""
+        """
+        Call multiple API methods using parallel batch requests with retries.
+
+        Args:
+            methods: Batch methods collection.
+            halt: Stop on first error if True.
+            timeout: Request timeout in seconds.
+            prefer_version: Preferred API version to resolve the batch method against.
+
+        Returns:
+            Batch response payload.
+        """
         return self._call_with_retries(
             call_func=call_batches,
             parameters=dict(
                 methods=methods,
                 halt=halt,
                 timeout=timeout,
+                prefer_version=prefer_version,
                 **kwargs,
             ),
         )
@@ -338,9 +412,22 @@ class AbstractBitrixToken:
             params: Optional[JSONDict] = None,
             limit: Optional[int] = None,
             timeout: Timeout = None,
+            prefer_version: B24APIVersionLiteral = B24APIVersion.V2,
             **kwargs,
     ) -> JSONDict:
-        """"""
+        """
+        Call list-like API methods with pagination and retries.
+
+        Args:
+            api_method: API method name, e.g. crm.deal.list.
+            params: API method parameters.
+            limit: Maximum number of items to return.
+            timeout: Request timeout in seconds.
+            prefer_version: Preferred API version to resolve the method against.
+
+        Returns:
+            API response payload.
+        """
         return self._call_with_retries(
             call_func=call_list,
             parameters=dict(
@@ -348,6 +435,7 @@ class AbstractBitrixToken:
                 params=params,
                 limit=limit,
                 timeout=timeout,
+                prefer_version=prefer_version,
                 **kwargs,
             ),
         )
@@ -359,9 +447,23 @@ class AbstractBitrixToken:
             descending: bool = False,
             limit: Optional[int] = None,
             timeout: Timeout = None,
+            prefer_version: B24APIVersionLiteral = B24APIVersion.V2,
             **kwargs,
     ) -> JSONDict:
-        """"""
+        """
+        Call list-like API methods with optimized pagination and retries.
+
+        Args:
+            api_method: API method name, e.g. crm.deal.list.
+            params: API method parameters.
+            descending: Whether to sort in descending order.
+            limit: Maximum number of items to return.
+            timeout: Request timeout in seconds.
+            prefer_version: Preferred API version to resolve the method against.
+
+        Returns:
+            API response payload.
+        """
         return self._call_with_retries(
             call_func=call_list_fast,
             parameters=dict(
@@ -370,13 +472,14 @@ class AbstractBitrixToken:
                 descending=descending,
                 limit=limit,
                 timeout=timeout,
+                prefer_version=prefer_version,
                 **kwargs,
             ),
         )
 
 
 class AbstractBitrixTokenLocal(AbstractBitrixToken):
-    """"""
+    """Token wrapper bound to a local Bitrix app."""
 
     bitrix_app: AbstractBitrixAppLocal = NotImplemented
     """"""
@@ -393,7 +496,7 @@ class AbstractBitrixTokenLocal(AbstractBitrixToken):
 
 
 class BitrixToken(AbstractBitrixToken):
-    """"""
+    """Concrete token wrapper for OAuth or webhook tokens."""
 
     def __init__(
             self,
@@ -448,7 +551,7 @@ class BitrixToken(AbstractBitrixToken):
 
 
 class BitrixTokenLocal(AbstractBitrixTokenLocal):
-    """"""
+    """Token wrapper for local Bitrix apps without explicit domain."""
 
     def __init__(
             self,
@@ -499,7 +602,7 @@ class BitrixTokenLocal(AbstractBitrixTokenLocal):
 
 
 class BitrixWebhook(BitrixToken):
-    """"""
+    """Token wrapper for webhook auth tokens."""
 
     __AUTH_TOKEN_PARTS_COUNT: Final[int] = 2
 
@@ -512,23 +615,35 @@ class BitrixWebhook(BitrixToken):
         super().__init__(domain=domain, auth_token=auth_token)
 
     @property
+    def __auth_token_parts(self) -> Tuple[int, Text]:
+        """Return parsed (user_id, webhook_key) from auth_token."""
+
+        parts = self.auth_token.strip("/").split("/")
+
+        if len(parts) != self.__AUTH_TOKEN_PARTS_COUNT:
+            raise ValueError(
+                f"Invalid webhook auth_token format: "
+                f"expected 'user_id/webhook_key', got {self.auth_token!r}",
+            )
+
+        user_id, webhook_key = parts
+
+        if not user_id.isdigit():
+            raise ValueError(
+                f"Invalid webhook auth_token format: "
+                f"expected numeric user_id, got {user_id!r}",
+            )
+
+        return int(user_id), webhook_key
+
+    @property
     def user_id(self) -> int:
-        """"""
-
-        auth_parts = self.auth_token.strip("/").split("/")
-
-        if len(auth_parts) == self.__AUTH_TOKEN_PARTS_COUNT and auth_parts[0].isdigit():
-            return int(auth_parts[0])
-        else:
-            raise ValueError(f"Invalid webhook auth_token format: expected 'user_id/webhook_key', got '{self.auth_token}'")
+        """Return the webhook user_id parsed from auth_token."""
+        user_id, _ = self.__auth_token_parts
+        return user_id
 
     @property
     def webhook_key(self) -> Text:
-        """"""
-
-        auth_parts = self.auth_token.strip("/").split("/")
-
-        if len(auth_parts) == self.__AUTH_TOKEN_PARTS_COUNT:
-            return auth_parts[1]
-        else:
-            raise ValueError(f"Invalid webhook auth_token format: expected 'user_id/webhook_key', got '{self.auth_token}'")
+        """Return the webhook key parsed from auth_token."""
+        _, webhook_key = self.__auth_token_parts
+        return webhook_key

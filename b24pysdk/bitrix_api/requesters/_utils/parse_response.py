@@ -41,6 +41,7 @@ from ....error import (
     BitrixResponse500JSONDecodeError,
     BitrixResponseJSONDecodeError,
 )
+from ....error.v3 import BitrixAPIError as BitrixAPIErrorV3
 from ....utils.types import JSONDict
 
 _EXCEPTIONS_BY_ERROR: Dict[Text, Type[BitrixAPIError]] = {
@@ -100,8 +101,11 @@ _EXCEPTIONS_BY_JSON_DECODE_RESPONSE_STATUS_CODE: Dict[int, Type[BitrixResponseJS
 
 
 def _raise_http_error(response: requests.Response):
+    error_payload = response.json()["error"]
+    error = error_payload.get("code") if isinstance(error_payload, dict) else error_payload
+
     raise HTTPError(
-        f"{response.status_code} Client Error: {response.json()['error']} for url: {response.url}",
+        f"{response.status_code} Client Error: {error} for url: {response.url}",
         response=response,
     )
 
@@ -138,8 +142,13 @@ def parse_response(response: requests.Response) -> JSONDict:
             _raise_http_error(response)
 
     except HTTPError as error:
+        error_payload = json_response.get("error")
+
+        if isinstance(error_payload, dict):
+            raise BitrixAPIErrorV3(json_response=json_response, response=response) from error
+
         exception_class = (
-                _EXCEPTIONS_BY_ERROR.get(str(json_response.get("error", "")).upper()) or
+                _EXCEPTIONS_BY_ERROR.get(str(error_payload or "").upper()) or
                 _EXCEPTIONS_BY_STATUS_CODE.get(response.status_code) or
                 BitrixAPIError
         )

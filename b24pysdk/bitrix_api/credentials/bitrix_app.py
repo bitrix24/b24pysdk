@@ -22,17 +22,17 @@ class AbstractBitrixApp:
         """"""
         return bool(getattr(self, "domain", None))
 
-    def get_oauth_token(self, code: Text) -> RenewedOAuthToken:
+    def get_oauth_token(self, code: Text, **kwargs) -> RenewedOAuthToken:
         """"""
-        return RenewedOAuthToken.from_dict(BitrixOAuthRequester(self).get_oauth_token(code))
+        return RenewedOAuthToken.from_dict(BitrixOAuthRequester(self, **kwargs).get_oauth_token(code))
 
-    def refresh_oauth_token(self, refresh_token: Text) -> RenewedOAuthToken:
+    def refresh_oauth_token(self, refresh_token: Text, **kwargs) -> RenewedOAuthToken:
         """"""
-        return RenewedOAuthToken.from_dict(BitrixOAuthRequester(self).refresh_oauth_token(refresh_token))
+        return RenewedOAuthToken.from_dict(BitrixOAuthRequester(self, **kwargs).refresh_oauth_token(refresh_token))
 
-    def get_app_info(self, auth_token: Text) -> BitrixAppInfoResponse:
+    def get_app_info(self, auth_token: Text, **kwargs) -> BitrixAppInfoResponse:
         """"""
-        return BitrixAppInfoResponse.from_dict(BitrixOAuthRequester(self).get_app_info(auth_token))
+        return BitrixAppInfoResponse.from_dict(BitrixOAuthRequester(self, **kwargs).get_app_info(auth_token))
 
 
 class AbstractBitrixAppLocal(AbstractBitrixApp):

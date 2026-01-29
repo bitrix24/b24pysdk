@@ -1,16 +1,18 @@
-from typing import TYPE_CHECKING, Optional, Text, Union
+from typing import Optional, Text
 
-from ...utils.types import JSONDict, Timeout
-from ..protocols import BitrixTokenProtocol
+from ...constants.version import B24APIVersion
+from ...protocols import BitrixTokenProtocol
+from ...utils.types import B24APIVersionLiteral, JSONDict, Timeout
 from ._base_caller import BaseCaller
 from .call import call
-
-if TYPE_CHECKING:
-    from ..credentials import AbstractBitrixToken
 
 
 class _MethodCaller(BaseCaller):
     """"""
+
+    __slots__ = ("_api_version",)
+
+    _api_version: B24APIVersionLiteral
 
     def __init__(
             self,
@@ -19,8 +21,8 @@ class _MethodCaller(BaseCaller):
             is_webhook: bool,
             api_method: Text,
             params: Optional[JSONDict] = None,
-            timeout: Timeout = None,
-            bitrix_token: Optional[Union["AbstractBitrixToken", BitrixTokenProtocol]] = None,
+            prefer_version: B24APIVersionLiteral = B24APIVersion.V2,
+            bitrix_token: Optional[BitrixTokenProtocol] = None,
             **kwargs,
     ):
         super().__init__(
@@ -29,10 +31,21 @@ class _MethodCaller(BaseCaller):
             is_webhook=is_webhook,
             api_method=api_method,
             params=params,
-            timeout=timeout,
             bitrix_token=bitrix_token,
             **kwargs,
         )
+        self._api_version = self._resolve_api_version(api_method, prefer_version)
+
+    def _resolve_api_version(
+            self,
+            api_method: Text,
+            prefer_version: B24APIVersionLiteral = B24APIVersion.V2,
+    ) -> B24APIVersionLiteral:
+        """"""
+        if prefer_version == B24APIVersion.V3 and self._config.is_api_v3_method(api_method):
+            return B24APIVersion.V3
+        else:
+            return B24APIVersion.V2
 
     @property
     def _dynamic_auth_token(self) -> Text:
@@ -40,9 +53,17 @@ class _MethodCaller(BaseCaller):
         return ("", f"{self._auth_token}/")[self._is_webhook]
 
     @property
+    def _base_url(self) -> Text:
+        """"""
+        return f"https://{self._domain}/rest"
+
+    @property
     def _url(self) -> Text:
         """"""
-        return f"https://{self._domain}/rest/{self._dynamic_auth_token}{self._api_method}.json"
+        if self._api_version == B24APIVersion.V3:
+            return f"{self._base_url}/api/{self._dynamic_auth_token}{self._api_method}"
+        else:
+            return f"{self._base_url}/{self._dynamic_auth_token}{self._api_method}.json"
 
     @property
     def _dynamic_params(self) -> JSONDict:
@@ -66,14 +87,12 @@ class _MethodCaller(BaseCaller):
         json_response = call(
                 url=self._url,
                 params=self._dynamic_params,
-                timeout=self._timeout,
                 **self._kwargs,
         )
         self._config.logger.debug(
             "finish call_method",
             context=dict(
-                result=json_response.get("result"),
-                time=json_response.get("time"),
+                json_response=json_response,
             ),
         )
         return json_response
@@ -87,7 +106,8 @@ def call_method(
         api_method: Text,
         params: Optional[JSONDict] = None,
         timeout: Timeout = None,
-        bitrix_token: Optional[Union["AbstractBitrixToken", BitrixTokenProtocol]] = None,
+        prefer_version: B24APIVersionLiteral = B24APIVersion.V2,
+        bitrix_token: Optional[BitrixTokenProtocol] = None,
         **kwargs,
 ) -> JSONDict:
     """
@@ -100,6 +120,7 @@ def call_method(
         api_method: name of the bitrix API method to call, e.g. crm.deal.add
         params: API method parameters
         timeout: timeout in seconds
+        prefer_version: preferred API version to resolve the method against
         bitrix_token:
 
     Returns:
@@ -112,6 +133,7 @@ def call_method(
         api_method=api_method,
         params=params,
         timeout=timeout,
+        prefer_version=prefer_version,
         bitrix_token=bitrix_token,
         **kwargs,
     ).call()

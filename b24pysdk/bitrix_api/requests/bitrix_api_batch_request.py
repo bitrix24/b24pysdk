@@ -1,60 +1,43 @@
-from typing import TYPE_CHECKING, Final, Mapping, Optional, Sequence, Text, Union, overload
+from typing import TYPE_CHECKING, Final, Generic, Mapping, Sequence, Text, TypeVar, Union, cast, overload
 
-from ...utils.types import B24BatchMethods, B24BatchMethodTuple, JSONDict, Key, Timeout
-from ..protocols import BitrixTokenFullProtocol
-from ..responses import B24APIBatchResult, BitrixAPIBatchResponse
-from .bitrix_api_request import BitrixAPIRequest
+from ...protocols import BitrixTokenFullProtocol
+from ...utils.types import B24Requests, B24RequestTuple, JSONDict, Key
+from ..responses import BitrixAPIBatchResponse
+from .abstract_bitrix_api_request import AbstractBitrixAPIRequest
 
 if TYPE_CHECKING:
-    from ..credentials import AbstractBitrixToken
+    from ..responses import B24APIBatchResult, BitrixAPITimeResponse
+
+_BARQST = TypeVar(
+    "_BARQST",
+    bound=Union[
+        Mapping[Key, AbstractBitrixAPIRequest],
+        Sequence[AbstractBitrixAPIRequest],
+    ],
+)
 
 
-class BitrixAPIBatchesRequest(BitrixAPIRequest):
+class BitrixAPIBatchesRequest(AbstractBitrixAPIRequest[BitrixAPIBatchResponse], Generic[_BARQST]):
     """"""
 
     _API_METHOD: Final[Text] = "batch"
 
     __slots__ = ("_bitrix_api_requests", "_halt")
 
-    _bitrix_api_requests: Union[Mapping[Key, BitrixAPIRequest], Sequence[BitrixAPIRequest]]
+    _bitrix_api_requests: _BARQST
     _halt: bool
-    _response: Optional[BitrixAPIBatchResponse]
-
-    @overload
-    def __init__(
-            self,
-            *,
-            bitrix_token: Union["AbstractBitrixToken", BitrixTokenFullProtocol],
-            bitrix_api_requests: Mapping[Key, BitrixAPIRequest],
-            halt: bool = False,
-            timeout: Timeout = None,
-            **kwargs,
-    ): ...
-
-    @overload
-    def __init__(
-            self,
-            *,
-            bitrix_token: Union["AbstractBitrixToken", BitrixTokenFullProtocol],
-            bitrix_api_requests: Sequence[BitrixAPIRequest],
-            halt: bool = False,
-            timeout: Timeout = None,
-            **kwargs,
-    ): ...
 
     def __init__(
             self,
             *,
-            bitrix_token: Union["AbstractBitrixToken", BitrixTokenFullProtocol],
-            bitrix_api_requests: Union[Mapping[Key, BitrixAPIRequest], Sequence[BitrixAPIRequest]],
+            bitrix_token: BitrixTokenFullProtocol,
+            bitrix_api_requests: _BARQST,
             halt: bool = False,
-            timeout: Timeout = None,
             **kwargs,
     ):
         super().__init__(
             bitrix_token=bitrix_token,
             api_method=self._API_METHOD,
-            timeout=timeout,
             **kwargs,
         )
         self._bitrix_api_requests = bitrix_api_requests
@@ -68,130 +51,87 @@ class BitrixAPIBatchesRequest(BitrixAPIRequest):
             f"{self.__class__.__name__}("
             f"bitrix_token={self._bitrix_token}, "
             f"bitrix_api_requests={self._bitrix_api_requests_string}, "
-            f"halt={self._halt}, "
-            f"timeout={self._timeout})"
+            f"halt={self._halt})"
         )
 
-    @overload
     @property
-    def bitrix_api_requests(self) -> Mapping[Key, BitrixAPIRequest]: ...
-
-    @overload
-    @property
-    def bitrix_api_requests(self) -> Sequence[BitrixAPIRequest]: ...
-
-    @property
-    def bitrix_api_requests(self) -> Union[Mapping[Key, BitrixAPIRequest], Sequence[BitrixAPIRequest]]:
+    def _bitrix_api_requests_type_string(self) -> Text:
         """"""
-        return self._bitrix_api_requests
+        return type(self._bitrix_api_requests[0]).__name__ if self._bitrix_api_requests else "BitrixAPIRequests"
 
     @property
     def _bitrix_api_requests_string(self) -> Text:
         """"""
-        return f"<{type(self._bitrix_api_requests).__name__} of {len(self._bitrix_api_requests)} BitrixAPIRequests>"
-
-    @property
-    def halt(self) -> bool:
-        """"""
-        return self._halt
+        return f"<{type(self._bitrix_api_requests).__name__} of {len(self._bitrix_api_requests)} {self._bitrix_api_requests_type_string}>"
 
     @overload
-    @property
-    def methods(self) -> Mapping[Key, B24BatchMethodTuple]: ...
+    def _methods(self: "BitrixAPIBatchesRequest[Mapping[Key, AbstractBitrixAPIRequest]]") -> Mapping[Key, B24RequestTuple]: ...
 
     @overload
-    @property
-    def methods(self) -> Sequence[B24BatchMethodTuple]: ...
+    def _methods(self: "BitrixAPIBatchesRequest[Sequence[AbstractBitrixAPIRequest]]") -> Sequence[B24RequestTuple]: ...
 
     @property
-    def methods(self) -> B24BatchMethods:
+    def _methods(self) -> B24Requests:
         """"""
 
         if isinstance(self._bitrix_api_requests, Mapping):
             methods = dict()
 
-            for key, bitrix_api_request in self.bitrix_api_requests.items():
+            for key, bitrix_api_request in cast(Mapping[Key, AbstractBitrixAPIRequest], self._bitrix_api_requests).items():
                 methods[key] = bitrix_api_request._as_tuple
 
         else:
             methods = list()
 
-            for bitrix_api_request in self.bitrix_api_requests:
+            for bitrix_api_request in cast(Sequence[AbstractBitrixAPIRequest], self._bitrix_api_requests):
                 methods.append(bitrix_api_request._as_tuple)
 
         return methods
 
     @property
-    def response(self) -> BitrixAPIBatchResponse:
-        """"""
-        return self._response or self.call()
-
-    @property
-    def result(self) -> B24APIBatchResult:
+    def result(self) -> "B24APIBatchResult":
         """"""
         return self.response.result
+
+    @property
+    def time(self) -> "BitrixAPITimeResponse":
+        """"""
+        return self.response.time
+
+    @staticmethod
+    def _convert_response(response: JSONDict) -> BitrixAPIBatchResponse:
+        """"""
+        return BitrixAPIBatchResponse.from_dict(response)
 
     def _call(self) -> JSONDict:
         """"""
         return self._bitrix_token.call_batches(
-            methods=self.methods,
+            methods=self._methods,
             halt=self._halt,
-            timeout=self._timeout,
             **self._kwargs,
         )
 
-    def call(self) -> BitrixAPIBatchResponse:
-        """"""
-        self._response = BitrixAPIBatchResponse.from_dict(self._call())
-        return self._response
 
-
-class BitrixAPIBatchRequest(BitrixAPIBatchesRequest):
+class BitrixAPIBatchRequest(BitrixAPIBatchesRequest[_BARQST], Generic[_BARQST]):
     """"""
 
     __slots__ = ("_ignore_size_limit",)
 
     _ignore_size_limit: bool
 
-    @overload
     def __init__(
             self,
             *,
-            bitrix_token: Union["AbstractBitrixToken", BitrixTokenFullProtocol],
-            bitrix_api_requests: Mapping[Key, BitrixAPIRequest],
+            bitrix_token: BitrixTokenFullProtocol,
+            bitrix_api_requests: _BARQST,
             halt: bool = False,
             ignore_size_limit: bool = False,
-            timeout: Timeout = None,
-            **kwargs,
-    ): ...
-
-    @overload
-    def __init__(
-            self,
-            *,
-            bitrix_token: Union["AbstractBitrixToken", BitrixTokenFullProtocol],
-            bitrix_api_requests: Sequence[BitrixAPIRequest],
-            halt: bool = False,
-            ignore_size_limit: bool = False,
-            timeout: Timeout = None,
-            **kwargs,
-    ): ...
-
-    def __init__(
-            self,
-            *,
-            bitrix_token: Union["AbstractBitrixToken", BitrixTokenFullProtocol],
-            bitrix_api_requests: Union[Mapping[Key, BitrixAPIRequest], Sequence[BitrixAPIRequest]],
-            halt: bool = False,
-            ignore_size_limit: bool = False,
-            timeout: Timeout = None,
             **kwargs,
     ):
         super().__init__(
             bitrix_token=bitrix_token,
             bitrix_api_requests=bitrix_api_requests,
             halt=halt,
-            timeout=timeout,
             **kwargs,
         )
         self._ignore_size_limit = ignore_size_limit
@@ -202,21 +142,14 @@ class BitrixAPIBatchRequest(BitrixAPIBatchesRequest):
             f"bitrix_token={self._bitrix_token}, "
             f"bitrix_api_requests={self._bitrix_api_requests_string}, "
             f"halt={self._halt}, "
-            f"ignore_size_limit={self._ignore_size_limit}, "
-            f"timeout={self._timeout})"
+            f"ignore_size_limit={self._ignore_size_limit})"
         )
-
-    @property
-    def ignore_size_limit(self) -> bool:
-        """"""
-        return self._ignore_size_limit
 
     def _call(self) -> JSONDict:
         """"""
         return self._bitrix_token.call_batch(
-            methods=self.methods,
+            methods=self._methods,
             halt=self._halt,
             ignore_size_limit=self._ignore_size_limit,
-            timeout=self._timeout,
             **self._kwargs,
         )

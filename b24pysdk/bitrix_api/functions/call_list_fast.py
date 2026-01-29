@@ -1,15 +1,13 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Callable, Dict, Final, Iterable, Literal, Optional, Text, Tuple, Union
+from typing import Callable, Dict, Final, Iterable, Literal, Optional, Text, Tuple, Union
 
 from ..._constants import MAX_BATCH_SIZE
-from ...utils.types import B24BatchMethodTuple, JSONDict, JSONDictGenerator, JSONList, Timeout
-from ..protocols import BitrixTokenProtocol
+from ...constants.version import B24APIVersion
+from ...protocols import BitrixTokenProtocol
+from ...utils.types import B24APIVersionLiteral, B24RequestTuple, JSONDict, JSONDictGenerator, JSONList, Timeout
 from ._base_caller import BaseCaller
 from .call_batch import call_batch
 from .call_method import call_method
-
-if TYPE_CHECKING:
-    from ..credentials import AbstractBitrixToken
 
 
 class _ListFastCaller(BaseCaller):
@@ -68,8 +66,7 @@ class _ListFastCaller(BaseCaller):
             params: Optional[JSONDict] = None,
             descending: bool = False,
             limit: Optional[int] = None,
-            timeout: Timeout = None,
-            bitrix_token: Optional[Union["AbstractBitrixToken", BitrixTokenProtocol]] = None,
+            bitrix_token: Optional[BitrixTokenProtocol] = None,
             **kwargs,
     ):
         super().__init__(
@@ -78,7 +75,6 @@ class _ListFastCaller(BaseCaller):
             is_webhook=is_webhook,
             api_method=api_method,
             params=params,
-            timeout=timeout,
             bitrix_token=bitrix_token,
             **kwargs,
         )
@@ -248,7 +244,7 @@ class _ListFastCaller(BaseCaller):
             dict(start=self._START),
         )
 
-    def _generate_batch_methods(self) -> Dict[Text, B24BatchMethodTuple]:
+    def _generate_batch_methods(self) -> Dict[Text, B24RequestTuple]:
         """
         Generates list of methods, using call_list_fast() api_method and params, adding filter by ID
 
@@ -256,7 +252,7 @@ class _ListFastCaller(BaseCaller):
             dict of B24BatchMethodTuple, ready to be used by call_batches()
         """
 
-        methods: Dict[Text, B24BatchMethodTuple] = dict()
+        methods: Dict[Text, B24RequestTuple] = dict()
 
         for index in range(self._MAX_BATCH_SIZE):
             method_params = self._generate_method_params(index=index)
@@ -270,7 +266,6 @@ class _ListFastCaller(BaseCaller):
             return self._bitrix_token.call_method(
                 api_method=self._api_method,
                 params=self._generate_method_params(),
-                timeout=self._timeout,
                 **self._kwargs,
             )
         else:
@@ -280,7 +275,6 @@ class _ListFastCaller(BaseCaller):
                 is_webhook=self._is_webhook,
                 api_method=self._api_method,
                 params=self._generate_method_params(),
-                timeout=self._timeout,
                 **self._kwargs,
             )
 
@@ -288,12 +282,12 @@ class _ListFastCaller(BaseCaller):
         """"""
         return call_batch(
                 domain=self._domain,
-                auth_token=self._auth_token,
-                is_webhook=self._is_webhook,
-                methods=self._generate_batch_methods(),
-                halt=self._HALT,
-                timeout=self._timeout,
-                **self._kwargs,
+            auth_token=self._auth_token,
+            is_webhook=self._is_webhook,
+            methods=self._generate_batch_methods(),
+            halt=self._HALT,
+            bitrix_token=self._bitrix_token,
+            **self._kwargs,
         )
 
     def _extract_response_id_field(self, result_value: JSONDict) -> Text:
@@ -368,7 +362,8 @@ def call_list_fast(
         descending: bool = False,
         limit: Optional[int] = None,
         timeout: Timeout = None,
-        bitrix_token: Optional[Union["AbstractBitrixToken", BitrixTokenProtocol]] = None,
+        prefer_version: B24APIVersionLiteral = B24APIVersion.V2,
+        bitrix_token: Optional[BitrixTokenProtocol] = None,
         **kwargs,
 ) -> JSONDict:
     """
@@ -386,6 +381,7 @@ def call_list_fast(
         limit: max number of items to retrieve
         descending: whether items should be retrieved in descending order
         timeout: timeout in seconds
+        prefer_version: preferred API version to resolve the method against
         bitrix_token:
 
     Returns:
@@ -400,6 +396,7 @@ def call_list_fast(
         descending=descending,
         limit=limit,
         timeout=timeout,
+        prefer_version=prefer_version,
         bitrix_token=bitrix_token,
         **kwargs,
     ).call()

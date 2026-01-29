@@ -1,14 +1,12 @@
-from typing import TYPE_CHECKING, Final, Iterable, List, Mapping, Optional, Text, Tuple, Union
+from typing import Final, Iterable, List, Mapping, Optional, Text, Tuple
 
 from ..._constants import MAX_BATCH_SIZE
-from ...utils.types import B24BatchMethodTuple, JSONDict, JSONList, Timeout
-from ..protocols import BitrixTokenProtocol
+from ...constants.version import B24APIVersion
+from ...protocols import BitrixTokenProtocol
+from ...utils.types import B24APIVersionLiteral, B24RequestTuple, JSONDict, JSONList, Timeout
 from ._base_caller import BaseCaller
 from .call_batches import call_batches
 from .call_method import call_method
-
-if TYPE_CHECKING:
-    from ..credentials import AbstractBitrixToken
 
 
 class _ListCaller(BaseCaller):
@@ -33,8 +31,7 @@ class _ListCaller(BaseCaller):
             api_method: Text,
             params: Optional[JSONDict] = None,
             limit: Optional[int] = None,
-            timeout: Timeout = None,
-            bitrix_token: Optional[Union["AbstractBitrixToken", BitrixTokenProtocol]] = None,
+            bitrix_token: Optional[BitrixTokenProtocol] = None,
             **kwargs,
     ):
         super().__init__(
@@ -43,7 +40,6 @@ class _ListCaller(BaseCaller):
             is_webhook=is_webhook,
             api_method=api_method,
             params=params,
-            timeout=timeout,
             bitrix_token=bitrix_token,
             **kwargs,
         )
@@ -94,7 +90,7 @@ class _ListCaller(BaseCaller):
             filter_key: Text,
             filter_id_key: Text,
             filter_ids: List[int],
-    ) -> List[B24BatchMethodTuple]:
+    ) -> List[B24RequestTuple]:
         """
         Generates list of methods, using call_list() api_method and params, slicing ids from filter parameter in chunks
 
@@ -102,7 +98,7 @@ class _ListCaller(BaseCaller):
             list of B24BatchMethodTuple, ready to be used by call_batches()
         """
 
-        methods: List[B24BatchMethodTuple] = list()
+        methods: List[B24RequestTuple] = list()
 
         for start in range(0, len(filter_ids), self._STEP):
             id_chunk = filter_ids[start:start + self._STEP]
@@ -115,7 +111,7 @@ class _ListCaller(BaseCaller):
             self,
             next_step: int,
             total: int,
-    ) -> List[B24BatchMethodTuple]:
+    ) -> List[B24RequestTuple]:
         """
         Generates list of methods, using call_list() api_method and params, adding pagination parameter
         Args:
@@ -126,7 +122,7 @@ class _ListCaller(BaseCaller):
             list of B24BatchMethodTuple, ready to be used by call_batches()
         """
 
-        methods: List[B24BatchMethodTuple] = list()
+        methods: List[B24RequestTuple] = list()
 
         for start in range(next_step, total, self._STEP):
             page_params = self._params | {"start": start}
@@ -140,7 +136,6 @@ class _ListCaller(BaseCaller):
             return self._bitrix_token.call_method(
                 api_method=self._api_method,
                 params=self._params,
-                timeout=self._timeout,
                 **self._kwargs,
             )
         else:
@@ -150,11 +145,10 @@ class _ListCaller(BaseCaller):
                 is_webhook=self._is_webhook,
                 api_method=self._api_method,
                 params=self._params,
-                timeout=self._timeout,
                 **self._kwargs,
             )
 
-    def _fetch_batches_response(self, methods: List[B24BatchMethodTuple]) -> JSONDict:
+    def _fetch_batches_response(self, methods: List[B24RequestTuple]) -> JSONDict:
         """"""
         return call_batches(
             domain=self._domain,
@@ -162,7 +156,7 @@ class _ListCaller(BaseCaller):
             is_webhook=self._is_webhook,
             methods=methods,
             halt=self._HALT,
-            timeout=self._timeout,
+            bitrix_token=self._bitrix_token,
             **self._kwargs,
         )
 
@@ -265,7 +259,8 @@ def call_list(
         params: Optional[JSONDict] = None,
         limit: Optional[int] = None,
         timeout: Timeout = None,
-        bitrix_token: Optional[Union["AbstractBitrixToken", BitrixTokenProtocol]] = None,
+        prefer_version: B24APIVersionLiteral = B24APIVersion.V2,
+        bitrix_token: Optional[BitrixTokenProtocol] = None,
         **kwargs,
 ) -> JSONDict:
     """
@@ -279,6 +274,7 @@ def call_list(
         params: API method parameters
         limit: max number of items to retrieve
         timeout: timeout in seconds
+        prefer_version: preferred API version to resolve the method against
         bitrix_token:
 
     Returns:
@@ -292,6 +288,7 @@ def call_list(
         params=params,
         limit=limit,
         timeout=timeout,
+        prefer_version=prefer_version,
         bitrix_token=bitrix_token,
         **kwargs,
     ).call()

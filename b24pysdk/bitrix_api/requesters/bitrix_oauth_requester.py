@@ -10,8 +10,8 @@ from ...error import (
     BitrixOAuthRequestError,
     BitrixOAuthRequestTimeout,
 )
+from ...protocols import BitrixOAuthProtocol
 from ...utils.types import JSONDict, Number, Timeout
-from ..protocols import BitrixOAuthProtocol
 from ._base_requester import BaseRequester
 
 

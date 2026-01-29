@@ -1,12 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Dict, Optional, Text, Union
+from typing import Optional, Text
 
 from ..._config import Config
-from ...utils.types import JSONDict, Timeout
-from ..protocols import BitrixTokenProtocol
-
-if TYPE_CHECKING:
-    from ..credentials import AbstractBitrixToken
+from ...protocols import BitrixTokenProtocol
+from ...utils.types import JSONDict
 
 
 class BaseCaller(ABC):
@@ -21,7 +18,6 @@ class BaseCaller(ABC):
         "_is_webhook",
         "_kwargs",
         "_params",
-        "_timeout",
     )
 
     _config: Config
@@ -30,9 +26,8 @@ class BaseCaller(ABC):
     _is_webhook: bool
     _api_method: Text
     _params: JSONDict
-    _timeout: Timeout
-    _bitrix_token: Optional[Union["AbstractBitrixToken", BitrixTokenProtocol]]
-    _kwargs: Dict
+    _bitrix_token: Optional[BitrixTokenProtocol]
+    _kwargs: JSONDict
 
     def __init__(
             self,
@@ -42,8 +37,7 @@ class BaseCaller(ABC):
             is_webhook: bool,
             api_method: Text,
             params: Optional[JSONDict] = None,
-            timeout: Timeout = None,
-            bitrix_token: Optional[Union["AbstractBitrixToken", BitrixTokenProtocol]] = None,
+            bitrix_token: Optional[BitrixTokenProtocol] = None,
             **kwargs,
     ):
         self._config = Config()
@@ -52,7 +46,6 @@ class BaseCaller(ABC):
         self._is_webhook = is_webhook
         self._api_method = api_method
         self._params = params or dict()
-        self._timeout = timeout
         self._bitrix_token = bitrix_token
         self._kwargs = kwargs
 
