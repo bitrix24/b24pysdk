@@ -8,6 +8,11 @@ from .abstract_bitrix_api_request import AbstractBitrixAPIRequest
 if TYPE_CHECKING:
     from ..responses import B24APIBatchResult, BitrixAPITimeResponse
 
+__all__ = [
+    "BitrixAPIBatchRequest",
+    "BitrixAPIBatchesRequest",
+]
+
 _BARQST = TypeVar(
     "_BARQST",
     bound=Union[

@@ -9,6 +9,10 @@ from ._base_caller import BaseCaller
 from .call_batch import call_batch
 from .call_method import call_method
 
+__all__ = [
+    "call_list_fast",
+]
+
 
 class _ListFastCaller(BaseCaller):
     """"""

@@ -4,6 +4,10 @@ from typing import Generic, Optional, Text, TypeVar
 from ...protocols import BitrixTokenFullProtocol
 from ...utils.types import B24RequestTuple, JSONDict
 
+__all__ = [
+    "AbstractBitrixAPIRequest",
+]
+
 _BARPT = TypeVar("_BARPT")
 
 

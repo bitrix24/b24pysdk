@@ -8,6 +8,10 @@ from ._base_caller import BaseCaller
 from .call_batches import call_batches
 from .call_method import call_method
 
+__all__ = [
+    "call_list",
+]
+
 
 class _ListCaller(BaseCaller):
     """"""
@@ -58,9 +62,9 @@ class _ListCaller(BaseCaller):
             list of ids to filter by if params satisfy the condition, otherwise None
         """
 
-        filter_key = ""
-        filter_id_key = ""
-        filter_ids = []
+        filter_key: Text = ""
+        filter_id_key: Text = ""
+        filter_ids: List[int] = []
 
         for key in self._params:
             if key.lower() == "filter":

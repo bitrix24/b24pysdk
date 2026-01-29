@@ -5,6 +5,10 @@ from ..._config import Config
 from ...protocols import BitrixTokenProtocol
 from ...utils.types import JSONDict
 
+__all__ = [
+    "BaseCaller",
+]
+
 
 class BaseCaller(ABC):
     """"""

@@ -1,7 +1,11 @@
 from typing import IO, Dict, Optional, Text, Tuple
 
-from ...utils.types import JSONDict, Timeout
+from ...utils.types import JSONDict, Number, Timeout
 from ..requesters import BitrixAPIRequester
+
+__all__ = [
+    "call",
+]
 
 
 def call(
@@ -11,8 +15,8 @@ def call(
         files: Optional[Dict[Text, Tuple[Text, IO]]] = None,
         timeout: Timeout = None,
         max_retries: Optional[int] = None,
-        initial_retry_delay: Optional[float] = None,
-        retry_delay_increment: Optional[float] = None,
+        initial_retry_delay: Optional[Number] = None,
+        retry_delay_increment: Optional[Number] = None,
 ) -> JSONDict:
     """
     Performs a call to the Bitrix API

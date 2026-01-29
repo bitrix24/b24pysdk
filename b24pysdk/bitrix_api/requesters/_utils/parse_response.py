@@ -26,9 +26,11 @@ from ....error import (
     BitrixAPIMethodNotAllowed,
     BitrixAPINoAuthFound,
     BitrixAPINotFound,
+    BitrixAPIOperationTimeLimit,
     BitrixAPIOverloadLimit,
     BitrixAPIQueryLimitExceeded,
     BitrixAPIServiceUnavailable,
+    BitrixAPITooManyRequests,
     BitrixAPIUnauthorized,
     BitrixAPIUserAccessError,
     BitrixAPIWrongAuthType,
@@ -43,6 +45,10 @@ from ....error import (
 )
 from ....error.v3 import BitrixAPIError as BitrixAPIErrorV3
 from ....utils.types import JSONDict
+
+__all__ = [
+    "parse_response",
+]
 
 _EXCEPTIONS_BY_ERROR: Dict[Text, Type[BitrixAPIError]] = {
     # 200
@@ -76,6 +82,8 @@ _EXCEPTIONS_BY_ERROR: Dict[Text, Type[BitrixAPIError]] = {
     # 500
     "ERROR_UNEXPECTED_ANSWER": BitrixAPIErrorUnexpectedAnswer,
     "INTERNAL_SERVER_ERROR": BitrixAPIInternalServerError,
+    # 429
+    "OPERATION_TIME_LIMIT": BitrixAPIOperationTimeLimit,
     # 503
     "OVERLOAD_LIMIT": BitrixAPIOverloadLimit,
     "QUERY_LIMIT_EXCEEDED": BitrixAPIQueryLimitExceeded,
@@ -88,6 +96,7 @@ _EXCEPTIONS_BY_STATUS_CODE: Dict[int, Type[BitrixAPIError]] = {
     403: BitrixAPIForbidden,
     404: BitrixAPINotFound,
     405: BitrixAPIMethodNotAllowed,
+    429: BitrixAPITooManyRequests,
     500: BitrixAPIInternalServerError,
     503: BitrixAPIServiceUnavailable,
 }
@@ -133,7 +142,7 @@ def parse_response(response: requests.Response) -> JSONDict:
                 _EXCEPTIONS_BY_JSON_DECODE_RESPONSE_STATUS_CODE.get(response.status_code)
                 or BitrixResponseJSONDecodeError
         )
-        raise exception_class(original_error=error, response=response) from error
+        raise exception_class(response=response) from error
 
     try:
         response.raise_for_status()

@@ -13,6 +13,10 @@ from ...utils.types import DefaultTimeout, JSONDict, Number, Timeout
 from ...version import SDK_VERSION
 from ._utils import parse_response
 
+__all__ = [
+    "BaseRequester",
+]
+
 
 class BaseRequester(ABC):
     """"""

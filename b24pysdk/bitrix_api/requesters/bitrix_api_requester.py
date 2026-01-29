@@ -6,6 +6,10 @@ from ...error import BitrixRequestError, BitrixRequestTimeout
 from ...utils.types import JSONDict, Number, Timeout
 from ._base_requester import BaseRequester
 
+__all__ = [
+    "BitrixAPIRequester",
+]
+
 
 class BitrixAPIRequester(BaseRequester):
     """"""

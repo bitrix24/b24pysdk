@@ -8,6 +8,10 @@ from .abstract_bitrix_api_request import AbstractBitrixAPIRequest
 if TYPE_CHECKING:
     from ..responses import BitrixAPITimeResponse
 
+__all__ = [
+    "BitrixAPIListFastRequest",
+    "BitrixAPIListRequest",
+]
 
 _BALRPT = TypeVar("_BALRPT", bound=BitrixAPIListResponse)
 

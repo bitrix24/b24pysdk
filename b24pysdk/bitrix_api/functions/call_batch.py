@@ -8,6 +8,10 @@ from ...utils.types import B24APIVersionLiteral, B24Requests, B24RequestTuple, J
 from ._base_caller import BaseCaller
 from .call_method import call_method
 
+__all__ = [
+    "call_batch",
+]
+
 
 class _BatchCaller(BaseCaller):
     """"""

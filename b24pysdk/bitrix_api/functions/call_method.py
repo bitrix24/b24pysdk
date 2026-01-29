@@ -6,6 +6,10 @@ from ...utils.types import B24APIVersionLiteral, JSONDict, Timeout
 from ._base_caller import BaseCaller
 from .call import call
 
+__all__ = [
+    "call_method",
+]
+
 
 class _MethodCaller(BaseCaller):
     """"""
