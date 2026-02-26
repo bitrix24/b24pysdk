@@ -7,7 +7,6 @@ __all__ = [
 ]
 
 
-# noinspection PyPep8Naming
 class classproperty:  # noqa: N801
     """
     Decorator that converts a method with a single cls argument into a property
@@ -44,7 +43,7 @@ class classproperty:  # noqa: N801
 _FT = typing.TypeVar("_FT", bound=typing.Callable[..., typing.Any])
 
 
-class _TypeChecker:
+class _TypeChecker(typing.Generic[_FT]):
     """
     Callable class that enforces runtime type checking for function arguments.
     Supports Annotated types with type-based metadata constraints.
@@ -53,6 +52,8 @@ class _TypeChecker:
     _HandlerType = typing.Callable[[typing.Any, typing.Type, typing.Text], bool]
 
     __slots__ = ("_func",)
+
+    _func: _FT
 
     def __init__(self, func: _FT):
         self._func = func
@@ -72,7 +73,7 @@ class _TypeChecker:
         """Check argument types and call the wrapped function."""
 
         for index, arg in enumerate(args):
-            param_name = self._func.__code__.co_varnames[index]
+            param_name = self._func.__code__.co_varnames[index]  # type: ignore[attr-defined]
             self._check_param(arg, param_name)
 
         for param_name, arg in kwargs.items():

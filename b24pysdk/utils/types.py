@@ -121,7 +121,7 @@ class B24Bool:
     __B24_FALSE: B24BoolLiteral = "N"
     __B24_TRUE: B24BoolLiteral = "Y"
 
-    _B24_BOOL_VALUES: typing.ClassVar[typing.Dict[typing.Optional[bool], B24BoolLiteral]] = {
+    _B24_BOOL_VALUES: typing.ClassVar[typing.Dict[typing.Optional[bool], typing.Text]] = {
         None: __B24_DEFAULT,
         False: __B24_FALSE,
         True: __B24_TRUE,
@@ -176,10 +176,10 @@ class B24Bool:
 
         if isinstance(value, cls):
             return value._value
-        
+
         elif value is None or value == cls.__B24_DEFAULT:
             return None
-        
+
         elif value is False or value == cls.__B24_FALSE:
             return False
 
@@ -196,7 +196,7 @@ class B24Bool:
 
     def to_b24(self) -> B24BoolLiteral:
         """Convert the internal boolean to a B24-compatible literal."""
-        return self._B24_BOOL_VALUES[self._value]
+        return typing.cast("B24BoolLiteral", self._B24_BOOL_VALUES[self._value])
 
 
 class B24BoolStrict(B24Bool):
@@ -205,7 +205,7 @@ class B24BoolStrict(B24Bool):
     __B24_FALSE: B24BoolStrictLiteral = "N"
     __B24_TRUE: B24BoolStrictLiteral = "Y"
 
-    _B24_BOOL_VALUES: typing.ClassVar[typing.Dict[bool, B24BoolStrictLiteral]] = {
+    _B24_BOOL_VALUES: typing.ClassVar[typing.Dict[bool, typing.Text]] = {
         False: __B24_FALSE,
         True: __B24_TRUE,
     }
@@ -340,7 +340,7 @@ class B24BoolStrict(B24Bool):
 
         if isinstance(value, cls):
             return value._value
-        
+
         elif value is False or value == cls.__B24_FALSE:
             return False
 
@@ -373,7 +373,7 @@ class B24BoolStrict(B24Bool):
 
     def to_b24(self) -> B24BoolStrictLiteral:
         """"""
-        return typing.cast(B24BoolStrictLiteral, super().to_b24())
+        return typing.cast("B24BoolStrictLiteral", super().to_b24())
 
 
 class DocumentType(tuple):

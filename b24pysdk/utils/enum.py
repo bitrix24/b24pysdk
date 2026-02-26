@@ -1,14 +1,14 @@
 import enum as _enum
 import typing
 
-from .._constants import PYTHON_VERSION as _PV
+from .. import _constants
 
 __all__ = [
     "IntEnum",
     "StrEnum",
 ]
 
-if _PV >= (3, 11):
+if _constants.PYTHON_VERSION >= (3, 11):
     IntEnum = _enum.IntEnum
 else:
     class IntEnum(_enum.IntEnum):
@@ -17,8 +17,7 @@ else:
         def __str__(self) -> typing.Text:
             return str(self.value)
 
-
-if _PV >= (3, 11):
+if _constants.PYTHON_VERSION >= (3, 11):
     StrEnum = _enum.StrEnum
 else:
     class StrEnum(str, _enum.Enum):
