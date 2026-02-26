@@ -2,7 +2,7 @@ import threading
 import typing
 from datetime import date, datetime, timezone, tzinfo
 
-from .constants import DEFAULT_INITIAL_RETRY_DELAY, DEFAULT_MAX_RETRIES, DEFAULT_RETRY_DELAY_INCREMENT, DEFAULT_TIMEOUT
+from .constants import DEFAULT_CONNECTION_TIMEOUT, DEFAULT_INITIAL_RETRY_DELAY, DEFAULT_MAX_RETRIES, DEFAULT_READ_TIMEOUT, DEFAULT_RETRY_DELAY_INCREMENT
 from .constants.version import API_V3_METHODS
 from .log import AbstractLogger, NullLogger
 from .utils.types import DefaultTimeout, Number, Timeout
@@ -11,46 +11,50 @@ __all__ = [
     "Config",
 ]
 
+_TIMEOUT_TUPLE_LENGTH: typing.Final[int] = 2
+
 
 class _LocalConfig:
     """"""
 
     __slots__ = (
         "api_v3_methods",
+        "default_connection_timeout",
         "default_initial_retry_delay",
         "default_max_retries",
+        "default_read_timeout",
         "default_retry_delay_increment",
-        "default_timeout",
         "logger",
         "tz",
     )
 
     api_v3_methods: typing.Tuple[typing.Text, ...]
+    default_connection_timeout: typing.Optional[Number]
+    default_read_timeout: Number
     default_initial_retry_delay: Number
     default_max_retries: int
     default_retry_delay_increment: Number
-    default_timeout: DefaultTimeout
     logger: AbstractLogger
     tz: tzinfo
 
     def __init__(self):
         self.api_v3_methods = API_V3_METHODS
+        self.default_connection_timeout = DEFAULT_CONNECTION_TIMEOUT
+        self.default_read_timeout = DEFAULT_READ_TIMEOUT
         self.default_initial_retry_delay = DEFAULT_INITIAL_RETRY_DELAY
         self.default_max_retries = DEFAULT_MAX_RETRIES
         self.default_retry_delay_increment = DEFAULT_RETRY_DELAY_INCREMENT
-        self.default_timeout = DEFAULT_TIMEOUT
         self.logger = NullLogger()
+        self.tz = self.__get_default_tz()
 
-        self.__set_default_tz()
-
-    def __set_default_tz(self):
+    def __get_default_tz(self) -> tzinfo:
         try:
             tz = datetime.now().astimezone().tzinfo
         except OSError as error:
             self.logger.warning(
                 "Failed to detect system tzinfo, falling back to UTC",
                 context={
-                   "error": error,
+                    "error": error,
                 },
             )
             tz = timezone.utc
@@ -58,8 +62,7 @@ class _LocalConfig:
             if tz is None:
                 self.logger.warning("Failed to detect system tzinfo, falling back to UTC")
                 tz = timezone.utc
-
-        self.tz = tz
+        return tz
 
 
 class Config:
@@ -79,13 +82,15 @@ class Config:
 
         self._config = local_thread.config
 
-    def configure(
+    def configure(  # noqa: C901
             self,
             *,
             api_v3_methods: typing.Optional[typing.Iterable[typing.Text]] = None,
             default_initial_retry_delay: typing.Optional[Number] = None,
             default_max_retries: typing.Optional[int] = None,
             default_retry_delay_increment: typing.Optional[Number] = None,
+            default_connection_timeout: typing.Optional[Number] = None,
+            default_read_timeout: typing.Optional[Number] = None,
             default_timeout: Timeout = None,
             logger: typing.Optional[AbstractLogger] = None,
             log_level: typing.Optional[int] = None,
@@ -104,6 +109,12 @@ class Config:
 
         if default_retry_delay_increment is not None:
             self.default_retry_delay_increment = default_retry_delay_increment
+
+        if default_connection_timeout is not None:
+            self.default_connection_timeout = default_connection_timeout
+
+        if default_read_timeout is not None:
+            self.default_read_timeout = default_read_timeout
 
         if default_timeout is not None:
             self.default_timeout = default_timeout
@@ -154,16 +165,74 @@ class Config:
         self._config.default_retry_delay_increment = value
 
     @property
+    def default_connection_timeout(self) -> typing.Optional[Number]:
+        """Connection timeout in seconds (None to use only read timeout)"""
+        return self._config.default_connection_timeout
+
+    @default_connection_timeout.setter
+    def default_connection_timeout(self, value: typing.Optional[Number]):
+        """Set connection timeout"""
+        if value is not None and not (isinstance(value, (int, float)) and value > 0):
+            raise ValueError("Connection timeout must be a positive number or None")
+        self._config.default_connection_timeout = value
+
+    @property
+    def default_read_timeout(self) -> Number:
+        """Read timeout in seconds"""
+        return self._config.default_read_timeout
+
+    @default_read_timeout.setter
+    def default_read_timeout(self, value: Number):
+        """Set read timeout"""
+        if not (isinstance(value, (int, float)) and value > 0):
+            raise ValueError("Read timeout must be a positive number")
+        self._config.default_read_timeout = value
+
+    @property
     def default_timeout(self) -> DefaultTimeout:
-        """Default timeout for API calls"""
-        return self._config.default_timeout
+        """Default timeout for API calls.
+
+        Returns:
+            - (connection_timeout, read_timeout) if connection_timeout is set
+            - read_timeout if connection_timeout is None
+        """
+        if self._config.default_connection_timeout is not None:
+            return self._config.default_connection_timeout, self._config.default_read_timeout
+        return self._config.default_read_timeout
 
     @default_timeout.setter
     def default_timeout(self, value: DefaultTimeout):
-        """"""
-        if not (isinstance(value, (int, float)) and value > 0):
-            raise ValueError("Default_timeout must be a positive number or a tuple of two positive numbers (connect_timeout, read_timeout)")
-        self._config.default_timeout = value
+        """Set timeout (can be a number or tuple)"""
+
+        if isinstance(value, (int, float)):
+            if value <= 0:
+                raise ValueError("Timeout must be a positive number")
+
+            self._config.default_connection_timeout = None
+            self._config.default_read_timeout = value
+
+        elif isinstance(value, tuple):
+            if len(value) != _TIMEOUT_TUPLE_LENGTH:
+                raise ValueError(
+                    "Timeout tuple must contain exactly two values: "
+                    "(connect_timeout, read_timeout)",
+                )
+
+            connect_timeout, read_timeout = value
+
+            if connect_timeout is not None and not (isinstance(connect_timeout, (int, float)) and connect_timeout > 0):
+                raise ValueError("Connection timeout must be a positive number or None")
+
+            if not (isinstance(read_timeout, (int, float)) and read_timeout > 0):
+                raise ValueError("Read timeout must be a positive number")
+
+            self._config.default_connection_timeout = connect_timeout
+            self._config.default_read_timeout = read_timeout
+
+        else:
+            raise TypeError(
+                "Timeout must be a positive number or a tuple of (connect_timeout, read_timeout)",
+            )
 
     @property
     def logger(self) -> AbstractLogger:
@@ -221,12 +290,12 @@ class Config:
         if not isinstance(value, typing.Iterable):
             raise TypeError("api_v3_methods must be an iterable of strings")
 
-        methods = value if isinstance(value, tuple) else tuple(value)
+        api_v3_methods = value if isinstance(value, tuple) else tuple(value)
 
-        if not all(isinstance(method, str) for method in methods):
+        if not all(isinstance(api_v3_method, str) for api_v3_method in api_v3_methods):
             raise TypeError("All api_v3_methods entries must be strings")
 
-        self._config.api_v3_methods = methods
+        self._config.api_v3_methods = api_v3_methods
 
     def is_api_v3_method(self, api_method: typing.Text) -> bool:
         """"""

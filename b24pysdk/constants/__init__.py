@@ -4,15 +4,15 @@ from ..utils import enum as _enum
 from ..utils import types as _types
 
 __all__ = [
+    "DEFAULT_CONNECTION_TIMEOUT",
     "DEFAULT_INITIAL_RETRY_DELAY",
     "DEFAULT_MAX_RETRIES",
+    "DEFAULT_READ_TIMEOUT",
     "DEFAULT_RETRY_DELAY_INCREMENT",
-    "DEFAULT_TIMEOUT",
     "B24AppStatus",
     "B24BoolLit",
     "Protocol",
 ]
-
 
 DEFAULT_INITIAL_RETRY_DELAY: typing.Final[_types.Number] = 1
 """"""
@@ -20,10 +20,13 @@ DEFAULT_INITIAL_RETRY_DELAY: typing.Final[_types.Number] = 1
 DEFAULT_MAX_RETRIES: typing.Final[int] = 3
 """"""
 
-DEFAULT_RETRY_DELAY_INCREMENT: typing.Final[_types.Number] = 0
+DEFAULT_RETRY_DELAY_INCREMENT: typing.Final[_types.Number] = 1
 """"""
 
-DEFAULT_TIMEOUT: typing.Final[_types.DefaultTimeout] = 10
+DEFAULT_CONNECTION_TIMEOUT: typing.Final[_types.Number] = 3.05
+"""https://requests.readthedocs.io/en/latest/user/advanced/#timeouts"""
+
+DEFAULT_READ_TIMEOUT: typing.Final[_types.Number] = 10
 """"""
 
 
