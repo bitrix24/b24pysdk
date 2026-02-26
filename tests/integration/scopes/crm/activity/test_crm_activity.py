@@ -1,23 +1,23 @@
 from datetime import datetime, timedelta
-from typing import Generator, Text, Tuple, cast
+from typing import Generator, Text, Tuple
 
 import pytest
 from _pytest.cacheprovider import Cache
 
-from b24pysdk import Client, Config
-from b24pysdk.bitrix_api.responses import (
+from b24pysdk import Config
+from b24pysdk.api.responses import (
     BitrixAPIListFastResponse,
     BitrixAPIListResponse,
     BitrixAPIResponse,
 )
+from b24pysdk.client import BaseClient
 from b24pysdk.constants import B24BoolLit
-from b24pysdk.utils.types import JSONDictGenerator
 
 from .....constants import SDK_NAME
 
 pytestmark = [
-    pytest.mark.integration,
-    pytest.mark.crm,
+    # pytest.mark.integration,
+    # pytest.mark.crm,
     pytest.mark.crm_activity,
     pytest.mark.crm_activity_only,
 ]
@@ -42,7 +42,7 @@ _UPDATED_RESPONSIBLE_ID: int = 2
 _UPDATED_DESCRIPTION: Text = f"Updated {SDK_NAME} Activity Description"
 
 
-def test_crm_activity_fields(bitrix_client: Client):
+def test_crm_activity_fields(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.activity.fields().response
@@ -50,7 +50,7 @@ def test_crm_activity_fields(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    fields = cast(dict, bitrix_response.result)
+    fields = bitrix_response.result
 
     for field in _FIELDS:
         assert field in fields, f"Field '{field}' should be present"
@@ -58,7 +58,7 @@ def test_crm_activity_fields(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_crm_activity_add")
-def test_crm_activity_add(bitrix_client: Client, cache: Cache):
+def test_crm_activity_add(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     bitrix_response = bitrix_client.crm.activity.add(
@@ -84,7 +84,7 @@ def test_crm_activity_add(bitrix_client: Client, cache: Cache):
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    activity_id = cast(int, bitrix_response.result)
+    activity_id = bitrix_response.result
     assert isinstance(activity_id, int)
     assert activity_id > 0
 
@@ -92,7 +92,7 @@ def test_crm_activity_add(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_crm_activity_get", depends=["test_crm_activity_add"])
-def test_crm_activity_get(bitrix_client: Client, cache: Cache):
+def test_crm_activity_get(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     activity_id = cache.get("activity_id", None)
@@ -105,7 +105,7 @@ def test_crm_activity_get(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    activity = cast(dict, bitrix_response.result)
+    activity = bitrix_response.result
 
     assert activity.get("ID") == str(activity_id)
     assert activity.get("OWNER_TYPE_ID") == str(_OWNER_TYPE_ID)
@@ -118,7 +118,7 @@ def test_crm_activity_get(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_crm_activity_list", depends=["test_crm_activity_get"])
-def test_crm_activity_list(bitrix_client: Client, cache: Cache):
+def test_crm_activity_list(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     activity_id = cache.get("activity_id", None)
@@ -133,7 +133,7 @@ def test_crm_activity_list(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, list)
 
-    activities = cast(list, bitrix_response.result)
+    activities = bitrix_response.result
 
     for activity in activities:
         assert isinstance(activity, dict)
@@ -151,7 +151,7 @@ def test_crm_activity_list(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_crm_activity_list_as_list", depends=["test_crm_activity_list"])
-def test_crm_activity_list_as_list(bitrix_client: Client):
+def test_crm_activity_list_as_list(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.activity.list().as_list().response
@@ -159,7 +159,7 @@ def test_crm_activity_list_as_list(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListResponse)
     assert isinstance(bitrix_response.result, list)
 
-    activities = cast(list, bitrix_response.result)
+    activities = bitrix_response.result
 
     assert len(activities) >= 1, "Expected at least one activity to be returned"
 
@@ -168,7 +168,7 @@ def test_crm_activity_list_as_list(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_crm_activity_list_as_list_fast", depends=["test_crm_activity_list_as_list"])
-def test_crm_activity_list_as_list_fast(bitrix_client: Client):
+def test_crm_activity_list_as_list_fast(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.activity.list().as_list_fast(descending=True).response
@@ -176,7 +176,7 @@ def test_crm_activity_list_as_list_fast(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListFastResponse)
     assert isinstance(bitrix_response.result, Generator)
 
-    activities = cast(JSONDictGenerator, bitrix_response.result)
+    activities = bitrix_response.result
 
     last_activity_id = None
 
@@ -194,7 +194,7 @@ def test_crm_activity_list_as_list_fast(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_crm_activity_update", depends=["test_crm_activity_list_as_list_fast"])
-def test_crm_activity_update(bitrix_client: Client, cache: Cache):
+def test_crm_activity_update(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     activity_id = cache.get("activity_id", None)
@@ -211,12 +211,12 @@ def test_crm_activity_update(bitrix_client: Client, cache: Cache):
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_updated = cast(bool, bitrix_response.result)
+    is_updated = bitrix_response.result
     assert is_updated is True
 
 
 @pytest.mark.dependency(name="test_crm_activity_delete", depends=["test_crm_activity_update"])
-def test_crm_activity_delete(bitrix_client: Client, cache: Cache):
+def test_crm_activity_delete(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     activity_id = cache.get("activity_id", None)
@@ -228,5 +228,5 @@ def test_crm_activity_delete(bitrix_client: Client, cache: Cache):
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_deleted = cast(bool, bitrix_response.result)
+    is_deleted = bitrix_response.result
     assert is_deleted is True

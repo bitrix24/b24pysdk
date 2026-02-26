@@ -1,6 +1,6 @@
 from typing import Optional
 
-from ...bitrix_api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
 from .._base_entity import BaseEntity
@@ -39,7 +39,7 @@ class Userfield(BaseEntity):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "fields": fields,
         }
 
@@ -75,7 +75,7 @@ class Userfield(BaseEntity):
             Instance of BitrixAPIRequest
         """
 
-        params = dict()
+        params: JSONDict = {}
 
         if order is not None:
             params["order"] = order
@@ -115,7 +115,7 @@ class Userfield(BaseEntity):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "fields": fields,
         }
@@ -149,7 +149,7 @@ class Userfield(BaseEntity):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 

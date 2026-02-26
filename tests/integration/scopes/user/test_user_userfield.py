@@ -1,15 +1,16 @@
-from typing import Generator, Text, cast
+from typing import Generator, Text
 
 import pytest
 from _pytest.cacheprovider import Cache
 
-from b24pysdk import Client, Config
-from b24pysdk.bitrix_api.responses import BitrixAPIListFastResponse, BitrixAPIListResponse, BitrixAPIResponse
+from b24pysdk import Config
+from b24pysdk.api.responses import BitrixAPIListFastResponse, BitrixAPIListResponse, BitrixAPIResponse
+from b24pysdk.client import BaseClient
 from b24pysdk.constants import B24BoolLit
 from b24pysdk.constants.userfield import UserTypeID
-from b24pysdk.utils.types import JSONDict, JSONDictGenerator
+from b24pysdk.utils.types import JSONDict
 
-from ....constants import SDK_NAME
+from ....constants import SDK_NAME, SORT
 
 pytestmark = [
     pytest.mark.integration,
@@ -21,7 +22,7 @@ _USER_TYPE_ID: UserTypeID = UserTypeID.STRING
 _MULTIPLE: B24BoolLit = B24BoolLit.TRUE
 
 _XML_ID: Text = "123"
-_SORT: Text = "456"
+_SORT: int = SORT
 _MANDATORY: B24BoolLit = B24BoolLit.TRUE
 _SHOW_FILTER: B24BoolLit = B24BoolLit.TRUE
 _SHOW_IN_LIST: B24BoolLit = B24BoolLit.TRUE
@@ -36,7 +37,7 @@ _SETTINGS: JSONDict = {
 
 
 @pytest.mark.dependency(name="test_user_userfield_add")
-def test_user_userfield_add(bitrix_client: Client, cache: Cache):
+def test_user_userfield_add(bitrix_client: BaseClient, cache: Cache):
     """Test adding a new user field and ensuring the field is created successfully."""
 
     user_userfield_field_name = f"UF_USR_{SDK_NAME.upper()}_{int(Config().get_local_datetime().timestamp() * (10 ** 6))}"
@@ -52,7 +53,7 @@ def test_user_userfield_add(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, int)
 
-    user_userfield_id = cast(int, bitrix_response.result)
+    user_userfield_id = bitrix_response.result
 
     assert user_userfield_id > 0, "User field creation should return a positive ID"
 
@@ -61,7 +62,7 @@ def test_user_userfield_add(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_user_userfield_update", depends=["test_user_userfield_add"])
-def test_user_userfield_update(bitrix_client: Client, cache: Cache):
+def test_user_userfield_update(bitrix_client: BaseClient, cache: Cache):
     """Test updating a user field and ensuring updates are successful."""
 
     user_userfield_id = cache.get("user_userfield_id", None)
@@ -83,13 +84,13 @@ def test_user_userfield_update(bitrix_client: Client, cache: Cache):
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_updated = cast(bool, bitrix_response.result)
+    is_updated = bitrix_response.result
 
     assert is_updated is True, "User field update should return True"
 
 
 @pytest.mark.dependency(name="test_user_userfield_list", depends=["test_user_userfield_update"])
-def test_user_userfield_list(bitrix_client: Client, cache: Cache):
+def test_user_userfield_list(bitrix_client: BaseClient, cache: Cache):
     """Test retrieving user fields and ensuring we get the correct fields."""
 
     user_userfield_id = cache.get("user_userfield_id", None)
@@ -107,7 +108,7 @@ def test_user_userfield_list(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, list)
 
-    user_userfields = cast(list, bitrix_response.result)
+    user_userfields = bitrix_response.result
 
     assert len(user_userfields) == 1, "Expected one user field to be returned"
 
@@ -120,7 +121,7 @@ def test_user_userfield_list(bitrix_client: Client, cache: Cache):
     assert user_userfield.get("USER_TYPE_ID") == _USER_TYPE_ID, "User userfield USER_TYPE_ID does not match"
     assert user_userfield.get("MULTIPLE") == _MULTIPLE, "User userfield MULTIPLE does not match"
     assert user_userfield.get("XML_ID") == _XML_ID, "User userfield XML_ID does not match"
-    assert user_userfield.get("SORT") == _SORT, "User userfield SORT does not match"
+    assert user_userfield.get("SORT") == str(_SORT), "User userfield SORT does not match"
     # assert user_field.get("MANDATORY") == _MANDATORY, "User field MANDATORY does not match"
     # assert user_userfield.get("SHOW_FILTER") == _SHOW_FILTER, "User userfield SHOW_FILTER does not match"
     assert user_userfield.get("SHOW_IN_LIST") == _SHOW_IN_LIST, "User userfield SHOW_IN_LIST does not match"
@@ -129,14 +130,14 @@ def test_user_userfield_list(bitrix_client: Client, cache: Cache):
 
     assert isinstance(user_userfield.get("SETTINGS"), dict), "User userfield SETTINGS is not a dictionary"
 
-    user_userfield_settings = cast(dict, user_userfield["SETTINGS"])
+    user_userfield_settings = user_userfield["SETTINGS"]
 
     assert user_userfield_settings.get("DEFAULT_VALUE") == _SETTINGS_DEFAULT_VALUE, "User userfield SETTINGS DEFAULT_VALUE does not match"
     assert user_userfield_settings.get("ROWS") == _SETTINGS_ROWS, "User userfield SETTINGS ROWS does not match"
 
 
 @pytest.mark.dependency(name="test_user_userfield_list_as_list", depends=["test_user_userfield_update"])
-def test_user_userfield_list_as_list(bitrix_client: Client):
+def test_user_userfield_list_as_list(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.user.userfield.list().as_list().response
@@ -144,7 +145,7 @@ def test_user_userfield_list_as_list(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListResponse)
     assert isinstance(bitrix_response.result, list)
 
-    user_userfields = cast(list, bitrix_response.result)
+    user_userfields = bitrix_response.result
 
     assert len(user_userfields) >= 1, "Expected at least one user userfield to be returned"
 
@@ -153,7 +154,7 @@ def test_user_userfield_list_as_list(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_user_userfield_list_as_list_fast", depends=["test_user_userfield_update"])
-def test_user_userfield_list_as_list_fast(bitrix_client: Client):
+def test_user_userfield_list_as_list_fast(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.user.userfield.list().as_list_fast(descending=True).response
@@ -161,7 +162,7 @@ def test_user_userfield_list_as_list_fast(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListFastResponse)
     assert isinstance(bitrix_response.result, Generator)
 
-    user_userfields = cast(JSONDictGenerator, bitrix_response.result)
+    user_userfields = bitrix_response.result
 
     last_user_userfield_id = None
 
@@ -178,8 +179,8 @@ def test_user_userfield_list_as_list_fast(bitrix_client: Client):
             last_user_userfield_id = user_userfield_id
 
 
-@pytest.mark.dependency(name="test_user_userfield_delete", depends=["test_user_userfield_list_as_list_fast"])
-def test_user_userfield_delete(bitrix_client: Client, cache: Cache):
+@pytest.mark.dependency(name="test_user_userfield_delete", depends=["test_user_userfield_add"])
+def test_user_userfield_delete(bitrix_client: BaseClient, cache: Cache):
     """Test deleting a specific user field and ensuring the field is removed."""
 
     user_userfield_id = cache.get("user_userfield_id", None)
@@ -191,6 +192,6 @@ def test_user_userfield_delete(bitrix_client: Client, cache: Cache):
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_deleted = cast(bool, bitrix_response.result)
+    is_deleted = bitrix_response.result
 
     assert is_deleted is True, "User field deletion should return True"

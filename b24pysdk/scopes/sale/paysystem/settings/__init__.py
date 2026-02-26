@@ -1,17 +1,22 @@
 from functools import cached_property
 
-from .....bitrix_api.requests import BitrixAPIRequest
+from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
 from .....utils.types import JSONDict, Timeout
 from ...._base_entity import BaseEntity
+from .invoice import Invoice
 from .payment import Payment
 
-_all__ = [
+__all__ = [
     "Settings",
 ]
 
 
 class Settings(BaseEntity):
+
+    @cached_property
+    def invoice(self) -> Invoice:
+        return Invoice(self)
 
     @cached_property
     def payment(self) -> Payment:

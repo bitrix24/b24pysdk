@@ -1,7 +1,11 @@
 ### Running Tests
 
 ### Preparation
-1. Create a .env.local file with the following data(example values):
+1. Install dev dependencies:
+```bash
+pip install -r requirements-dev.txt
+```
+2. Create a .env.local file with the following data(example values):
 ```txt
 B24_DOMAIN=b24-e4f2d1.bitrix24.com
 B24_WEBHOOK=13/dd5w3aldjdu4twfk
@@ -14,6 +18,13 @@ B24_ACCESS_TOKEN=b0872d69007e1212107f3e254fb7f1gdsgdv11297667cf03e675caa
 B24_REFRESH_TOKEN=a00655dgghd5tfd25df256fd52e5f1f5d60d44b7bd193be0a98869
 B24_EXPIRES=2025-11-28 21:09:16+03:00
 B24_EXPIRES_IN=3600
+B24_EXPIRED_TOKEN=expired_token_value
+```
+3. (Optional) Create or update `tests/constants_local.py` to override local test constants:
+```python
+# Local overrides for user constants. 
+PROFILE_ONLY_WEBHOOK_TOKEN = "your_webhook_token"
+EVENT_HANDLER_URL = "http://localhost:8000"
 ```
 
 **Important Notes:**
@@ -22,14 +33,14 @@ B24_EXPIRES_IN=3600
 
 - Tests are designed assuming that the webhook/application token will have administrator privileges
 
-2. Run tests/application_bridge/index.py:
+4. Run tests/application_bridge/index.py:
     - In your IDE: Right-click on the file and select "Run"
     - Via command line:
     ```bash
     fastapi dev tests/application_bridge/index.py
     ```
-3. Navigate to the application whose data you specified in step 1, and set the `Handler URL` to `http://localhost:8000`.
-4. Launch the application. A file named `oauth_data.json` should appear in your `tests/` directory, containing:
+5. Navigate to the application whose data you specified in step 2, and set the `Handler URL` to `http://localhost:8000`.
+6. Launch the application. A file named `oauth_data.json` should appear in your `tests/` directory, containing:
 ```txt
 {
     "access_token": "",
@@ -84,7 +95,7 @@ The project defines a make target (`Makefile`) for running scope tests inside a 
   make test-integration-oauth
   ```
 
-- Execute all unit tests located in the `tests/integration/unit` directory:
+- Execute all unit tests located in the `tests/unit` directory:
   ```bash
   make test-unit
   ```

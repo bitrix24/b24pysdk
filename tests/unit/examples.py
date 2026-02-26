@@ -1,7 +1,7 @@
 import typing
 from unittest.mock import Mock
 
-from b24pysdk.bitrix_api.requests import BitrixAPIRequest
+from b24pysdk.api.requests import BitrixAPIRequest
 from b24pysdk.utils.types import JSONDict
 
 __all__ = [

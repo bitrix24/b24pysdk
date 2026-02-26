@@ -1,6 +1,6 @@
 from typing import Iterable, Optional, Text
 
-from ...bitrix_api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
 from ._base_biconnector import BaseBiconnector
@@ -62,7 +62,7 @@ class Connector(BaseBiconnector):
                     "field_n": "value_n",
                 };
 
-                timeout: Timeout in seconds.
+            timeout: Timeout in seconds.
 
         Returns:
             Instance of BitrixAPIRequest.

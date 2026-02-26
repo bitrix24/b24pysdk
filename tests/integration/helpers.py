@@ -2,8 +2,9 @@ import json
 from pathlib import Path
 from typing import Annotated, Literal, Text
 
-from b24pysdk import BitrixApp, BitrixToken, BitrixWebhook, Client
-from b24pysdk.bitrix_api.events import OAuthTokenRenewedEvent
+from b24pysdk.client import BaseClient, Client
+from b24pysdk.credentials import BitrixApp, BitrixToken, BitrixWebhook
+from b24pysdk.events import OAuthTokenRenewedEvent
 
 from ..constants import OAUTH_DATA_FILE
 from ..env_config import EnvConfig
@@ -25,7 +26,7 @@ def _save_token_to_oauth_json(event: OAuthTokenRenewedEvent):
         )
 
 
-def _make_client_from_webhook() -> Client:
+def _make_client_from_webhook() -> BaseClient:
     if not env_config.are_webhook_credentials_available:
         raise MissingCredentials(
             "Webhook requires: 'B24_DOMAIN' and 'B24_WEBHOOK'",
@@ -39,7 +40,7 @@ def _make_client_from_webhook() -> Client:
     return Client(webhook_token)
 
 
-def _make_client_from_oauth() -> Client:
+def _make_client_from_oauth() -> BaseClient:
     if not env_config.are_oauth_credentials_available:
         raise MissingCredentials(
             "OAuth requires: 'B24_DOMAIN', 'B24_CLIENT_ID', 'B24_CLIENT_SECRET', 'B24_ACCESS_TOKEN' and 'B24_REFRESH_TOKEN'",
@@ -64,7 +65,7 @@ def _make_client_from_oauth() -> Client:
     return Client(bitrix_token)
 
 
-def make_client_from_env(auth_type: Annotated[Text, Literal["webhook", "oauth"]]) -> Client:
+def make_client_from_env(auth_type: Annotated[Text, Literal["webhook", "oauth"]]) -> BaseClient:
     if auth_type == "webhook":
         return _make_client_from_webhook()
     elif auth_type == "oauth":

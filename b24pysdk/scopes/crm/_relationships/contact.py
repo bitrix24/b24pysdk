@@ -1,4 +1,4 @@
-from ....bitrix_api.requests import BitrixAPIRequest
+from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
 from .base_relationship import BaseRelationship

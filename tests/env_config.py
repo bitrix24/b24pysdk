@@ -80,7 +80,7 @@ class EnvConfig:
         oauth_data_file_path = Path(oauth_data_file)
 
         if oauth_data_file_path.exists():
-            with Path.open(oauth_data_file_path, "r", encoding="utf-8") as file:
+            with Path.open(oauth_data_file_path, encoding="utf-8") as file:
                 oauth_data = json.load(file)
 
                 access_token = self._validate_credential(oauth_data.get("access_token"), name="access_token")

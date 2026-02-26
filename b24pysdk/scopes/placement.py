@@ -1,6 +1,6 @@
 from typing import Optional, Text
 
-from ..bitrix_api.requests import BitrixAPIRequest
+from ..api.requests import BitrixAPIRequest
 from ..utils.functional import type_checker
 from ..utils.types import JSONDict, Timeout
 from ._base_scope import BaseScope
@@ -52,7 +52,7 @@ class Placement(BaseScope):
             Instance of BitrixAPIRequest.
         """
 
-        params = {
+        params: JSONDict = {
             "PLACEMENT": placement,
             "HANDLER": handler,
         }
@@ -127,7 +127,7 @@ class Placement(BaseScope):
             Instance of BitrixAPIRequest.
         """
 
-        params = dict()
+        params: JSONDict = {}
 
         if scope is not None:
             params["SCOPE"] = scope
@@ -162,7 +162,7 @@ class Placement(BaseScope):
             Instance of BitrixAPIRequest.
         """
 
-        params = {
+        params: JSONDict = {
             "PLACEMENT": placement,
         }
 

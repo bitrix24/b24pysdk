@@ -5,7 +5,7 @@ import uvicorn
 from fastapi import FastAPI, Request, status
 from fastapi.responses import FileResponse, JSONResponse
 
-from b24pysdk.bitrix_api.credentials import OAuthPlacementData
+from b24pysdk.credentials import OAuthPlacementData
 from tests.constants import OAUTH_DATA_FILE
 
 app = FastAPI()

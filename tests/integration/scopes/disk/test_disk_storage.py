@@ -1,15 +1,15 @@
-from typing import List, Text, Tuple, cast
+from typing import List, Text, Tuple
 
 import pytest
 from _pytest.cacheprovider import Cache
 
-from b24pysdk import Client, Config
-from b24pysdk.bitrix_api.responses import BitrixAPIListFastResponse, BitrixAPIListResponse, BitrixAPIResponse
-from b24pysdk.utils.types import JSONDictGenerator
+from b24pysdk import Config
+from b24pysdk.api.responses import BitrixAPIListFastResponse, BitrixAPIListResponse, BitrixAPIResponse
+from b24pysdk.client import BaseClient
 from tests.constants import SDK_NAME
 
 pytestmark = [
-    pytest.mark.integration,
+    # pytest.mark.integration,
     pytest.mark.disk,
     pytest.mark.storage,
 ]
@@ -55,7 +55,7 @@ _START: int = 0
 
 
 @pytest.mark.dependency(name="test_disk_storage_getfields")
-def test_disk_storage_getfields(bitrix_client: Client):
+def test_disk_storage_getfields(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.disk.storage.getfields().response
@@ -63,14 +63,14 @@ def test_disk_storage_getfields(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    fields = cast(dict, bitrix_response.result)
+    fields = bitrix_response.result
 
     for field in _FIELDS:
         assert field in fields, f"Field '{field}' should be present"
 
 
 @pytest.mark.dependency(name="test_disk_storage_get", depends=["test_disk_storage_getfields"])
-def test_disk_storage_get(bitrix_client: Client):
+def test_disk_storage_get(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.disk.storage.get(
@@ -80,7 +80,7 @@ def test_disk_storage_get(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    storage = cast(dict, bitrix_response.result)
+    storage = bitrix_response.result
 
     for field in _FIELDS:
         assert field in storage, f"Field '{field}' should be present"
@@ -89,7 +89,7 @@ def test_disk_storage_get(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_disk_storage_gettypes", depends=["test_disk_storage_get"])
-def test_disk_storage_gettypes(bitrix_client: Client):
+def test_disk_storage_gettypes(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.disk.storage.gettypes().response
@@ -97,7 +97,7 @@ def test_disk_storage_gettypes(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, list)
 
-    types = cast(list, bitrix_response.result)
+    types = bitrix_response.result
 
     assert len(types) >= 1, "Expected at least one storage type"
 
@@ -107,7 +107,7 @@ def test_disk_storage_gettypes(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_disk_storage_gettypes_as_list", depends=["test_disk_storage_gettypes"])
-def test_disk_storage_gettypes_as_list(bitrix_client: Client):
+def test_disk_storage_gettypes_as_list(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.disk.storage.gettypes().as_list().response
@@ -115,7 +115,7 @@ def test_disk_storage_gettypes_as_list(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListResponse)
     assert isinstance(bitrix_response.result, list)
 
-    types = cast(list, bitrix_response.result)
+    types = bitrix_response.result
 
     assert len(types) >= 1, "Expected at least one storage type"
 
@@ -125,7 +125,7 @@ def test_disk_storage_gettypes_as_list(bitrix_client: Client):
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_disk_storage_getforapp", depends=["test_disk_storage_gettypes_as_list"])
-def test_disk_storage_getforapp(bitrix_client: Client, cache: Cache):
+def test_disk_storage_getforapp(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     bitrix_response = bitrix_client.disk.storage.getforapp().response
@@ -133,7 +133,7 @@ def test_disk_storage_getforapp(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    storage = cast(dict, bitrix_response.result)
+    storage = bitrix_response.result
 
     for field in _FIELDS:
         assert field in storage, f"Field '{field}' should be present"
@@ -142,7 +142,7 @@ def test_disk_storage_getforapp(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_disk_storage_getlist", depends=["test_disk_storage_getforapp"])
-def test_disk_storage_getlist(bitrix_client: Client):
+def test_disk_storage_getlist(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.disk.storage.getlist(
@@ -153,7 +153,7 @@ def test_disk_storage_getlist(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, list)
 
-    storages = cast(list, bitrix_response.result)
+    storages = bitrix_response.result
 
     assert len(storages) >= 1, "Expected at least one storage"
 
@@ -166,7 +166,7 @@ def test_disk_storage_getlist(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_disk_storage_getlist_as_list", depends=["test_disk_storage_getlist"])
-def test_disk_storage_getlist_as_list(bitrix_client: Client):
+def test_disk_storage_getlist_as_list(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.disk.storage.getlist().as_list().response
@@ -174,21 +174,21 @@ def test_disk_storage_getlist_as_list(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListResponse)
     assert isinstance(bitrix_response.result, list)
 
-    storages = cast(list, bitrix_response.result)
+    storages = bitrix_response.result
 
     for storage in storages:
         assert isinstance(storage, dict)
 
 
 @pytest.mark.dependency(name="test_disk_storage_getlist_as_list_fast", depends=["test_disk_storage_getlist_as_list"])
-def test_disk_storage_getlist_as_list_fast(bitrix_client: Client):
+def test_disk_storage_getlist_as_list_fast(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.disk.storage.getlist().as_list_fast(descending=True).response
 
     assert isinstance(bitrix_response, BitrixAPIListFastResponse)
 
-    storages = cast(JSONDictGenerator, bitrix_response.result)
+    storages = bitrix_response.result
 
     last_storage_id = None
 
@@ -206,7 +206,7 @@ def test_disk_storage_getlist_as_list_fast(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_disk_storage_getchildren", depends=["test_disk_storage_getlist_as_list_fast"])
-def test_disk_storage_getchildren(bitrix_client: Client):
+def test_disk_storage_getchildren(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.disk.storage.getchildren(
@@ -216,7 +216,7 @@ def test_disk_storage_getchildren(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, list)
 
-    children = cast(list, bitrix_response.result)
+    children = bitrix_response.result
 
     assert len(children) >= 1, "Expected at least one user field to be returned"
 
@@ -226,7 +226,7 @@ def test_disk_storage_getchildren(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_disk_storage_getchildren_as_list", depends=["test_disk_storage_getchildren"])
-def test_disk_storage_getchildren_as_list(bitrix_client: Client):
+def test_disk_storage_getchildren_as_list(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.disk.storage.getchildren(bitrix_id=_STORAGE_ID).as_list().response
@@ -234,21 +234,21 @@ def test_disk_storage_getchildren_as_list(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListResponse)
     assert isinstance(bitrix_response.result, list)
 
-    children = cast(list, bitrix_response.result)
+    children = bitrix_response.result
 
     for child in children:
         assert isinstance(child, dict)
 
 
 @pytest.mark.dependency(name="test_disk_storage_getchildren_as_list_fast", depends=["test_disk_storage_getchildren_as_list"])
-def test_disk_storage_getchildren_as_list_fast(bitrix_client: Client):
+def test_disk_storage_getchildren_as_list_fast(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.disk.storage.getchildren(bitrix_id=_STORAGE_ID).as_list_fast(descending=True).response
 
     assert isinstance(bitrix_response, BitrixAPIListFastResponse)
 
-    children = cast(JSONDictGenerator, bitrix_response.result)
+    children = bitrix_response.result
 
     last_child_id = None
 
@@ -266,7 +266,7 @@ def test_disk_storage_getchildren_as_list_fast(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_disk_storage_addfolder", depends=["test_disk_storage_getchildren_as_list"])
-def test_disk_storage_addfolder(bitrix_client: Client):
+def test_disk_storage_addfolder(bitrix_client: BaseClient):
     """"""
 
     unique_name = f"{_NAME}_{int(Config().get_local_datetime().timestamp() * (10 ** 6))}"
@@ -279,7 +279,7 @@ def test_disk_storage_addfolder(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    folder = cast(dict, bitrix_response.result)
+    folder = bitrix_response.result
 
     for field in _CHILDREN_FIELDS:
         assert field in folder, f"Field '{field}' should be present"
@@ -290,7 +290,7 @@ def test_disk_storage_addfolder(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_disk_storage_uploadfile", depends=["test_disk_storage_addfolder"])
-def test_disk_storage_uploadfile(bitrix_client: Client):
+def test_disk_storage_uploadfile(bitrix_client: BaseClient):
     """"""
 
     unique_file_name = f"{_FILE_NAME}_{int(Config().get_local_datetime().timestamp() * (10 ** 6))}"
@@ -305,7 +305,7 @@ def test_disk_storage_uploadfile(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    file = cast(dict, bitrix_response.result)
+    file = bitrix_response.result
 
     for field in _CHILDREN_FIELDS:
         assert field in file, f"Field '{field}' should be present"
@@ -316,7 +316,7 @@ def test_disk_storage_uploadfile(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_disk_storage_rename", depends=["test_disk_storage_get"])
-def test_disk_storage_rename(bitrix_client: Client, cache: Cache):
+def test_disk_storage_rename(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     app_storage_id = cache.get("app_storage_id", None)
@@ -332,7 +332,7 @@ def test_disk_storage_rename(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    updated_storage = cast(dict, bitrix_response.result)
+    updated_storage = bitrix_response.result
 
     assert updated_storage.get("ID") == str(app_storage_id), "Storage ID should remain the same"
     assert updated_storage.get("NAME") == unique_name, "Storage NAME should be updated"

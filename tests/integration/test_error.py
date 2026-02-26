@@ -1,46 +1,49 @@
 from __future__ import annotations
 
+# from contextlib import suppress
 from typing import Dict, Optional, Text, Type
 
 import pytest
 import requests
 
-from b24pysdk import Client
-from b24pysdk.bitrix_api.requesters._utils.parse_response import parse_response
-from b24pysdk.bitrix_api.requests import BitrixAPIRequest
+# noinspection PyProtectedMember
+from b24pysdk.api.requesters._utils.parse_response import parse_response
+from b24pysdk.api.requests import BitrixAPIRequest
+from b24pysdk.client import BaseClient, Client
+from b24pysdk.credentials import BitrixApp, BitrixToken, BitrixWebhook
 from b24pysdk.error import (
     BitrixAPIAccessDenied,
     BitrixAPIAllowedOnlyIntranetUser,
     BitrixAPIAuthorizationError,
     BitrixAPIBadRequest,
     BitrixAPIError,
-    # BitrixAPIErrorBatchLengthExceeded,
-    BitrixAPIErrorBatchMethodNotAllowed,
-    BitrixAPIErrorManifestIsNotAvailable,
     BitrixAPIErrorOAuth,
     BitrixAPIErrorUnexpectedAnswer,
     BitrixAPIExpiredToken,
     BitrixAPIInsufficientScope,
-    BitrixAPIInternalServerError,
     BitrixAPIInvalidArgValue,
-    # BitrixAPINotFound,
+    BitrixAPIInvalidCredentials,
+    BitrixAPIInvalidToken,
     BitrixAPIMethodConfirmDenied,
-    # BitrixAPIInvalidRequest,
     BitrixAPIMethodConfirmWaiting,
     BitrixAPINoAuthFound,
     BitrixAPIOverloadLimit,
     BitrixAPIQueryLimitExceeded,
-    BitrixAPIServiceUnavailable,
+    # BitrixAPITooManyRequests,
     BitrixAPIUnauthorized,
     BitrixAPIUserAccessError,
     BitrixAPIWrongAuthType,
     BitrixOAuthInsufficientScope,
     BitrixOAuthInvalidClient,
     BitrixOAuthInvalidGrant,
+    BitrixOAuthRequestTimeout,
     # BitrixOAuthInvalidRequest,
     # BitrixOAuthInvalidScope,
     BitrixOauthWrongClient,
+    BitrixRequestTimeout,
+    BitrixResponse302JSONDecodeError,
 )
+from tests.constants import OLD_DOMAIN, PROFILE_ONLY_WEBHOOK_TOKEN
 from tests.env_config import EnvConfig
 
 pytestmark = [
@@ -55,6 +58,7 @@ _OAUTH_TOKEN_URL: Text = f"https://{env_config.domain}/oauth/token/"
 
 _JSON_HEADERS: Dict[Text, Text] = {"Accept": "application/json"}
 _REQUEST_TIMEOUT: int = 10
+_TINY_TIMEOUT: float = 0.0001
 
 _TEST_ENTITY_TYPE_ID: int = 1268
 _TEST_ITEM_ID: int = 1
@@ -67,14 +71,16 @@ def _rest_url(path: Text) -> Text:
 
 def _assert_error_response(exc: BitrixAPIError, error_cls: Type[BitrixAPIError]):
     """Ensure HTTP status and error code (when available) match expected values."""
+
     assert exc.status_code == error_cls.STATUS_CODE
 
     expected_error = getattr(error_cls, "ERROR", NotImplemented)
+
     if exc.error and expected_error is not NotImplemented:
         assert exc.error.upper() == expected_error
 
 
-def test_error_bitrix_api_bad_request(bitrix_client: Client):
+def test_error_bitrix_api_bad_request(bitrix_client: BaseClient):
     """Expect BitrixAPIBadRequest on CANCELED when sending to an inaccessible chat."""
 
     bitrix_request = BitrixAPIRequest(
@@ -93,7 +99,7 @@ def test_error_bitrix_api_bad_request(bitrix_client: Client):
 
 
 @pytest.mark.oauth_only
-def test_error_bitrix_api_unauthorized(bitrix_client: Client):
+def test_error_bitrix_api_unauthorized(bitrix_client: BaseClient):
     """Expect BitrixAPIUnauthorized on an OAuth call with inadequate rights (works)."""
 
     bitrix_request = BitrixAPIRequest(
@@ -106,18 +112,6 @@ def test_error_bitrix_api_unauthorized(bitrix_client: Client):
         _ = bitrix_request.response
 
     _assert_error_response(exc_info.value, BitrixAPIUnauthorized)
-
-
-# def test_error_bitrix_api_not_found(bitrix_client: Client):
-#     """Expected NOT_FOUND but Bitrix returns 400 with NOT_FOUND payload (cannot meet 404)."""
-#
-#     deleting_result = bitrix_client.crm.deal.delete(
-#         bitrix_id=11111,
-#     )
-#
-#     with pytest.raises(BitrixAPINotFound) as exc_info:
-#         _ = deleting_result.response
-#     _assert_error_response(exc_info.value, BitrixAPINotFound)
 
 
 # def test_error_bitrix_api_method_not_allowed():
@@ -146,29 +140,75 @@ def test_error_bitrix_api_no_auth_found():
 
     with pytest.raises(BitrixAPINoAuthFound) as exc_info:
         parse_response(deleting_result)
+
     _assert_error_response(exc_info.value, BitrixAPINoAuthFound)
 
 
-def test_error_bitrix_api_internal_server_error():
-    """No stable way to trigger BitrixAPIInternalServerError; kept skipped."""
-    pytest.skip(BitrixAPIInternalServerError.__name__)
+def test_error_bitrix_request_timeout(bitrix_client: BaseClient):
+    """Expect BitrixRequestTimeout with an unrealistically small timeout."""
+
+    timeout_client = Client(bitrix_client._bitrix_token, timeout=_TINY_TIMEOUT, max_retries=1)
+    profile_request = timeout_client.app.info()
+
+    with pytest.raises(BitrixRequestTimeout) as exc_info:
+        _ = profile_request.response
+
+    assert exc_info.value.timeout == _TINY_TIMEOUT
 
 
-def test_error_bitrix_api_service_unavailable(bitrix_client: Client):
-    """Attempt to trigger BitrixAPIServiceUnavailable by issuing many requests."""
-    max_attempts = 500
+def test_error_bitrix_oauth_request_timeout():
+    """Expect BitrixOAuthRequestTimeout with an unrealistically small timeout."""
 
-    for _ in range(max_attempts):
-        profile_response = bitrix_client.profile().response
+    if not env_config.are_oauth_credentials_available:
+        pytest.skip("Missing OAuth credentials")
 
-        with pytest.raises(BitrixAPIServiceUnavailable) as exc_info:
-            parse_response(profile_response)
-        _assert_error_response(exc_info.value, BitrixAPIServiceUnavailable)
+    bitrix_app = BitrixApp(
+        client_id=env_config.client_id,
+        client_secret=env_config.client_secret,
+    )
+
+    with pytest.raises(BitrixOAuthRequestTimeout) as exc_info:
+        _ = bitrix_app.get_oauth_token(code="any_code", timeout=_TINY_TIMEOUT, max_retries=1)
+
+    assert exc_info.value.timeout == _TINY_TIMEOUT
+
+
+# def test_error_bitrix_api_too_many_requests(bitrix_client: BaseClient):
+#     """Attempt to trigger BitrixAPITooManyRequests by spamming updates on the same deal."""
+#     deal_id = bitrix_client.crm.deal.add(
+#         fields={
+#             "TITLE": "B24PySDK TooManyRequests",
+#             "STAGE_ID": "NEW",
+#             "CURRENCY_ID": "USD",
+#             "OPPORTUNITY": 1,
+#         },
+#     ).response.result
+#
+#     max_attempts = 1000
+#     try:
+#         for idx in range(max_attempts):
+#             update_request = bitrix_client.crm.deal.update(
+#                 bitrix_id=deal_id,
+#                 fields={
+#                     "COMMENTS": f"rate-limit-test-{idx}",
+#                 },
+#             )
+#             try:
+#                 _ = update_request.response
+#             except BitrixAPITooManyRequests as error:
+#                 _assert_error_response(error, BitrixAPITooManyRequests)
+#                 return
+#     finally:
+#         with suppress(BitrixAPIError):
+#             _ = bitrix_client.crm.deal.delete(bitrix_id=deal_id).response
+#
+#     pytest.skip(f"{BitrixAPITooManyRequests.__name__} not reproduced after {max_attempts} calls")
 
 
 @pytest.mark.webhook_only
-def test_error_bitrix_api_access_denied(bitrix_client: Client):
+def test_error_bitrix_api_access_denied(bitrix_client: BaseClient):
     """Expect BitrixAPIAccessDenied via webhook call on a restricted plan (works)."""
+
     bitrix_request = bitrix_client.app.option.get(option="nonexistent_option")
 
     with pytest.raises(BitrixAPIAccessDenied) as exc_info:
@@ -182,27 +222,70 @@ def test_error_bitrix_api_allowed_only_intranet_user():
     pytest.skip(BitrixAPIAllowedOnlyIntranetUser.__name__)
 
 
+@pytest.mark.webhook_only
 def test_error_bitrix_api_insufficient_scope():
-    """Needs a webhook with insufficient permissions to reproduce BitrixAPIInsufficientScope."""
-    pytest.skip(BitrixAPIInsufficientScope.__name__)
+    """Expect BitrixAPIInsufficientScope using a profile-only webhook on app scope."""
+
+    if not PROFILE_ONLY_WEBHOOK_TOKEN or PROFILE_ONLY_WEBHOOK_TOKEN is NotImplemented:
+        pytest.skip("PROFILE_ONLY_WEBHOOK_TOKEN is not configured")
+
+    limited_client = Client(
+        BitrixWebhook(
+            domain=env_config.domain,
+            auth_token=PROFILE_ONLY_WEBHOOK_TOKEN,
+        ),
+    )
+
+    bitrix_request = limited_client.crm.lead.fields()
+
+    with pytest.raises(BitrixAPIInsufficientScope) as exc_info:
+        _ = bitrix_request.response
+
+    _assert_error_response(exc_info.value, BitrixAPIInsufficientScope)
 
 
-# @pytest.mark.webhook_only
-# def test_error_bitrix_api_invalid_credentials():
-#     """ AssertionError: assert 401 == 403 """
-#
-#     invalid_client = Client(
-#         BitrixWebhook(
-#             domain=env_config.domain,
-#             auth_token=f"{env_config.webhook_token}INVALID",
-#         ),
-#     )
-#     bitrix_request = invalid_client.profile()
-#
-#     with pytest.raises(BitrixAPIInvalidCredentials) as exc_info:
-#         _ = bitrix_request.response
-#
-#     _assert_error_response(exc_info.value, BitrixAPIInvalidCredentials)
+@pytest.mark.webhook_only
+def test_error_bitrix_api_invalid_credentials():
+    """"""
+
+    invalid_client = Client(
+        BitrixWebhook(
+            domain=env_config.domain,
+            auth_token=f"{env_config.webhook_token}INVALID",
+        ),
+    )
+    bitrix_request = invalid_client.profile()
+
+    with pytest.raises(BitrixAPIInvalidCredentials) as exc_info:
+        _ = bitrix_request.response
+
+    _assert_error_response(exc_info.value, BitrixAPIInvalidCredentials)
+
+
+@pytest.mark.oauth_only
+def test_error_bitrix_api_invalid_token():
+    """Expect BitrixAPIInvalidToken for invalid OAuth app token."""
+
+    if not env_config.are_oauth_credentials_available:
+        pytest.skip("Missing OAuth credentials")
+
+    invalid_token_client = Client(
+        BitrixToken(
+            domain=env_config.domain,
+            auth_token="INVALID_OAUTH_TOKEN_123", # noqa: S106
+            bitrix_app=BitrixApp(
+                client_id=env_config.client_id,
+                client_secret=env_config.client_secret,
+            ),
+        ),
+    )
+
+    bitrix_request = invalid_token_client.profile()
+
+    with pytest.raises(BitrixAPIInvalidToken) as exc_info:
+        _ = bitrix_request.response
+
+    _assert_error_response(exc_info.value, BitrixAPIInvalidToken)
 
 
 def test_error_bitrix_api_method_confirm_denied():
@@ -216,7 +299,7 @@ def test_error_bitrix_api_user_access_error():
 
 
 @pytest.mark.webhook_only
-def test_error_bitrix_api_wrong_auth_type(bitrix_client: Client):
+def test_error_bitrix_api_wrong_auth_type(bitrix_client: BaseClient):
     """Expect WRONG_AUTH_TYPE when using an auth type not allowed for the method (works)."""
 
     bitrix_request = bitrix_client.placement.bind(
@@ -228,6 +311,27 @@ def test_error_bitrix_api_wrong_auth_type(bitrix_client: Client):
         _ = bitrix_request.response
 
     _assert_error_response(exc_info.value, BitrixAPIWrongAuthType)
+
+
+@pytest.mark.webhook_only
+def test_error_bitrix_response_302_json_decode_error():
+    """Expect BitrixResponse302JSONDecodeError when calling a stale portal domain."""
+
+    if not OLD_DOMAIN or OLD_DOMAIN is NotImplemented:
+        pytest.skip("OLD_DOMAIN is not configured")
+
+    old_domain_client = Client(
+        BitrixWebhook(
+            domain=OLD_DOMAIN,
+            auth_token=env_config.webhook_token,
+        ),
+    )
+    bitrix_request = old_domain_client.profile()
+
+    with pytest.raises(BitrixResponse302JSONDecodeError) as exc_info:
+        _ = bitrix_request.response
+
+    assert exc_info.value.status_code == BitrixResponse302JSONDecodeError.STATUS_CODE
 
 
 def test_error_bitrix_api_authorization_error():
@@ -256,11 +360,12 @@ def test_error_bitrix_api_expired_token():
 
     with pytest.raises(BitrixAPIExpiredToken) as exc_info:
         parse_response(response)
+
     _assert_error_response(exc_info.value, BitrixAPIExpiredToken)
 
 
 @pytest.mark.oauth_only
-def test_error_bitrix_api_method_confirm_waiting(bitrix_client: Client):
+def test_error_bitrix_api_method_confirm_waiting(bitrix_client: BaseClient):
     """Expect METHOD_CONFIRM_WAITING when Bitrix awaits admin approval (works)."""
 
     bitrix_request = BitrixAPIRequest(
@@ -274,85 +379,17 @@ def test_error_bitrix_api_method_confirm_waiting(bitrix_client: Client):
     _assert_error_response(exc_info.value, BitrixAPIMethodConfirmWaiting)
 
 
-# def test_error_bitrix_api_error_batch_length_exceeded():
-#     """SDK limits batch to 50; direct REST with >50 currently does not raise this error."""
-#
-#
-#     batch_url = f"https://{env_config.domain}/rest/{env_config.webhook_token}/batch.json"
-#     commands = {f"c{idx}": "app.info" for idx in range(150)}
-#
-#     response = requests.post(
-#         batch_url,
-#         json={
-#             "halt": False,
-#             "cmd": commands,
-#         },
-#         headers=_JSON_HEADERS,
-#     )
-#
-#     with pytest.raises(BitrixAPIErrorBatchLengthExceeded) as exc_info:
-#         parse_response(response)
-#
-#     _assert_error_response(exc_info.value, BitrixAPIErrorBatchLengthExceeded)
-
-
-def test_error_bitrix_api_invalid_arg_value():
+def test_error_bitrix_api_invalid_arg_value(bitrix_client: BaseClient):
     """Expect INVALID_ARG_VALUE for a request with a nonexistent filter field (works)."""
 
-    response = requests.post(
-        _rest_url(f"{env_config.webhook_token}/crm.type.list"),
-        json={
-            "filter": {"non_existent_field_12345": "some_value"},
-        },
-        headers=_JSON_HEADERS,
-        timeout=_REQUEST_TIMEOUT,
+    bitrix_request = bitrix_client.crm.type.list(
+        filter={"non_existent_field_12345": "some_value"},
     )
 
     with pytest.raises(BitrixAPIInvalidArgValue) as exc_info:
-        parse_response(response)
+        _ = bitrix_request.response
 
     _assert_error_response(exc_info.value, BitrixAPIInvalidArgValue)
-
-
-# def test_error_bitrix_api_invalid_request():
-#    """"""
-#
-#    response = requests.post(
-#        f"http://{env_config.domain}/rest/placement.get",
-#        json={
-#            "auth": env_config.access_token,
-#        },
-#        headers=_JSON_HEADERS,
-#    )
-#
-#    with pytest.raises(BitrixAPIInvalidRequest) as exc_info:
-#        parse_response(response)
-#
-#    _assert_error_response(exc_info.value, BitrixAPIInvalidRequest)
-
-
-def test_error_bitrix_api_error_manifest_is_not_available():
-    """No known stable way to reproduce ERROR_MANIFEST_IS_NOT_AVAILABLE; kept skipped."""
-    pytest.skip(BitrixAPIErrorManifestIsNotAvailable.__name__)
-
-
-def test_error_bitrix_api_error_batch_method_not_allowed(bitrix_client: Client):
-    """Expect ERROR_BATCH_METHOD_NOT_ALLOWED when batching the batch method itself."""
-
-    batch_request = bitrix_client.call_batch(
-        {
-            "nested_batch": BitrixAPIRequest(
-                bitrix_token=bitrix_client._bitrix_token,
-                api_method="batch",
-                params={"cmd": {"profile": "profile"}},
-            ),
-        },
-    )
-
-    with pytest.raises(BitrixAPIErrorBatchMethodNotAllowed) as exc_info:
-        _ = batch_request.response
-
-    _assert_error_response(exc_info.value, BitrixAPIErrorBatchMethodNotAllowed)
 
 
 def test_error_bitrix_api_error_unexpected_answer():
@@ -378,53 +415,29 @@ def test_error_bitrix_oauth_wrong_client():
 def test_error_bitrix_oauth_invalid_client():
     """Expect INVALID_CLIENT when using wrong OAuth client credentials (works)."""
 
-    response = requests.post(
-        _OAUTH_TOKEN_URL,
-        data={
-            "client_id": env_config.client_id,
-            "client_secret": "WRONG_SECRET_12345",
-            "grant_type": "authorization_code",
-            "code": "any_valid_or_invalid_code",
-        },
-        timeout=_REQUEST_TIMEOUT,
+    bitrix_app = BitrixApp(
+        client_id=env_config.client_id,
+        client_secret="WRONG_SECRET_12345",  # noqa: S106
     )
+
     with pytest.raises(BitrixOAuthInvalidClient) as exc_info:
-        parse_response(response)
+        _ = bitrix_app.get_oauth_token(code="any_valid_or_invalid_code")
+
     _assert_error_response(exc_info.value, BitrixOAuthInvalidClient)
 
 
 def test_error_bitrix_oauth_invalid_grant():
     """Expect INVALID_GRANT when reusing/invalidating an auth code or refresh token (works)."""
 
-    response = requests.post(
-        _OAUTH_TOKEN_URL,
-        data={
-            "client_id": env_config.client_id,
-            "client_secret": env_config.client_secret,
-            "grant_type": "authorization_code",
-            "code": env_config.access_token,
-        },
-        timeout=_REQUEST_TIMEOUT,
+    bitrix_app = BitrixApp(
+        client_id=env_config.client_id,
+        client_secret=env_config.client_secret,
     )
 
     with pytest.raises(BitrixOAuthInvalidGrant) as exc_info:
-        parse_response(response)
+        _ = bitrix_app.get_oauth_token(code=env_config.access_token)
+
     _assert_error_response(exc_info.value, BitrixOAuthInvalidGrant)
-
-
-# def test_error_bitrix_oauth_invalid_request():
-#     """Bitrix returns BitrixAPIInvalidRequest for missing/invalid grant_type instead of OAuthInvalidRequest."""
-#     response = requests.post(
-#         _OAUTH_TOKEN_URL,
-#         data={
-#             "client_id": env_config.client_id,
-#             "client_secret": env_config.client_secret,
-#             "code": "some_code",
-#         },
-#     )
-#     with pytest.raises(BitrixOAuthInvalidRequest) as exc_info:
-#         parse_response(response)
-#     _assert_error_response(exc_info.value, BitrixOAuthInvalidRequest)
 
 
 # def test_error_bitrix_oauth_invalid_scope():

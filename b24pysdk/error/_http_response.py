@@ -9,7 +9,7 @@ __all__ = [
     "HTTPResponseBadRequest",
     "HTTPResponseForbidden",
     "HTTPResponseFound",
-    "HTTPResponseInternalError",
+    "HTTPResponseInternalServerError",
     "HTTPResponseMethodNotAllowed",
     "HTTPResponseNotFound",
     "HTTPResponseOK",
@@ -72,7 +72,7 @@ class HTTPResponseTooManyRequests(HTTPResponse):
     STATUS_CODE = HTTPStatus.TOO_MANY_REQUESTS
 
 
-class HTTPResponseInternalError(HTTPResponse):
+class HTTPResponseInternalServerError(HTTPResponse):
     """"""
     STATUS_CODE = HTTPStatus.INTERNAL_SERVER_ERROR
 

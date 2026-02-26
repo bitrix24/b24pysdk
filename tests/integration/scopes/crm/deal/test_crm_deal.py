@@ -1,12 +1,12 @@
-from typing import Generator, Text, Tuple, cast
+from typing import Generator, Text, Tuple
 
 import pytest
 from _pytest.cacheprovider import Cache
 
-from b24pysdk import Client
-from b24pysdk.bitrix_api.responses import BitrixAPIListFastResponse, BitrixAPIListResponse, BitrixAPIResponse
-from b24pysdk.utils.types import JSONDictGenerator
-from tests.constants import SDK_NAME
+from b24pysdk.api.responses import BitrixAPIListFastResponse, BitrixAPIListResponse, BitrixAPIResponse
+from b24pysdk.client import BaseClient
+
+from .....constants import SDK_NAME
 
 pytestmark = [
     pytest.mark.integration,
@@ -15,13 +15,14 @@ pytestmark = [
 ]
 
 _FIELDS: Tuple[Text, ...] = (
-"ID", "TITLE", "TYPE_ID", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "IS_NEW", "IS_RECURRING",
-"IS_RETURN_CUSTOMER", "IS_REPEATED_APPROACH", "PROBABILITY", "CURRENCY_ID", "OPPORTUNITY", "IS_MANUAL_OPPORTUNITY",
-"TAX_VALUE", "COMPANY_ID", "CONTACT_ID", "CONTACT_IDS", "QUOTE_ID", "BEGINDATE", "CLOSEDATE", "OPENED", "CLOSED",
-"COMMENTS", "ASSIGNED_BY_ID", "CREATED_BY_ID", "MODIFY_BY_ID", "MOVED_BY_ID", "DATE_CREATE", "DATE_MODIFY",
-"MOVED_TIME", "SOURCE_ID", "SOURCE_DESCRIPTION", "LEAD_ID", "ADDITIONAL_INFO", "LOCATION_ID", "ORIGINATOR_ID",
-"ORIGIN_ID", "UTM_SOURCE", "UTM_MEDIUM", "UTM_CAMPAIGN", "UTM_CONTENT", "UTM_TERM", "LAST_ACTIVITY_TIME",
-"LAST_ACTIVITY_BY")
+    "ID", "TITLE", "TYPE_ID", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "IS_NEW", "IS_RECURRING",
+    "IS_RETURN_CUSTOMER", "IS_REPEATED_APPROACH", "PROBABILITY", "CURRENCY_ID", "OPPORTUNITY", "IS_MANUAL_OPPORTUNITY",
+    "TAX_VALUE", "COMPANY_ID", "CONTACT_ID", "CONTACT_IDS", "QUOTE_ID", "BEGINDATE", "CLOSEDATE", "OPENED", "CLOSED",
+    "COMMENTS", "ASSIGNED_BY_ID", "CREATED_BY_ID", "MODIFY_BY_ID", "MOVED_BY_ID", "DATE_CREATE", "DATE_MODIFY",
+    "MOVED_TIME", "SOURCE_ID", "SOURCE_DESCRIPTION", "LEAD_ID", "ADDITIONAL_INFO", "LOCATION_ID", "ORIGINATOR_ID",
+    "ORIGIN_ID", "UTM_SOURCE", "UTM_MEDIUM", "UTM_CAMPAIGN", "UTM_CONTENT", "UTM_TERM", "LAST_ACTIVITY_TIME",
+    "LAST_ACTIVITY_BY",
+)
 
 _TITLE: Text = f"{SDK_NAME} Deal"
 _TYPE_ID: Text = "GOODS"
@@ -34,7 +35,7 @@ _UPDATED_OPPORTUNITY: float = 2000.00
 
 
 @pytest.mark.dependency(name="test_deal_fields")
-def test_deal_fields(bitrix_client: Client):
+def test_deal_fields(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.deal.fields().response
@@ -42,7 +43,7 @@ def test_deal_fields(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    fields = cast(dict, bitrix_response.result)
+    fields = bitrix_response.result
 
     for field in _FIELDS:
         assert field in fields, f"Field '{field}' should be present"
@@ -50,7 +51,7 @@ def test_deal_fields(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_deal_add", depends=["test_deal_fields"])
-def test_deal_add(bitrix_client: Client, cache: Cache):
+def test_deal_add(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     bitrix_response = bitrix_client.crm.deal.add(
@@ -67,7 +68,7 @@ def test_deal_add(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, int)
 
-    deal_id = cast(int, bitrix_response.result)
+    deal_id = bitrix_response.result
 
     assert deal_id > 0, "Deal creation should return a positive ID"
 
@@ -75,7 +76,7 @@ def test_deal_add(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_deal_get", depends=["test_deal_add"])
-def test_deal_get(bitrix_client: Client, cache: Cache):
+def test_deal_get(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     deal_id = cache.get("deal_id", None)
@@ -86,7 +87,7 @@ def test_deal_get(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    deal = cast(dict, bitrix_response.result)
+    deal = bitrix_response.result
 
     assert deal.get("ID") == str(deal_id), "Deal ID does not match"
     assert deal.get("TITLE") == _TITLE, "Deal TITLE does not match"
@@ -98,7 +99,7 @@ def test_deal_get(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_deal_update", depends=["test_deal_get"])
-def test_deal_update(bitrix_client: Client, cache: Cache):
+def test_deal_update(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     deal_id = cache.get("deal_id", None)
@@ -113,12 +114,12 @@ def test_deal_update(bitrix_client: Client, cache: Cache):
     ).response
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
-    is_updated = cast(bool, bitrix_response.result)
+    is_updated = bitrix_response.result
     assert is_updated is True, "Deal update should return True"
 
 
 @pytest.mark.dependency(name="test_deal_list", depends=["test_deal_update"])
-def test_deal_list(bitrix_client: Client, cache: Cache):
+def test_deal_list(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     deal_id = cache.get("deal_id", None)
@@ -131,7 +132,7 @@ def test_deal_list(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, list)
 
-    deals = cast(list, bitrix_response.result)
+    deals = bitrix_response.result
 
     assert len(deals) == 1, "Expected one deal to be returned"
     deal = deals[0]
@@ -143,7 +144,7 @@ def test_deal_list(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_deal_list_as_list", depends=["test_deal_list"])
-def test_deal_list_as_list(bitrix_client: Client):
+def test_deal_list_as_list(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.deal.list().as_list().response
@@ -151,7 +152,7 @@ def test_deal_list_as_list(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListResponse)
     assert isinstance(bitrix_response.result, list)
 
-    deals = cast(list, bitrix_response.result)
+    deals = bitrix_response.result
 
     assert len(deals) >= 1, "Expected at least one deal to be returned"
 
@@ -160,7 +161,7 @@ def test_deal_list_as_list(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_deal_list_as_list_fast", depends=["test_deal_list_as_list"])
-def test_deal_list_as_list_fast(bitrix_client: Client):
+def test_deal_list_as_list_fast(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.deal.list().as_list_fast(descending=True).response
@@ -168,7 +169,7 @@ def test_deal_list_as_list_fast(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListFastResponse)
     assert isinstance(bitrix_response.result, Generator)
 
-    deals = cast(JSONDictGenerator, bitrix_response.result)
+    deals = bitrix_response.result
 
     last_deal_id = None
 
@@ -186,7 +187,7 @@ def test_deal_list_as_list_fast(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_deal_delete", depends=["test_deal_list_as_list_fast"])
-def test_deal_delete(bitrix_client: Client, cache: Cache):
+def test_deal_delete(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     deal_id = cache.get("deal_id", None)
@@ -195,5 +196,5 @@ def test_deal_delete(bitrix_client: Client, cache: Cache):
     bitrix_response = bitrix_client.crm.deal.delete(bitrix_id=deal_id).response
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
-    is_deleted = cast(bool, bitrix_response.result)
+    is_deleted = bitrix_response.result
     assert is_deleted is True, "Deal deletion should return True"

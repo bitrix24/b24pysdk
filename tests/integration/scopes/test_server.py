@@ -1,10 +1,10 @@
 from datetime import datetime
-from typing import cast
 
 import pytest
 
-from b24pysdk import Client, Config
-from b24pysdk.bitrix_api.responses import BitrixAPIResponse
+from b24pysdk import Config
+from b24pysdk.api.responses import BitrixAPIResponse
+from b24pysdk.client import BaseClient
 
 pytestmark = [
     pytest.mark.integration,
@@ -12,7 +12,7 @@ pytestmark = [
 ]
 
 
-def test_server_time(bitrix_client: Client):
+def test_server_time(bitrix_client: BaseClient):
     """"""
 
     start_dt = Config().get_local_datetime()
@@ -24,7 +24,7 @@ def test_server_time(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, str), "Server time result should be a str"
 
-    server_dt_str = cast(str, bitrix_response.result)
+    server_dt_str = bitrix_response.result
 
     try:
         server_dt = datetime.fromisoformat(server_dt_str)

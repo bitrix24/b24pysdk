@@ -1,8 +1,8 @@
 from typing import Text
 
-from ..bitrix_api.requests import BitrixAPIRequest
+from ..api.requests import BitrixAPIRequest
 from ..utils.functional import type_checker
-from ..utils.types import Timeout
+from ..utils.types import JSONDict, Timeout
 from ._base_scope import BaseScope
 
 __all__ = [
@@ -22,7 +22,7 @@ class Method(BaseScope):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {
+        params: JSONDict = {
             "name": name,
         }
 

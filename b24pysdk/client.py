@@ -3,7 +3,7 @@ from abc import ABC
 from typing import TYPE_CHECKING, ClassVar, List, Literal, Mapping, Optional, Sequence, Text, Union, overload
 
 from . import scopes
-from .bitrix_api.requests import BitrixAPIBatchesRequest, BitrixAPIBatchRequest
+from .api.requests import BitrixAPIBatchesRequest, BitrixAPIBatchRequest
 from .constants.version import B24APIVersion
 from .protocols import BitrixTokenFullProtocol
 from .scopes import v3 as scopes_v3
@@ -13,7 +13,7 @@ from .scopes._base_context import BaseContext
 from .utils.types import B24APIVersionLiteral, JSONDict, Key, Number, Timeout
 
 if TYPE_CHECKING:
-    from .bitrix_api.requests import AbstractBitrixAPIRequest
+    from .api.requests import BitrixAPIRequest
 
 __all__ = [
     "BaseClient",
@@ -27,95 +27,162 @@ __all__ = [
 class BaseClient(ABC):
     """"""
 
-    VERSION: ClassVar[B24APIVersionLiteral]
+    VERSION: ClassVar[Union[B24APIVersion, B24APIVersionLiteral]] = NotImplemented
 
     __slots__ = (
         "_bitrix_token",
         "_kwargs",
         "access",
+        "ai",
         "app",
         "biconnector",
         "bizproc",
+        "booking",
         "calendar",
+        "catalog",
         "crm",
         "department",
         "disk",
         "documentation",
+        "documentgenerator",
         "entity",
         "event",
         "events",
         "feature",
+        "im",
+        "imbot",
+        "imconnector",
+        "imopenlines",
+        "landing",
+        "lists",
+        "mailservice",
+        "messageservice",
         "method",
         "placement",
         "profile",
+        "pull",
+        "rpa",
         "sale",
+        "salescenter",
         "scope",
         "server",
+        "sign",
         "socialnetwork",
-        "tasks",
+        "sonet_group",
+        "task",
+        "telephony",
+        "timeman",
         "user",
+        "userconsent",
+        "vote",
+        "voximplant",
     )
 
     _bitrix_token: BitrixTokenFullProtocol
     _kwargs: JSONDict
 
     access: scopes.Access
+    ai: scopes.Ai
     app: scopes.App
+    booking: scopes.Booking
     biconnector: scopes.Biconnector
     bizproc: scopes.Bizproc
     calendar: scopes.Calendar
+    catalog: scopes.Catalog
     crm: scopes.CRM
     department: scopes.Department
     disk: scopes.Disk
+    documentgenerator: scopes.Documentgenerator
     entity: scopes.Entity
     event: scopes.Event
     events: scopes.Events
     feature: scopes.Feature
+    im: scopes.Im
+    imbot: scopes.Imbot
+    imconnector: scopes.Imconnector
+    imopenlines: scopes.Imopenlines
+    landing: scopes.Landing
+    lists: scopes.Lists
+    mailservice: scopes.Mailservice
+    messageservice: scopes.Messageservice
     method: scopes.Method
     placement: scopes.Placement
     profile: scopes.Profile
+    pull: scopes.Pull
+    rpa: scopes.Rpa
+    salescenter: scopes.Salescenter
     sale: scopes.Sale
     scope: scopes.Scope
     server: scopes.Server
+    sign: scopes.Sign
     socialnetwork: scopes.Socialnetwork
+    sonet_group: scopes.SonetGroup
+    task: scopes.Task
+    telephony: scopes.Telephony
+    timeman: scopes.Timeman
     user: scopes.User
+    userconsent: scopes.Userconsent
+    vote: scopes.Vote
+    voximplant: scopes.Voximplant
 
-    def __init__(
+    def __init__(  # noqa: PLR0915
             self,
             bitrix_token: BitrixTokenFullProtocol,
             *,
             timeout: Timeout = None,
             max_retries: Optional[int] = None,
-            initial_retry_delay: Optional[float] = None,
-            retry_delay_increment: Optional[float] = None,
+            initial_retry_delay: Optional[Number] = None,
+            retry_delay_increment: Optional[Number] = None,
             **kwargs,
     ):
         self._bitrix_token = bitrix_token
 
         self.access = scopes.Access(self)
+        self.ai = scopes.Ai(self)
         self.app = scopes.App(self)
+        self.booking = scopes.Booking(self)
         self.biconnector = scopes.Biconnector(self)
         self.bizproc = scopes.Bizproc(self)
         self.calendar = scopes.Calendar(self)
+        self.catalog = scopes.Catalog(self)
         self.documentation = scopes_v3.Documentation(self)
         self.crm = scopes.CRM(self)
         self.department = scopes.Department(self)
         self.disk = scopes.Disk(self)
+        self.documentgenerator = scopes.Documentgenerator(self)
         self.entity = scopes.Entity(self)
         self.event = scopes.Event(self)
         self.events = scopes.Events(self)
         self.feature = scopes.Feature(self)
+        self.im = scopes.Im(self)
+        self.imbot = scopes.Imbot(self)
+        self.imconnector = scopes.Imconnector(self)
+        self.imopenlines = scopes.Imopenlines(self)
+        self.landing = scopes.Landing(self)
+        self.lists = scopes.Lists(self)
+        self.mailservice = scopes.Mailservice(self)
+        self.messageservice = scopes.Messageservice(self)
         self.method = scopes.Method(self)
         self.placement = scopes.Placement(self)
         self.profile = scopes.Profile(self)
+        self.pull = scopes.Pull(self)
+        self.rpa = scopes.Rpa(self)
+        self.salescenter = scopes.Salescenter(self)
         self.sale = scopes.Sale(self)
         self.scope = scopes.Scope(self)
         self.server = scopes.Server(self)
+        self.sign = scopes.Sign(self)
         self.socialnetwork = scopes.Socialnetwork(self)
+        self.sonet_group = scopes.SonetGroup(self)
+        self.task = scopes.Task(self)
+        self.telephony = scopes.Telephony(self)
+        self.timeman = scopes.Timeman(self)
         self.user = scopes.User(self)
+        self.userconsent = scopes.Userconsent(self)
+        self.vote = scopes.Vote(self)
+        self.voximplant = scopes.Voximplant(self)
 
-        self._kwargs = kwargs
-        self._kwargs["prefer_version"] = self.VERSION
+        self._kwargs = kwargs | {"prefer_version": self.VERSION}
 
         if timeout is not None:
             self._kwargs["timeout"] = timeout
@@ -124,7 +191,7 @@ class BaseClient(ABC):
             self._kwargs["max_retries"] = max_retries
 
         if initial_retry_delay is not None:
-            self._kwargs["initial_retry_delay"] = initial_retry_delay\
+            self._kwargs["initial_retry_delay"] = initial_retry_delay
 
         if retry_delay_increment is not None:
             self._kwargs["retry_delay_increment"] = retry_delay_increment
@@ -141,28 +208,28 @@ class BaseClient(ABC):
     @overload
     def call_batch(
             self,
-            bitrix_api_requests: Mapping[Key, "AbstractBitrixAPIRequest"],
+            bitrix_api_requests: Mapping[Key, "BitrixAPIRequest"],
             *,
             halt: bool = False,
             ignore_size_limit: bool = False,
             timeout: Timeout = None,
             **kwargs,
-    ) -> BitrixAPIBatchRequest[Mapping[Key, "AbstractBitrixAPIRequest"]]: ...
+    ) -> BitrixAPIBatchRequest[Mapping[Key, "BitrixAPIRequest"]]: ...
 
     @overload
     def call_batch(
             self,
-            bitrix_api_requests: Sequence["AbstractBitrixAPIRequest"],
+            bitrix_api_requests: Sequence["BitrixAPIRequest"],
             *,
             halt: bool = False,
             ignore_size_limit: bool = False,
             timeout: Timeout = None,
             **kwargs,
-    ) -> BitrixAPIBatchRequest[Sequence["AbstractBitrixAPIRequest"]]: ...
+    ) -> BitrixAPIBatchRequest[Sequence["BitrixAPIRequest"]]: ...
 
     def call_batch(
             self,
-            bitrix_api_requests: Union[Mapping[Key, "AbstractBitrixAPIRequest"], Sequence["AbstractBitrixAPIRequest"]],
+            bitrix_api_requests: Union[Mapping[Key, "BitrixAPIRequest"], Sequence["BitrixAPIRequest"]],
             *,
             halt: bool = False,
             ignore_size_limit: bool = False,
@@ -198,26 +265,26 @@ class BaseClient(ABC):
     @overload
     def call_batches(
             self,
-            bitrix_api_requests: Mapping[Key, "AbstractBitrixAPIRequest"],
+            bitrix_api_requests: Mapping[Key, "BitrixAPIRequest"],
             *,
             halt: bool = False,
             timeout: Timeout = None,
             **kwargs,
-    ) -> BitrixAPIBatchRequest[Mapping[Key, "AbstractBitrixAPIRequest"]]: ...
+    ) -> BitrixAPIBatchRequest[Mapping[Key, "BitrixAPIRequest"]]: ...
 
     @overload
     def call_batches(
             self,
-            bitrix_api_requests: Sequence["AbstractBitrixAPIRequest"],
+            bitrix_api_requests: Sequence["BitrixAPIRequest"],
             *,
             halt: bool = False,
             timeout: Timeout = None,
             **kwargs,
-    ) -> BitrixAPIBatchRequest[Sequence["AbstractBitrixAPIRequest"]]: ...
+    ) -> BitrixAPIBatchRequest[Sequence["BitrixAPIRequest"]]: ...
 
     def call_batches(
             self,
-            bitrix_api_requests: Union[Mapping[Key, "AbstractBitrixAPIRequest"], Sequence["AbstractBitrixAPIRequest"]],
+            bitrix_api_requests: Union[Mapping[Key, "BitrixAPIRequest"], Sequence["BitrixAPIRequest"]],
             halt: bool = False,
             timeout: Timeout = None,
             **kwargs,
@@ -337,15 +404,39 @@ class BaseClient(ABC):
 class ClientV1(BaseClient):
     """"""
 
-    VERSION: ClassVar[B24APIVersionLiteral] = B24APIVersion.V1
+    VERSION = B24APIVersion.V1
 
-    __slots__ = ()
+    __slots__ = (
+        "tasks",
+    )
+
+    tasks: scopes.Tasks
+
+    def __init__(
+            self,
+            bitrix_token: BitrixTokenFullProtocol,
+            *,
+            timeout: Timeout = None,
+            max_retries: Optional[int] = None,
+            initial_retry_delay: Optional[Number] = None,
+            retry_delay_increment: Optional[Number] = None,
+            **kwargs,
+    ):
+        super().__init__(
+            bitrix_token,
+            timeout=timeout,
+            max_retries=max_retries,
+            initial_retry_delay=initial_retry_delay,
+            retry_delay_increment=retry_delay_increment,
+            **kwargs,
+        )
+        self.tasks = scopes.Tasks(self)
 
 
 class ClientV2(ClientV1):
     """"""
 
-    VERSION: ClassVar[B24APIVersionLiteral] = B24APIVersion.V2
+    VERSION = B24APIVersion.V2
 
     __slots__ = ()
 
@@ -353,7 +444,7 @@ class ClientV2(ClientV1):
 class ClientV3(BaseClient):
     """"""
 
-    VERSION: ClassVar[B24APIVersionLiteral] = B24APIVersion.V3
+    VERSION = B24APIVersion.V3
 
     __slots__ = (
         "documentation",
@@ -396,7 +487,7 @@ class ClientV3(BaseClient):
 def Client(
         bitrix_token: BitrixTokenFullProtocol,
         *,
-        prefer_version: Literal[2] = B24APIVersion.V2,
+        prefer_version: Literal[2, B24APIVersion.V2] = B24APIVersion.V2,
         timeout: Timeout = None,
         max_retries: Optional[int] = None,
         initial_retry_delay: Optional[Number] = None,
@@ -410,7 +501,7 @@ def Client(
 def Client(
         bitrix_token: BitrixTokenFullProtocol,
         *,
-        prefer_version: Literal[1],
+        prefer_version: Literal[1, B24APIVersion.V1],
         timeout: Timeout = None,
         max_retries: Optional[int] = None,
         initial_retry_delay: Optional[Number] = None,
@@ -424,7 +515,7 @@ def Client(
 def Client(
         bitrix_token: BitrixTokenFullProtocol,
         *,
-        prefer_version: Literal[3],
+        prefer_version: Literal[3, B24APIVersion.V3],
         timeout: Timeout = None,
         max_retries: Optional[int] = None,
         initial_retry_delay: Optional[Number] = None,
@@ -433,11 +524,10 @@ def Client(
 ) -> ClientV3: ...
 
 
-# noinspection PyPep8Naming
 def Client(  # noqa: N802
         bitrix_token: BitrixTokenFullProtocol,
         *,
-        prefer_version: B24APIVersionLiteral = B24APIVersion.V2,
+        prefer_version: Union[B24APIVersionLiteral, B24APIVersion] = B24APIVersion.V2,
         timeout: Timeout = None,
         max_retries: Optional[int] = None,
         initial_retry_delay: Optional[Number] = None,

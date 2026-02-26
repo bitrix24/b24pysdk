@@ -96,7 +96,7 @@ Behavior and skips:
 
 CI note:
 
-- GitHub Actions runs linter and unit tests on push/PR (Python 3.9–3.12 matrix).
+- GitHub Actions runs linter and unit tests on push/PR (Python 3.9–3.14 matrix).
 - Integration tests that call the real REST API do not auto‑run in CI.
 
 ## Library structure at a glance
@@ -357,12 +357,21 @@ logger = StreamLogger()
 
 cfg = Config()
 cfg.configure(
-    default_timeout=10,                        # seconds or (connect_timeout, read_timeout)
-    default_max_retries=3,                     # number of retries on transient errors
-    default_initial_retry_delay=1,             # seconds
-    default_retry_delay_increment=0,           # seconds
-    logger=logger,
-    tz=timezone(offset=timedelta(hours=2)),    # set timezone to UTC+2 (default to system if not specified)
+    default_timeout=(3.05, 10),       # seconds or tuple (default_connection_timeout, default_read_timeout)
+    default_max_retries=3,            # number of retries on transient errors
+    default_initial_retry_delay=1,    # seconds
+    default_retry_delay_increment=1,  # seconds
+    logger=logger,                     
+)
+
+# other way to pass default timeout values
+cfg.configure(
+    default_connection_timeout=3.05,
+    default_read_timeout=10,          # seconds or tuple (connect_timeout, read_timeout)
+    default_max_retries=3,            # number of retries on transient errors
+    default_initial_retry_delay=1,    # seconds
+    default_retry_delay_increment=1,  # seconds
+    logger=logger,                     
 )
 ```
 
@@ -452,11 +461,10 @@ When working with received data from Bitrix24 you can use built-in validation. T
 2. `OAuthEventData` - validate event data from Bitrix24;
 3. `OAuthWorkflowData` - workflow results validation.
 
-With all validators above you should pass dictionary received from Bitrix24. 
-
+With all validators above you should pass dictionary received from Bitrix24.
 
 ```python
-from b24pysdk.bitrix_api.credentials.oauth_placement_data import OAuthPlacementData
+from b24pysdk.credentials.oauth_placement_data import OAuthPlacementData
 
 # get placement_data from Bitrix24
 

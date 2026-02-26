@@ -1,8 +1,10 @@
+from typing import Optional
+
 import pytest
 from _pytest.cacheprovider import Cache
 from _pytest.fixtures import SubRequest
 
-from b24pysdk import Client
+from b24pysdk.client import BaseClient
 from tests.integration.helpers import make_client_from_env
 
 from .env_config import EnvConfig
@@ -12,7 +14,7 @@ env_config = EnvConfig()
 
 
 @pytest.fixture(scope="session")
-def bitrix_client(request: SubRequest) -> Client:
+def bitrix_client(request: SubRequest) -> Optional[BaseClient]:
     auth_type = getattr(request, "param", "webhook")
     try:
         return make_client_from_env(auth_type=auth_type)

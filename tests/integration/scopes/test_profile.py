@@ -1,9 +1,9 @@
-from typing import Text, Tuple, cast
+from typing import Text, Tuple
 
 import pytest
 
-from b24pysdk import Client
-from b24pysdk.bitrix_api.responses import BitrixAPIResponse
+from b24pysdk.api.responses import BitrixAPIResponse
+from b24pysdk.client import BaseClient
 
 pytestmark = [
     pytest.mark.integration,
@@ -13,14 +13,14 @@ pytestmark = [
 _FIELDS: Tuple[Text, ...] = ("ID", "ADMIN", "NAME", "LAST_NAME", "PERSONAL_GENDER", "TIME_ZONE")
 
 
-def test_profile(bitrix_client: Client):
+def test_profile(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.profile().response
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    user_profile = cast(dict, bitrix_response.result)
+    user_profile = bitrix_response.result
 
     assert isinstance(user_profile, dict), "User profile should be dict"
 

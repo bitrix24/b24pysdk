@@ -1,14 +1,15 @@
 from functools import cached_property
 from typing import Annotated, Iterable, Literal, Optional, Text, Union
 
-from ....bitrix_api.requests import BitrixAPIRequest
+from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import B24BoolStrict, JSONDict, Timeout
 from ..._base_entity import BaseEntity
 from .handler import Handler
+from .pay import Pay
 from .settings import Settings
 
-_all__ = [
+__all__ = [
     "Paysystem",
 ]
 
@@ -19,6 +20,11 @@ class Paysystem(BaseEntity):
     def handler(self) -> Handler:
         """"""
         return Handler(self)
+
+    @cached_property
+    def pay(self) -> Pay:
+        """"""
+        return Pay(self)
 
     @cached_property
     def settings(self) -> Settings:

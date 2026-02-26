@@ -1,14 +1,14 @@
-from typing import Text, Tuple, cast
+from typing import Text, Tuple
 
 import pytest
 from _pytest.cacheprovider import Cache
 
-from b24pysdk import Client
-from b24pysdk.bitrix_api.responses import BitrixAPIResponse
+from b24pysdk.api.responses import BitrixAPIResponse
+from b24pysdk.client import BaseClient
 from tests.constants import SDK_NAME
 
 pytestmark = [
-    pytest.mark.integration,
+    # pytest.mark.integration,
     pytest.mark.bizproc,
     pytest.mark.activity,
 ]
@@ -57,7 +57,7 @@ _FILTER = {
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_bizproc_activity_add")
-def test_bizproc_activity_add(bitrix_client: Client):
+def test_bizproc_activity_add(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.bizproc.activity.add(
@@ -76,14 +76,14 @@ def test_bizproc_activity_add(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, bool)
 
-    is_added = cast(bool, bitrix_response.result)
+    is_added = bitrix_response.result
 
     assert is_added is True, "Activity creation should return True"
 
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_bizproc_activity_update", depends=["test_bizproc_activity_add"])
-def test_bizproc_activity_update(bitrix_client: Client):
+def test_bizproc_activity_update(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.bizproc.activity.update(
@@ -103,14 +103,14 @@ def test_bizproc_activity_update(bitrix_client: Client):
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_updated = cast(bool, bitrix_response.result)
+    is_updated = bitrix_response.result
 
     assert is_updated is True, "Activity update should return True"
 
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_bizproc_activity_list", depends=["test_bizproc_activity_update"])
-def test_bizproc_activity_list(bitrix_client: Client):
+def test_bizproc_activity_list(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.bizproc.activity.list().response
@@ -118,7 +118,7 @@ def test_bizproc_activity_list(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, list)
 
-    activities = cast(list, bitrix_response.result)
+    activities = bitrix_response.result
 
     assert len(activities) == 1, "Expected one activity to be returned"
 
@@ -129,7 +129,7 @@ def test_bizproc_activity_list(bitrix_client: Client):
     assert activity == _CODE
 
 # @pytest.mark.oauth_only
-# def test_bizproc_activity_log(bitrix_client: Client):
+# def test_bizproc_activity_log(bitrix_client: BaseClient):
 #     """"""
 #
 #     test_event_token = "test_token_12345"
@@ -144,7 +144,7 @@ def test_bizproc_activity_list(bitrix_client: Client):
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_bizproc_activity_delete", depends=["test_bizproc_activity_list"])
-def test_bizproc_activity_delete(bitrix_client: Client, cache: Cache):
+def test_bizproc_activity_delete(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     activity_code = cache.get("activity_code", None)
@@ -156,5 +156,5 @@ def test_bizproc_activity_delete(bitrix_client: Client, cache: Cache):
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_deleted = cast(bool, bitrix_response.result)
+    is_deleted = bitrix_response.result
     assert is_deleted is True, "Activity deletion should return True"

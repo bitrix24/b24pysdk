@@ -1,10 +1,12 @@
-from typing import Text, cast
+from typing import Text
 
 import pytest
-from _pytest.cacheprovider import Cache
 
-from b24pysdk import Client, Config
-from b24pysdk.bitrix_api.responses import BitrixAPIResponse
+from b24pysdk.api.responses import BitrixAPIResponse
+from b24pysdk.client import BaseClient
+from b24pysdk.utils.types import JSONDict
+
+from ....constants import SDK_NAME
 
 pytestmark = [
     pytest.mark.integration,
@@ -12,45 +14,40 @@ pytestmark = [
     pytest.mark.app_option,
 ]
 
-_OPTION_NAME: Text = f"{Config().get_local_datetime().timestamp()}_test_option"
-_OPTION_VALUE: Text = "test_option_value"
+_OPTION: Text = f"{SDK_NAME}_OPTION"
+_OPTION_VALUE: Text = f"{SDK_NAME}_OPTION_VALUE"
+_OPTIONS: JSONDict = {
+    _OPTION: _OPTION_VALUE,
+}
 
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_option_set")
-def test_option_set(bitrix_client: Client, cache: Cache):
+def test_option_set(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.app.option.set(
-        options={
-            _OPTION_NAME: _OPTION_VALUE,
-        },
+        options=_OPTIONS,
     ).response
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_set = cast(bool, bitrix_response.result)
+    is_set = bitrix_response.result
 
     assert is_set is True, "Option set should return True"
-
-    cache.set("option_name", _OPTION_NAME)
 
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_option_get", depends=["test_option_set"])
-def test_option_get(bitrix_client: Client, cache: Cache):
+def test_option_get(bitrix_client: BaseClient):
     """"""
 
-    option_name = cache.get("option_name", None)
-    assert isinstance(option_name, str), "Option name should be cached"
-
     bitrix_response = bitrix_client.app.option.get(
-        option=option_name,
+        option=_OPTION,
     ).response
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
-    assert isinstance(bitrix_response.result, (str, dict))
 
-    option_value = cast(str, bitrix_response.result)
+    option_value = bitrix_response.result
 
-    assert option_value == _OPTION_VALUE, f"Option {option_name} value does not match"
+    assert option_value == _OPTION_VALUE, "Option value does not match"

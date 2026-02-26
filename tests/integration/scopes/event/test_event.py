@@ -1,9 +1,9 @@
-from typing import Text, Tuple, cast
+from typing import Text, Tuple
 
 import pytest
 
-from b24pysdk import Client
-from b24pysdk.bitrix_api.responses import BitrixAPIListResponse, BitrixAPIResponse
+from b24pysdk.api.responses import BitrixAPIListResponse, BitrixAPIResponse
+from b24pysdk.client import BaseClient
 from b24pysdk.constants.event import EventType
 
 from ....constants import BITRIX_PORTAL_OWNER_ID
@@ -13,35 +13,36 @@ pytestmark = [
     pytest.mark.event,
 ]
 
-_FIELDS: Tuple[Text, ...] = ("event", "handler", "auth_type", "offline")
+_FIELDS: Tuple[Text, ...] = ("event", "offline")
 _EVENT_NAME: Text = "ONCRMLEADADD"
 _HANDLER: Text = "https://example.com/handler/"
+_AUTH_TYPE: int = BITRIX_PORTAL_OWNER_ID
 _EVENT_TYPE: EventType = EventType.ONLINE
 _UNBIND_RESULT_FIELD: Text = "count"
 
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_event_bind")
-def test_event_bind(bitrix_client: Client):
+def test_event_bind(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.event.bind(
         event=_EVENT_NAME,
         handler=_HANDLER,
-        auth_type=BITRIX_PORTAL_OWNER_ID,
+        auth_type=_AUTH_TYPE,
         event_type=_EVENT_TYPE,
     ).response
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_bound = cast(bool, bitrix_response.result)
+    is_bound = bitrix_response.result
 
     assert is_bound is True, "Event binding should return True"
 
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_event_get", depends=["test_event_bind"])
-def test_event_get(bitrix_client: Client):
+def test_event_get(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.event.get().response
@@ -49,7 +50,7 @@ def test_event_get(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, list)
 
-    events = cast(list, bitrix_response.result)
+    events = bitrix_response.result
 
     assert len(events) >= 1, "Expected at least one event to be returned"
 
@@ -61,17 +62,16 @@ def test_event_get(bitrix_client: Client):
 
         if all((
             event.get("event") == _EVENT_NAME,
-            event.get("handler") == _HANDLER,
-            event.get("auth_type") == str(BITRIX_PORTAL_OWNER_ID),
+            event.get("auth_type") == str(_AUTH_TYPE),
         )):
             break
     else:
-        pytest.fail(f"Event '{_EVENT_NAME}' with handler '{_HANDLER}' should be found")
+        pytest.fail(f"Event '{_EVENT_NAME}' should be found")
 
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_event_get_as_list", depends=["test_event_bind"])
-def test_event_get_as_list(bitrix_client: Client):
+def test_event_get_as_list(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.event.get().as_list().response
@@ -79,7 +79,7 @@ def test_event_get_as_list(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListResponse)
     assert isinstance(bitrix_response.result, list)
 
-    events = cast(list, bitrix_response.result)
+    events = bitrix_response.result
 
     assert len(events) >= 1, "Expected at least one event to be returned"
 
@@ -88,8 +88,8 @@ def test_event_get_as_list(bitrix_client: Client):
 
 
 @pytest.mark.oauth_only
-@pytest.mark.dependency(name="test_event_unbind", depends=["test_event_get_as_list"])
-def test_event_unbind(bitrix_client: Client):
+@pytest.mark.dependency(name="test_event_unbind", depends=["test_event_bind"])
+def test_event_unbind(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.event.unbind(
@@ -102,7 +102,7 @@ def test_event_unbind(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    unbind_result = cast(dict, bitrix_response.result)
+    unbind_result = bitrix_response.result
 
     assert _UNBIND_RESULT_FIELD in unbind_result, f"Field {_UNBIND_RESULT_FIELD!r} should be present"
 

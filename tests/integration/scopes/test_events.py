@@ -1,9 +1,9 @@
-from typing import Text, cast
+from typing import Text
 
 import pytest
 
-from b24pysdk import Client
-from b24pysdk.bitrix_api.responses import BitrixAPIListResponse, BitrixAPIResponse
+from b24pysdk.api.responses import BitrixAPIListResponse, BitrixAPIResponse
+from b24pysdk.client import BaseClient
 
 pytestmark = [
     pytest.mark.integration,
@@ -14,7 +14,7 @@ _SCOPE: Text = "crm"
 
 
 @pytest.mark.oauth_only
-def test_events(bitrix_client: Client):
+def test_events(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.events(scope=_SCOPE).response
@@ -22,7 +22,7 @@ def test_events(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, list)
 
-    events = cast(list, bitrix_response.result)
+    events = bitrix_response.result
 
     assert len(events) > 0, "Events list should not be empty"
 
@@ -32,7 +32,7 @@ def test_events(bitrix_client: Client):
 
 
 @pytest.mark.oauth_only
-def test_events_as_list(bitrix_client: Client):
+def test_events_as_list(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.events(full=True).as_list().response
@@ -40,7 +40,7 @@ def test_events_as_list(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListResponse)
     assert isinstance(bitrix_response.result, list)
 
-    events = cast(list, bitrix_response.result)
+    events = bitrix_response.result
 
     assert len(events) > 0, "Events list should not be empty"
 

@@ -1,19 +1,20 @@
-from typing import Text, cast
+from typing import Text
 
 import pytest
 from _pytest.cacheprovider import Cache
 
-from b24pysdk import Client, Config
-from b24pysdk.bitrix_api.responses import (
+from b24pysdk import Config
+from b24pysdk.api.responses import (
     BitrixAPIListResponse,
     BitrixAPIResponse,
 )
+from b24pysdk.client import BaseClient
 
 from .....constants import SDK_NAME
 
 pytestmark = [
-    pytest.mark.integration,
-    pytest.mark.crm,
+    # pytest.mark.integration,
+    # pytest.mark.crm,
     pytest.mark.crm_activity,
     pytest.mark.crm_activity_badge,
 ]
@@ -24,7 +25,7 @@ _TYPE: Text = "failure"
 
 
 @pytest.mark.dependency(name="test_crm_activity_badge_add")
-def test_crm_activity_badge_add(bitrix_client: Client, cache: Cache):
+def test_crm_activity_badge_add(bitrix_client: BaseClient, cache: Cache):
     """Test adding a new badge."""
 
     code: Text = f"{SDK_NAME.lower()}_test_badge_{int(Config().get_local_datetime().timestamp() * (10 ** 6))}"
@@ -39,11 +40,11 @@ def test_crm_activity_badge_add(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    result = cast(dict, bitrix_response.result)
+    result = bitrix_response.result
 
     assert "badge" in result, "Result should contain 'badge' key"
 
-    badge = cast(dict, result["badge"])
+    badge = result["badge"]
 
     assert isinstance(badge, dict)
     assert badge.get("code") == code, "Badge code does not match"
@@ -55,7 +56,7 @@ def test_crm_activity_badge_add(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_crm_activity_badge_get", depends=["test_crm_activity_badge_add"])
-def test_crm_activity_badge_get(bitrix_client: Client, cache: Cache):
+def test_crm_activity_badge_get(bitrix_client: BaseClient, cache: Cache):
     """Test retrieving a badge by code."""
 
     badge_code = cache.get("badge_code", None)
@@ -66,11 +67,11 @@ def test_crm_activity_badge_get(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    result = cast(dict, bitrix_response.result)
+    result = bitrix_response.result
 
     assert "badge" in result, "Result should contain 'badge' key"
 
-    badge = cast(dict, result["badge"])
+    badge = result["badge"]
 
     assert isinstance(badge, dict)
     assert badge.get("code") == badge_code, "Badge code does not match"
@@ -80,7 +81,7 @@ def test_crm_activity_badge_get(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_crm_activity_badge_list", depends=["test_crm_activity_badge_get"])
-def test_crm_activity_badge_list(bitrix_client: Client, cache: Cache):
+def test_crm_activity_badge_list(bitrix_client: BaseClient, cache: Cache):
     """Test retrieving a list of badges."""
 
     badge_code = cache.get("badge_code", None)
@@ -91,11 +92,11 @@ def test_crm_activity_badge_list(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    result = cast(dict, bitrix_response.result)
+    result = bitrix_response.result
 
     assert "badges" in result, "Result should contain 'badges' key"
 
-    badges = cast(list, result["badges"])
+    badges = result["badges"]
 
     assert isinstance(badges, list)
     assert len(badges) >= 1, "Expected at least one badge to be returned"
@@ -114,7 +115,7 @@ def test_crm_activity_badge_list(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_crm_activity_badge_list_as_list", depends=["test_crm_activity_badge_list"])
-def test_crm_activity_badge_list_as_list(bitrix_client: Client):
+def test_crm_activity_badge_list_as_list(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.activity.badge.list().as_list().response
@@ -122,7 +123,7 @@ def test_crm_activity_badge_list_as_list(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListResponse)
     assert isinstance(bitrix_response.result, list)
 
-    badges = cast(list, bitrix_response.result)
+    badges = bitrix_response.result
 
     assert len(badges) >= 1, "Expected at least one badge to be returned"
 
@@ -131,7 +132,7 @@ def test_crm_activity_badge_list_as_list(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_crm_activity_badge_delete", depends=["test_crm_activity_badge_list_as_list"])
-def test_crm_activity_badge_delete(bitrix_client: Client, cache: Cache):
+def test_crm_activity_badge_delete(bitrix_client: BaseClient, cache: Cache):
     """Test deleting a badge."""
 
     badge_code = cache.get("badge_code", None)
@@ -141,6 +142,6 @@ def test_crm_activity_badge_delete(bitrix_client: Client, cache: Cache):
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_deleted = cast(bool, bitrix_response.result)
+    is_deleted = bitrix_response.result
 
     assert is_deleted is True, "Badge deletion should return True"

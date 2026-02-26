@@ -1,8 +1,8 @@
 from typing import Dict, Optional, Text
 
-from ...bitrix_api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import Timeout
+from ...utils.types import JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -39,7 +39,7 @@ class Option(BaseEntity):
             Instance of BitrixAPIRequest representing the ongoing request.
         """
 
-        params = dict()
+        params: JSONDict = {}
 
         if option is not None:
             params["option"] = option
@@ -73,7 +73,7 @@ class Option(BaseEntity):
             Instance of BitrixAPIRequest representing the ongoing request.
         """
 
-        params = {
+        params: JSONDict = {
             "options": options,
         }
 

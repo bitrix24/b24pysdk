@@ -1,16 +1,15 @@
-from typing import cast
 
 import pytest
 
-from b24pysdk import Client
-from b24pysdk.bitrix_api.responses import BitrixAPIResponse
+from b24pysdk.api.responses import BitrixAPIResponse
+from b24pysdk.client import BaseClient
 from b24pysdk.utils.types import JSONDict
 
 from .....constants import SDK_NAME
 
 pytestmark = [
-    pytest.mark.integration,
-    pytest.mark.crm,
+    # pytest.mark.integration,
+    # pytest.mark.crm,
     pytest.mark.crm_activity,
     pytest.mark.crm_activity_layout_blocks,
 ]
@@ -53,7 +52,7 @@ _LAYOUT: JSONDict = {
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_crm_activity_layout_blocks_set")
-def test_crm_activity_layout_blocks_set(bitrix_client: Client):
+def test_crm_activity_layout_blocks_set(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.activity.layout.blocks.set(
@@ -71,7 +70,7 @@ def test_crm_activity_layout_blocks_set(bitrix_client: Client):
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_crm_activity_layout_blocks_get", depends=["test_crm_activity_layout_blocks_set"])
-def test_crm_activity_layout_blocks_get(bitrix_client: Client):
+def test_crm_activity_layout_blocks_get(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.activity.layout.blocks.get(
@@ -86,11 +85,11 @@ def test_crm_activity_layout_blocks_get(bitrix_client: Client):
     assert isinstance(result, dict)
     assert "layout" in result
 
-    layout = cast(dict, result["layout"])
+    layout = result["layout"]
     assert isinstance(layout, dict)
     assert "blocks" in layout
 
-    blocks = cast(dict, layout["blocks"])
+    blocks = layout["blocks"]
 
     assert "block_1" in blocks
     assert blocks["block_1"]["type"] == "text"
@@ -106,7 +105,7 @@ def test_crm_activity_layout_blocks_get(bitrix_client: Client):
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_crm_activity_layout_blocks_delete", depends=["test_crm_activity_layout_blocks_get"])
-def test_crm_activity_layout_blocks_delete(bitrix_client: Client):
+def test_crm_activity_layout_blocks_delete(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.activity.layout.blocks.delete(

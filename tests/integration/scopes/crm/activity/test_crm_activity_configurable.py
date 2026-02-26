@@ -1,21 +1,22 @@
 from datetime import datetime, timedelta
-from typing import Text, Tuple, cast
+from typing import Text, Tuple
 
 import pytest
 from _pytest.cacheprovider import Cache
 
-from b24pysdk import Client, Config
-from b24pysdk.bitrix_api.responses import (
+from b24pysdk import Config
+from b24pysdk.api.responses import (
     BitrixAPIResponse,
 )
+from b24pysdk.client import BaseClient
 from b24pysdk.constants import B24BoolLit
 from b24pysdk.utils.types import JSONDict
 
 from .....constants import SDK_NAME
 
 pytestmark = [
-    pytest.mark.integration,
-    pytest.mark.crm,
+    # pytest.mark.integration,
+    # pytest.mark.crm,
     pytest.mark.crm_activity,
     pytest.mark.crm_activity_configurable,
 ]
@@ -70,7 +71,7 @@ _LAYOUT: JSONDict = {
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_crm_timeline_activities_configurable_add")
-def test_crm_activity_configurable_add(bitrix_client: Client, cache: Cache):
+def test_crm_activity_configurable_add(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     bitrix_response = bitrix_client.crm.activity.configurable.add(
@@ -93,7 +94,7 @@ def test_crm_activity_configurable_add(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    result = cast(dict, bitrix_response.result)
+    result = bitrix_response.result
 
     activity = result["activity"]
     assert isinstance(activity, dict)
@@ -107,7 +108,7 @@ def test_crm_activity_configurable_add(bitrix_client: Client, cache: Cache):
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_crm_timeline_activities_configurable_get", depends=["test_crm_timeline_activities_configurable_add"])
-def test_crm_activity_configurable_get(bitrix_client: Client, cache: Cache):
+def test_crm_activity_configurable_get(bitrix_client: BaseClient, cache: Cache):
     """"""
     activity_id = cache.get("configurable_activity_id", None)
     assert isinstance(activity_id, int)
@@ -119,7 +120,7 @@ def test_crm_activity_configurable_get(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    result = cast(dict, bitrix_response.result)
+    result = bitrix_response.result
     activity = result["activity"]
 
     assert isinstance(activity, dict)
@@ -127,7 +128,7 @@ def test_crm_activity_configurable_get(bitrix_client: Client, cache: Cache):
     assert activity.get("ownerTypeId") == _OWNER_TYPE_ID
     assert activity.get("ownerId") == _OWNER_ID
 
-    fields = cast(dict, activity["fields"])
+    fields = activity["fields"]
 
     assert fields.get("typeId") == _TYPE_ID
 
@@ -139,13 +140,13 @@ def test_crm_activity_configurable_get(bitrix_client: Client, cache: Cache):
     assert fields.get("originId") == _ORIGIN_ID
     assert fields.get("pingOffsets") == _PING_OFFSETS
 
-    layout = cast(dict, activity["layout"])
+    layout = activity["layout"]
     assert layout.get("header", {}).get("title") == _LAYOUT["header"]["title"]
 
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_crm_timeline_activities_configurable_update", depends=["test_crm_timeline_activities_configurable_get"])
-def test_crm_activity_configurable_update(bitrix_client: Client, cache: Cache):
+def test_crm_activity_configurable_update(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     activity_id = cache.get("configurable_activity_id", None)
@@ -164,7 +165,7 @@ def test_crm_activity_configurable_update(bitrix_client: Client, cache: Cache):
 
     assert isinstance(bitrix_response.result, dict)
 
-    result = cast(dict, bitrix_response.result)
+    result = bitrix_response.result
     activity = result["activity"]
     assert isinstance(activity, dict)
 

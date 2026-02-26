@@ -1,9 +1,9 @@
-from typing import List, Text, cast
+from typing import List, Text
 
 import pytest
 
-from b24pysdk import Client
-from b24pysdk.bitrix_api.responses import BitrixAPIResponse
+from b24pysdk.api.responses import BitrixAPIResponse
+from b24pysdk.client import BaseClient
 
 pytestmark = [
     pytest.mark.integration,
@@ -13,7 +13,7 @@ pytestmark = [
 _ACCESS: List[Text] = ["G2", "AU"]
 
 
-def test_name(bitrix_client: Client):
+def test_name(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.access.name(access=_ACCESS).response
@@ -21,7 +21,7 @@ def test_name(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict), "Name result should be a dict"
 
-    names = cast(dict, bitrix_response.result)
+    names = bitrix_response.result
 
     for access in _ACCESS:
         assert access in names, f"Access {access!r} should be present in result"

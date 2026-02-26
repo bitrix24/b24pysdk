@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import Optional, Text
 
-from ......bitrix_api.requests import BitrixAPIRequest
+from ......api.requests import BitrixAPIRequest
 from ......utils.types import JSONDict, JSONList, Timeout
 from ...._base_crm import BaseCRM
 

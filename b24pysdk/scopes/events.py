@@ -1,8 +1,8 @@
 from typing import Optional, Text
 
-from ..bitrix_api.requests import BitrixAPIRequest
+from ..api.requests import BitrixAPIRequest
 from ..utils.functional import type_checker
-from ..utils.types import Timeout
+from ..utils.types import JSONDict, Timeout
 from ._base_scope import BaseScope
 
 __all__ = [
@@ -23,7 +23,7 @@ class Events(BaseScope):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        params: JSONDict = {}
 
         if scope is not None:
             params["SCOPE"] = scope

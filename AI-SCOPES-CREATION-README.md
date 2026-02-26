@@ -154,7 +154,7 @@ class API(BaseEntity):
 
 ```python
 # b24pysdk/scopes/socialnetwork/workgroup.py
-from ...bitrix_api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout, B24Bool
 from .._base_entity import BaseEntity
@@ -189,7 +189,7 @@ class Workgroup(BaseEntity):
 - **Signature:** Parameters documented at the top level in Bitrix24 REST documentation must be expressed in snake_case. Always include `timeout: Timeout = None`. For parameters described as arrays, annotate them with `Iterable` (or a concrete subtype) and convert them to `list` internally if necessary. Example:
 
 ```python
-    params = dict()
+    params: JSONDict = {}
 
     if select is not None:
         if select.__class__ is not list:
@@ -212,7 +212,7 @@ class Workgroup(BaseEntity):
 # b24pysdk/scopes/socialnetwork/workgroup.py
 from typing import Iterable, Optional, Text, Union
 
-from ...bitrix_api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import B24BoolStrict, JSONDict, Timeout
 from .._base_entity import BaseEntity
@@ -234,7 +234,7 @@ class Workgroup(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {
+        params: JSONDict = {
             "params": params,
         }
 
@@ -255,7 +255,7 @@ class Workgroup(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        params: JSONDict = {}
 
         if filter is not None:
             params["filter"] = filter
@@ -380,7 +380,7 @@ class Trigger(BaseCRM):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {
+        params: JSONDict = {
             "target": target,
         }
 
@@ -444,7 +444,7 @@ class Userfield(BaseCRM):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "fields": fields,
         }

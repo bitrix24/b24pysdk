@@ -1,13 +1,13 @@
-from typing import List, Text, cast
+from typing import List, Text
 
 import pytest
 
-from b24pysdk import Client
-from b24pysdk.bitrix_api.responses import BitrixAPIResponse
+from b24pysdk.api.responses import BitrixAPIResponse
+from b24pysdk.client import BaseClient
 
 pytestmark = [
-    pytest.mark.integration,
-    pytest.mark.crm,
+    # pytest.mark.integration,
+    # pytest.mark.crm,
     pytest.mark.crm_calllist_items,
 ]
 
@@ -15,7 +15,7 @@ _LIST_ID: int = 19
 _ITEMS_FIELDS: List[Text] = ["ID", "STATUS", "ENTITY_TYPE"]
 
 
-def test_calllist_items_get(bitrix_client: Client):
+def test_calllist_items_get(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.calllist.items.get(
@@ -25,7 +25,7 @@ def test_calllist_items_get(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, list)
 
-    items = cast(list, bitrix_response.result)
+    items = bitrix_response.result
 
     assert len(items) >= 1, "Expected at least one item to be returned"
 

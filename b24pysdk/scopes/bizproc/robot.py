@@ -1,6 +1,6 @@
 from typing import Optional, Sequence, Text, Union
 
-from ...bitrix_api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import B24BoolStrict, DocumentType, JSONDict, Timeout
 from .._base_entity import BaseEntity
@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Robot(BaseEntity):
-    """"""
+    """Handle operations related to Bitrix24 Bizproc robots.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/bizproc/bizproc-robot/
+    """
 
     @type_checker
     def add(
@@ -31,7 +34,53 @@ class Robot(BaseEntity):
             placement_handler: Optional[Text] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Register a new Bizproc robot.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/bizproc/bizproc-robot/bizproc-robot-add.html
+
+        The method registers a new robot. Works only in the application context.
+
+        Args:
+            code: Internal robot identifier (unique within the application);
+
+            handler: URL to which the robot will send data via the Bitrix24 queue server;
+
+            name: Robot name;
+
+            auth_user_id: Identifier of the user whose token will be passed to the application;
+
+            use_subscription: Whether the robot should wait for a response from the application;
+
+            description: Robot description;
+
+            properties: An object with robot parameters;
+
+            return_properties: An object with additional results from the robot;
+
+            document_type: Array of three strings that defines the document type and resolves data types for PROPERTIES and RETURN_PROPERTIES;
+
+            filter: Object format:
+                {
+                    'INCLUDE': [ <rule_or_document_type>, ... ],
+
+                    'EXCLUDE': [ <rule_or_document_type>, ... ],
+
+                }
+
+                where
+                - rule_or_document_type can be a string or an array representing full or partial document type;
+
+                - to limit by edition use: 'b24' for cloud, 'box' for self-hosted;
+
+            use_placement: Enables opening additional robot settings in the application slider;
+
+            placement_handler: URL of the placement handler on the application side.
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params = {
             "CODE": code,
@@ -80,7 +129,30 @@ class Robot(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update fields of a robot registered by the application.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/bizproc/bizproc-robot/bizproc-robot-update.html
+
+        This method updates the fields of a robot registered by the application. Works only in the application context.
+
+        Args:
+            code: Internal robot identifier;
+
+            fields: Object format:
+                {
+                    "field_1": "value_1",
+
+                    ...,
+
+                    "field_n": "value_n",
+                }
+
+                where field_n - field of the robot and value_n its value;
+
+            timeout: Timeout in seconds.
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params = {
             "CODE": code,
@@ -99,7 +171,18 @@ class Robot(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Retrieve a list of robots registered by the application.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/bizproc/bizproc-robot/bizproc-robot-list.html
+
+        The method returns a list of robots registered by the application. Works only in the application context.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
@@ -113,7 +196,20 @@ class Robot(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete a robot registered by the application.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/bizproc/bizproc-robot/bizproc-robot-delete.html
+
+        This method removes a robot registered by the application. Works only in the application context.
+
+        Args:
+            code: Symbolic identifier of the application's robot;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params = {
             "CODE": code,

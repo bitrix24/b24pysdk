@@ -1,6 +1,6 @@
 from typing import Text
 
-from .....bitrix_api.requests import BitrixAPIRequest
+from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
 from .....utils.types import Timeout
 from ._base_image import BaseImage

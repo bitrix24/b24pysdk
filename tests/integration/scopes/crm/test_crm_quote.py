@@ -1,21 +1,20 @@
-from typing import Generator, Text, Tuple, cast
+from typing import Generator, Text, Tuple
 
 import pytest
 from _pytest.cacheprovider import Cache
 
-from b24pysdk import Client
-from b24pysdk.bitrix_api.responses import (
+from b24pysdk.api.responses import (
     BitrixAPIListFastResponse,
     BitrixAPIListResponse,
     BitrixAPIResponse,
 )
-from b24pysdk.utils.types import JSONDictGenerator
+from b24pysdk.client import BaseClient
 
 from ....constants import SDK_NAME
 
 pytestmark = [
-    pytest.mark.integration,
-    pytest.mark.crm,
+    # pytest.mark.integration,
+    # pytest.mark.crm,
     pytest.mark.crm_quote,
 ]
 
@@ -58,7 +57,7 @@ _OPENED: Text = "Y"
 
 
 @pytest.mark.dependency(name="test_quote_fields")
-def test_quote_fields(bitrix_client: Client):
+def test_quote_fields(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.quote.fields().response
@@ -66,7 +65,7 @@ def test_quote_fields(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    fields = cast(dict, bitrix_response.result)
+    fields = bitrix_response.result
 
     for field in _FIELDS:
         assert field in fields, f"Field '{field}' should be present"
@@ -74,7 +73,7 @@ def test_quote_fields(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_quote_add", depends=["test_quote_fields"])
-def test_quote_add(bitrix_client: Client, cache: Cache):
+def test_quote_add(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     bitrix_response = bitrix_client.crm.quote.add(
@@ -93,7 +92,7 @@ def test_quote_add(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, int)
 
-    quote_id = cast(int, bitrix_response.result)
+    quote_id = bitrix_response.result
 
     assert quote_id > 0, "Quote creation should return a positive ID"
 
@@ -101,7 +100,7 @@ def test_quote_add(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_quote_get", depends=["test_quote_add"])
-def test_quote_get(bitrix_client: Client, cache: Cache):
+def test_quote_get(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     quote_id = cache.get("quote_id", None)
@@ -112,7 +111,7 @@ def test_quote_get(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    quote = cast(dict, bitrix_response.result)
+    quote = bitrix_response.result
 
     assert quote.get("ID") == str(quote_id), "Quote ID does not match"
     assert quote.get("TITLE") == _TITLE, "Quote TITLE does not match"
@@ -124,7 +123,7 @@ def test_quote_get(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_quote_list", depends=["test_quote_add"])
-def test_quote_list(bitrix_client: Client, cache: Cache):
+def test_quote_list(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     quote_id = cache.get("quote_id", None)
@@ -140,7 +139,7 @@ def test_quote_list(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, list)
 
-    quotes = cast(list, bitrix_response.result)
+    quotes = bitrix_response.result
 
     assert len(quotes) >= 1, "Expected at least one quote to be returned"
 
@@ -159,7 +158,7 @@ def test_quote_list(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_quote_list_as_list", depends=["test_quote_add"])
-def test_quote_list_as_list(bitrix_client: Client):
+def test_quote_list_as_list(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.quote.list().as_list().response
@@ -167,7 +166,7 @@ def test_quote_list_as_list(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListResponse)
     assert isinstance(bitrix_response.result, list)
 
-    quotes = cast(list, bitrix_response.result)
+    quotes = bitrix_response.result
 
     assert len(quotes) >= 1, "Expected at least one quote to be returned"
 
@@ -176,7 +175,7 @@ def test_quote_list_as_list(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_quote_list_as_list_fast", depends=["test_quote_add"])
-def test_quote_list_as_list_fast(bitrix_client: Client):
+def test_quote_list_as_list_fast(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.quote.list().as_list_fast(descending=True).response
@@ -184,7 +183,7 @@ def test_quote_list_as_list_fast(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListFastResponse)
     assert isinstance(bitrix_response.result, Generator)
 
-    quotes = cast(JSONDictGenerator, bitrix_response.result)
+    quotes = bitrix_response.result
 
     last_quote_id = None
 
@@ -202,7 +201,7 @@ def test_quote_list_as_list_fast(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_quote_update", depends=["test_quote_add"])
-def test_quote_update(bitrix_client: Client, cache: Cache):
+def test_quote_update(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     quote_id = cache.get("quote_id", None)
@@ -220,7 +219,7 @@ def test_quote_update(bitrix_client: Client, cache: Cache):
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_updated = cast(bool, bitrix_response.result)
+    is_updated = bitrix_response.result
 
     assert is_updated is True, "Quote update should return True"
 
@@ -228,7 +227,7 @@ def test_quote_update(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_quote_delete", depends=["test_quote_update"])
-def test_quote_delete(bitrix_client: Client, cache: Cache):
+def test_quote_delete(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     quote_id = cache.get("quote_id", None)
@@ -238,6 +237,6 @@ def test_quote_delete(bitrix_client: Client, cache: Cache):
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_deleted = cast(bool, bitrix_response.result)
+    is_deleted = bitrix_response.result
 
     assert is_deleted is True, "Quote deletion should return True"

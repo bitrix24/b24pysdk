@@ -1,7 +1,7 @@
 from functools import cached_property
 from typing import Optional, Text, Union
 
-from ....bitrix_api.requests import BitrixAPIRequest
+from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import B24BoolStrict, JSONDict, Timeout
 from ..._base_entity import BaseEntity

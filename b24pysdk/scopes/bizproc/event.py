@@ -1,6 +1,6 @@
 from typing import Optional, Text
 
-from ...bitrix_api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
 from .._base_entity import BaseEntity

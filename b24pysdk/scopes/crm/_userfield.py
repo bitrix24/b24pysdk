@@ -1,6 +1,6 @@
 from typing import Optional
 
-from ...bitrix_api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, JSONList, Timeout
 from ._base_crm import BaseCRM

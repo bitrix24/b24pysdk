@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Callable, Optional, Text, Type, TypeVar, Union
 
-from ..bitrix_api.requests import AbstractBitrixAPIRequest, BitrixAPIRequest
+from ..api.requests import AbstractBitrixAPIRequest, BitrixAPIRequest
 from ..protocols import BitrixTokenFullProtocol
 from ..utils.functional import classproperty
 from ..utils.types import JSONDict, Timeout
@@ -54,14 +54,14 @@ class BaseContext(ABC):
         first, *parts = snake_str.split("_")
         return "".join((first.lower(), *(part.title() for part in parts)))
 
-    def _get_api_method(self, api_wrapper: Callable) -> Text:
+    def _get_api_method(self, api_wrapper: Callable[..., _BARQT]) -> Text:
         """"""
         api_wrapper_name = getattr(api_wrapper, "__name__", None)
         return f"{self}.{self.__to_camel_case(api_wrapper_name.strip('_'))}" if api_wrapper_name else str(self)
 
     def _make_bitrix_api_request(
             self,
-            api_wrapper: Callable,
+            api_wrapper: Callable[..., _BARQT],
             params: Optional[JSONDict] = None,
             timeout: Timeout = None,
             bitrix_api_request_type: Type[_BARQT] = BitrixAPIRequest,

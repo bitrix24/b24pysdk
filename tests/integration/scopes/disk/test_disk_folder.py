@@ -1,15 +1,15 @@
-from typing import List, Text, Tuple, cast
+from typing import List, Text, Tuple
 
 import pytest
 from _pytest.cacheprovider import Cache
 
-from b24pysdk import Client, Config
-from b24pysdk.bitrix_api.responses import BitrixAPIListFastResponse, BitrixAPIListResponse, BitrixAPIResponse
-from b24pysdk.utils.types import JSONDictGenerator
+from b24pysdk import Config
+from b24pysdk.api.responses import BitrixAPIListFastResponse, BitrixAPIListResponse, BitrixAPIResponse
+from b24pysdk.client import BaseClient
 from tests.constants import SDK_NAME
 
 pytestmark = [
-    pytest.mark.integration,
+    # pytest.mark.integration,
     pytest.mark.disk,
     pytest.mark.folder,
 ]
@@ -78,7 +78,7 @@ _START: int = 0
 
 
 @pytest.mark.dependency(name="test_disk_folder_getfields")
-def test_disk_folder_getfields(bitrix_client: Client):
+def test_disk_folder_getfields(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.disk.folder.getfields().response
@@ -86,14 +86,14 @@ def test_disk_folder_getfields(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    fields = cast(dict, bitrix_response.result)
+    fields = bitrix_response.result
 
     for field in _FOLDER_FIELDS_INFO:
         assert field in fields, f"Field '{field}' should be present"
 
 
 @pytest.mark.dependency(name="test_disk_folder_get", depends=["test_disk_folder_getfields"])
-def test_disk_folder_get(bitrix_client: Client):
+def test_disk_folder_get(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.disk.folder.get(
@@ -103,7 +103,7 @@ def test_disk_folder_get(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    folder = cast(dict, bitrix_response.result)
+    folder = bitrix_response.result
 
     for field in _FIELDS:
         assert field in folder, f"Field '{field}' should be present"
@@ -113,7 +113,7 @@ def test_disk_folder_get(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_disk_folder_getchildren", depends=["test_disk_folder_get"])
-def test_disk_folder_getchildren(bitrix_client: Client):
+def test_disk_folder_getchildren(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.disk.folder.getchildren(
@@ -125,7 +125,7 @@ def test_disk_folder_getchildren(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, list)
 
-    children = cast(list, bitrix_response.result)
+    children = bitrix_response.result
 
     assert len(children) >= 1, "Expected at least one user field to be returned"
 
@@ -138,7 +138,7 @@ def test_disk_folder_getchildren(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_disk_folder_getchildren_as_list", depends=["test_disk_folder_getchildren"])
-def test_disk_folder_getchildren_as_list(bitrix_client: Client):
+def test_disk_folder_getchildren_as_list(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.disk.folder.getchildren(bitrix_id=_FOLDER_ID).as_list().response
@@ -146,21 +146,21 @@ def test_disk_folder_getchildren_as_list(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListResponse)
     assert isinstance(bitrix_response.result, list)
 
-    children = cast(list, bitrix_response.result)
+    children = bitrix_response.result
 
     for child in children:
         assert isinstance(child, dict)
 
 
 @pytest.mark.dependency(name="test_disk_folder_getchildren_as_list_fast", depends=["test_disk_folder_getchildren_as_list"])
-def test_disk_folder_getchildren_as_list_fast(bitrix_client: Client):
+def test_disk_folder_getchildren_as_list_fast(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.disk.folder.getchildren(bitrix_id=_FOLDER_ID).as_list_fast(descending=True).response
 
     assert isinstance(bitrix_response, BitrixAPIListFastResponse)
 
-    children = cast(JSONDictGenerator, bitrix_response.result)
+    children = bitrix_response.result
 
     last_child_id = None
 
@@ -178,7 +178,7 @@ def test_disk_folder_getchildren_as_list_fast(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_disk_folder_addsubfolder", depends=["test_disk_folder_getchildren_as_list_fast"])
-def test_disk_folder_addsubfolder(bitrix_client: Client, cache: Cache):
+def test_disk_folder_addsubfolder(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     unique_name = f"{_NAME}_{int(Config().get_local_datetime().timestamp() * (10 ** 6))}"
@@ -191,7 +191,7 @@ def test_disk_folder_addsubfolder(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    folder = cast(dict, bitrix_response.result)
+    folder = bitrix_response.result
 
     for field in _FIELDS:
         assert field in folder, f"Field '{field}' should be present"
@@ -204,7 +204,7 @@ def test_disk_folder_addsubfolder(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_disk_folder_rename", depends=["test_disk_folder_addsubfolder"])
-def test_disk_folder_rename(bitrix_client: Client, cache: Cache):
+def test_disk_folder_rename(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     folder_id = cache.get("created_folder_id", None)
@@ -220,14 +220,14 @@ def test_disk_folder_rename(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    updated_folder = cast(dict, bitrix_response.result)
+    updated_folder = bitrix_response.result
 
     assert updated_folder.get("ID") == str(folder_id), "Folder ID should remain the same"
     assert updated_folder.get("NAME") == unique_name, "Folder NAME should be updated"
 
 
 @pytest.mark.dependency(name="test_disk_folder_copyto", depends=["test_disk_folder_rename"])
-def test_disk_folder_copyto(bitrix_client: Client, cache: Cache):
+def test_disk_folder_copyto(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     folder_id = cache.get("created_folder_id", None)
@@ -241,7 +241,7 @@ def test_disk_folder_copyto(bitrix_client: Client, cache: Cache):
     ).response
 
     assert isinstance(target_response, BitrixAPIResponse)
-    target_folder = cast(dict, target_response.result)
+    target_folder = target_response.result
     target_folder_id = int(target_folder["ID"])
 
     bitrix_response = bitrix_client.disk.folder.copyto(
@@ -252,13 +252,13 @@ def test_disk_folder_copyto(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    copied_folder = cast(dict, bitrix_response.result)
+    copied_folder = bitrix_response.result
 
     assert copied_folder.get("PARENT_ID") == str(target_folder_id), "Copied folder PARENT_ID should be target folder"
 
 
 @pytest.mark.dependency(name="test_disk_folder_moveto", depends=["test_disk_folder_copyto"])
-def test_disk_folder_moveto(bitrix_client: Client, cache: Cache):
+def test_disk_folder_moveto(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     folder_id = cache.get("created_folder_id", None)
@@ -272,7 +272,7 @@ def test_disk_folder_moveto(bitrix_client: Client, cache: Cache):
     ).response
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
-    temp_folder = cast(dict, bitrix_response.result)
+    temp_folder = bitrix_response.result
     temp_folder_id = int(temp_folder["ID"])
 
     assert folder_id != temp_folder_id, "Cannot move folder to itself"
@@ -285,14 +285,14 @@ def test_disk_folder_moveto(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    moved_folder = cast(dict, bitrix_response.result)
+    moved_folder = bitrix_response.result
 
     assert moved_folder.get("ID") == str(folder_id), "Folder ID should remain the same after move"
     assert moved_folder.get("PARENT_ID") == temp_folder_id, f"Moved folder PARENT_ID should be {temp_folder_id}, got {moved_folder.get('PARENT_ID')}"
 
 
 @pytest.mark.dependency(name="test_disk_folder_uploadfile", depends=["test_disk_folder_moveto"])
-def test_disk_folder_uploadfile(bitrix_client: Client, cache: Cache):
+def test_disk_folder_uploadfile(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     folder_id = cache.get("created_folder_id", None)
@@ -310,7 +310,7 @@ def test_disk_folder_uploadfile(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    file = cast(dict, bitrix_response.result)
+    file = bitrix_response.result
 
     for field in _CHILDREN_FIELDS:
         assert field in file, f"Field '{field}' should be present"
@@ -321,7 +321,7 @@ def test_disk_folder_uploadfile(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_disk_folder_get_external_link", depends=["test_disk_folder_uploadfile"])
-def test_disk_folder_get_external_link(bitrix_client: Client, cache: Cache):
+def test_disk_folder_get_external_link(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     folder_id = cache.get("created_folder_id", None)
@@ -337,7 +337,7 @@ def test_disk_folder_get_external_link(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_disk_folder_markdeleted", depends=["test_disk_folder_get_external_link"])
-def test_disk_folder_markdeleted(bitrix_client: Client, cache: Cache):
+def test_disk_folder_markdeleted(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     folder_id = cache.get("created_folder_id", None)
@@ -350,13 +350,13 @@ def test_disk_folder_markdeleted(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    deleted_folder = cast(dict, bitrix_response.result)
+    deleted_folder = bitrix_response.result
 
     assert deleted_folder.get("DELETED_TYPE") != "0", "Folder should be marked as deleted"
 
 
 @pytest.mark.dependency(name="test_disk_folder_restore", depends=["test_disk_folder_markdeleted"])
-def test_disk_folder_restore(bitrix_client: Client, cache: Cache):
+def test_disk_folder_restore(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     folder_id = cache.get("created_folder_id", None)
@@ -369,13 +369,13 @@ def test_disk_folder_restore(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    restored_folder = cast(dict, bitrix_response.result)
+    restored_folder = bitrix_response.result
 
     assert restored_folder.get("DELETED_TYPE") == 0, "Folder should be restored from deleted state"
 
 
 @pytest.mark.dependency(name="test_disk_folder_deletetree", depends=["test_disk_folder_restore"])
-def test_disk_folder_deletetree(bitrix_client: Client, cache: Cache):
+def test_disk_folder_deletetree(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     folder_id = cache.get("created_folder_id", None)
@@ -388,5 +388,5 @@ def test_disk_folder_deletetree(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, bool)
 
-    is_deleted = cast(bool, bitrix_response.result)
+    is_deleted = bitrix_response.result
     assert is_deleted is True, "Folder tree deletion should return True"

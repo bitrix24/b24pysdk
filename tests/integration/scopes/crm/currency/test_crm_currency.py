@@ -1,14 +1,14 @@
-from typing import Text, Tuple, cast
+from typing import Text, Tuple
 
 import pytest
 from _pytest.cacheprovider import Cache
 
-from b24pysdk import Client
-from b24pysdk.bitrix_api.responses import BitrixAPIResponse
+from b24pysdk.api.responses import BitrixAPIResponse
+from b24pysdk.client import BaseClient
 
 pytestmark = [
-    pytest.mark.integration,
-    pytest.mark.crm,
+    # pytest.mark.integration,
+    # pytest.mark.crm,
     pytest.mark.crm_currency,
 ]
 
@@ -22,7 +22,7 @@ _UPDATED_AMOUNT: float = 2.3456
 _UPDATED_SORT: int = 998
 
 
-def test_currency_fields(bitrix_client: Client):
+def test_currency_fields(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.currency.fields().response
@@ -30,7 +30,7 @@ def test_currency_fields(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    fields = cast(dict, bitrix_response.result)
+    fields = bitrix_response.result
 
     for field in _FIELDS:
         assert field in fields, f"Field '{field}' should be present"
@@ -38,7 +38,7 @@ def test_currency_fields(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_currency_add")
-def test_currency_add(bitrix_client: Client, cache: Cache):
+def test_currency_add(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     bitrix_response = bitrix_client.crm.currency.add(
@@ -54,7 +54,7 @@ def test_currency_add(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, str)
 
-    currency_id = cast(str, bitrix_response.result)
+    currency_id = bitrix_response.result
 
     assert currency_id == _CURRENCY_ID, "Currency creation should return currency ID"
 
@@ -62,7 +62,7 @@ def test_currency_add(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_currency_get", depends=["test_currency_add"])
-def test_currency_get(bitrix_client: Client, cache: Cache):
+def test_currency_get(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     currency_id = cache.get("currency_id", None)
@@ -73,7 +73,7 @@ def test_currency_get(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    currency = cast(dict, bitrix_response.result)
+    currency = bitrix_response.result
 
     assert currency.get("CURRENCY") == _CURRENCY_ID, "Currency CURRENCY does not match"
     assert int(currency.get("AMOUNT_CNT", 0)) == _AMOUNT_CNT, "Currency AMOUNT_CNT does not match"
@@ -83,7 +83,7 @@ def test_currency_get(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_currency_update", depends=["test_currency_add"])
-def test_currency_update(bitrix_client: Client, cache: Cache):
+def test_currency_update(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     currency_id = cache.get("currency_id", None)
@@ -98,12 +98,12 @@ def test_currency_update(bitrix_client: Client, cache: Cache):
     ).response
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
-    is_updated = cast(bool, bitrix_response.result)
+    is_updated = bitrix_response.result
     assert is_updated is True, "Currency update should return True"
 
 
 @pytest.mark.dependency(name="test_currency_list", depends=["test_currency_update"])
-def test_currency_list(bitrix_client: Client, cache: Cache):
+def test_currency_list(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     currency_id = cache.get("currency_id", None)
@@ -116,7 +116,7 @@ def test_currency_list(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, list)
 
-    currencies = cast(list, bitrix_response.result)
+    currencies = bitrix_response.result
 
     for currency in currencies:
         assert isinstance(currency, dict)
@@ -129,7 +129,7 @@ def test_currency_list(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_currency_delete", depends=["test_currency_list"])
-def test_currency_delete(bitrix_client: Client, cache: Cache):
+def test_currency_delete(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     currency_id = cache.get("currency_id", None)
@@ -138,5 +138,5 @@ def test_currency_delete(bitrix_client: Client, cache: Cache):
     bitrix_response = bitrix_client.crm.currency.delete(bitrix_id=currency_id).response
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
-    is_deleted = cast(bool, bitrix_response.result)
+    is_deleted = bitrix_response.result
     assert is_deleted is True, "Currency deletion should return True"

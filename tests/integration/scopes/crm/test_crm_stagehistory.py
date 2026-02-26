@@ -1,10 +1,10 @@
-from typing import Generator, Text, Tuple, cast
+from typing import Generator, Text, Tuple
 
 import pytest
 
-from b24pysdk import Client
-from b24pysdk.bitrix_api.responses import BitrixAPIListFastResponse, BitrixAPIListResponse, BitrixAPIResponse
-from b24pysdk.utils.types import JSONDictGenerator
+from b24pysdk.api.responses import BitrixAPIListFastResponse, BitrixAPIListResponse, BitrixAPIResponse
+from b24pysdk.client import BaseClient
+from b24pysdk.constants.crm import EntityTypeID
 
 pytestmark = [
     pytest.mark.integration,
@@ -12,27 +12,25 @@ pytestmark = [
     pytest.mark.crm_stagehistory,
 ]
 
-_ENTITY_TYPE_ID: int = 2
-_FIELDS: Tuple[Text, ...] = (
-"ID", "TYPE_ID", "OWNER_ID", "CREATED_TIME", "CATEGORY_ID", "STAGE_SEMANTIC_ID", "STAGE_ID")
+_FIELDS: Tuple[Text, ...] = ("ID", "TYPE_ID", "OWNER_ID", "CREATED_TIME")
+_ENTITY_TYPE_ID: EntityTypeID = EntityTypeID.LEAD
 
 
-def test_stagehistory_list(bitrix_client: Client):
+def test_stagehistory_list(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.stagehistory.list(
         entity_type_id=_ENTITY_TYPE_ID,
-        select=["ID", "TYPE_ID", "OWNER_ID", "CREATED_TIME", "CATEGORY_ID", "STAGE_SEMANTIC_ID", "STAGE_ID"],
-        order={"ID": "ASC"},
+        select=list(_FIELDS),
     ).response
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    result = cast(dict, bitrix_response.result)
+    result = bitrix_response.result
     assert "items" in result, "Result should contain 'items' key"
 
-    items = cast(list, result["items"])
+    items = result["items"]
 
     for item in items:
         assert isinstance(item, dict)
@@ -40,8 +38,7 @@ def test_stagehistory_list(bitrix_client: Client):
             assert field in item, f"Field {field!r} should be present"
 
 
-@pytest.mark.dependency(name="test_stagehistory_list_as_list", depends=[])
-def test_stagehistory_list_as_list(bitrix_client: Client):
+def test_stagehistory_list_as_list(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.stagehistory.list(
@@ -51,7 +48,7 @@ def test_stagehistory_list_as_list(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListResponse)
     assert isinstance(bitrix_response.result, list)
 
-    items = cast(list, bitrix_response.result)
+    items = bitrix_response.result
 
     assert len(items) >= 1, "Expected at least one stage history item to be returned"
 
@@ -59,8 +56,7 @@ def test_stagehistory_list_as_list(bitrix_client: Client):
         assert isinstance(item, dict)
 
 
-@pytest.mark.dependency(name="test_stagehistory_list_as_list_fast", depends=[])
-def test_stagehistory_list_as_list_fast(bitrix_client: Client):
+def test_stagehistory_list_as_list_fast(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.stagehistory.list(
@@ -70,7 +66,7 @@ def test_stagehistory_list_as_list_fast(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListFastResponse)
     assert isinstance(bitrix_response.result, Generator)
 
-    items = cast(JSONDictGenerator, bitrix_response.result)
+    items = bitrix_response.result
 
     last_item_id = None
 

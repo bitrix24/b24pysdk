@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from functools import cached_property
 
-from ....bitrix_api.requests import BitrixAPIRequest
+from ....api.requests import BitrixAPIRequest
 from ....utils.types import JSONDict, Timeout
 from .._base_crm import BaseCRM
 from .items import Items

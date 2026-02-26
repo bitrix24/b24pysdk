@@ -1,15 +1,14 @@
-from typing import Generator, Text, Tuple, cast
+from typing import Generator, Text, Tuple
 
 import pytest
 from _pytest.cacheprovider import Cache
 
-from b24pysdk import Client
-from b24pysdk.bitrix_api.responses import BitrixAPIListFastResponse, BitrixAPIListResponse, BitrixAPIResponse
-from b24pysdk.utils.types import JSONDictGenerator
+from b24pysdk.api.responses import BitrixAPIListFastResponse, BitrixAPIListResponse, BitrixAPIResponse
+from b24pysdk.client import BaseClient
 
 pytestmark = [
-    pytest.mark.integration,
-    pytest.mark.crm,
+    # pytest.mark.integration,
+    # pytest.mark.crm,
     pytest.mark.crm_calllist,
 ]
 
@@ -20,7 +19,7 @@ _UPDATED_ENTITIES: Tuple[int, ...] = (1, 3)
 _STATUS_LIST_FIELDS: Tuple = ("ID", "NAME", "SORT", "STATUS_ID")
 
 
-def test_calllist_statuslist(bitrix_client: Client):
+def test_calllist_statuslist(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.calllist.statuslist().response
@@ -28,7 +27,7 @@ def test_calllist_statuslist(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, list)
 
-    statuses = cast(list, bitrix_response.result)
+    statuses = bitrix_response.result
 
     assert len(statuses) >= 1, "Expected at least one call status to be returned"
 
@@ -39,7 +38,7 @@ def test_calllist_statuslist(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_calllist_add")
-def test_calllist_add(bitrix_client: Client, cache: Cache):
+def test_calllist_add(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     bitrix_response = bitrix_client.crm.calllist.add(
@@ -50,7 +49,7 @@ def test_calllist_add(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, int)
 
-    calllist_id = cast(int, bitrix_response.result)
+    calllist_id = bitrix_response.result
 
     assert calllist_id > 0, "Call list creation should return a positive ID"
 
@@ -58,7 +57,7 @@ def test_calllist_add(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_calllist_get", depends=["test_calllist_add"])
-def test_calllist_get(bitrix_client: Client, cache: Cache):
+def test_calllist_get(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     calllist_id = cache.get("calllist_id", None)
@@ -69,14 +68,14 @@ def test_calllist_get(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    calllist = cast(dict, bitrix_response.result)
+    calllist = bitrix_response.result
 
     assert calllist.get("ID") == str(calllist_id), "Call list ID does not match"
     assert calllist.get("ENTITY_TYPE") == _ENTITY_TYPE, "Call list ENTITY_TYPE does not match"
 
 
 @pytest.mark.dependency(name="test_calllist_update", depends=["test_calllist_add"])
-def test_calllist_update(bitrix_client: Client, cache: Cache):
+def test_calllist_update(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     calllist_id = cache.get("calllist_id", None)
@@ -90,13 +89,13 @@ def test_calllist_update(bitrix_client: Client, cache: Cache):
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_updated = cast(bool, bitrix_response.result)
+    is_updated = bitrix_response.result
 
     assert is_updated is True, "Call list update should return True"
 
 
 @pytest.mark.dependency(name="test_calllist_list", depends=["test_calllist_update"])
-def test_calllist_list(bitrix_client: Client, cache: Cache):
+def test_calllist_list(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     calllist_id = cache.get("calllist_id", None)
@@ -110,7 +109,7 @@ def test_calllist_list(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, list)
 
-    calllists = cast(list, bitrix_response.result)
+    calllists = bitrix_response.result
 
     assert len(calllists) == 1, "Expected one call list to be returned"
 
@@ -122,7 +121,7 @@ def test_calllist_list(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_calllist_list_as_list", depends=["test_calllist_add"])
-def test_calllist_list_as_list(bitrix_client: Client):
+def test_calllist_list_as_list(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.calllist.list().as_list().response
@@ -130,7 +129,7 @@ def test_calllist_list_as_list(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListResponse)
     assert isinstance(bitrix_response.result, list)
 
-    calllists = cast(list, bitrix_response.result)
+    calllists = bitrix_response.result
 
     assert len(calllists) >= 1, "Expected at least one call list to be returned"
 
@@ -139,7 +138,7 @@ def test_calllist_list_as_list(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_calllist_list_as_list_fast", depends=["test_calllist_add"])
-def test_calllist_list_as_list_fast(bitrix_client: Client):
+def test_calllist_list_as_list_fast(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.calllist.list().as_list_fast(descending=True).response
@@ -147,7 +146,7 @@ def test_calllist_list_as_list_fast(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListFastResponse)
     assert isinstance(bitrix_response.result, Generator)
 
-    calllists = cast(JSONDictGenerator, bitrix_response.result)
+    calllists = bitrix_response.result
 
     last_calllist_id = None
 

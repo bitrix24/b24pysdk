@@ -10,23 +10,23 @@ The Bitrix24 Python SDK, `B24PySDK`, is an official library designed for seamles
 
 ```plaintext
 b24pysdk/
-├── bitrix_api/                # API communication and credential handling
-│   ├── credentials/           # Core classes for requests, responses, events
-│   ├── events/                # Core classes for requests, responses, events
-│   ├── functions/             # API function utilities and methods
+├── api/                       # API communication and credential handling
+│   ├── callers/               # API function utilities and methods
 │   ├── requesters/            # Handling different request types
 │   ├── requests/              # API function utilities and methods
-│   ├── responses/             # API function utilities and methods
-│   └── signals/               # Handling different request types
+│   └── responses/             # API function utilities and methods
 ├── constants/                 # Constant definitions
 │   ├── crm.py                 # Constant definitions for CRM scope
 │   ├── event.py               # Constant definitions for Event scope
 │   ├── user.py                # Constant definitions for User scope
 │   ├── userfield.py           # Constant definitions for Userfield scope
 │   └── version.py             # Constant definitions for API versions
+├── credentials/               # Core classes for working with authentication and connection workflow
+│   └── _utils/                # Utility functions and helpers
 ├── error/                     # Error handling and exceptions
 │   ├── _http_responce.py      # HTTP responces
 │   └── v3.py                  # Error handling for v3 Bitrix API
+├── events/                    # Core classes for requests, responses, events
 ├── log/                       # Logging utilities
 │   ├── abstract_logger.py     # Logger interface required to implement
 │   ├── base_logger.py         # Abstract logger class with basic logger interface implementation
@@ -38,30 +38,56 @@ b24pysdk/
 │   │   ├── main/              # Main related scope module for v3
 │   │   ├── rest/              # Rest related scope module for v3
 │   │   └── tasks/             # Tasks related scope module for v3
+│   ├── ai_admin/              # AI module related scope module
 │   ├── app/                   # App related scope module
 │   ├── biconnector/           # BI Connector related scope module
 │   ├── bizproc/               # Workflow related scope module
+│   ├── booking/               # Booking related scope module
 │   ├── calendar/              # Calendar related scope module
+│   ├── catalog/               # Catalog related scope module
 │   ├── crm/                   # CRM related scope modules
+│   ├── disk/                  # Drive related scope module
+│   ├── documentgenerator/     # Numbering systems related scope module
 │   ├── entity/                # Data storage related scope module
 │   ├── event/                 # Event related scope module
+│   ├── im/                    # Chat related scope module
+│   ├── imbot/                 # Chat-bots related scope module
+│   ├── imconnector/           # Open Line connectors related scope module
+│   ├── imopenlines/           # Open Line related scope module
+│   ├── landing/               # Custom blocks related scope module
+│   ├── lists/                 # Sections related scope module
+│   ├── messageservice/        # Message providers related scope module
+│   ├── pull/                  # Notifications related scope module
+│   ├── rpa/                   # RPA related scope module
 │   ├── sale/                  # Sale related scope modules
+│   ├── salescenter/           # Salescenter related scope modules
+│   ├── sign/                  # Sign service related scope modules
 │   ├── socialnetwork/         # Social network related scope modules
+│   ├── sonet_group/           # Workgroups and projects related scope modules
+│   ├── task/                  # Task related scope modules
+│   ├── tasks/                 # Tasks related scope modules
+│   ├── telephony/             # Telephony related scope modules
 │   ├── user/                  # User management scope modules
+│   ├── userconsent/           # User agreements related scope modules
+│   ├── vote/                  # Polls related scope modules
+│   ├── voximplant/            # SIP and Built-in Telephony related scope modules
 │   ├── access.py              # Access related scope module
 │   ├── department.py          # Department related scope module
 │   ├── events.py              # Events related scope module
 │   ├── feature.py             # Fearure related scope module
+│   ├── mailservice.py         # Email Services related scope module
 │   ├── method.py              # Method related scope module
 │   ├── placement.py           # Placement related scope module
 │   ├── profile.py             # Profile related scope module
 │   ├── scope.py               # Scope related scope module
-│   └── server.py              # Server related scope module
+│   ├── server.py              # Server related scope module
+│   └── timeman.py             # Work schedule related scope module
+├── signals/                   # Handling different request types
 ├── utils/                     # Utility functions and helpers
-├── _client.py                 # Client initialization and setup
 ├── _config.py                 # Configuration and settings management
 ├── _constants.py              # Constant values for internal use
-└── _version.py                # Versioning information
+├── _version.py                # Versioning information
+└── client.py                 # Client initialization and setup
 ```
 
 ### Abstraction Levels
@@ -281,72 +307,69 @@ except Exception as error:
 
 Use `b24pysdk.error` for v1/v2 wrappers and `b24pysdk.error.v3` for the newer API surface.
 ```plaintext
-_HTTPResponse (ABC)
-├─ _HTTPResponseOK (200)
-├─ _HTTPResponseFound (302)
-├─ _HTTPResponseBadRequest (400)
-├─ _HTTPResponseUnauthorized (401)
-├─ _HTTPResponseForbidden (403)
-├─ _HTTPResponseNotFound (404)
-├─ _HTTPResponseMethodNotAllowed (405)
-├─ _HTTPResponseTooManyRequests (429)
-├─ _HTTPResponseInternalError (500)
-└─ _HTTPResponseServiceUnavailable (503)
-
 BitrixSDKException (Exception)
 ├─ BitrixOAuthException
-├─ BitrixValidationError (ValueError)
+├─ BitrixValidationError
+├─ BitrixResponseError
 ├─ BitrixRequestError
 │   ├─ BitrixOAuthRequestError
 │   ├─ BitrixRequestTimeout
 │   │   └─ BitrixOAuthRequestTimeout
-│   └─ BitrixResponseJSONDecodeError (_HTTPResponse)
-│       ├─ BitrixResponse302JSONDecodeError (_HTTPResponseFound)
-│       ├─ BitrixResponse403JSONDecodeError (_HTTPResponseForbidden)
-│       └─ BitrixResponse500JSONDecodeError (_HTTPResponseInternalError)
-├─ BaseBitrixAPIError (_HTTPResponse)
-│   └─ BitrixAPIError (v1/v2, b24pysdk.error)
-│   │   ├─ BitrixAPIBadRequest (_HTTPResponseBadRequest)
-│   │   │   ├─ BitrixAPIErrorBatchLengthExceeded
-│   │   │   ├─ BitrixAPIInvalidArgValue
-│   │   │   ├─ BitrixAPIInvalidRequest
-│   │   │   │   └─ BitrixOAuthInvalidRequest (BitrixOAuthException)
-│   │   │   ├─ BitrixOAuthInvalidClient (BitrixOAuthException)
-│   │   │   └─ BitrixOAuthInvalidGrant (BitrixOAuthException)
-│   │   ├─ BitrixAPIUnauthorized (_HTTPResponseUnauthorized)
-│   │   │   ├─ BitrixAPIAuthorizationError
-│   │   │   ├─ BitrixAPIErrorOAuth
-│   │   │   ├─ BitrixAPIExpiredToken
-│   │   │   ├─ BitrixAPIMethodConfirmWaiting
-│   │   │   └─ BitrixAPINoAuthFound
-│   │   ├─ BitrixAPIForbidden (_HTTPResponseForbidden)
-│   │   │   ├─ BitrixAPIAccessDenied
-│   │   │   ├─ BitrixAPIAllowedOnlyIntranetUser
-│   │   │   ├─ BitrixAPIInsufficientScope
-│   │   │   │   └─ BitrixOAuthInsufficientScope
-│   │   │   ├─ BitrixAPIInvalidCredentials
-│   │   │   ├─ BitrixAPIMethodConfirmDenied
-│   │   │   ├─ BitrixAPIUserAccessError
-│   │   │   ├─ BitrixAPIWrongAuthType
-│   │   │   └─ BitrixOAuthInvalidScope (BitrixOAuthException)
-│   │   ├─ BitrixAPINotFound (_HTTPResponseNotFound)
-│   │   │   └─ BitrixAPIErrorManifestIsNotAvailable
-│   │   ├─ BitrixAPIMethodNotAllowed (_HTTPResponseMethodNotAllowed)
-│   │   │   └─ BitrixAPIErrorBatchMethodNotAllowed
-│   │   ├─ BitrixAPIOperationTimeLimit (_HTTPResponseTooManyRequests)
-│   │   ├─ BitrixAPIInternalServerError (_HTTPResponseInternalError)
-│   │   │   └─ BitrixAPIErrorUnexpectedAnswer
-│   │   ├─ BitrixAPIServiceUnavailable (_HTTPResponseServiceUnavailable)
-│   │   │   ├─ BitrixAPIOverloadLimit
-│   │   │   └─ BitrixAPIQueryLimitExceeded
-│   │   ├─ BitrixOauthWrongClient (BitrixOAuthException, _HTTPResponseOK)
-│   └─ BitrixAPIError (v3, b24pysdk.error.v3)
+│   └─ BitrixResponseJSONDecodeError 
+│       ├─ BitrixResponse302JSONDecodeError 
+│       ├─ BitrixResponse403JSONDecodeError 
+│       └─ BitrixResponse500JSONDecodeError 
+└─ BaseBitrixAPIError 
+    └─ BitrixAPIError (v1/v2, b24pysdk.error)
+    │   ├─ BitrixAPIBadRequest
+    │   │   ├─ BitrixAPIInvalidArgValue
+    │   │   ├─ BitrixAPIInvalidRequest
+    │   │   │   └─ BitrixOAuthInvalidRequest 
+    │   │   ├─ BitrixOAuthInvalidClient 
+    │   │   └─ BitrixOAuthInvalidGrant 
+    │   ├─ BitrixAPIUnauthorized 
+    │   │   ├─ BitrixAPIAuthorizationError
+    │   │   ├─ BitrixAPIErrorOAuth
+    │   │   ├─ BitrixAPIExpiredToken
+    │   │   ├─ BitrixAPIMethodConfirmWaiting
+    │   │   ├─ BitrixAPIInvalidToken
+    │   │   └─ BitrixAPINoAuthFound
+    │   ├─ BitrixAPIForbidden 
+    │   │   ├─ BitrixAPIAccessDenied
+    │   │   ├─ BitrixAPIAllowedOnlyIntranetUser
+    │   │   ├─ BitrixAPIInsufficientScope
+    │   │   │   └─ BitrixOAuthInsufficientScope
+    │   │   ├─ BitrixAPIInvalidCredentials
+    │   │   ├─ BitrixAPIMethodConfirmDenied
+    │   │   ├─ BitrixAPIUserAccessError
+    │   │   ├─ BitrixAPIWrongAuthType
+    │   │   └─ BitrixOAuthInvalidScope 
+    │   ├─ BitrixAPINotFound 
+    │   ├─ BitrixAPIMethodNotAllowed 
+    │   ├─ BitrixAPIOperationTimeLimit 
+    │   ├─ BitrixAPIInternalServerError 
+    │   │   └─ BitrixAPIErrorUnexpectedAnswer
+    │   ├─ BitrixAPIServiceUnavailable 
+    │   │   ├─ BitrixAPIOverloadLimit
+    │   │   └─ BitrixAPIQueryLimitExceeded
+    │   ├─ BitrixOauthWrongClient
+    │   └─ BitrixAPITooManyRequests
+    └─ BitrixAPIError (v3, b24pysdk.error.v3)
+        ├─ BitrixAPIBadRequest 
+        │   ├─ BitrixAPIEntityNotFoundException
+        │   ├─ BitrixAPIInvalidFilterException
+        │   ├─ BitrixAPIInvalidPaginationException
+        │   ├─ BitrixAPIUnknownDTOPropertyException
+        │   ├─ BitrixAPIValidationDTOValidationException
+        │   └─ BitrixAPIValidationRequestValidationException
+        └─ BitrixAPIUnauthorized
+            └─ BitrixAPIAccessDeniedException
 ```
 
 #### Handles API errors gracefully, providing error descriptions for failed method calls.
 
 ```python
-from b24pysdk.bitrix_api.credentials.bitrix_token import BitrixToken
+from b24pysdk.credentials.bitrix_token import BitrixToken
 from b24pysdk import Client
 from b24pysdk.error import (
     BitrixAPIError,
@@ -358,6 +381,7 @@ from b24pysdk.error import (
     BitrixAPIInternalServerError,
     BitrixAPIServiceUnavailable
 )
+
 bitrix_token = BitrixToken(domain="example.bitrix24.com", auth_token="user_id/webhook_key")
 client = Client(bitrix_token)
 
@@ -384,7 +408,7 @@ except BitrixAPIError as e:
 #### v3 error handling
 
 ```python
-from b24pysdk.bitrix_api.credentials.bitrix_token import BitrixToken
+from b24pysdk.credentials.bitrix_token import BitrixToken
 from b24pysdk import Client
 from b24pysdk.error.v3 import BitrixAPIError
 
@@ -462,10 +486,20 @@ logger = StreamLogger()
 
 cfg = Config()
 cfg.configure(
-    default_timeout=10,                 # seconds or (connect_timeout, read_timeout)
-    default_max_retries=3,              # number of retries on transient errors
+    default_timeout=(3.05, 10),       # seconds or tuple (default_connection_timeout, default_read_timeout)
+    default_max_retries=3,            # number of retries on transient errors
     default_initial_retry_delay=1,    # seconds
-    default_retry_delay_increment=0,  # seconds
+    default_retry_delay_increment=1,  # seconds
+    logger=logger,                     
+)
+
+# other way to pass default timeout values
+cfg.configure(
+    default_connection_timeout=3.05,
+    default_read_timeout=10,          # seconds or tuple (connect_timeout, read_timeout)
+    default_max_retries=3,            # number of retries on transient errors
+    default_initial_retry_delay=1,    # seconds
+    default_retry_delay_increment=1,  # seconds
     logger=logger,                     
 )
 ```
@@ -476,19 +510,19 @@ By using `OAuthTokenRenewedEvent` and `PortalDomainChangedEvent` you can subscri
 
 ```python
 from b24pysdk import BitrixToken
-from b24pysdk.bitrix_api.events import OAuthTokenRenewedEvent, PortalDomainChangedEvent
+from b24pysdk.events import OAuthTokenRenewedEvent, PortalDomainChangedEvent
 
 
 class MyBitrixToken(BitrixToken):
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.oauth_token_renewed_signal.connect(self.oauth_token_renewed_handler)
-        self.portal_domain_changed_signal.connect(self.portal_domain_changed_handler)
-        
-    def oauth_token_renewed_handler(self, event: OAuthTokenRenewedEvent):
-        print(self, f"Renewed oauth token: {event.renewed_oauth_token}")
-        
-    def portal_domain_changed_handler(self, event: PortalDomainChangedEvent):
-        print(self, f"Old domain: {event.old_domain}, new domain: {event.new_domain}")
+
+   def __init__(self, *args, **kwargs):
+      super().__init__(*args, **kwargs)
+      self.oauth_token_renewed_signal.connect(self.oauth_token_renewed_handler)
+      self.portal_domain_changed_signal.connect(self.portal_domain_changed_handler)
+
+   def oauth_token_renewed_handler(self, event: OAuthTokenRenewedEvent):
+      print(self, f"Renewed oauth token: {event.renewed_oauth_token}")
+
+   def portal_domain_changed_handler(self, event: PortalDomainChangedEvent):
+      print(self, f"Old domain: {event.old_domain}, new domain: {event.new_domain}")
 ```

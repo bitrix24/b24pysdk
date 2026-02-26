@@ -4,7 +4,7 @@ from typing import Text, Type, TypeVar
 
 import pytest
 
-from b24pysdk.bitrix_api.responses import BitrixAPITimeResponse
+from b24pysdk.api.responses import BitrixTimeResponse
 from b24pysdk.utils.types import JSONDict
 from tests.constants import PYTHON_VERSION
 
@@ -33,7 +33,7 @@ def assert_slots(cls: Type[ResponseT]):
         assert hasattr(cls, "__slots__")
 
 
-def verify_time(time_obj: BitrixAPITimeResponse, time_data: JSONDict):
+def verify_time(time_obj: BitrixTimeResponse, time_data: JSONDict):
     assert time_obj.start == time_data["start"]
     assert time_obj.finish == time_data["finish"]
     assert time_obj.duration == time_data["duration"]

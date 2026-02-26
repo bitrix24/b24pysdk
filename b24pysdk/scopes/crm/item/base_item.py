@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import Iterable, Optional, Text, Union
 
-from ....bitrix_api.requests import BitrixAPIRequest
+from ....api.requests import BitrixAPIRequest
 from ....utils.types import B24BoolStrict, JSONDict, Timeout
 from .._base_crm import BaseCRM
 

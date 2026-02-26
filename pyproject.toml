@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 name = "b24pysdk"
 version = "0.4.0"
 authors = [
-  { name = "Bitrix24", email = "pypi@bitrixsoft.com" }
+    { name = "Bitrix24", email = "pypi@bitrixsoft.com" }
 ]
 description = "An official Python library for the Bitrix24 REST API"
 license = { file = "LICENSE" }
@@ -29,7 +29,7 @@ Homepage = "https://github.com/bitrix24/b24pysdk"
 [project.optional-dependencies]
 dev = [
     "pre-commit",
-    "ruff==0.12.1",
+    "ruff==0.15.1",
 ]
 test = [
     "environs>=11.0.0",
@@ -52,58 +52,65 @@ exclude = ["build", "dist", ".venv", "__pycache__"]
 
 [tool.ruff.lint]
 select = [
-    "ARG",   # https://docs.astral.sh/ruff/rules/#flake8-unused-arguments-arg
-    "B",     # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-    "BLE",   # https://docs.astral.sh/ruff/rules/#flake8-blind-except-ble
-    "C",     # https://docs.astral.sh/ruff/rules/#mccabe-c
-    "C4",    # https://docs.astral.sh/ruff/rules/#flake8-comprehensions-c4
-    "C90",   # https://docs.astral.sh/ruff/rules/#mccabe-c90
-    "COM",   # https://docs.astral.sh/ruff/rules/#flake8-commas-com
-    "DTZ",   # https://docs.astral.sh/ruff/rules/#flake8-datetimez-dtz
-    "E",     # https://docs.astral.sh/ruff/rules/#pycodestyle-e
-    "F",     # https://docs.astral.sh/ruff/rules/#pyflakes-f
-    "FLY",   # https://docs.astral.sh/ruff/rules/#flynt-fly
-    "G",     # https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
-    "I",     # https://docs.astral.sh/ruff/rules/#isort-i
-    "INP",   # https://docs.astral.sh/ruff/rules/#flake8-no-pep420-inp
-    "INT",   # https://docs.astral.sh/ruff/rules/#flake8-gettext-int
-    "ISC",   # https://docs.astral.sh/ruff/rules/#flake8-implicit-str-concat-isc
-    "LOG",   # https://docs.astral.sh/ruff/rules/#flake8-logging-log
-    "N",     # https://docs.astral.sh/ruff/rules/#pep8-naming-n
-    "Q",     # https://docs.astral.sh/ruff/rules/#flake8-quotes-q
-    "PERF",  # https://docs.astral.sh/ruff/rules/#perflint-perf
-    "PIE",   # https://docs.astral.sh/ruff/rules/#flake8-pie-pie
-    "PGH",   # https://docs.astral.sh/ruff/rules/#pygrep-hooks-pgh
-    "PL",    # https://docs.astral.sh/ruff/rules/#pylint-pl
-    "PT",    # https://docs.astral.sh/ruff/rules/#flake8-pytest-style-pt
-    "PTH",   # https://docs.astral.sh/ruff/rules/#flake8-use-pathlib-pth
-    "PYI",   # https://docs.astral.sh/ruff/rules/#flake8-pyi-pyi
-    "RET",   # https://docs.astral.sh/ruff/rules/#flake8-return-ret
-    "RSE",   # https://docs.astral.sh/ruff/rules/#flake8-raise-rse
-    "RUF",   # https://docs.astral.sh/ruff/rules/#ruff-specific-ruf
-    "S",     # https://docs.astral.sh/ruff/rules/#flake8-bandit-s
-    "SIM",   # https://docs.astral.sh/ruff/rules/#flake8-simplify-sim
-    "SLOT",  # https://docs.astral.sh/ruff/rules/#flake8-slots-slot
-    "T",     # https://docs.astral.sh/ruff/rules/#flake8-debugger-t
-    "TD",    # https://docs.astral.sh/ruff/rules/#flake8-todos-td
-    "TID",   # https://docs.astral.sh/ruff/rules/#flake8-tidy-imports-tid
-    "TRY",   # https://docs.astral.sh/ruff/rules/#tryceratops-try
-    "YTT",   # https://docs.astral.sh/ruff/rules/#flake8-2020-ytt
+    "ARG", # https://docs.astral.sh/ruff/rules/#flake8-unused-arguments-arg
+    "B", # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+    "BLE", # https://docs.astral.sh/ruff/rules/#flake8-blind-except-ble
+    "C", # https://docs.astral.sh/ruff/rules/#mccabe-c
+    "C4", # https://docs.astral.sh/ruff/rules/#flake8-comprehensions-c4
+    "C90", # https://docs.astral.sh/ruff/rules/#mccabe-c90
+    "COM", # https://docs.astral.sh/ruff/rules/#flake8-commas-com
+    "DTZ", # https://docs.astral.sh/ruff/rules/#flake8-datetimez-dtz
+    "E", # https://docs.astral.sh/ruff/rules/#pycodestyle-e
+    "EXE", # https://docs.astral.sh/ruff/rules/#flake8-executable-exe
+    "F", # https://docs.astral.sh/ruff/rules/#pyflakes-f
+    "FLY", # https://docs.astral.sh/ruff/rules/#flynt-fly
+    "FURB", # https://docs.astral.sh/ruff/rules/#refurb-furb
+    "G", # https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
+    "I", # https://docs.astral.sh/ruff/rules/#isort-i
+    "ICN", # https://docs.astral.sh/ruff/rules/#flake8-import-conventions-icn
+    "INP", # https://docs.astral.sh/ruff/rules/#flake8-no-pep420-inp
+    "INT", # https://docs.astral.sh/ruff/rules/#flake8-gettext-int
+    "ISC", # https://docs.astral.sh/ruff/rules/#flake8-implicit-str-concat-isc
+    "LOG", # https://docs.astral.sh/ruff/rules/#flake8-logging-log
+    "N", # https://docs.astral.sh/ruff/rules/#pep8-naming-n
+    "Q", # https://docs.astral.sh/ruff/rules/#flake8-quotes-q
+    "PERF", # https://docs.astral.sh/ruff/rules/#perflint-perf
+    "PIE", # https://docs.astral.sh/ruff/rules/#flake8-pie-pie
+    "PGH", # https://docs.astral.sh/ruff/rules/#pygrep-hooks-pgh
+    "PL", # https://docs.astral.sh/ruff/rules/#pylint-pl
+    "PLC", # https://docs.astral.sh/ruff/rules/#convention-plc
+    "PLE", # https://docs.astral.sh/ruff/rules/#error-ple
+    "PLR", # https://docs.astral.sh/ruff/rules/#refactor-plr
+    "PLW", # https://docs.astral.sh/ruff/rules/#warning-plw
+    "PT", # https://docs.astral.sh/ruff/rules/#flake8-pytest-style-pt
+    "PTH", # https://docs.astral.sh/ruff/rules/#flake8-use-pathlib-pth
+    "PYI", # https://docs.astral.sh/ruff/rules/#flake8-pyi-pyi
+    "RET", # https://docs.astral.sh/ruff/rules/#flake8-return-ret
+    "RSE", # https://docs.astral.sh/ruff/rules/#flake8-raise-rse
+    "RUF", # https://docs.astral.sh/ruff/rules/#ruff-specific-ruf
+    "S", # https://docs.astral.sh/ruff/rules/#flake8-bandit-s
+    "SIM", # https://docs.astral.sh/ruff/rules/#flake8-simplify-sim
+    "SLOT", # https://docs.astral.sh/ruff/rules/#flake8-slots-slot
+    "T", # https://docs.astral.sh/ruff/rules/#flake8-debugger-t
+    "TC", # https://docs.astral.sh/ruff/rules/#flake8-type-checking-tc
+    "TD", # https://docs.astral.sh/ruff/rules/#flake8-todos-td
+    "TID", # https://docs.astral.sh/ruff/rules/#flake8-tidy-imports-tid
+    "TRY", # https://docs.astral.sh/ruff/rules/#tryceratops-try
+    "W", # https://docs.astral.sh/ruff/rules/#warning-w
+    "YTT", # https://docs.astral.sh/ruff/rules/#flake8-2020-ytt
 ]
 
 ignore = [
-    "B009",     # https://docs.astral.sh/ruff/rules/get-and-set-attribute-on-class
-    "C408",     # https://docs.astral.sh/ruff/rules/unnecessary-collection-call
-    "E501",     # https://docs.astral.sh/ruff/rules/line-too-long
-    "N805",     # https://docs.astral.sh/ruff/rules/invalid-first-argument-name-for-method
-    "N818",     # https://docs.astral.sh/ruff/rules/error-suffix-on-exception-name
-    "PLC0415",  # https://docs.astral.sh/ruff/rules/import-outside-toplevel
-    "PLR0913",  # https://docs.astral.sh/ruff/rules/too-many-arguments
-    "RET505",   # https://docs.astral.sh/ruff/rules/superfluous-else-return
-    "SIM108",   # https://docs.astral.sh/ruff/rules/if-else-block-instead-of-if-exp
-    "T201",     # https://docs.astral.sh/ruff/rules/print-found
-    "TID252",   # https://docs.astral.sh/ruff/rules/relative-imports
-    "TRY003",   # https://docs.astral.sh/ruff/rules/raise-vanilla-args
+    "B009", # https://docs.astral.sh/ruff/rules/get-attr-with-constant/
+    "C408", # https://docs.astral.sh/ruff/rules/unnecessary-collection-call/
+    "N805", # https://docs.astral.sh/ruff/rules/invalid-first-argument-name-for-method/
+    "N818", # https://docs.astral.sh/ruff/rules/error-suffix-on-exception-name/
+    "PLR0913", # https://docs.astral.sh/ruff/rules/too-many-arguments/
+    "RET505", # https://docs.astral.sh/ruff/rules/superfluous-else-return/
+    "SIM108", # https://docs.astral.sh/ruff/rules/if-else-block-instead-of-if-exp/
+    "T201", # https://docs.astral.sh/ruff/rules/print/
+    "TID252", # https://docs.astral.sh/ruff/rules/relative-imports/
+    "TRY003", # https://docs.astral.sh/ruff/rules/raise-vanilla-args/
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -131,7 +138,6 @@ markers = [
     "b24_app_info_install_result",
     "bitrix_app_info_response",
     "bitrix_api_response",
-    "bitrix_api_time_response",
     "bitrix_api_request",
     "bitrix_api_list_request",
     "bitrix_api_list_fast_request",
@@ -139,6 +145,7 @@ markers = [
     "bitrix_api_batches_request",
     "bitrix_api_requester",
     "bitrix_oauth_requester",
+    "bitrix_time_response",
     "bizproc",
     "crm: mark a test as related to crm operations",
     "crm_activity",
@@ -168,9 +175,12 @@ markers = [
     "crm_type",
     "department: mark a test as related to department operations",
     "disk",
+    "documentgenerator",
+    "documentgenerator_document",
     "entity: mark a test as related to entity operations",
     "entity_section: mark a test as related to entity section operations",
     "event: mark a test as related to event operations",
+    "event_offline",
     "events: mark a test as related to events operations",
     "feature: mark a test as related to feature operations",
     "folder",
@@ -187,6 +197,7 @@ markers = [
     "server: mark a test as related to server operations",
     "scope",
     "storage",
+    "test_error",
     "unit",
     "user: mark a test as related to user operations",
     "user_option: mark a test as related to user option operations",

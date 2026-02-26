@@ -1,7 +1,7 @@
 from functools import cached_property
 from typing import Iterable, Optional, Text
 
-from ...bitrix_api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
 from .._base_scope import BaseScope
@@ -65,7 +65,7 @@ class User(BaseScope):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        params: JSONDict = {}
 
         if sort is not None:
             params["sort"] = sort
@@ -115,7 +115,7 @@ class User(BaseScope):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        params: JSONDict = {}
 
         if filter is not None:
             params["filter"] = filter
@@ -174,7 +174,7 @@ class User(BaseScope):
         if access.__class__ is not list:
             access = list(access)
 
-        params = {
+        params: JSONDict = {
             "ACCESS": access,
         }
 

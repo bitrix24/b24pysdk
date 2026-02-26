@@ -1,15 +1,16 @@
-from typing import Dict, Text, Tuple, cast
+from typing import Dict, Text, Tuple
 
 import pytest
 from _pytest.cacheprovider import Cache
 
-from b24pysdk import Client, Config
-from b24pysdk.bitrix_api.responses import BitrixAPIListResponse, BitrixAPIResponse
+from b24pysdk import Config
+from b24pysdk.api.responses import BitrixAPIListResponse, BitrixAPIResponse
+from b24pysdk.client import BaseClient
 
 from ....constants import SDK_NAME
 
 pytestmark = [
-    pytest.mark.integration,
+    # pytest.mark.integration,
     pytest.mark.entity,
 ]
 
@@ -19,7 +20,7 @@ _ACCESS: Dict = {"AU": "R"}
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_entity_add")
-def test_entity_add(bitrix_client: Client, cache: Cache):
+def test_entity_add(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     entity_name: Text = f"ENTITY_{str(Config().get_local_datetime().timestamp() * (10 ** 6))[:8]}"
@@ -33,7 +34,7 @@ def test_entity_add(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, int)
 
-    entity_id = cast(int, bitrix_response.result)
+    entity_id = bitrix_response.result
     assert entity_id > 0, "Entity creation should return a positive ID"
 
     cache.set("entity_name", entity_name)
@@ -41,7 +42,7 @@ def test_entity_add(bitrix_client: Client, cache: Cache):
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_entity_get", depends=["test_entity_add"])
-def test_entity_get(bitrix_client: Client, cache: Cache):
+def test_entity_get(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     entity_name = cache.get("entity_name", None)
@@ -54,14 +55,14 @@ def test_entity_get(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    entity = cast(dict, bitrix_response.result)
+    entity = bitrix_response.result
 
     assert entity.get("ENTITY") == entity_name, "Entity ENTITY does not match"
     assert entity.get("NAME") == f"{SDK_NAME} Test Entity", "Entity NAME does not match"
 
 
 @pytest.mark.oauth_only
-def test_entity_get_as_list(bitrix_client: Client):
+def test_entity_get_as_list(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.entity.get().as_list().response
@@ -69,7 +70,7 @@ def test_entity_get_as_list(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListResponse)
     assert isinstance(bitrix_response.result, list)
 
-    entities = cast(list, bitrix_response.result)
+    entities = bitrix_response.result
 
     assert len(entities) >= 1, "Expected at least one entities to be returned"
 
@@ -81,7 +82,7 @@ def test_entity_get_as_list(bitrix_client: Client):
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_entity_update", depends=["test_entity_add"])
-def test_entity_update(bitrix_client: Client, cache: Cache):
+def test_entity_update(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     entity_name = cache.get("entity_name", None)
@@ -94,14 +95,14 @@ def test_entity_update(bitrix_client: Client, cache: Cache):
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_updated = cast(bool, bitrix_response.result)
+    is_updated = bitrix_response.result
 
     assert is_updated is True, "Entity update should return True"
 
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_entity_rights", depends=["test_entity_add"])
-def test_entity_rights(bitrix_client: Client, cache: Cache):
+def test_entity_rights(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     entity_name = cache.get("entity_name", None)
@@ -114,13 +115,13 @@ def test_entity_rights(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    rights = cast(dict, bitrix_response.result)
+    rights = bitrix_response.result
     assert isinstance(rights, dict), "Rights should be a dictionary"
 
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_entity_delete", depends=["test_entity_add"])
-def test_entity_delete(bitrix_client: Client, cache: Cache):
+def test_entity_delete(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     entity_name = cache.get("entity_name", None)
@@ -132,6 +133,6 @@ def test_entity_delete(bitrix_client: Client, cache: Cache):
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_deleted = cast(bool, bitrix_response.result)
+    is_deleted = bitrix_response.result
 
     assert is_deleted is True, "Entity deletion should return True"

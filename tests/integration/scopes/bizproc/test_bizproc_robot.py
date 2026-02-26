@@ -1,14 +1,14 @@
-from typing import Text, Tuple, cast
+from typing import Text, Tuple
 
 import pytest
 from _pytest.cacheprovider import Cache
 
-from b24pysdk import Client
-from b24pysdk.bitrix_api.responses import BitrixAPIResponse
+from b24pysdk.api.responses import BitrixAPIResponse
+from b24pysdk.client import BaseClient
 from tests.constants import SDK_NAME
 
 pytestmark = [
-    pytest.mark.integration,
+    # pytest.mark.integration,
     pytest.mark.bizproc,
     pytest.mark.robot,
 ]
@@ -56,7 +56,7 @@ _FILTER = {
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_bizproc_robot_add")
-def test_bizproc_robot_add(bitrix_client: Client, cache: Cache):
+def test_bizproc_robot_add(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     bitrix_response = bitrix_client.bizproc.robot.add(
@@ -75,7 +75,7 @@ def test_bizproc_robot_add(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, bool)
 
-    is_added = cast(bool, bitrix_response.result)
+    is_added = bitrix_response.result
 
     assert is_added is True, "Robot creation should return True"
 
@@ -84,7 +84,7 @@ def test_bizproc_robot_add(bitrix_client: Client, cache: Cache):
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_bizproc_robot_update", depends=["test_bizproc_robot_add"])
-def test_bizproc_robot_update(bitrix_client: Client, cache: Cache):
+def test_bizproc_robot_update(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     robot_code = cache.get("robot_code", None)
@@ -108,14 +108,14 @@ def test_bizproc_robot_update(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, bool)
 
-    is_updated = cast(bool, bitrix_response.result)
+    is_updated = bitrix_response.result
 
     assert is_updated is True, "Robot update should return True"
 
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_bizproc_robot_list", depends=["test_bizproc_robot_update"])
-def test_bizproc_robot_list(bitrix_client: Client, cache: Cache):
+def test_bizproc_robot_list(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     robot_code = cache.get("robot_code", None)
@@ -126,7 +126,7 @@ def test_bizproc_robot_list(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, list)
 
-    robots = cast(list, bitrix_response.result)
+    robots = bitrix_response.result
 
     assert len(robots) == 1, "Expected one robot to be returned"
 
@@ -139,7 +139,7 @@ def test_bizproc_robot_list(bitrix_client: Client, cache: Cache):
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_bizproc_robot_delete", depends=["test_bizproc_robot_list"])
-def test_bizproc_robot_delete(bitrix_client: Client, cache: Cache):
+def test_bizproc_robot_delete(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     robot_code = cache.get("robot_code", None)
@@ -152,6 +152,6 @@ def test_bizproc_robot_delete(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, bool)
 
-    is_deleted = cast(bool, bitrix_response.result)
+    is_deleted = bitrix_response.result
 
     assert is_deleted is True, "Robot deletion should return True"

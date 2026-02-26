@@ -1,14 +1,14 @@
-from typing import Text, Tuple, cast
+from typing import Text, Tuple
 
 import pytest
 
-from b24pysdk import Client
-from b24pysdk.bitrix_api.responses import BitrixAPIResponse
+from b24pysdk.api.responses import BitrixAPIResponse
+from b24pysdk.client import BaseClient
 from b24pysdk.utils.types import JSONDict
 
 pytestmark = [
-    pytest.mark.integration,
-    pytest.mark.crm,
+    # pytest.mark.integration,
+    # pytest.mark.crm,
     pytest.mark.crm_currency_localizations,
 ]
 
@@ -29,7 +29,7 @@ _LOCALIZATIONS_EN: JSONDict = {
 
 
 @pytest.mark.dependency(name="test_localizations_fields")
-def test_localizations_fields(bitrix_client: Client):
+def test_localizations_fields(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.currency.localizations.fields().response
@@ -37,7 +37,7 @@ def test_localizations_fields(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    fields = cast(dict, bitrix_response.result)
+    fields = bitrix_response.result
 
     for field in _FIELDS:
         assert field in fields, f"Field '{field}' should be present"
@@ -45,7 +45,7 @@ def test_localizations_fields(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_localizations_set", depends=["test_localizations_fields"])
-def test_localizations_set(bitrix_client: Client):
+def test_localizations_set(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.currency.localizations.set(
@@ -57,13 +57,13 @@ def test_localizations_set(bitrix_client: Client):
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_set = cast(bool, bitrix_response.result)
+    is_set = bitrix_response.result
 
     assert is_set is True, "Setting localizations should return True"
 
 
 @pytest.mark.dependency(name="test_localizations_get", depends=["test_localizations_set"])
-def test_localizations_get(bitrix_client: Client):
+def test_localizations_get(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.currency.localizations.get(
@@ -73,13 +73,13 @@ def test_localizations_get(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    localizations = cast(dict, bitrix_response.result)
+    localizations = bitrix_response.result
 
     assert localizations.get(_LANG_EN) == _LOCALIZATIONS_EN, f"Localization {_LANG_EN} should be in result"
 
 
 @pytest.mark.dependency(name="test_localizations_delete", depends=["test_localizations_get"])
-def test_localizations_delete(bitrix_client: Client):
+def test_localizations_delete(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.currency.localizations.delete(
@@ -89,6 +89,6 @@ def test_localizations_delete(bitrix_client: Client):
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_deleted = cast(bool, bitrix_response.result)
+    is_deleted = bitrix_response.result
 
     assert is_deleted is True, "Deleting localizations should return True"

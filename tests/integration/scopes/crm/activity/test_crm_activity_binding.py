@@ -1,13 +1,12 @@
-from typing import cast
 
 import pytest
 
-from b24pysdk import Client
-from b24pysdk.bitrix_api.responses import BitrixAPIResponse
+from b24pysdk.api.responses import BitrixAPIResponse
+from b24pysdk.client import BaseClient
 
 pytestmark = [
-    pytest.mark.integration,
-    pytest.mark.crm,
+    # pytest.mark.integration,
+    # pytest.mark.crm,
     pytest.mark.crm_activity,
     pytest.mark.crm_activity_binding,
 ]
@@ -19,7 +18,7 @@ _TARGET_ENTITY_ID: int = 2
 
 
 @pytest.mark.dependency(name="test_crm_activity_binding_add")
-def test_crm_activity_binding_add(bitrix_client: Client):
+def test_crm_activity_binding_add(bitrix_client: BaseClient):
     """Test adding a binding to a CRM entity."""
 
     bitrix_response = bitrix_client.crm.activity.binding.add(
@@ -30,13 +29,13 @@ def test_crm_activity_binding_add(bitrix_client: Client):
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_added = cast(bool, bitrix_response.result)
+    is_added = bitrix_response.result
 
     assert is_added is True, "Binding addition should return True"
 
 
 @pytest.mark.dependency(name="test_crm_activity_binding_list", depends=["test_crm_activity_binding_add"])
-def test_crm_activity_binding_list(bitrix_client: Client):
+def test_crm_activity_binding_list(bitrix_client: BaseClient):
     """Test retrieving a list of bindings for an activity."""
 
     bitrix_response = bitrix_client.crm.activity.binding.list(
@@ -46,7 +45,7 @@ def test_crm_activity_binding_list(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, list)
 
-    bindings = cast(list, bitrix_response.result)
+    bindings = bitrix_response.result
 
     assert len(bindings) >= 1, "Expected at least one binding to be returned"
 
@@ -62,7 +61,7 @@ def test_crm_activity_binding_list(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_crm_activity_binding_move", depends=["test_crm_activity_binding_list"])
-def test_crm_activity_binding_move(bitrix_client: Client):
+def test_crm_activity_binding_move(bitrix_client: BaseClient):
     """Test updating a binding to a different CRM entity."""
 
     bitrix_response = bitrix_client.crm.activity.binding.move(
@@ -75,13 +74,13 @@ def test_crm_activity_binding_move(bitrix_client: Client):
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_moved = cast(bool, bitrix_response.result)
+    is_moved = bitrix_response.result
 
     assert is_moved is True, "Binding move should return True"
 
 
 @pytest.mark.dependency(name="test_crm_activity_binding_delete", depends=["test_crm_activity_binding_move"])
-def test_crm_activity_binding_delete(bitrix_client: Client):
+def test_crm_activity_binding_delete(bitrix_client: BaseClient):
     """Test deleting a binding from a CRM entity."""
 
     bitrix_response = bitrix_client.crm.activity.binding.delete(
@@ -92,6 +91,6 @@ def test_crm_activity_binding_delete(bitrix_client: Client):
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_deleted = cast(bool, bitrix_response.result)
+    is_deleted = bitrix_response.result
 
     assert is_deleted is True, "Binding deletion should return True"

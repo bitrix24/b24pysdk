@@ -1,16 +1,16 @@
-from typing import Text, Tuple, cast
+from typing import Text, Tuple
 
 import pytest
 from _pytest.cacheprovider import Cache
 
-from b24pysdk import Client
-from b24pysdk.bitrix_api.responses import BitrixAPIListResponse, BitrixAPIResponse
+from b24pysdk.api.responses import BitrixAPIListResponse, BitrixAPIResponse
+from b24pysdk.client import BaseClient
 
 from .....constants import SDK_NAME
 
 pytestmark = [
-    pytest.mark.integration,
-    pytest.mark.crm,
+    # pytest.mark.integration,
+    # pytest.mark.crm,
     pytest.mark.documentgenerator,
     pytest.mark.documentgenerator_document,
 ]
@@ -52,7 +52,7 @@ _FILTER = {
 _START: int = 0
 
 
-def test_crm_documentgenerator_document_getfields(bitrix_client: Client):
+def test_crm_documentgenerator_document_getfields(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.documentgenerator.document.getfields(
@@ -62,13 +62,13 @@ def test_crm_documentgenerator_document_getfields(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    fields = cast(dict, bitrix_response.result)
+    fields = bitrix_response.result
 
     assert len(fields) > 0, "Fields should not be empty"
 
 
 @pytest.mark.dependency(name="test_crm_documentgenerator_document_add")
-def test_crm_documentgenerator_document_add(bitrix_client: Client, cache: Cache):
+def test_crm_documentgenerator_document_add(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     bitrix_response = bitrix_client.crm.documentgenerator.document.add(
@@ -82,10 +82,10 @@ def test_crm_documentgenerator_document_add(bitrix_client: Client, cache: Cache)
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    response_dict = cast(dict, bitrix_response.result)
+    response_dict = bitrix_response.result
     assert "document" in response_dict, "Response should contain 'document' key"
 
-    document = cast(dict, response_dict["document"])
+    document = response_dict["document"]
 
     for field in _DOCUMENT_FIELDS:
         assert field in document, f"Field '{field}' should be present"
@@ -97,7 +97,7 @@ def test_crm_documentgenerator_document_add(bitrix_client: Client, cache: Cache)
 
 
 @pytest.mark.dependency(name="test_crm_documentgenerator_document_get", depends=["test_crm_documentgenerator_document_add"])
-def test_crm_documentgenerator_document_get(bitrix_client: Client, cache: Cache):
+def test_crm_documentgenerator_document_get(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     document_id = cache.get("created_document_id", None)
@@ -110,10 +110,10 @@ def test_crm_documentgenerator_document_get(bitrix_client: Client, cache: Cache)
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    response_dict = cast(dict, bitrix_response.result)
+    response_dict = bitrix_response.result
     assert "document" in response_dict, "Response should contain 'document' key"
 
-    document = cast(dict, response_dict["document"])
+    document = response_dict["document"]
 
     for field in _DOCUMENT_FIELDS:
         assert field in document, f"Field '{field}' should be present"
@@ -126,7 +126,7 @@ def test_crm_documentgenerator_document_get(bitrix_client: Client, cache: Cache)
 
 
 @pytest.mark.dependency(name="test_crm_documentgenerator_document_list", depends=["test_crm_documentgenerator_document_get"])
-def test_crm_documentgenerator_document_list(bitrix_client: Client, cache: Cache):
+def test_crm_documentgenerator_document_list(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     document_id = cache.get("created_document_id", None)
@@ -140,10 +140,10 @@ def test_crm_documentgenerator_document_list(bitrix_client: Client, cache: Cache
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    response_dict = cast(dict, bitrix_response.result)
+    response_dict = bitrix_response.result
     assert "documents" in response_dict, "Response should contain 'documents' key"
 
-    documents = cast(list, response_dict["documents"])
+    documents = response_dict["documents"]
 
     assert len(documents) >= 1, "Expected at least one document to be returned"
 
@@ -160,7 +160,7 @@ def test_crm_documentgenerator_document_list(bitrix_client: Client, cache: Cache
 
 
 @pytest.mark.dependency(name="test_crm_documentgenerator_document_list_as_list", depends=["test_crm_documentgenerator_document_list"])
-def test_crm_documentgenerator_document_list_as_list(bitrix_client: Client):
+def test_crm_documentgenerator_document_list_as_list(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.documentgenerator.document.list().as_list().response
@@ -168,14 +168,14 @@ def test_crm_documentgenerator_document_list_as_list(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListResponse)
     assert isinstance(bitrix_response.result, list)
 
-    documents = cast(list, bitrix_response.result)
+    documents = bitrix_response.result
 
     for document in documents:
         assert isinstance(document, dict)
 
 
 @pytest.mark.dependency(name="test_crm_documentgenerator_document_update", depends=["test_crm_documentgenerator_document_list_as_list"])
-def test_crm_documentgenerator_document_update(bitrix_client: Client, cache: Cache):
+def test_crm_documentgenerator_document_update(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     document_id = cache.get("created_document_id", None)
@@ -190,17 +190,17 @@ def test_crm_documentgenerator_document_update(bitrix_client: Client, cache: Cac
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    response_dict = cast(dict, bitrix_response.result)
+    response_dict = bitrix_response.result
     assert "document" in response_dict, "Response should contain 'document' key"
 
-    updated_document = cast(dict, response_dict["document"])
+    updated_document = response_dict["document"]
 
     assert updated_document.get("id") == str(document_id), "Document ID should remain the same"
     assert updated_document.get("stampsEnabled") is False, "Document stamps enabled should be updated"
 
 
 @pytest.mark.dependency(name="test_crm_documentgenerator_document_enablepublicurl", depends=["test_crm_documentgenerator_document_update"])
-def test_crm_documentgenerator_document_enablepublicurl(bitrix_client: Client, cache: Cache):
+def test_crm_documentgenerator_document_enablepublicurl(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     document_id = cache.get("created_document_id", None)
@@ -214,12 +214,12 @@ def test_crm_documentgenerator_document_enablepublicurl(bitrix_client: Client, c
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    result = cast(dict, bitrix_response.result)
+    result = bitrix_response.result
     assert "publicUrl" in result, "Response should contain 'publicUrl'"
 
 
 # @pytest.mark.dependency(name="test_crm_documentgenerator_document_upload", depends=["test_crm_documentgenerator_document_enablepublicurl"])
-# def test_crm_documentgenerator_document_upload(bitrix_client: Client):
+# def test_crm_documentgenerator_document_upload(bitrix_client: BaseClient):
 #     """"""
 #
 #     unique_title = f"{_TITLE}_{int(Config().get_local_datetime().timestamp() * (10 ** 6))}"
@@ -247,7 +247,7 @@ def test_crm_documentgenerator_document_enablepublicurl(bitrix_client: Client, c
 
 
 @pytest.mark.dependency(name="test_crm_documentgenerator_document_delete", depends=["test_crm_documentgenerator_document_enablepublicurl"])
-def test_crm_documentgenerator_document_delete(bitrix_client: Client, cache: Cache):
+def test_crm_documentgenerator_document_delete(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     document_id = cache.get("created_document_id", None)

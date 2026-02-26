@@ -1,13 +1,13 @@
 from datetime import date, datetime
-from typing import Generator, List, Text, Tuple, cast
+from typing import Generator, List, Text, Tuple
 
 import pytest
 from _pytest.cacheprovider import Cache
 
-from b24pysdk import Client, Config
-from b24pysdk.bitrix_api.responses import BitrixAPIListFastResponse, BitrixAPIListResponse, BitrixAPIResponse
+from b24pysdk import Config
+from b24pysdk.api.responses import BitrixAPIListFastResponse, BitrixAPIListResponse, BitrixAPIResponse
+from b24pysdk.client import BaseClient
 from b24pysdk.constants.user import PersonalGender
-from b24pysdk.utils.types import JSONDictGenerator
 
 from ....constants import HEAD_DEPARTMENT_ID, SDK_NAME
 
@@ -16,8 +16,10 @@ pytestmark = [
     pytest.mark.user,
 ]
 
-_FIELDS: Tuple[Text, ...] = ("ID", "XML_ID", "ACTIVE", "NAME", "LAST_NAME", "EMAIL", "LAST_LOGIN", "DATE_REGISTER", "TIME_ZONE", "IS_ONLINE", "TIMESTAMP_X",
-                             "LAST_ACTIVITY_DATE", "PERSONAL_GENDER", "PERSONAL_BIRTHDAY", "UF_EMPLOYMENT_DATE", "UF_DEPARTMENT")
+_FIELDS: Tuple[Text, ...] = (
+    "ID", "XML_ID", "ACTIVE", "NAME", "LAST_NAME", "EMAIL", "LAST_LOGIN", "DATE_REGISTER", "TIME_ZONE", "IS_ONLINE",
+    "TIMESTAMP_X", "LAST_ACTIVITY_DATE", "PERSONAL_GENDER", "PERSONAL_BIRTHDAY", "UF_EMPLOYMENT_DATE", "UF_DEPARTMENT",
+)
 
 _NAME: Text = "Test"
 _LAST_NAME: Text = SDK_NAME
@@ -30,7 +32,7 @@ _PERSONAL_BIRTHDAY: date = Config().get_local_date()
 _ACCESS: List[Text] = ["AU", "G2"]
 
 
-def test_user_fields(bitrix_client: Client):
+def test_user_fields(bitrix_client: BaseClient):
     """Test retrieving user fields and validating the structure."""
 
     bitrix_response = bitrix_client.user.fields().response
@@ -38,7 +40,7 @@ def test_user_fields(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    fields = cast(dict, bitrix_response.result)
+    fields = bitrix_response.result
 
     for field in _FIELDS:
         assert field in fields, f"Field '{field}' should be present"
@@ -46,7 +48,7 @@ def test_user_fields(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_user_add")
-def test_user_add(bitrix_client: Client, cache: Cache):
+def test_user_add(bitrix_client: BaseClient, cache: Cache):
     """Test addition of a new user and validate successful creation."""
 
     email: Text = f"{int(Config().get_local_datetime().timestamp() * (10 ** 6))}@pysdktest.com"
@@ -63,7 +65,7 @@ def test_user_add(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, int)
 
-    user_id = cast(int, bitrix_response.result)
+    user_id = bitrix_response.result
 
     assert user_id > 0, "The result should be a positive integer representing the user ID"
 
@@ -72,7 +74,7 @@ def test_user_add(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_user_get", depends=["test_user_add"])
-def test_user_get(bitrix_client: Client, cache: Cache):
+def test_user_get(bitrix_client: BaseClient, cache: Cache):
     """Test retrieving a user by ID."""
 
     user_id = cache.get("user_id", None)
@@ -90,12 +92,14 @@ def test_user_get(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, list)
 
-    users = cast(list, bitrix_response.result)
+    users = bitrix_response.result
 
     assert len(users) == 1, "Expected one user to be returned"
+
     user = users[0]
 
     assert isinstance(user, dict)
+
     assert user.get("ID") == str(user_id), "Returned user ID does not match expected"
     assert user.get("NAME") == _NAME, "Name does not match"
     assert user.get("LAST_NAME") == _LAST_NAME, "Last name does not match"
@@ -104,7 +108,7 @@ def test_user_get(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_user_get_as_list", depends=["test_user_add"])
-def test_user_get_as_list(bitrix_client: Client):
+def test_user_get_as_list(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.user.get().as_list().response
@@ -112,7 +116,7 @@ def test_user_get_as_list(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListResponse)
     assert isinstance(bitrix_response.result, list)
 
-    users = cast(list, bitrix_response.result)
+    users = bitrix_response.result
 
     assert len(users) >= 1, "Expected at least one user to be returned"
 
@@ -121,7 +125,7 @@ def test_user_get_as_list(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_user_get_as_list_fast", depends=["test_user_add"])
-def test_user_get_as_list_fast(bitrix_client: Client):
+def test_user_get_as_list_fast(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.user.get().as_list_fast(descending=True).response
@@ -129,7 +133,7 @@ def test_user_get_as_list_fast(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListFastResponse)
     assert isinstance(bitrix_response.result, Generator)
 
-    users = cast(JSONDictGenerator, bitrix_response.result)
+    users = bitrix_response.result
 
     last_user_id = None
 
@@ -147,7 +151,7 @@ def test_user_get_as_list_fast(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_user_update", depends=["test_user_add"])
-def test_user_update(bitrix_client: Client, cache: Cache):
+def test_user_update(bitrix_client: BaseClient, cache: Cache):
     """Test updating an existing user's attributes."""
 
     user_id = cache.get("user_id", None)
@@ -166,13 +170,13 @@ def test_user_update(bitrix_client: Client, cache: Cache):
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_updated = cast(bool, bitrix_response.result)
+    is_updated = bitrix_response.result
 
     assert is_updated is True, "User update should return True"
 
 
 @pytest.mark.dependency(name="test_user_search", depends=["test_user_update"])
-def test_user_search(bitrix_client: Client, cache: Cache):
+def test_user_search(bitrix_client: BaseClient, cache: Cache):
     """Test searching for users by a given criteria."""
 
     user_id = cache.get("user_id", None)
@@ -190,7 +194,7 @@ def test_user_search(bitrix_client: Client, cache: Cache):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, list)
 
-    users = cast(list, bitrix_response.result)
+    users = bitrix_response.result
 
     assert len(users) == 1, "Expected one user to be returned"
 
@@ -211,7 +215,7 @@ def test_user_search(bitrix_client: Client, cache: Cache):
 
 
 @pytest.mark.dependency(name="test_user_search", depends=["test_user_update"])
-def test_user_search_as_list(bitrix_client: Client):
+def test_user_search_as_list(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.user.search().as_list().response
@@ -219,7 +223,7 @@ def test_user_search_as_list(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListResponse)
     assert isinstance(bitrix_response.result, list)
 
-    users = cast(list, bitrix_response.result)
+    users = bitrix_response.result
 
     assert len(users) >= 1, "Expected at least one user to be returned"
 
@@ -228,7 +232,7 @@ def test_user_search_as_list(bitrix_client: Client):
 
 
 @pytest.mark.dependency(name="test_user_search", depends=["test_user_update"])
-def test_user_search_as_list_fast(bitrix_client: Client):
+def test_user_search_as_list_fast(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.user.search().as_list_fast(descending=True).response
@@ -236,7 +240,7 @@ def test_user_search_as_list_fast(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIListFastResponse)
     assert isinstance(bitrix_response.result, Generator)
 
-    users = cast(JSONDictGenerator, bitrix_response.result)
+    users = bitrix_response.result
 
     last_user_id = None
 
@@ -253,7 +257,7 @@ def test_user_search_as_list_fast(bitrix_client: Client):
             last_user_id = user_id
 
 
-def test_user_current(bitrix_client: Client):
+def test_user_current(bitrix_client: BaseClient):
     """Test retrieving details of the current user."""
 
     bitrix_response = bitrix_client.user.current().response
@@ -261,28 +265,28 @@ def test_user_current(bitrix_client: Client):
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
 
-    user = cast(dict, bitrix_response.result)
+    user = bitrix_response.result
 
     for field in _FIELDS:
         assert field in user, f"Field '{field}' should be present"
         assert isinstance(user[field], (bool, str, list)), f"Field '{field}' should be a bool, string or list"
 
 
-def test_user_admin(bitrix_client: Client):
+def test_user_admin(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.user.admin().response
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_admin = cast(bool, bitrix_response.result)
+    is_admin = bitrix_response.result
     assert is_admin is True, "User admin should return True"
 
 
-def test_user_access(bitrix_client: Client):
+def test_user_access(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.user.access(access=_ACCESS).response
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_available = cast(bool, bitrix_response.result)
+    is_available = bitrix_response.result
     assert is_available is True, "User access should return True"

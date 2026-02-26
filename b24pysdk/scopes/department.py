@@ -1,8 +1,8 @@
 from typing import Optional, Text
 
-from ..bitrix_api.requests import BitrixAPIRequest
+from ..api.requests import BitrixAPIRequest
 from ..utils.functional import type_checker
-from ..utils.types import Timeout
+from ..utils.types import JSONDict, Timeout
 from ._base_scope import BaseScope
 
 __all__ = [
@@ -35,7 +35,6 @@ class Department(BaseScope):
         Returns:
             Instance of BitrixAPIRequest
         """
-
         return self._make_bitrix_api_request(
             api_wrapper=self.fields,
             timeout=timeout,
@@ -73,7 +72,7 @@ class Department(BaseScope):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "NAME": name,
             "PARENT": parent,
         }
@@ -131,7 +130,7 @@ class Department(BaseScope):
             Instance of BitrixAPIRequest
         """
 
-        params = dict()
+        params: JSONDict = {}
 
         if sort is not None:
             params["sort"] = sort
@@ -195,7 +194,7 @@ class Department(BaseScope):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "ID": bitrix_id,
         }
 
@@ -240,7 +239,7 @@ class Department(BaseScope):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "ID": bitrix_id,
         }
 

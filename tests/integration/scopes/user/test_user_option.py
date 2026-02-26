@@ -1,9 +1,9 @@
-from typing import Text, cast
+from typing import Text
 
 import pytest
 
-from b24pysdk import Client
-from b24pysdk.bitrix_api.responses import BitrixAPIResponse
+from b24pysdk.api.responses import BitrixAPIResponse
+from b24pysdk.client import BaseClient
 from b24pysdk.utils.types import JSONDict
 
 from ....constants import SDK_NAME
@@ -23,7 +23,7 @@ _OPTIONS: JSONDict = {
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_user_option_set")
-def test_user_option_set(bitrix_client: Client):
+def test_user_option_set(bitrix_client: BaseClient):
     """Test adding a new user option and ensuring it is created successfully."""
 
     bitrix_response = bitrix_client.user.option.set(
@@ -32,14 +32,14 @@ def test_user_option_set(bitrix_client: Client):
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    is_set = cast(bool, bitrix_response.result)
+    is_set = bitrix_response.result
 
     assert is_set is True, "User option set should return True"
 
 
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_user_option_get", depends=["test_user_option_set"])
-def test_user_option_get(bitrix_client: Client):
+def test_user_option_get(bitrix_client: BaseClient):
     """Test retrieving a user option and ensuring correctness."""
 
     bitrix_response = bitrix_client.user.option.get(
@@ -48,6 +48,6 @@ def test_user_option_get(bitrix_client: Client):
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
 
-    option_value = cast(str, bitrix_response.result)
+    option_value = bitrix_response.result
 
     assert option_value == _OPTION_VALUE, "User option value does not match"

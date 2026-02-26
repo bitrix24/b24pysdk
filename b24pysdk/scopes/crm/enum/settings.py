@@ -1,4 +1,4 @@
-from ....bitrix_api.requests import BitrixAPIRequest
+from ....api.requests import BitrixAPIRequest
 from ....scopes.crm._base_crm import BaseCRM
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
