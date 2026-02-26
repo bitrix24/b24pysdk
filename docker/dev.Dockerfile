@@ -1,7 +1,7 @@
 # Dev container for running lint/tests via bind mounts (no source COPY)
 # Usage: build once, then run with -v "$PWD:/work" so code/logs stay on host.
 
-ARG PYTHON_VERSION=3.13
+ARG PYTHON_VERSION=3.14
 FROM python:${PYTHON_VERSION}-slim
 
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \

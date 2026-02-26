@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-PYTHON_VERSION ?= 3.12
+PYTHON_VERSION ?= 3.14
 # CI image (bakes in sources) used in GitHub Actions only
 CI_IMAGE ?= b24pysdk-ci
 # Dev image (no sources baked) for local iterative dev with bind mounts
