@@ -4,7 +4,7 @@ from typing import Any, Mapping, Optional, Text
 
 from .._config import Config
 from .._constants import PYTHON_VERSION
-from ..error import BitrixValidationError
+from ..errors import BitrixValidationError
 from ..utils.types import JSONDict
 
 __all__ = [

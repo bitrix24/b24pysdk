@@ -15,6 +15,11 @@ __all__ = [
 class Status(BaseEntity):
     """"""
 
+    @cached_property
+    def idle(self) -> Idle:
+        """"""
+        return Idle(self)
+
     @type_checker
     def get(
             self,
@@ -27,11 +32,6 @@ class Status(BaseEntity):
             api_wrapper=self.get,
             timeout=timeout,
         )
-
-    @cached_property
-    def idle(self) -> Idle:
-        """"""
-        return Idle(self)
 
     @type_checker
     def set(

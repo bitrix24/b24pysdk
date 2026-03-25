@@ -8,7 +8,7 @@ import requests
 from uuid6 import uuid7
 
 from ..._config import Config
-from ..._constants import TEXT_PYTHON_VERSION
+from ..._constants import DEFAULT_REQUEST_ID_HEADER_NAME, SDK_USER_AGENT, TEXT_PYTHON_VERSION
 from ...utils.types import DefaultTimeout, JSONDict, Number, Timeout
 from ...version import SDK_VERSION
 from ._utils import parse_response
@@ -21,9 +21,9 @@ __all__ = [
 class BaseRequester(ABC):
     """"""
 
-    _DEFAULT_REQUEST_ID_HEADER_FIELD_NAME: Final[Text] = "X-Request-ID"
+    _DEFAULT_REQUEST_ID_HEADER_NAME: Final[Text] = DEFAULT_REQUEST_ID_HEADER_NAME
     _SDK_VERSION: Final[Text] = SDK_VERSION
-    _SDK_USER_AGENT: Final[Text] = "b24-python-sdk-vendor"
+    _SDK_USER_AGENT: Final[Text] = SDK_USER_AGENT
     _TEXT_PYTHON_VERSION: Final[Text] = TEXT_PYTHON_VERSION
 
     _KEY_NAME_VARIANTS: Final[Tuple[Text, ...]] = (
@@ -77,7 +77,7 @@ class BaseRequester(ABC):
             "User-Agent": f"{self._SDK_USER_AGENT}-v-{self._SDK_VERSION}-python-{self._TEXT_PYTHON_VERSION}",
             "X-BITRIX24-PYTHON-SDK-PYTHON-VERSION": self._TEXT_PYTHON_VERSION,
             "X-BITRIX24-PYTHON-SDK-VERSION": self._SDK_VERSION,
-            self._DEFAULT_REQUEST_ID_HEADER_FIELD_NAME: self.get_request_id(),
+            self._DEFAULT_REQUEST_ID_HEADER_NAME: self.get_request_id(),
         }
 
     @abstractmethod

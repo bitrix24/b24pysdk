@@ -22,8 +22,9 @@ class Price(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["fields"] = fields
+        params: JSONDict = {
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.add,
@@ -40,8 +41,9 @@ class Price(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
+        params: JSONDict = {
+            "id": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.delete,
@@ -58,8 +60,9 @@ class Price(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
+        params: JSONDict = {
+            "id": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
@@ -123,8 +126,9 @@ class Price(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["fields"] = fields
+        params: JSONDict = {
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.modify,
@@ -142,9 +146,10 @@ class Price(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
-        params["fields"] = fields
+        params: JSONDict = {
+            "id": bitrix_id,
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,

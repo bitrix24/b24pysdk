@@ -17,9 +17,9 @@ class File(BaseEntity):
     def commit(
             self,
             chat_id: Union[int, Text],
+            upload_id: Union[int, Text],
+            disk_id: Union[int, Text],
             *,
-            upload_id: Optional[Union[int, Text]] = None,
-            disk_id: Optional[Union[int, Text]] = None,
             message: Optional[Text] = None,
             silent_mode: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
@@ -28,13 +28,9 @@ class File(BaseEntity):
 
         params = dict(
             CHAT_ID=chat_id,
+            UPLOAD_ID=upload_id,
+            DISK_ID=disk_id,
         )
-
-        if upload_id is not None:
-            params["UPLOAD_ID"] = upload_id
-
-        if disk_id is not None:
-            params["DISK_ID"] = disk_id
 
         if message is not None:
             params["MESSAGE"] = message

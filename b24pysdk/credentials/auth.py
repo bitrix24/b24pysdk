@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 
 from .._constants import PYTHON_VERSION
 from ..constants import B24AppStatus
-from ..error import BitrixValidationError
+from ..errors import BitrixValidationError
 from ..utils.types import JSONDict
 from .oauth_token import OAuthToken
 

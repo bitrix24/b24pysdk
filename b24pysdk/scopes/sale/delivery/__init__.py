@@ -24,7 +24,7 @@ class Delivery(BaseEntity):
         return Config(self)
 
     @cached_property
-    def extra_service(self) -> Extra:
+    def extra(self) -> Extra:
         """"""
         return Extra(self)
 

@@ -17,21 +17,27 @@ class Message(BaseEntity):
     def add(
             self,
             dialog_id: Text,
-            message: Text,
             *,
+            message: Optional[Text] = None,
+            reply_id: Optional[int] = None,
             system: Optional[Union[bool, B24BoolStrict]] = None,
-            attach: Optional[JSONDict] = None,
+            attach: Optional[Union[JSONDict, Text]] = None,
             url_preview: Optional[Union[bool, B24BoolStrict]] = None,
-            keyboard: Optional[JSONDict] = None,
-            menu: Optional[JSONDict] = None,
+            keyboard: Optional[Union[JSONDict, Text]] = None,
+            menu: Optional[Union[JSONDict, Text]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
         params = dict(
             DIALOG_ID=dialog_id,
-            MESSAGE=message,
         )
+
+        if message is not None:
+            params["MESSAGE"] = message
+
+        if reply_id is not None:
+            params["REPLY_ID"] = reply_id
 
         if system is not None:
             params["SYSTEM"] = B24BoolStrict(system).to_b24()
@@ -60,8 +66,8 @@ class Message(BaseEntity):
             message_id: Union[int, Text],
             bot_id: Union[int, Text],
             command: Text,
-            command_params: Text,
             *,
+            command_params: Optional[Text] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -70,8 +76,10 @@ class Message(BaseEntity):
             MESSAGE_ID=message_id,
             BOT_ID=bot_id,
             COMMAND=command,
-            COMMAND_PARAMS=command_params,
         )
+
+        if command_params is not None:
+            params["COMMAND_PARAMS"] = command_params
 
         return self._make_bitrix_api_request(
             api_wrapper=self.command,

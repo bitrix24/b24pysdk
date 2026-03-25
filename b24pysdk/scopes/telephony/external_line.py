@@ -1,8 +1,8 @@
-from typing import Optional, Text
+from typing import Optional, Text, Union
 
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import classproperty, type_checker
-from ...utils.types import B24Bool, Timeout
+from ...utils.types import B24BoolStrict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -23,7 +23,7 @@ class ExternalLine(BaseEntity):
             number: Text,
             *,
             name: Optional[Text] = None,
-            crm_auto_create: Optional[bool] = None,
+            crm_auto_create: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -36,7 +36,7 @@ class ExternalLine(BaseEntity):
             params["NAME"] = name
 
         if crm_auto_create is not None:
-            params["CRM_AUTO_CREATE"] = B24Bool(crm_auto_create).to_b24()
+            params["CRM_AUTO_CREATE"] = B24BoolStrict(crm_auto_create).to_b24()
 
         return self._make_bitrix_api_request(
             api_wrapper=self.add,
@@ -47,16 +47,15 @@ class ExternalLine(BaseEntity):
     @type_checker
     def delete(
             self,
+            number: Text,
             *,
-            number: Optional[Text] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
-
-        if number is not None:
-            params["NUMBER"] = number
+        params = {
+            "NUMBER": number,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.delete,
@@ -82,7 +81,7 @@ class ExternalLine(BaseEntity):
             *,
             number: Optional[Text] = None,
             name: Optional[Text] = None,
-            crm_auto_create: Optional[bool] = None,
+            crm_auto_create: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -96,7 +95,7 @@ class ExternalLine(BaseEntity):
             params["NAME"] = name
 
         if crm_auto_create is not None:
-            params["CRM_AUTO_CREATE"] = B24Bool(crm_auto_create).to_b24()
+            params["CRM_AUTO_CREATE"] = B24BoolStrict(crm_auto_create).to_b24()
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,

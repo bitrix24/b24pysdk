@@ -1,3 +1,17 @@
+"""
+Bitrix API client implementations.
+
+This module provides the main SDK client classes used to interact with
+the Bitrix REST API. It includes:
+
+- BaseClient — common functionality shared by all client versions
+- ClientV1 / ClientV2 / ClientV3 — version-specific API clients
+- Client — factory function that returns the appropriate client version
+
+Each client exposes Bitrix API scopes as attributes (e.g. `crm`, `user`,
+`task`) which provide access to the corresponding API methods.
+"""
+
 import inspect
 from abc import ABC
 from typing import TYPE_CHECKING, ClassVar, List, Literal, Mapping, Optional, Sequence, Text, Union, overload
@@ -25,7 +39,20 @@ __all__ = [
 
 
 class BaseClient(ABC):
-    """"""
+    """
+    Base class for Bitrix API clients.
+
+    This class provides common functionality shared by all API client
+    versions, including:
+
+    - scope initialization
+    - batch request execution
+    - API method discovery
+    - configuration forwarding to API requests
+
+    Concrete client implementations (ClientV1, ClientV2, ClientV3)
+    specify the Bitrix REST API version used for requests.
+    """
 
     VERSION: ClassVar[Union[B24APIVersion, B24APIVersionLiteral]] = NotImplemented
 
@@ -74,6 +101,7 @@ class BaseClient(ABC):
         "timeman",
         "user",
         "userconsent",
+        "userfieldconfig",
         "vote",
         "voximplant",
     )
@@ -121,6 +149,7 @@ class BaseClient(ABC):
     telephony: scopes.Telephony
     timeman: scopes.Timeman
     user: scopes.User
+    userfieldconfig: scopes.Userfieldconfig
     userconsent: scopes.Userconsent
     vote: scopes.Vote
     voximplant: scopes.Voximplant
@@ -135,6 +164,30 @@ class BaseClient(ABC):
             retry_delay_increment: Optional[Number] = None,
             **kwargs,
     ):
+        """
+        Initialize the Bitrix API client.
+
+        Parameters
+        ----------
+        bitrix_token : BitrixTokenFullProtocol
+            Authentication token used to access the Bitrix REST API.
+
+        timeout : Timeout, optional
+            Default request timeout.
+
+        max_retries : int, optional
+            Maximum number of retry attempts for failed requests.
+
+        initial_retry_delay : Number, optional
+            Delay before the first retry attempt.
+
+        retry_delay_increment : Number, optional
+            Increment added to retry delay after each retry.
+
+        **kwargs
+            Additional options passed to API request objects.
+        """
+
         self._bitrix_token = bitrix_token
 
         self.access = scopes.Access(self)
@@ -178,6 +231,7 @@ class BaseClient(ABC):
         self.telephony = scopes.Telephony(self)
         self.timeman = scopes.Timeman(self)
         self.user = scopes.User(self)
+        self.userfieldconfig = scopes.Userfieldconfig(self)
         self.userconsent = scopes.Userconsent(self)
         self.vote = scopes.Vote(self)
         self.voximplant = scopes.Voximplant(self)
@@ -314,7 +368,33 @@ class BaseClient(ABC):
         )
 
     def __get_context_by_path(self, path: Text) -> BaseContext:
-        """Retrieve a context object by its dot-separated path."""
+        """
+        Resolve a context object using a dot-separated path.
+
+        Examples
+        --------
+        "crm.lead"
+        "user"
+        "tasks.task"
+
+        Parameters
+        ----------
+        path : Text
+            Dot-separated path to the context.
+
+        Returns
+        -------
+        BaseContext
+            Resolved context object.
+
+        Raises
+        ------
+        ValueError
+            If the path cannot be resolved.
+
+        TypeError
+            If the resolved object is not a BaseContext instance.
+        """
 
         if not path:
             raise ValueError("Path cannot be empty")
@@ -338,7 +418,19 @@ class BaseClient(ABC):
             return context
 
     def __collect_api_methods(self, context: Union[BaseContext, "BaseClient"]) -> List[Text]:
-        """Collect all available API methods from a context."""
+        """
+        Recursively collect API method names from a context.
+
+        Parameters
+        ----------
+        context : BaseContext or BaseClient
+            Context to inspect.
+
+        Returns
+        -------
+        List[Text]
+            List of available API method names.
+        """
 
         api_methods: List[Text] = []
 
@@ -366,7 +458,7 @@ class BaseClient(ABC):
                      If None, returns all available methods.
 
         Returns:
-            Sorted list of available API method names.
+            List of available API method names.
         """
 
         if context is None:
@@ -384,25 +476,35 @@ class BaseClient(ABC):
                 f"The method accepts only 'str' (API path), 'None', or an instance of BaseContext.",
             )
 
-        return sorted(self.__collect_api_methods(context_object))
+        return self.__collect_api_methods(context_object)
 
     def print_supported_api_methods(self, context: Optional[Union[BaseContext, Text]] = None):
         """
-        Print all supported API methods to console.
+        Print supported API methods.
 
-        Args:
-            context: Optional context object or path to filter methods.
-                     If None, prints all available methods.
+        This is a convenience wrapper around :meth:`get_supported_api_methods`
+        that prints the discovered API methods to stdout in sorted order,
+        followed by the total number of methods.
+
+        Parameters
+        ----------
+        context : BaseContext or str, optional
+            Context object or dot-separated API path used to filter methods.
+            If omitted, methods from all available scopes are printed.
         """
 
         supported_api_methods = self.get_supported_api_methods(context)
 
-        print("\n".join(supported_api_methods))
-        print(f"\nTotal supported api methods: {len(supported_api_methods)}")
+        print("\n".join(sorted(supported_api_methods)))
+        print(f"\nTotal supported API methods: {len(supported_api_methods)}")
 
 
 class ClientV1(BaseClient):
-    """"""
+    """
+    Bitrix REST API v1 client.
+
+    Provides access to API scopes supported by the Bitrix API.
+    """
 
     VERSION = B24APIVersion.V1
 
@@ -434,7 +536,12 @@ class ClientV1(BaseClient):
 
 
 class ClientV2(ClientV1):
-    """"""
+    """
+    Bitrix REST API v2 client.
+
+    This client extends the v1 client with additional API methods
+    introduced in Bitrix REST API v2.
+    """
 
     VERSION = B24APIVersion.V2
 
@@ -442,7 +549,12 @@ class ClientV2(ClientV1):
 
 
 class ClientV3(BaseClient):
-    """"""
+    """
+    Bitrix REST API v3 client.
+
+    This client exposes the modern Bitrix REST API v3 which uses a
+    structured request/response model and different scope definitions.
+    """
 
     VERSION = B24APIVersion.V3
 
@@ -534,7 +646,41 @@ def Client(  # noqa: N802
         retry_delay_increment: Optional[Number] = None,
         **kwargs,
 ) -> BaseClient:
-    """Factory class to create the appropriate Client version."""
+    """
+    Client factory function.
+
+    Creates a Bitrix API client instance for the requested API version.
+
+    Parameters
+    ----------
+    bitrix_token : BitrixTokenFullProtocol
+        Authentication token used for API access.
+
+    prefer_version : int or B24APIVersion, default V2
+        Preferred Bitrix API version.
+
+    timeout : Timeout, optional
+        Default request timeout.
+
+    max_retries : int, optional
+        Maximum retry attempts.
+
+    initial_retry_delay : Number, optional
+        Initial delay between retries.
+
+    retry_delay_increment : Number, optional
+        Retry delay increment.
+
+    Returns
+    -------
+    BaseClient
+        Client instance corresponding to the requested API version.
+
+    Raises
+    ------
+    ValueError
+        If an unsupported API version is specified.
+    """
 
     if prefer_version == ClientV1.VERSION:
         client_class = ClientV1

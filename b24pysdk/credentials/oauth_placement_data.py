@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any, Mapping, Optional, Text
 
 from .._constants import PYTHON_VERSION
 from ..constants import B24AppStatus, Protocol
-from ..error import BitrixValidationError
+from ..errors import BitrixValidationError
 from ..utils.types import JSONDict
 from .oauth_token import OAuthToken
 

@@ -15,6 +15,11 @@ __all__ = [
 class Send(BaseEntity):
     """"""
 
+    @cached_property
+    def status(self) -> Status:
+        """"""
+        return Status(self)
+
     @type_checker
     def messages(
             self,
@@ -40,8 +45,3 @@ class Send(BaseEntity):
             params=params,
             timeout=timeout,
         )
-
-    @cached_property
-    def status(self) -> Status:
-        """"""
-        return Status(self)

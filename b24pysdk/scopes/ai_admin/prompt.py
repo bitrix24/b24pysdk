@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Prompt(BaseEntity):
-    """"""
+    """Handle operations related to Bitrix24 AI prompts.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/ai/prompts/index.html
+    """
 
     @type_checker
     def register(
@@ -27,7 +30,34 @@ class Prompt(BaseEntity):
             translate: Optional[JSONDict] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add a new AI prompt.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/ai/prompts/ai-prompt-register.html
+
+        This method adds a prompt for CoPilot. The code is immutable; to update a prompt, delete it and register again.
+
+        Args:
+            code: Unique code for the prompt. Must use the rest_ prefix; it is set once and cannot be changed. Updating is only possible via deletion and re-registration;
+
+            prompt: Text of the prompt sent to the AI. Special formatting (markers and conditions) may be used;
+
+            category: Category of placement where CoPilot is embedded. CoPilot can appear in various places in the product; optional;
+
+            icon: Icon code; optional;
+
+            parent_code: Code of the parent section. Must use the rest_ prefix; optional;
+
+            section: Category in the prompts menu for visual grouping. Allowed values: "create" — Create from text; "edit" — Edit text. If not specified, the prompt is placed above these categories; optional;
+
+            sort: Sorting order used to arrange items; optional;
+
+            translate: Array of translations for different languages. Ideally, at least English (en) and the portal language are provided; optional;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params = {
             "code": code,
@@ -68,7 +98,20 @@ class Prompt(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Unregister (delete) an AI prompt.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/ai/prompts/ai-prompt-unregister.html
+
+        This method removes a prompt by its unique code.
+
+        Args:
+            code: Unique code of the prompt. Always uses the rest_ prefix and cannot be changed;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params = {
             "code": code,

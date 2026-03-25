@@ -1,4 +1,4 @@
-from typing import Optional, Text, Union
+from typing import Annotated, Literal, Optional, Text, Union
 
 from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
@@ -17,7 +17,7 @@ class Service(BaseEntity):
     def add(
         self,
         delivery_id: int,
-        type: Text,
+        type: Annotated[Text, Literal["enum", "checkbox", "quantity"]],
         name: Text,
         *,
         active: Optional[Union[bool, B24BoolStrict]] = None,

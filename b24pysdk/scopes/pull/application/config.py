@@ -1,8 +1,8 @@
-from typing import Optional
+from typing import Optional, Union
 
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import B24Bool, Timeout
+from ....utils.types import B24BoolStrict, Timeout
 from ..._base_entity import BaseEntity
 
 __all__ = [
@@ -17,7 +17,7 @@ class Config(BaseEntity):
     def get(
             self,
             *,
-            cache: Optional[bool] = None,
+            cache: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -25,7 +25,7 @@ class Config(BaseEntity):
         params = dict()
 
         if cache is not None:
-            params["CACHE"] = B24Bool(cache).to_b24()
+            params["CACHE"] = B24BoolStrict(cache).to_b24()
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,

@@ -22,8 +22,9 @@ class Shipment(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["fields"] = fields
+        params: JSONDict = {
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.add,
@@ -40,8 +41,9 @@ class Shipment(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
+        params: JSONDict = {
+            "id": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.delete,
@@ -58,8 +60,9 @@ class Shipment(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
+        params: JSONDict = {
+            "id": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
@@ -87,6 +90,7 @@ class Shipment(BaseEntity):
         select: Optional[Iterable[Text]] = None,
         filter: Optional[JSONDict] = None,
         order: Optional[JSONDict] = None,
+        start: Optional[int] = None,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -104,6 +108,9 @@ class Shipment(BaseEntity):
         if order is not None:
             params["order"] = order
 
+        if start is not None:
+            params["start"] = start
+
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
             params=params,
@@ -120,9 +127,10 @@ class Shipment(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
-        params["fields"] = fields
+        params: JSONDict = {
+            "id": bitrix_id,
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,

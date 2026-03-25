@@ -22,8 +22,9 @@ class Storeproduct(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
+        params: JSONDict = {
+            "id": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,

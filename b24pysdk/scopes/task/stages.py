@@ -1,4 +1,4 @@
-from typing import Optional, Text
+from typing import Annotated, Literal, Optional, Text
 
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
@@ -40,7 +40,7 @@ class Stages(BaseEntity):
     def canmovetask(
             self,
             entity_id: int,
-            entity_type: Text,
+            entity_type: Annotated[Text, Literal["U", "G"]],
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:

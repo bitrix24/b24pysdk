@@ -30,9 +30,10 @@ class ProductImage(BaseEntity):
         if file_content.__class__ is not list:
             file_content = list(file_content)
 
-        params: JSONDict = dict()
-        params["fields"] = fields
-        params["fileContent"] = file_content
+        params: JSONDict = {
+            "fields": fields,
+            "fileContent": file_content,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.add,
@@ -50,9 +51,10 @@ class ProductImage(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["productId"] = product_id
-        params["id"] = bitrix_id
+        params: JSONDict = {
+            "productId": product_id,
+            "id": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.delete,
@@ -70,9 +72,10 @@ class ProductImage(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["productId"] = product_id
-        params["id"] = bitrix_id
+        params: JSONDict = {
+            "productId": product_id,
+            "id": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
@@ -98,18 +101,23 @@ class ProductImage(BaseEntity):
             product_id: int,
             *,
             select: Optional[Iterable[Text]] = None,
+            start: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["productId"] = product_id
+        params: JSONDict = {
+            "productId": product_id,
+        }
 
         if select is not None:
             if select.__class__ is not list:
                 select = list(select)
 
             params["select"] = select
+
+        if start is not None:
+            params["start"] = start
 
         return self._make_bitrix_api_request(
             api_wrapper=self.list,

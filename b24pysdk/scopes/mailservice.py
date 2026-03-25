@@ -28,10 +28,10 @@ class Mailservice(BaseScope):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict(
-            NAME=name,
-            ENCRYPTION=B24Bool(encryption).to_b24(),
-        )
+        params = {
+            "NAME": name,
+            "ENCRYPTION": B24Bool(encryption).to_b24(),
+        }
 
         if active is not None:
             params["ACTIVE"] = B24Bool(active).to_b24()

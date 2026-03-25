@@ -22,8 +22,9 @@ class Dialog(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
-        params["DIALOG_ID"] = dialog_id
+        params = {
+            "DIALOG_ID": dialog_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,

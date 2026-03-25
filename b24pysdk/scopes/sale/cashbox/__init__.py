@@ -44,10 +44,11 @@ class Cashbox(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["NAME"] = name
-        params["REST_CODE"] = rest_code
-        params["EMAIL"] = email
+        params: JSONDict = {
+            "NAME": name,
+            "REST_CODE": rest_code,
+            "EMAIL": email,
+        }
 
         if ofd is not None:
             params["OFD"] = ofd
@@ -85,8 +86,9 @@ class Cashbox(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["ID"] = bitrix_id
+        params: JSONDict = {
+            "ID": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.delete,
@@ -100,6 +102,7 @@ class Cashbox(BaseEntity):
         *,
         select: Optional[Iterable[Text]] = None,
         filter: Optional[JSONDict] = None,
+        order: Optional[JSONDict] = None,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -113,6 +116,9 @@ class Cashbox(BaseEntity):
 
         if filter is not None:
             params["FILTER"] = filter
+
+        if order is not None:
+            params["ORDER"] = order
 
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
@@ -130,9 +136,10 @@ class Cashbox(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["ID"] = bitrix_id
-        params["FIELDS"] = fields
+        params: JSONDict = {
+            "ID": bitrix_id,
+            "FIELDS": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,

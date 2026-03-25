@@ -1,6 +1,6 @@
 import typing
 
-from ..error import BitrixValidationError
+from ..errors import BitrixValidationError
 
 __all__ = [
     "B24APIResult",
@@ -33,7 +33,7 @@ JSONDictGenerator = typing.Generator[JSONDict, None, None]
 JSONList = typing.List[JSONDict]
 """A list containing dictionaries with string keys and values of any type, typically used for JSON data structures."""
 
-Key = typing.Union[int, typing.Text]
+Key = typing.Union[typing.Text, int]
 """A key that can be an integer or string used in dictionaries."""
 
 Number = typing.Union[float, int]

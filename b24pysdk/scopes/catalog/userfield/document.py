@@ -32,9 +32,10 @@ class Document(BaseEntity):
         if select.__class__ is not list:
             select = list(select)
 
-        params: JSONDict = dict()
-        params["select"] = select
-        params["filter"] = filter
+        params: JSONDict = {
+            "select": select,
+            "filter": filter,
+        }
 
         if order is not None:
             params["order"] = order
@@ -58,9 +59,10 @@ class Document(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["documentId"] = document_id
-        params["fields"] = fields
+        params: JSONDict = {
+            "documentId": document_id,
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,

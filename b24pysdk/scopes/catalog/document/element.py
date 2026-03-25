@@ -11,7 +11,11 @@ __all__ = [
 
 
 class Element(BaseEntity):
-    """"""
+    """
+    Handle operations related to Bitrix24 inventory document items (document elements).
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/catalog/document/document-element/index.html
+    """
 
     @type_checker
     def add(
@@ -20,10 +24,36 @@ class Element(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Create a document element (product position) in an inventory document.
 
-        params: JSONDict = dict()
-        params["fields"] = fields
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/document/document-element/catalog-document-element-add.html
+
+        Adds a product line to the specified stock management document.
+
+        Args:
+            fields: Object format:
+                {
+                    "field_n": value_n,
+
+                    "field_n": value_n,
+
+                    ...
+                };
+
+                where
+                    - field_n — field of the element for creating;
+                    - value_n — field value;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
+
+        params: JSONDict = {
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.add,
@@ -38,10 +68,23 @@ class Element(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Delete a document element from an inventory document by its identifier.
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/document/document-element/catalog-document-element-delete.html
+
+        Args:
+            bitrix_id: Identifier of the product record in the document.
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
+
+        params: JSONDict = {
+            "id": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.delete,
@@ -55,7 +98,19 @@ class Element(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Retrieve the list of available fields for document elements.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/document/document-element/catalog-document-element-get-fields.html
+
+        The API returns field descriptions.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
         return self._make_bitrix_api_request(
             api_wrapper=self.get_fields,
             timeout=timeout,
@@ -65,42 +120,72 @@ class Element(BaseEntity):
     def list(
             self,
             *,
-            order: Optional[JSONDict] = None,
-            filter: Optional[JSONDict] = None,
             select: Optional[Iterable[Text]] = None,
-            offset: Optional[int] = None,
+            filter: Optional[JSONDict] = None,
+            order: Optional[JSONDict] = None,
             start: Optional[int] = None,
-            limit: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        List document elements with selection, filtering, sorting, and pagination options.
 
-        params: JSONDict = dict()
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/document/document-element/catalog-document-element-list.html
 
-        if order is not None:
-            params["order"] = order
+        Returns product positions associated with inventory documents. Records are limited by document types available to the user and warehouse access rights.
 
-        if filter is not None:
-            params["filter"] = filter
+        Args:
+            select: Iterable of catalog_document_element field names to select.
+
+            filter: Object format:
+                {
+                    "field_n": value_n,
+
+                    "field_n": value_n,
+
+                    ...
+                }
+
+                where
+                    - field_n — field of the element for filtering;
+                    - value_n — field value;
+
+            order: Object format:
+                {
+                    field_n: value_n,
+                    ...,
+                }
+                where
+                - field_n is the name of the field to sort by;
+                - value_n is a string 'ASC' (ascending) or 'DESC' (descending);
+
+            start: Pagination start position for batch listing.
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
+
+
+        params: JSONDict = {}
 
         if select is not None:
             if select.__class__ is not list:
                 select = list(select)
-
             params["select"] = select
 
-        if offset is not None:
-            params["offset"] = offset
+        if filter is not None:
+            params["filter"] = filter
+
+        if order is not None:
+            params["order"] = order
 
         if start is not None:
             params["start"] = start
 
-        if limit is not None:
-            params["limit"] = limit
-
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
-            params=params,
+            params=params or None,
             timeout=timeout,
         )
 
@@ -112,11 +197,37 @@ class Element(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Update an existing document element and return the updated data.
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
-        params["fields"] = fields
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/document/document-element/catalog-document-element-update.html
+
+        Args:
+            bitrix_id: Identifier of the document item to update.
+
+            fields: Object format:
+                {
+                    "field_n": value_n,
+
+                    "field_n": value_n,
+
+                    ...
+                };
+
+                where
+                    - field_n — field of the element for updating;
+                    - value_n — field value;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
+
+        params: JSONDict = {
+            "id": bitrix_id,
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,

@@ -19,6 +19,31 @@ __all__ = [
 class Imconnector(BaseScope):
     """"""
 
+    @cached_property
+    def chat(self) -> Chat:
+        """"""
+        return Chat(self)
+
+    @cached_property
+    def connector(self) -> Connector:
+        """"""
+        return Connector(self)
+
+    @cached_property
+    def delete(self) -> Delete:
+        """"""
+        return Delete(self)
+
+    @cached_property
+    def send(self) -> Send:
+        """"""
+        return Send(self)
+
+    @cached_property
+    def update(self) -> Update:
+        """"""
+        return Update(self)
+
     @type_checker
     def activate(
             self,
@@ -44,21 +69,6 @@ class Imconnector(BaseScope):
             params=params,
             timeout=timeout,
         )
-
-    @cached_property
-    def chat(self) -> Chat:
-        """"""
-        return Chat(self)
-
-    @cached_property
-    def connector(self) -> Connector:
-        """"""
-        return Connector(self)
-
-    @cached_property
-    def delete(self) -> Delete:
-        """"""
-        return Delete(self)
 
     @type_checker
     def list(
@@ -134,17 +144,12 @@ class Imconnector(BaseScope):
             timeout=timeout,
         )
 
-    @cached_property
-    def send(self) -> Send:
-        """"""
-        return Send(self)
-
     @type_checker
     def status(
             self,
+            connector: Text,
             *,
             line: Optional[Union[int, Text]] = None,
-            connector: Optional[Text] = None,
             error: Optional[Union[bool, B24BoolStrict]] = None,
             configured: Optional[Union[bool, B24BoolStrict]] = None,
             status: Optional[Union[bool, B24BoolStrict]] = None,
@@ -152,13 +157,12 @@ class Imconnector(BaseScope):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        params = dict(
+            CONNECTOR=connector,
+        )
 
         if line is not None:
             params["LINE"] = line
-
-        if connector is not None:
-            params["CONNECTOR"] = connector
 
         if error is not None:
             params["ERROR"] = B24BoolStrict(error).to_b24()
@@ -194,8 +198,3 @@ class Imconnector(BaseScope):
             params=params or None,
             timeout=timeout,
         )
-
-    @cached_property
-    def update(self) -> Update:
-        """"""
-        return Update(self)

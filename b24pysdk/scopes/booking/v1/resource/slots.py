@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Slots(BaseEntity):
-    """"""
+    """Handle operations related to Bitrix24 booking resource slots.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/booking/resource/slots/index.html
+    """
 
     @type_checker
     def list(
@@ -20,7 +23,21 @@ class Slots(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Retrieve the time slot configuration for a specific resource.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/resource/slots/booking-v1-resource-slots-list.html
+
+        The method returns the configuration of time slots for the specified resource.
+
+        Args:
+            resource_id: Identifier of the resource;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params = {
             "resourceId": resource_id,
@@ -40,7 +57,32 @@ class Slots(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Set time slots for a specific resource.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/resource/slots/booking-v1-resource-slots-set.html
+
+        The method allows you to set time slots for the specified resource.
+
+        Args:
+            resource_id: Identifier of the resource;
+
+            slots: Object format:
+                [
+                    {
+                        "from": integer,
+                        "to": integer,
+                        "timezone": "TZ database name",
+                        "weekDays": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                        "slotSize": integer,
+                    }
+                ];
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         if slots.__class__ is not list:
             slots = list(slots)
@@ -63,7 +105,22 @@ class Slots(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Delete the time slot configuration for a specific resource.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/resource/slots/booking-v1-resource-slots-unset.html
+
+        The method removes the time slot settings for the specified resource.
+
+        Args:
+
+            resource_id: Identifier of the resource;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params = {
             "resourceID": resource_id,

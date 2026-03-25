@@ -6,9 +6,10 @@ from .._config import Config
 from ..api.callers import call_batch, call_batches, call_list, call_list_fast, call_method
 from ..client import Client
 from ..constants.version import B24APIVersion
-from ..error import BitrixAPIExpiredToken, BitrixResponse302JSONDecodeError
+from ..errors import BitrixAPIExpiredToken, BitrixResponse302JSONDecodeError
 from ..events import OAuthTokenRenewedEvent, PortalDomainChangedEvent
 from ..signals import BitrixSignalInstance
+from ..utils.functional import classproperty
 from ..utils.types import B24APIVersionLiteral, B24Requests, B24RequestTuple, JSONDict, Key, Timeout
 from .oauth_token import OAuthToken
 
@@ -28,7 +29,7 @@ __all__ = [
 ]
 
 
-def _bitrix_app_required(func: Callable):
+def _bitrix_app_required(func: Callable) -> Callable:
     """"""
 
     @wraps(func)
@@ -88,8 +89,9 @@ class AbstractBitrixToken:
             bitrix_token=self,
         )
 
-    @property
-    def _config(self):
+    # noinspection PyMethodParameters
+    @classproperty
+    def _config(cls) -> Config:
         return Config()
 
     @property

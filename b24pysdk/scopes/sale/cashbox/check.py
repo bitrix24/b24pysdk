@@ -29,8 +29,9 @@ class Check(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["UUID"] = uuid
+        params: JSONDict = {
+            "UUID": uuid,
+        }
 
         if print_end_time is not None:
             params["PRINT_END_TIME"] = print_end_time

@@ -15,6 +15,11 @@ __all__ = [
 class Get(BaseEntity):
     """"""
 
+    @cached_property
+    def iblock(self) -> Iblock:
+        """"""
+        return Iblock(self)
+
     @type_checker
     def __call__(
             self,
@@ -29,7 +34,7 @@ class Get(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {
+        params: JSONDict = {
             "IBLOCK_TYPE_ID": iblock_type_id,
         }
 
@@ -53,8 +58,3 @@ class Get(BaseEntity):
             params=params,
             timeout=timeout,
         )
-
-    @cached_property
-    def iblock(self) -> Iblock:
-        """"""
-        return Iblock(self)

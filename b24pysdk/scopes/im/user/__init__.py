@@ -16,6 +16,16 @@ __all__ = [
 class User(BaseEntity):
     """"""
 
+    @cached_property
+    def list(self) -> List:
+        """"""
+        return List(self)
+
+    @cached_property
+    def status(self) -> Status:
+        """"""
+        return Status(self)
+
     @type_checker
     def get(
             self,
@@ -39,13 +49,3 @@ class User(BaseEntity):
             params=params or None,
             timeout=timeout,
         )
-
-    @cached_property
-    def list(self) -> List:
-        """"""
-        return List(self)
-
-    @cached_property
-    def status(self) -> Status:
-        """"""
-        return Status(self)

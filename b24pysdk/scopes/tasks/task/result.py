@@ -59,7 +59,7 @@ class Result(BaseEntity):
         """"""
 
         params = {
-            "task_id": task_id,
+            "taskId": task_id,
         }
 
         return self._make_bitrix_api_request(

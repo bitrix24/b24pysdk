@@ -14,6 +14,7 @@ from b24pysdk.credentials import BitrixApp, BitrixToken, BitrixWebhook
 from b24pysdk.error import (
     BitrixAPIAccessDenied,
     BitrixAPIAllowedOnlyIntranetUser,
+    BitrixAPIApplicationNotFound,
     BitrixAPIAuthorizationError,
     BitrixAPIBadRequest,
     BitrixAPIError,
@@ -28,22 +29,25 @@ from b24pysdk.error import (
     BitrixAPIMethodConfirmWaiting,
     BitrixAPINoAuthFound,
     BitrixAPIOverloadLimit,
+    BitrixAPIPaymentRequired,
     BitrixAPIQueryLimitExceeded,
     # BitrixAPITooManyRequests,
     BitrixAPIUnauthorized,
     BitrixAPIUserAccessError,
     BitrixAPIWrongAuthType,
-    BitrixOAuthInsufficientScope,
-    BitrixOAuthInvalidClient,
-    BitrixOAuthInvalidGrant,
-    BitrixOAuthRequestTimeout,
-    # BitrixOAuthInvalidRequest,
-    # BitrixOAuthInvalidScope,
-    BitrixOauthWrongClient,
     BitrixRequestTimeout,
     BitrixResponse302JSONDecodeError,
 )
-from tests.constants import OLD_DOMAIN, PROFILE_ONLY_WEBHOOK_TOKEN
+from tests.constants import (
+    APP_NOT_FOUND_TOKEN,
+    APP_NOT_INSTALLED_TOKEN,
+    EXTERNAL_USER_WEBHOOK_TOKEN,
+    FIRED_USER_TOKEN,
+    OLD_DOMAIN,
+    PROFILE_ONLY_WEBHOOK_TOKEN,
+    RESTRICTED_USER_OAUTH_TOKEN,
+    SUBSCRIPTION_ENDED_TOKEN,
+)
 from tests.env_config import EnvConfig
 
 pytestmark = [
@@ -54,7 +58,6 @@ pytestmark = [
 env_config: EnvConfig = EnvConfig()
 
 _REST_BASE_URL: Text = f"https://{env_config.domain}/rest"
-_OAUTH_TOKEN_URL: Text = f"https://{env_config.domain}/oauth/token/"
 
 _JSON_HEADERS: Dict[Text, Text] = {"Accept": "application/json"}
 _REQUEST_TIMEOUT: int = 10
@@ -100,7 +103,7 @@ def test_error_bitrix_api_bad_request(bitrix_client: BaseClient):
 
 @pytest.mark.oauth_only
 def test_error_bitrix_api_unauthorized(bitrix_client: BaseClient):
-    """Expect BitrixAPIUnauthorized on an OAuth call with inadequate rights (works)."""
+    """Unauthorized: inadequate rights for the method."""
 
     bitrix_request = BitrixAPIRequest(
         bitrix_token=bitrix_client._bitrix_token,
@@ -156,23 +159,6 @@ def test_error_bitrix_request_timeout(bitrix_client: BaseClient):
     assert exc_info.value.timeout == _TINY_TIMEOUT
 
 
-def test_error_bitrix_oauth_request_timeout():
-    """Expect BitrixOAuthRequestTimeout with an unrealistically small timeout."""
-
-    if not env_config.are_oauth_credentials_available:
-        pytest.skip("Missing OAuth credentials")
-
-    bitrix_app = BitrixApp(
-        client_id=env_config.client_id,
-        client_secret=env_config.client_secret,
-    )
-
-    with pytest.raises(BitrixOAuthRequestTimeout) as exc_info:
-        _ = bitrix_app.get_oauth_token(code="any_code", timeout=_TINY_TIMEOUT, max_retries=1)
-
-    assert exc_info.value.timeout == _TINY_TIMEOUT
-
-
 # def test_error_bitrix_api_too_many_requests(bitrix_client: BaseClient):
 #     """Attempt to trigger BitrixAPITooManyRequests by spamming updates on the same deal."""
 #     deal_id = bitrix_client.crm.deal.add(
@@ -217,9 +203,25 @@ def test_error_bitrix_api_access_denied(bitrix_client: BaseClient):
     _assert_error_response(exc_info.value, BitrixAPIAccessDenied)
 
 
+@pytest.mark.webhook_only
 def test_error_bitrix_api_allowed_only_intranet_user():
-    """Would require a webhook from an external user to hit ALLOWED_ONLY_INTRANET_USER."""
-    pytest.skip(BitrixAPIAllowedOnlyIntranetUser.__name__)
+    """Expect ALLOWED_ONLY_INTRANET_USER when calling intranet-only method from external webhook user."""
+
+    if not EXTERNAL_USER_WEBHOOK_TOKEN:
+        pytest.skip("Set EXTERNAL_USER_WEBHOOK_TOKEN to run ALLOWED_ONLY_INTRANET_USER scenario")
+
+    external_user_client = Client(
+        BitrixWebhook(
+            domain=env_config.domain,
+            auth_token=EXTERNAL_USER_WEBHOOK_TOKEN,
+        ),
+    )
+    bitrix_request = external_user_client.timeman.status()
+
+    with pytest.raises(BitrixAPIAllowedOnlyIntranetUser) as exc_info:
+        _ = bitrix_request.response
+
+    _assert_error_response(exc_info.value, BitrixAPIAllowedOnlyIntranetUser)
 
 
 @pytest.mark.webhook_only
@@ -246,7 +248,7 @@ def test_error_bitrix_api_insufficient_scope():
 
 @pytest.mark.webhook_only
 def test_error_bitrix_api_invalid_credentials():
-    """"""
+    """INVALID_CREDENTIALS: Invalid request credentials (invalid webhook token)."""
 
     invalid_client = Client(
         BitrixWebhook(
@@ -264,7 +266,7 @@ def test_error_bitrix_api_invalid_credentials():
 
 @pytest.mark.oauth_only
 def test_error_bitrix_api_invalid_token():
-    """Expect BitrixAPIInvalidToken for invalid OAuth app token."""
+    """invalid_token: Unable to get application by token (OAuth access_token)."""
 
     if not env_config.are_oauth_credentials_available:
         pytest.skip("Missing OAuth credentials")
@@ -289,13 +291,29 @@ def test_error_bitrix_api_invalid_token():
 
 
 def test_error_bitrix_api_method_confirm_denied():
-    """Needs portal admin to deny method confirmation per https://apidocs.bitrix24.com/api-reference/scopes/confirmation.html."""
+    """Requires manual admin denial of method confirmation."""
     pytest.skip(BitrixAPIMethodConfirmDenied.__name__)
 
 
+@pytest.mark.oauth_only
 def test_error_bitrix_api_user_access_error():
-    """Would need a user token and an app with restricted access to reproduce USER_ACCESS_ERROR."""
-    pytest.skip(BitrixAPIUserAccessError.__name__)
+    """Expect USER_ACCESS_ERROR with OAuth token of app/user pair that has restricted app access."""
+
+    if not RESTRICTED_USER_OAUTH_TOKEN:
+        pytest.skip("Set RESTRICTED_USER_OAUTH_TOKEN to run USER_ACCESS_ERROR scenario")
+
+    restricted_user_client = Client(
+        BitrixToken(
+            domain=env_config.domain,
+            auth_token=RESTRICTED_USER_OAUTH_TOKEN,
+        ),
+    )
+    bitrix_request = restricted_user_client.crm.lead.fields()
+
+    with pytest.raises(BitrixAPIUserAccessError) as exc_info:
+        _ = bitrix_request.response
+
+    _assert_error_response(exc_info.value, BitrixAPIUserAccessError)
 
 
 @pytest.mark.webhook_only
@@ -335,18 +353,58 @@ def test_error_bitrix_response_302_json_decode_error():
 
 
 def test_error_bitrix_api_authorization_error():
-    """Occurs in isolated-box auth provider flows; not easily reproducible here."""
-    pytest.skip(BitrixAPIAuthorizationError.__name__)
+    """authorization_error: Unable to authorize user (user is fired/deactivated)."""
+
+    if not FIRED_USER_TOKEN:
+        pytest.skip("Set B24_FIRED_USER_TOKEN to run authorization_error scenario")
+
+    bitrix_app = BitrixApp(
+        client_id=env_config.client_id,
+        client_secret=env_config.client_secret,
+    )
+    fired_user_client = Client(
+        BitrixToken(
+            domain=env_config.domain,
+            auth_token=FIRED_USER_TOKEN,
+            bitrix_app=bitrix_app,
+        ),
+    )
+    bitrix_request = fired_user_client.profile()
+
+    with pytest.raises(BitrixAPIAuthorizationError) as exc_info:
+        _ = bitrix_request.response
+
+    _assert_error_response(exc_info.value, BitrixAPIAuthorizationError)
 
 
 def test_error_bitrix_api_error_oauth():
-    """Same isolated auth-provider scenario as AuthorizationError; not reproducible here."""
-    pytest.skip(BitrixAPIErrorOAuth.__name__)
+    """ERROR_OAUTH: OAuth server says app not installed when portal token cache is expired/missed."""
+    if not APP_NOT_INSTALLED_TOKEN:
+        pytest.skip("Set B24_APP_NOT_INSTALLED_TOKEN to run ERROR_OAUTH scenario")
+
+
+    bitrix_app = BitrixApp(
+        client_id=env_config.client_id,
+        client_secret=env_config.client_secret,
+    )
+    error_oauth_client = Client(
+        BitrixToken(
+            domain=env_config.domain,
+            auth_token=APP_NOT_INSTALLED_TOKEN,
+            bitrix_app=bitrix_app,
+        ),
+    )
+    bitrix_request = error_oauth_client.profile()
+
+    with pytest.raises(BitrixAPIErrorOAuth) as exc_info:
+        _ = bitrix_request.response
+
+    _assert_error_response(exc_info.value, BitrixAPIErrorOAuth)
 
 
 @pytest.mark.oauth_only
 def test_error_bitrix_api_expired_token():
-    """Expect BitrixAPIExpiredToken when using an expired OAuth token (works)."""
+    """expired_token: The access token provided has expired (OAuth token)."""
 
     if not _EXPIRED_TOKEN:
         pytest.skip("Set B24_EXPIRED_TOKEN to run expired token scenario")
@@ -362,6 +420,56 @@ def test_error_bitrix_api_expired_token():
         parse_response(response)
 
     _assert_error_response(exc_info.value, BitrixAPIExpiredToken)
+
+
+def test_error_bitrix_api_application_not_found():
+    """APPLICATION_NOT_FOUND: Portal cache still has token for a deleted app."""
+    if not APP_NOT_FOUND_TOKEN:
+        pytest.skip("Set B24_APP_NOT_FOUND_TOKEN to run APPLICATION_NOT_FOUND scenario")
+
+
+    bitrix_app = BitrixApp(
+        client_id=env_config.client_id,
+        client_secret=env_config.client_secret,
+    )
+    app_not_found_client = Client(
+        BitrixToken(
+            domain=env_config.domain,
+            auth_token=APP_NOT_FOUND_TOKEN,
+            bitrix_app=bitrix_app,
+        ),
+    )
+    bitrix_request = app_not_found_client.profile()
+
+    with pytest.raises(BitrixAPIApplicationNotFound) as exc_info:
+        _ = bitrix_request.response
+
+    _assert_error_response(exc_info.value, BitrixAPIApplicationNotFound)
+
+
+def test_error_bitrix_api_payment_required():
+    """PAYMENT_REQUIRED: Subscription has been ended (portal subscription expired)."""
+    if not SUBSCRIPTION_ENDED_TOKEN:
+        pytest.skip("Set B24_SUBSCRIPTION_ENDED_TOKEN to run PAYMENT_REQUIRED scenario")
+
+
+    bitrix_app = BitrixApp(
+        client_id=env_config.client_id,
+        client_secret=env_config.client_secret,
+    )
+    payment_required_client = Client(
+        BitrixToken(
+            domain=env_config.domain,
+            auth_token=SUBSCRIPTION_ENDED_TOKEN,
+            bitrix_app=bitrix_app,
+        ),
+    )
+    bitrix_request = payment_required_client.profile()
+
+    with pytest.raises(BitrixAPIPaymentRequired) as exc_info:
+        _ = bitrix_request.response
+
+    _assert_error_response(exc_info.value, BitrixAPIPaymentRequired)
 
 
 @pytest.mark.oauth_only
@@ -393,69 +501,15 @@ def test_error_bitrix_api_invalid_arg_value(bitrix_client: BaseClient):
 
 
 def test_error_bitrix_api_error_unexpected_answer():
-    """Server-side unexpected responses are not reproducible reliably; kept skipped."""
+    """Server-side error; not reliably reproducible."""
     pytest.skip(BitrixAPIErrorUnexpectedAnswer.__name__)
 
 
 def test_error_bitrix_api_overload_limit():
-    """Would require manual API server throttling/blocking to hit OVERLOAD_LIMIT."""
+    """Requires manual API throttling/blocking to hit OVERLOAD_LIMIT."""
     pytest.skip(BitrixAPIOverloadLimit.__name__)
 
 
 def test_error_bitrix_api_query_limit_exceeded():
     """Requires exceeding Bitrix24 request counters to hit QUERY_LIMIT_EXCEEDED."""
     pytest.skip(BitrixAPIQueryLimitExceeded.__name__)
-
-
-def test_error_bitrix_oauth_wrong_client():
-    """No reliable info on reproducing WRONG_CLIENT; left skipped."""
-    pytest.skip(BitrixOauthWrongClient.__name__)
-
-
-def test_error_bitrix_oauth_invalid_client():
-    """Expect INVALID_CLIENT when using wrong OAuth client credentials (works)."""
-
-    bitrix_app = BitrixApp(
-        client_id=env_config.client_id,
-        client_secret="WRONG_SECRET_12345",  # noqa: S106
-    )
-
-    with pytest.raises(BitrixOAuthInvalidClient) as exc_info:
-        _ = bitrix_app.get_oauth_token(code="any_valid_or_invalid_code")
-
-    _assert_error_response(exc_info.value, BitrixOAuthInvalidClient)
-
-
-def test_error_bitrix_oauth_invalid_grant():
-    """Expect INVALID_GRANT when reusing/invalidating an auth code or refresh token (works)."""
-
-    bitrix_app = BitrixApp(
-        client_id=env_config.client_id,
-        client_secret=env_config.client_secret,
-    )
-
-    with pytest.raises(BitrixOAuthInvalidGrant) as exc_info:
-        _ = bitrix_app.get_oauth_token(code=env_config.access_token)
-
-    _assert_error_response(exc_info.value, BitrixOAuthInvalidGrant)
-
-
-# def test_error_bitrix_oauth_invalid_scope():
-#     """Attempt to request disallowed scope should raise INVALID_SCOPE, but not reproduced here."""
-#
-#     response = requests.post(
-#         _OAUTH_TOKEN_URL,
-#         data={
-#             "client_id": env_config.client_id,
-#             "client_secret": env_config.client_secret,
-#             "grant_type": "authorization_code",
-#         },
-#     )
-#     with pytest.raises(BitrixOAuthInvalidScope) as exc_info:
-#         parse_response(response)
-#     _assert_error_response(exc_info.value, BitrixOAuthInvalidScope)
-
-
-def test_error_bitrix_oauth_insufficient_scope():
-    """Could not reproduce OAuth insufficient_scope; left skipped."""
-    pytest.skip(BitrixOAuthInsufficientScope.__name__)

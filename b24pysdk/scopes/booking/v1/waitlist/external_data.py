@@ -11,7 +11,11 @@ __all__ = [
 
 
 class ExternalData(BaseEntity):
-    """"""
+    """
+    Handle operations related to external data bindings for waitlist records.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/booking/waitlist/external-data/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -24,7 +28,21 @@ class ExternalData(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Retrieve external data bindings for a waitlist record.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/waitlist/external-data/booking-v1-waitlist-externaldata-list.html
+
+        Returns the list of linked external entities associated with the specified waitlist record.
+
+        Args:
+            wait_list_id: Identifier of the waitlist record (waitListId);
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params = {
             "waitListId": wait_list_id,
@@ -44,7 +62,23 @@ class ExternalData(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Set external data bindings for a waitlist record.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/waitlist/external-data/booking-v1-waitlist-externaldata-set.html
+
+        Creates or replaces the set of external entities linked to the specified waitlist record.
+
+        Args:
+            wait_list_id: Identifier of the waitlist record (waitListId);
+
+            external_data: Array of objects containing objects for binding;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         if external_data.__class__ is not list:
             external_data = list(external_data)
@@ -67,7 +101,21 @@ class ExternalData(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Remove all external data bindings for a waitlist record.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/waitlist/external-data/booking-v1-waitlist-externaldata-unset.html
+
+        Deletes all links to external entities for the specified waitlist record.
+
+        Args:
+            wait_list_id: Identifier of the waitlist record;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params = {
             "waitListId": wait_list_id,

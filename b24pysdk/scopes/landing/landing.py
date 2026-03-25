@@ -16,20 +16,19 @@ class Landing(BaseEntity):
     @type_checker
     def add(
             self,
+            fields: JSONDict,
             *,
-            fields: Optional[JSONDict] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
-
-        if fields is not None:
-            params["fields"] = fields
+        params: JSONDict = {
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.add,
-            params=params or None,
+            params=params,
             timeout=timeout,
         )
 
@@ -59,9 +58,30 @@ class Landing(BaseEntity):
         )
 
     @type_checker
+    def addblock(
+            self,
+            lid: int,
+            fields: JSONDict,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params: JSONDict = {
+            "lid": lid,
+            "fields": fields,
+        }
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.addblock,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
     def copy(
             self,
-            landing_id: int,
+            lid: int,
             *,
             to_site_id: Optional[int] = None,
             to_folder_id: Optional[int] = None,
@@ -70,7 +90,7 @@ class Landing(BaseEntity):
         """"""
 
         params = {
-            "lid": landing_id,
+            "lid": lid,
         }
 
         if to_site_id is not None:
@@ -86,21 +106,112 @@ class Landing(BaseEntity):
         )
 
     @type_checker
-    def delete(
+    def copyblock(
             self,
+            lid: int,
+            block: int,
             *,
-            landing_id: Optional[int] = None,
+            params: Optional[JSONDict] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        api_params: JSONDict = {
+            "lid": lid,
+            "block": block,
+        }
 
-        if landing_id is not None:
-            params["lid"] = landing_id
+        if params is not None:
+            api_params["params"] = params
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.copyblock,
+            params=api_params or None,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def delete(
+            self,
+            lid: int,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params: JSONDict = {
+            "lid": lid,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.delete,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def deleteblock(
+            self,
+            lid: int,
+            block: int,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params: JSONDict = {
+            "lid": lid,
+            "block": block,
+        }
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.deleteblock,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def downblock(
+            self,
+            lid: int,
+            block: int,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params: JSONDict = {
+            "lid": lid,
+            "block": block,
+        }
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.downblock,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def favorite_block(
+            self,
+            lid: int,
+            block: int,
+            *,
+            meta: Optional[JSONDict] = None,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params: JSONDict = {
+            "lid": lid,
+            "block": block,
+        }
+
+        if meta is not None:
+            params["meta"] = meta
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.favorite_block,
             params=params or None,
             timeout=timeout,
         )
@@ -108,20 +219,19 @@ class Landing(BaseEntity):
     @type_checker
     def getadditionalfields(
             self,
+            lid: int,
             *,
-            landing_id: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
-
-        if landing_id is not None:
-            params["lid"] = landing_id
+        params: JSONDict = {
+            "lid": lid,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.getadditionalfields,
-            params=params or None,
+            params=params,
             timeout=timeout,
         )
 
@@ -148,54 +258,73 @@ class Landing(BaseEntity):
     @type_checker
     def getpreview(
             self,
+            lid: int,
             *,
-            landing_id: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
-
-        if landing_id is not None:
-            params["lid"] = landing_id
+        params: JSONDict = {
+            "lid": lid,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.getpreview,
-            params=params or None,
+            params=params,
             timeout=timeout,
         )
 
     @type_checker
     def getpublicurl(
             self,
+            lid: int,
             *,
-            landing_id: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
-
-        if landing_id is not None:
-            params["lid"] = landing_id
+        params: JSONDict = {
+            "lid": lid,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.getpublicurl,
-            params=params or None,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def hideblock(
+            self,
+            lid: int,
+            block: int,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params: JSONDict = {
+            "lid": lid,
+            "block": block,
+        }
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.hideblock,
+            params=params,
             timeout=timeout,
         )
 
     @type_checker
     def mark_delete(
             self,
-            landing_id: int,
+            lid: int,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
         params = {
-            "lid": landing_id,
+            "lid": lid,
         }
 
         return self._make_bitrix_api_request(
@@ -205,29 +334,70 @@ class Landing(BaseEntity):
         )
 
     @type_checker
-    def mark_un_delete(
+    def mark_deleted_block(
             self,
+            lid: int,
+            block: int,
             *,
-            landing_id: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        params: JSONDict = {
+            "lid": lid,
+            "block": block,
+        }
 
-        if landing_id is not None:
-            params["lid"] = landing_id
+        return self._make_bitrix_api_request(
+            api_wrapper=self.mark_deleted_block,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def mark_un_delete(
+            self,
+            lid: int,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params: JSONDict = {
+            "lid": lid,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.mark_un_delete,
-            params=params or None,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def mark_undeleted_block(
+            self,
+            lid: int,
+            block: int,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params: JSONDict = {
+            "lid": lid,
+            "block": block,
+        }
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.mark_undeleted_block,
+            params=params,
             timeout=timeout,
         )
 
     @type_checker
     def move(
             self,
-            landing_id: int,
+            lid: int,
             *,
             to_site_id: Optional[int] = None,
             to_folder_id: Optional[int] = None,
@@ -236,7 +406,7 @@ class Landing(BaseEntity):
         """"""
 
         params = {
-            "lid": landing_id,
+            "lid": lid,
         }
 
         if to_site_id is not None:
@@ -252,113 +422,188 @@ class Landing(BaseEntity):
         )
 
     @type_checker
-    def publication(
+    def moveblock(
             self,
+            lid: int,
+            block: int,
             *,
-            landing_id: Optional[int] = None,
+            params: Optional[JSONDict] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        api_params: JSONDict = {
+            "lid": lid,
+            "block": block,
+        }
 
-        if landing_id is not None:
-            params["lid"] = landing_id
+        if params is not None:
+            api_params["params"] = params
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.moveblock,
+            params=api_params or None,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def publication(
+            self,
+            lid: int,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params: JSONDict = {
+            "lid": lid,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.publication,
-            params=params or None,
+            params=params,
             timeout=timeout,
         )
 
     @type_checker
     def remove_entities(
             self,
+            lid: int,
+            data: JSONDict,
             *,
-            landing_id: Optional[int] = None,
-            data: Optional[JSONDict] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
-
-        if landing_id is not None:
-            params["lid"] = landing_id
-
-        if data is not None:
-            params["data"] = data
+        params: JSONDict = {
+            "lid": lid,
+            "data": data,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.remove_entities,
-            params=params or None,
+            params=params,
             timeout=timeout,
         )
 
     @type_checker
     def resolve_id_by_public_url(
             self,
+            landing_url: Text,
+            site_id: int,
             *,
-            landing_url: Optional[Text] = None,
-            site_id: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
-
-        if landing_url is not None:
-            params["landingUrl"] = landing_url
-
-        if site_id is not None:
-            params["siteId"] = site_id
+        params: JSONDict = {
+            "landingUrl": landing_url,
+            "siteId": site_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.resolve_id_by_public_url,
-            params=params or None,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def showblock(
+            self,
+            lid: int,
+            block: int,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params: JSONDict = {
+            "lid": lid,
+            "block": block,
+        }
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.showblock,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def un_favorite_block(
+            self,
+            block_id: int,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params: JSONDict = {
+            "blockId": block_id,
+        }
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.un_favorite_block,
+            params=params,
             timeout=timeout,
         )
 
     @type_checker
     def unpublic(
             self,
+            lid: int,
             *,
-            landing_id: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
-
-        if landing_id is not None:
-            params["lid"] = landing_id
+        params: JSONDict = {
+            "lid": lid,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.unpublic,
-            params=params or None,
+            params=params,
             timeout=timeout,
         )
 
     @type_checker
     def update(
             self,
+            lid: int,
+            fields: JSONDict,
             *,
-            landing_id: Optional[int] = None,
-            fields: Optional[JSONDict] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
-
-        if landing_id is not None:
-            params["lid"] = landing_id
-
-        if fields is not None:
-            params["fields"] = fields
+        params: JSONDict = {
+            "lid": lid,
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,
-            params=params or None,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def upblock(
+            self,
+            lid: int,
+            block: int,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params: JSONDict = {
+            "lid": lid,
+            "block": block,
+        }
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.upblock,
+            params=params,
             timeout=timeout,
         )

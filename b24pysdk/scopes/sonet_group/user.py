@@ -1,4 +1,4 @@
-from typing import Iterable, Optional, Text, Union
+from typing import Annotated, Iterable, Literal, Optional, Text, Union
 
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
@@ -148,7 +148,7 @@ class User(BaseEntity):
             self,
             group_id: int,
             user_id: Union[int, Iterable[int]],
-            role: Text,
+            role: Annotated[Text, Literal["E", "K"]],
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:

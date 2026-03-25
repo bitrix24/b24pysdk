@@ -1,4 +1,4 @@
-from typing import Optional, Text
+from typing import Annotated, Literal, Optional, Text
 
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
@@ -19,7 +19,13 @@ class Counters(BaseEntity):
             *,
             user_id: Optional[int] = None,
             group_id: Optional[int] = None,
-            type: Optional[Text] = None,
+            type: Optional[Annotated[Text, Literal[
+                "view_all",
+                "view_role_responsible",
+                "view_role_accomplice",
+                "view_role_auditor",
+                "view_role_originator",
+            ]]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""

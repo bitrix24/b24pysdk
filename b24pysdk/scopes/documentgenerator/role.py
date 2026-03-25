@@ -22,8 +22,9 @@ class Role(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["fields"] = fields
+        params: JSONDict = {
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.add,
@@ -40,8 +41,9 @@ class Role(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
+        params: JSONDict = {
+            "id": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.delete,
@@ -58,8 +60,9 @@ class Role(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["accesses"] = accesses
+        params: JSONDict = {
+            "accesses": accesses,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.fillaccesses,
@@ -76,8 +79,9 @@ class Role(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
+        params: JSONDict = {
+            "id": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
@@ -115,8 +119,9 @@ class Role(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
+        params: JSONDict = {
+            "id": bitrix_id,
+        }
 
         if fields is not None:
             params["fields"] = fields

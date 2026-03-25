@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Client(BaseEntity):
-    """"""
+    """Handle operations related to clients of a waitlist record in Bitrix24 Booking.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/booking/waitlist/client/index.html
+    """
 
     @type_checker
     def set(
@@ -21,7 +24,23 @@ class Client(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Set clients for a specific waitlist record.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/waitlist/client/booking-v1-waitlist-client-set.html
+
+        This method assigns the provided clients to the specified waitlist record.
+
+        Args:
+            wait_list_id: Identifier of the waitlist record (waitListId);
+
+            clients: Array of objects containing information about clients;
+
+            timeout: Request timeout;
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         if clients.__class__ is not list:
             clients = list(clients)
@@ -44,7 +63,19 @@ class Client(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Retrieve the list of clients for a specific waitlist record.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/waitlist/client/booking-v1-waitlist-client-list.html
+
+        Args:
+            wait_list_id: Identifier of the waitlist record (waitListId);
+
+            timeout: Request timeout;
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "waitListId": wait_list_id,
@@ -63,7 +94,19 @@ class Client(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Remove clients from a specific waitlist record.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/waitlist/client/booking-v1-waitlist-client-unset.html
+
+        Args:
+            wait_list_id: Identifier of the waitlist record (waitListId);
+
+            timeout: Request timeout;
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "waitListId": wait_list_id,

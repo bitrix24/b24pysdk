@@ -1,4 +1,4 @@
-from typing import Iterable, Optional, Text
+from typing import Annotated, Iterable, Literal, Optional, Text
 
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
@@ -22,8 +22,9 @@ class Shipmentproperty(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["fields"] = fields
+        params: JSONDict = {
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.add,
@@ -40,8 +41,9 @@ class Shipmentproperty(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
+        params: JSONDict = {
+            "id": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.delete,
@@ -58,8 +60,9 @@ class Shipmentproperty(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
+        params: JSONDict = {
+            "id": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
@@ -70,14 +73,15 @@ class Shipmentproperty(BaseEntity):
     @type_checker
     def getfieldsbytype(
         self,
-        type: Text,
+        type: Annotated[Text, Literal["STRING", "Y/N", "NUMBER", "ENUM", "FILE", "DATE", "LOCATION", "ADDRESS"]],
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["type"] = type
+        params: JSONDict = {
+            "type": type,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.getfieldsbytype,
@@ -91,6 +95,8 @@ class Shipmentproperty(BaseEntity):
         *,
         select: Optional[Iterable[Text]] = None,
         filter: Optional[JSONDict] = None,
+        order: Optional[JSONDict] = None,
+        start: Optional[int] = None,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -104,6 +110,12 @@ class Shipmentproperty(BaseEntity):
 
         if filter is not None:
             params["filter"] = filter
+
+        if order is not None:
+            params["order"] = order
+
+        if start is not None:
+            params["start"] = start
 
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
@@ -121,9 +133,10 @@ class Shipmentproperty(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
-        params["fields"] = fields
+        params: JSONDict = {
+            "id": bitrix_id,
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,

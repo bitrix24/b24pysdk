@@ -1,5 +1,5 @@
 from functools import cached_property
-from typing import Optional, Text, Union
+from typing import Text, Union
 
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
@@ -17,23 +17,37 @@ __all__ = [
 class Session(BaseEntity):
     """"""
 
+    @cached_property
+    def head(self) -> Head:
+        """"""
+        return Head(self)
+
+    @cached_property
+    def history(self) -> History:
+        """"""
+        return History(self)
+
+    @cached_property
+    def mode(self) -> Mode:
+        """"""
+        return Mode(self)
+
     @type_checker
     def intercept(
             self,
+            chat_id: Union[int, Text],
             *,
-            chat_id: Optional[Union[int, Text]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
-
-        if chat_id is not None:
-            params["CHAT_ID"] = chat_id
+        params = {
+            "CHAT_ID": chat_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.intercept,
-            params=params or None,
+            params=params,
             timeout=timeout,
         )
 
@@ -55,21 +69,6 @@ class Session(BaseEntity):
             params=params,
             timeout=timeout,
         )
-
-    @cached_property
-    def head(self) -> Head:
-        """"""
-        return Head(self)
-
-    @cached_property
-    def history(self) -> History:
-        """"""
-        return History(self)
-
-    @cached_property
-    def mode(self) -> Mode:
-        """"""
-        return Mode(self)
 
     @type_checker
     def open(

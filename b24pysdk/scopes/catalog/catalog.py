@@ -22,8 +22,9 @@ class Catalog(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
+        params: JSONDict = {
+            "id": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
@@ -51,7 +52,6 @@ class Catalog(BaseEntity):
             filter: Optional[JSONDict] = None,
             order: Optional[JSONDict] = None,
             start: Optional[int] = None,
-            limit: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -73,11 +73,27 @@ class Catalog(BaseEntity):
         if start is not None:
             params["start"] = start
 
-        if limit is not None:
-            params["limit"] = limit
-
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def is_offers(
+            self,
+            bitrix_id: int,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params: JSONDict = {
+            "id": bitrix_id,
+        }
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.is_offers,
             params=params,
             timeout=timeout,
         )

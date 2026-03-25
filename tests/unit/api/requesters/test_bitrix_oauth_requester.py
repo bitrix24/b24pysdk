@@ -5,8 +5,10 @@ import pytest
 import requests
 
 from b24pysdk.api.requesters.bitrix_oauth_requester import BitrixOAuthRequester
-from b24pysdk.error import (
+from b24pysdk.errors import (
     BitrixAPIInsufficientScope,
+)
+from b24pysdk.errors.oauth import (
     BitrixOAuthInsufficientScope,
     BitrixOAuthRequestError,
     BitrixOAuthRequestTimeout,
@@ -166,7 +168,9 @@ def test_get_oauth_token_success(mock_get):
         mock_parse.return_value = {"access_token": "new_token", "refresh_token": "new_refresh"}
         result = obj.get_oauth_token(code=_AUTH_CODE)
 
-        mock_get.assert_called_once_with(url=BitrixOAuthRequester._OUATH_URL, params=expected_params)
+        mock_get.assert_called_once()
+        assert mock_get.call_args.kwargs["url"].endswith("/oauth/token/")
+        assert mock_get.call_args.kwargs["params"] == expected_params
         mock_parse.assert_called_once_with(mock_response)
         assert result == {"access_token": "new_token", "refresh_token": "new_refresh"}
 
@@ -190,7 +194,9 @@ def test_refresh_oauth_token_success(mock_get):
         mock_parse.return_value = {"access_token": "refreshed_token"}
         result = obj.refresh_oauth_token(refresh_token=_REFRESH_TOKEN)
 
-        mock_get.assert_called_once_with(url=BitrixOAuthRequester._OUATH_URL, params=expected_params)
+        mock_get.assert_called_once()
+        assert mock_get.call_args.kwargs["url"].endswith("/oauth/token/")
+        assert mock_get.call_args.kwargs["params"] == expected_params
         mock_parse.assert_called_once_with(mock_response)
         assert result == {"access_token": "refreshed_token"}
 
@@ -211,6 +217,8 @@ def test_get_app_info_success(mock_get):
         mock_parse.return_value = {"result": {"APP_ID": "test_app"}, "time": {"start": 1.0, "finish": 2.0}}
         result = obj.get_app_info(auth_token=_AUTH_TOKEN)
 
-        mock_get.assert_called_once_with(url=BitrixOAuthRequester._REST_URL, params=expected_params)
+        mock_get.assert_called_once()
+        assert mock_get.call_args.kwargs["url"].endswith("/rest/app.info/")
+        assert mock_get.call_args.kwargs["params"] == expected_params
         mock_parse.assert_called_once_with(mock_response)
         assert result == {"result": {"APP_ID": "test_app"}, "time": {"start": 1.0, "finish": 2.0}}

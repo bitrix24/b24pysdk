@@ -357,7 +357,7 @@ logger = StreamLogger()
 
 cfg = Config()
 cfg.configure(
-    default_timeout=(3.05, 10),       # seconds or tuple (default_connection_timeout, default_read_timeout)
+    default_timeout=(3.05, 10),       # seconds or tuple (connect_timeout, read_timeout)
     default_max_retries=3,            # number of retries on transient errors
     default_initial_retry_delay=1,    # seconds
     default_retry_delay_increment=1,  # seconds
@@ -366,8 +366,8 @@ cfg.configure(
 
 # other way to pass default timeout values
 cfg.configure(
-    default_connection_timeout=3.05,
-    default_read_timeout=10,          # seconds or tuple (connect_timeout, read_timeout)
+    default_connect_timeout=3.05,
+    default_read_timeout=10,          # seconds
     default_max_retries=3,            # number of retries on transient errors
     default_initial_retry_delay=1,    # seconds
     default_retry_delay_increment=1,  # seconds

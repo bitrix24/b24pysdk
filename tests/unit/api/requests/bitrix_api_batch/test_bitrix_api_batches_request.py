@@ -80,7 +80,7 @@ def test_initialization_and_properties_variants(
         assert expected_requests_repr_fragment in repr_output
 
         str_output = str(obj)
-        assert obj._API_METHOD in str_output
+        assert "batch" in str_output
         assert expected_requests_repr_fragment in str_output
 
 

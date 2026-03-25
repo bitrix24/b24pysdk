@@ -1,7 +1,7 @@
 from typing import Optional, Text
 
 from ....api.requests import BitrixAPIRequest
-from ....utils.functional import type_checker
+from ....utils.functional import classproperty, type_checker
 from ....utils.types import JSONDict, Timeout
 from ..._base_entity import BaseEntity
 
@@ -12,6 +12,10 @@ __all__ = [
 
 class Im(BaseEntity):
     """"""
+
+    @classproperty
+    def _name(cls):
+        return "Im"
 
     @type_checker
     def send(

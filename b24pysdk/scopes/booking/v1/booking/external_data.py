@@ -11,7 +11,10 @@ __all__ = [
 
 
 class ExternalData(BaseEntity):
-    """"""
+    """Handle operations related to Bitrix24 booking external data links.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/booking/booking/external-data/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -24,7 +27,21 @@ class ExternalData(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Retrieve external data links for a specific booking.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/booking/external-data/booking-v1-booking-externaldata-list.html
+
+        This method fetches the external objects linked to the specified booking.
+
+        Args:
+            booking_id: Identifier of the booking;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params = {
             "bookingId": booking_id,
@@ -44,7 +61,30 @@ class ExternalData(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Set external data links for a specific booking.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/booking/external-data/booking-v1-booking-externaldata-set.html
+
+        This method assigns external objects to the specified booking.
+
+        Args:
+            booking_id: Identifier of the booking;
+
+            external_data: Object format:
+                [
+                    {
+                        "moduleId": value,
+                        "entityTypeId": value,
+                        "value": value,
+                    },
+                ];
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         if external_data.__class__ is not list:
             external_data = list(external_data)
@@ -67,7 +107,21 @@ class ExternalData(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Remove all external data links from a specific booking.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/booking/external-data/booking-v1-booking-externaldata-unset.html
+
+        This method detaches any external objects linked to the specified booking.
+
+        Args:
+            booking_id: Identifier of the booking;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params = {
             "bookingId": booking_id,

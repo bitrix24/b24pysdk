@@ -351,7 +351,7 @@ if document_type is not None:
 - 1\. When creating new scopes, conform to the established style prevalent in existing modules:
   - List function parameters one per line.
   - Declare `__all__` explicitly with the exported class.
-  - Prefer `dict()` over `{}` when initializing parameter collections to maintain stylistic consistency.
+- Prefer `{}` over `dict()` when initializing parameter collections to maintain stylistic consistency.
   - Limit type annotations to constructs described in Section 6.
   - Use `bitrix_id` instead of `id` in your values for params
   - Leave class and method docstrings empty.

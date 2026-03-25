@@ -1,7 +1,7 @@
-from typing import Iterable, Optional, Text
+from typing import Annotated, Iterable, Literal, Optional, Text
 
 from ...api.requests import BitrixAPIRequest
-from ...utils.functional import type_checker
+from ...utils.functional import classproperty, type_checker
 from ...utils.types import JSONDict, Timeout
 from .._base_entity import BaseEntity
 
@@ -13,13 +13,20 @@ __all__ = [
 class AttachedVote(BaseEntity):
     """"""
 
+    @classproperty
+    def _name(cls):
+        return "AttachedVote"
+
     @type_checker
     def download(
             self,
             *,
             attach_id: Optional[int] = None,
-            module_id: Optional[Text] = None,
-            entity_type: Optional[Text] = None,
+            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = None,
+            entity_type: Optional[Annotated[
+                Text,
+                Literal["Bitrix\\Vote\\Attachment\\ImMessageConnector", "Bitrix\\Vote\\Attachment\\BlogPostConnector"],
+            ]] = None,
             entity_id: Optional[int] = None,
             signed_attach_id: Optional[Text] = None,
             timeout: Timeout = None,
@@ -52,19 +59,23 @@ class AttachedVote(BaseEntity):
     @type_checker
     def get(
             self,
-            attach_id: int,
             *,
-            module_id: Optional[Text] = None,
-            entity_type: Optional[Text] = None,
+            attach_id: Optional[int] = None,
+            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = None,
+            entity_type: Optional[Annotated[
+                Text,
+                Literal["Bitrix\\Vote\\Attachment\\ImMessageConnector", "Bitrix\\Vote\\Attachment\\BlogPostConnector"],
+            ]] = None,
             entity_id: Optional[int] = None,
             signed_attach_id: Optional[Text] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {
-            "attachId": attach_id,
-        }
+        params = {}
+
+        if attach_id is not None:
+            params["attachId"] = attach_id
 
         if module_id is not None:
             params["moduleId"] = module_id
@@ -87,13 +98,16 @@ class AttachedVote(BaseEntity):
     @type_checker
     def get_answer_voted(
             self,
-            attach_id: int,
             answer_id: int,
             *,
+            attach_id: Optional[int] = None,
             page_navigation: Optional[JSONDict] = None,
             user_for_mobile_format: Optional[bool] = None,
-            module_id: Optional[Text] = None,
-            entity_type: Optional[Text] = None,
+            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = None,
+            entity_type: Optional[Annotated[
+                Text,
+                Literal["Bitrix\\Vote\\Attachment\\ImMessageConnector", "Bitrix\\Vote\\Attachment\\BlogPostConnector"],
+            ]] = None,
             entity_id: Optional[int] = None,
             signed_attach_id: Optional[Text] = None,
             timeout: Timeout = None,
@@ -101,9 +115,11 @@ class AttachedVote(BaseEntity):
         """"""
 
         params = {
-            "attachId": attach_id,
             "answerId": answer_id,
         }
+
+        if attach_id is not None:
+            params["attachId"] = attach_id
 
         if page_navigation is not None:
             params["pageNavigation"] = page_navigation
@@ -132,8 +148,11 @@ class AttachedVote(BaseEntity):
     @type_checker
     def get_many(
             self,
-            module_id: Text,
-            entity_type: Text,
+            module_id: Annotated[Text, Literal["Im", "blog"]],
+            entity_type: Annotated[
+                Text,
+                Literal["Bitrix\\Vote\\Attachment\\ImMessageConnector", "Bitrix\\Vote\\Attachment\\BlogPostConnector"],
+            ],
             entity_ids: Iterable[int],
             *,
             timeout: Timeout = None,
@@ -158,21 +177,25 @@ class AttachedVote(BaseEntity):
     @type_checker
     def get_with_voted(
             self,
-            attach_id: int,
             *,
+            attach_id: Optional[int] = None,
             page_size: Optional[int] = None,
             user_for_mobile_format: Optional[bool] = None,
-            module_id: Optional[Text] = None,
-            entity_type: Optional[Text] = None,
+            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = None,
+            entity_type: Optional[Annotated[
+                Text,
+                Literal["Bitrix\\Vote\\Attachment\\ImMessageConnector", "Bitrix\\Vote\\Attachment\\BlogPostConnector"],
+            ]] = None,
             entity_id: Optional[int] = None,
             signed_attach_id: Optional[Text] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {
-            "attachId": attach_id,
-        }
+        params = {}
+
+        if attach_id is not None:
+            params["attachId"] = attach_id
 
         if page_size is not None:
             params["pageSize"] = page_size
@@ -201,19 +224,23 @@ class AttachedVote(BaseEntity):
     @type_checker
     def recall(
             self,
-            attach_id: int,
             *,
-            module_id: Optional[Text] = None,
-            entity_type: Optional[Text] = None,
+            attach_id: Optional[int] = None,
+            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = None,
+            entity_type: Optional[Annotated[
+                Text,
+                Literal["Bitrix\\Vote\\Attachment\\ImMessageConnector", "Bitrix\\Vote\\Attachment\\BlogPostConnector"],
+            ]] = None,
             entity_id: Optional[int] = None,
             signed_attach_id: Optional[Text] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {
-            "attachId": attach_id,
-        }
+        params = {}
+
+        if attach_id is not None:
+            params["attachId"] = attach_id
 
         if module_id is not None:
             params["moduleId"] = module_id
@@ -236,19 +263,23 @@ class AttachedVote(BaseEntity):
     @type_checker
     def resume(
             self,
-            attach_id: int,
             *,
-            module_id: Optional[Text] = None,
-            entity_type: Optional[Text] = None,
+            attach_id: Optional[int] = None,
+            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = None,
+            entity_type: Optional[Annotated[
+                Text,
+                Literal["Bitrix\\Vote\\Attachment\\ImMessageConnector", "Bitrix\\Vote\\Attachment\\BlogPostConnector"],
+            ]] = None,
             entity_id: Optional[int] = None,
             signed_attach_id: Optional[Text] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {
-            "attachId": attach_id,
-        }
+        params = {}
+
+        if attach_id is not None:
+            params["attachId"] = attach_id
 
         if module_id is not None:
             params["moduleId"] = module_id
@@ -271,19 +302,23 @@ class AttachedVote(BaseEntity):
     @type_checker
     def stop(
             self,
-            attach_id: int,
             *,
-            module_id: Optional[Text] = None,
-            entity_type: Optional[Text] = None,
+            attach_id: Optional[int] = None,
+            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = None,
+            entity_type: Optional[Annotated[
+                Text,
+                Literal["Bitrix\\Vote\\Attachment\\ImMessageConnector", "Bitrix\\Vote\\Attachment\\BlogPostConnector"],
+            ]] = None,
             entity_id: Optional[int] = None,
             signed_attach_id: Optional[Text] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {
-            "attachId": attach_id,
-        }
+        params = {}
+
+        if attach_id is not None:
+            params["attachId"] = attach_id
 
         if module_id is not None:
             params["moduleId"] = module_id
@@ -306,21 +341,26 @@ class AttachedVote(BaseEntity):
     @type_checker
     def vote(
             self,
-            attach_id: int,
             ballot: JSONDict,
             *,
-            module_id: Optional[Text] = None,
-            entity_type: Optional[Text] = None,
+            attach_id: Optional[int] = None,
+            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = None,
+            entity_type: Optional[Annotated[
+                Text,
+                Literal["Bitrix\\Vote\\Attachment\\ImMessageConnector", "Bitrix\\Vote\\Attachment\\BlogPostConnector"],
+            ]] = None,
             entity_id: Optional[int] = None,
             signed_attach_id: Optional[Text] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {
-            "attachId": attach_id,
+        params: JSONDict = {
             "ballot": ballot,
         }
+
+        if attach_id is not None:
+            params["attachId"] = attach_id
 
         if module_id is not None:
             params["moduleId"] = module_id

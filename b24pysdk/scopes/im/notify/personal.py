@@ -1,4 +1,4 @@
-from typing import Optional, Text
+from typing import Optional, Text, Union
 
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
@@ -22,7 +22,7 @@ class Personal(BaseEntity):
             message_out: Optional[Text] = None,
             tag: Optional[Text] = None,
             sub_tag: Optional[Text] = None,
-            attach: Optional[JSONDict] = None,
+            attach: Optional[Union[JSONDict, Text]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""

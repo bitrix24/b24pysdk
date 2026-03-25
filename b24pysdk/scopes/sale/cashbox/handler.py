@@ -26,10 +26,11 @@ class Handler(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["CODE"] = code
-        params["NAME"] = name
-        params["SETTINGS"] = settings
+        params: JSONDict = {
+            "CODE": code,
+            "NAME": name,
+            "SETTINGS": settings,
+        }
 
         if sort is not None:
             params["SORT"] = sort
@@ -52,8 +53,9 @@ class Handler(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["ID"] = bitrix_id
+        params: JSONDict = {
+            "ID": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.delete,
@@ -84,9 +86,10 @@ class Handler(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["ID"] = bitrix_id
-        params["FIELDS"] = fields
+        params: JSONDict = {
+            "ID": bitrix_id,
+            "FIELDS": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,

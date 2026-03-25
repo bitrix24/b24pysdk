@@ -17,25 +17,24 @@ class List(BaseEntity):
     def get(
             self,
             *,
-            bitrix_ids: Optional[Iterable[Union[int, Text]]] = None,
+            bitrix_id: Iterable[Union[int, Text]],
             avatar_hr: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        if bitrix_id.__class__ is not list:
+            bitrix_id = list(bitrix_id)
 
-        if bitrix_ids is not None:
-            if bitrix_ids.__class__ is not list:
-                bitrix_ids = list(bitrix_ids)
-
-            params["ID"] = bitrix_ids
+        params = {
+            "ID": bitrix_id,
+        }
 
         if avatar_hr is not None:
             params["AVATAR_HR"] = B24BoolStrict(avatar_hr).to_b24()
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
-            params=params or None,
+            params=params,
             timeout=timeout,
         )

@@ -15,6 +15,11 @@ __all__ = [
 class Chat(BaseEntity):
     """"""
 
+    @cached_property
+    def user(self) -> User:
+        """"""
+        return User(self)
+
     @type_checker
     def get(
             self,
@@ -60,8 +65,3 @@ class Chat(BaseEntity):
             params=params,
             timeout=timeout,
         )
-
-    @cached_property
-    def user(self) -> User:
-        """"""
-        return User(self)

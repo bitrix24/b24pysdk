@@ -1,4 +1,4 @@
-from typing import Optional, Text
+from typing import Optional
 
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
@@ -28,17 +28,16 @@ class Agreement(BaseEntity):
     @type_checker
     def text(
             self,
+            bitrix_id: int,
             *,
-            bitrix_id: Optional[Text] = None,
             replace: Optional[JSONDict] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
-
-        if bitrix_id is not None:
-            params["id"] = bitrix_id
+        params = {
+            "id": bitrix_id,
+        }
 
         if replace is not None:
             params["replace"] = replace

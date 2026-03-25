@@ -8,7 +8,9 @@ __all__ = [
     "ActivityType",
     "AddressType",
     "CRMSettingsMode",
+    "CallListEntityType",
     "ContentType",
+    "DuplicateCommunicationType",
     "EntityTypeAbbr",
     "EntityTypeID",
     "EntityTypeName",
@@ -64,6 +66,12 @@ class AddressType(_enum.IntEnum):
     DELIVERY = 11
 
 
+class CallListEntityType(_enum.StrEnum):
+    """Supported entity types for CRM call lists."""
+    CONTACT = "CONTACT"
+    COMPANY = "COMPANY"
+
+
 class CRMSettingsMode(_enum.IntEnum):
     """"""
     CLASSIC = 1
@@ -75,6 +83,12 @@ class ContentType(_enum.IntEnum):
     PLAIN_TEXT = 1
     BBCODE = 2
     HTML = 3
+
+
+class DuplicateCommunicationType(_enum.StrEnum):
+    """Communication types used in crm.duplicate.find_by_comm."""
+    EMAIL = "EMAIL"
+    PHONE = "PHONE"
 
 
 class EntityTypeAbbr(_enum.StrEnum):

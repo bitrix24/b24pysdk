@@ -22,8 +22,9 @@ class Paymentitemshipment(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["fields"] = fields
+        params: JSONDict = {
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.add,
@@ -40,8 +41,9 @@ class Paymentitemshipment(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
+        params: JSONDict = {
+            "id": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.delete,
@@ -58,8 +60,9 @@ class Paymentitemshipment(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
+        params: JSONDict = {
+            "id": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
@@ -86,6 +89,8 @@ class Paymentitemshipment(BaseEntity):
         *,
         select: Optional[Iterable[Text]] = None,
         filter: Optional[JSONDict] = None,
+        order: Optional[JSONDict] = None,
+        start: Optional[int] = None,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -99,6 +104,12 @@ class Paymentitemshipment(BaseEntity):
 
         if filter is not None:
             params["filter"] = filter
+
+        if order is not None:
+            params["order"] = order
+
+        if start is not None:
+            params["start"] = start
 
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
@@ -116,9 +127,10 @@ class Paymentitemshipment(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
-        params["fields"] = fields
+        params: JSONDict = {
+            "id": bitrix_id,
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,

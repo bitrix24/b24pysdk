@@ -2,9 +2,11 @@ from typing import Dict, Final, Optional, Text
 
 import requests
 
-from ...error import (
+from ...errors import (
     BitrixAPIInsufficientScope,
     BitrixAPIInvalidRequest,
+)
+from ...errors.oauth import (
     BitrixOAuthInsufficientScope,
     BitrixOAuthInvalidRequest,
     BitrixOAuthRequestError,
@@ -23,8 +25,9 @@ class BitrixOAuthRequester(BaseRequester):
     """"""
 
     _HEADERS: Final[Dict] = {"Content-Type": "application/x-www-form-urlencoded"}
-    _OUATH_URL: Final[Text] = "https://oauth.bitrix.info/oauth/token/"
-    _REST_URL: Final[Text] = "https://oauth.bitrix24.tech/rest/app.info/"
+    _BASE_OAUTH_URL = "https://oauth.bitrix24.tech"
+    _OAUTH_TOKEN_URL: Final[Text] = f"{_BASE_OAUTH_URL}/oauth/token/"
+    _APP_INFO_URL: Final[Text] = f"{_BASE_OAUTH_URL}/rest/app.info/"
 
     __slots__ = ("_bitrix_oauth",)
 
@@ -103,7 +106,7 @@ class BitrixOAuthRequester(BaseRequester):
             ),
         )
 
-        json_response = self._parse_response(self._get(url=self._OUATH_URL, params=params))
+        json_response = self._parse_response(self._get(url=self._OAUTH_TOKEN_URL, params=params))
 
         self._config.logger.debug(
             "finish get_oauth_token",
@@ -132,7 +135,7 @@ class BitrixOAuthRequester(BaseRequester):
             ),
         )
 
-        json_response = self._parse_response(self._get(url=self._OUATH_URL, params=params))
+        json_response = self._parse_response(self._get(url=self._OAUTH_TOKEN_URL, params=params))
 
         self._config.logger.debug(
             "finish refresh_oauth_token",
@@ -158,7 +161,7 @@ class BitrixOAuthRequester(BaseRequester):
             ),
         )
 
-        json_response = self._parse_response(self._get(url=self._REST_URL, params=params))
+        json_response = self._parse_response(self._get(url=self._APP_INFO_URL, params=params))
 
         self._config.logger.debug(
             "finish get_app_info",

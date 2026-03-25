@@ -11,7 +11,11 @@ __all__ = [
 
 
 class Client(BaseEntity):
-    """"""
+    """
+    Handle operations related to Bitrix24 booking clients linked to a booking.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/booking/booking/client/index.html
+    """
 
     @type_checker
     def list(
@@ -20,7 +24,22 @@ class Client(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Retrieve the list of clients linked to a specific booking.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/booking/client/booking-v1-booking-client-list.html
+
+        This method returns the clients associated with the provided booking.
+
+        Args:
+
+            booking_id: Identifier of the booking;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params = {
             "bookingId": booking_id,
@@ -40,7 +59,32 @@ class Client(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Set clients for a specific booking.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/booking/client/booking-v1-booking-client-set.html
+
+        This method assigns clients to the specified booking.
+
+        Args:
+            booking_id: Identifier of the booking; can be obtained via booking.v1.booking.add and booking.v1.booking.list;
+
+            clients: Object format:
+                [
+                    {
+                        "id": integer,
+                        "type": {
+                            "module": "crm",
+                            "code": "CONTACT" | "COMPANY",
+                        },
+                    }
+                ];
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         if clients.__class__ is not list:
             clients = list(clients)
@@ -63,7 +107,21 @@ class Client(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Remove all clients from a specific booking.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/booking/client/booking-v1-booking-client-unset.html
+
+        his method detaches any clients linked to the specified booking.
+
+        Args:
+            booking_id: Identifier of the booking;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params = {
             "bookingId": booking_id,

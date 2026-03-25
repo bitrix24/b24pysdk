@@ -14,6 +14,29 @@ class Read(BaseEntity):
     """"""
 
     @type_checker
+    def __call__(
+            self,
+            bitrix_id: int,
+            *,
+            only_current: Optional[Union[bool, B24BoolStrict]] = None,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params = {
+            "ID": bitrix_id,
+        }
+
+        if only_current is not None:
+            params["ONLY_CURRENT"] = B24BoolStrict(only_current).to_b24()
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
     def list(
             self,
             ids: Iterable[int],
@@ -40,24 +63,14 @@ class Read(BaseEntity):
         )
 
     @type_checker
-    def read(
+    def all(
             self,
-            bitrix_id: int,
             *,
-            only_current: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {
-            "ID": bitrix_id,
-        }
-
-        if only_current is not None:
-            params["ONLY_CURRENT"] = B24BoolStrict(only_current).to_b24()
-
         return self._make_bitrix_api_request(
-            api_wrapper=self.read,
-            params=params,
+            api_wrapper=self.all,
             timeout=timeout,
         )

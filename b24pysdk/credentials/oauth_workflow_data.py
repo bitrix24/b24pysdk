@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, List, Mapping, Optional, Text
 from .._config import Config
 from .._constants import PYTHON_VERSION
 from ..constants import B24BoolLit
-from ..error import BitrixValidationError
+from ..errors import BitrixValidationError
 from ..utils.types import JSONDict
 from ._utils import parse_flattened_keys
 from .auth import WorkflowOAuth

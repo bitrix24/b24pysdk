@@ -11,7 +11,11 @@ __all__ = [
 
 
 class Offer(BaseEntity):
-    """"""
+    """
+    Handle operations related to Bitrix24 product offers (variations).
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/offer/index.html
+    """
 
     @type_checker
     def add(
@@ -20,10 +24,32 @@ class Offer(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Create a product offer (variation) in the catalog.
 
-        params: JSONDict = dict()
-        params["fields"] = fields
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/offer/catalog-product-offer-add.html
+
+        This method adds a new product offer by sending field values to the REST API.
+
+        Args:
+            fields: Object format:
+                {
+                    "field_1": "value_1",
+
+                    ...,
+
+                    "field_n": "value_n",
+                }, values correspond to catalog_product_offer fields used for creating an offer;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
+
+        params: JSONDict = {
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.add,
@@ -38,10 +64,25 @@ class Offer(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Delete a product offer by identifier.
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/offer/catalog-product-offer-delete.html
+
+        This method deletes a product variation.
+
+        Args:
+            bitrix_id: Identifier of the product offer (catalog_product_offer.id);
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
+
+        params: JSONDict = {
+            "id": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.delete,
@@ -56,10 +97,32 @@ class Offer(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Download files of a product offer by the provided parameters.
 
-        params: JSONDict = dict()
-        params["fields"] = fields
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/offer/catalog-product-offer-download.html
+
+        This method downloads product variation files based on the provided parameters.
+
+        Args:
+            fields: Object format:
+                {
+                    "fileId": integer,
+
+                    "productId": integer,
+
+                    "fieldName": string,
+                };
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
+
+        params: JSONDict = {
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.download,
@@ -74,10 +137,25 @@ class Offer(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Retrieve information about a specific product offer by ID.
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/offer/catalog-product-offer-get.html
+
+        The method returns the field values of a product variation by its identifier.
+
+        Args:
+            bitrix_id: Identifier of the product offer;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
+
+        params: JSONDict = {
+            "id": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
@@ -92,10 +170,29 @@ class Offer(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Retrieve field descriptions of product offers by filter.
 
-        params: JSONDict = dict()
-        params["filter"] = filter
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/offer/catalog-product-offer-get-fields-by-filter.html
+
+        This method returns the fields of a product variation based on the filter.
+
+        Args:
+            filter: Object format:
+                {
+
+                    "iblockId": integer,
+                }, where iblockId is the identifier of the catalog information block for offers;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
+
+        params: JSONDict = {
+            "filter": filter,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get_fields_by_filter,
@@ -111,26 +208,55 @@ class Offer(BaseEntity):
             *,
             order: Optional[JSONDict] = None,
             start: Optional[int] = None,
-            limit: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Return a list of product offers by filter.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/offer/catalog-product-offer-list.html
+
+        The method returns a list of product variations based on the filter.
+
+        Args:
+            select: Iterable of field names to select; required fields include id and iblockId;
+
+            filter: Object format:
+                {
+                    "field_1": "value_1",
+                    ...,
+                    "field_N": "value_N",
+                }, possible keys correspond to catalog_product_offer fields;
+
+            order: Object format:
+                {
+                    field_1: value_1,
+                    ...,
+                }
+                where
+                - field_n is the field name to sort by
+                - value_n is either 'ASC' (ascending) or 'DESC' (descending);
+
+            start: Starting position for selection if pagination is used;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         if select.__class__ is not list:
             select = list(select)
 
-        params: JSONDict = dict()
-        params["select"] = select
-        params["filter"] = filter
+        params: JSONDict = {
+            "select": select,
+            "filter": filter,
+        }
 
         if order is not None:
             params["order"] = order
 
         if start is not None:
             params["start"] = start
-
-        if limit is not None:
-            params["limit"] = limit
 
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
@@ -146,11 +272,35 @@ class Offer(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """
+        Update fields of a product offer.
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
-        params["fields"] = fields
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/offer/catalog-product-offer-update.html
+
+        This method updates the fields of a product variation.
+
+        Args:
+            bitrix_id: Identifier of the product offer;
+
+            fields: Object format:
+                {
+                    "field_1": "value_1",
+
+                    ...,
+
+                    "field_n": "value_n",
+                }, where the keys correspond to catalog_product_offer fields;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
+
+        params: JSONDict = {
+            "id": bitrix_id,
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,

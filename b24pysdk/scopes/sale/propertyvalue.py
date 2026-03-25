@@ -22,8 +22,9 @@ class Propertyvalue(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
+        params: JSONDict = {
+            "id": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.delete,
@@ -40,8 +41,9 @@ class Propertyvalue(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
+        params: JSONDict = {
+            "id": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
@@ -70,7 +72,6 @@ class Propertyvalue(BaseEntity):
         filter: Optional[JSONDict] = None,
         order: Optional[JSONDict] = None,
         start: Optional[int] = None,
-        limit: Optional[int] = None,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -91,9 +92,6 @@ class Propertyvalue(BaseEntity):
         if start is not None:
             params["start"] = start
 
-        if limit is not None:
-            params["limit"] = limit
-
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
             params=params,
@@ -109,8 +107,9 @@ class Propertyvalue(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["fields"] = fields
+        params: JSONDict = {
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.modify,

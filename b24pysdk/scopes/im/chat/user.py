@@ -16,8 +16,8 @@ class User(BaseEntity):
     @type_checker
     def add(
             self,
-            chat_id: Union[int, Text],
-            users: Iterable[Union[int, Text]],
+            chat_id: int,
+            users: Iterable[int],
             *,
             hide_history: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
@@ -44,7 +44,7 @@ class User(BaseEntity):
     @type_checker
     def delete(
             self,
-            chat_id: Union[int, Text],
+            chat_id: int,
             user_id: Union[int, Text],
             *,
             timeout: Timeout = None,
@@ -65,7 +65,7 @@ class User(BaseEntity):
     @type_checker
     def list(
             self,
-            chat_id: Union[int, Text],
+            chat_id: int,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:

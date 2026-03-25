@@ -16,6 +16,16 @@ __all__ = [
 class Config(BaseEntity):
     """"""
 
+    @cached_property
+    def list(self) -> List:
+        """"""
+        return List(self)
+
+    @cached_property
+    def path(self) -> Path:
+        """"""
+        return Path(self)
+
     @type_checker
     def add(
             self,
@@ -81,16 +91,6 @@ class Config(BaseEntity):
             params=params,
             timeout=timeout,
         )
-
-    @cached_property
-    def list(self) -> List:
-        """"""
-        return List(self)
-
-    @cached_property
-    def path(self) -> Path:
-        """"""
-        return Path(self)
 
     @type_checker
     def update(

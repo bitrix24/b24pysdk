@@ -22,8 +22,9 @@ class Sku(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["fields"] = fields
+        params: JSONDict = {
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.add,
@@ -40,8 +41,9 @@ class Sku(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
+        params: JSONDict = {
+            "id": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.delete,
@@ -58,8 +60,9 @@ class Sku(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["fields"] = fields
+        params: JSONDict = {
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.download,
@@ -76,8 +79,9 @@ class Sku(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
+        params: JSONDict = {
+            "id": bitrix_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
@@ -94,8 +98,9 @@ class Sku(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["filter"] = filter
+        params: JSONDict = {
+            "filter": filter,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get_fields_by_filter,
@@ -110,6 +115,7 @@ class Sku(BaseEntity):
             filter: JSONDict,
             *,
             order: Optional[JSONDict] = None,
+            start: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -117,12 +123,16 @@ class Sku(BaseEntity):
         if select.__class__ is not list:
             select = list(select)
 
-        params: JSONDict = dict()
-        params["select"] = select
-        params["filter"] = filter
+        params: JSONDict = {
+            "select": select,
+            "filter": filter,
+        }
 
         if order is not None:
             params["order"] = order
+
+        if start is not None:
+            params["start"] = start
 
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
@@ -140,9 +150,10 @@ class Sku(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["id"] = bitrix_id
-        params["fields"] = fields
+        params: JSONDict = {
+            "id": bitrix_id,
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,

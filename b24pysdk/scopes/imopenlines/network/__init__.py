@@ -15,6 +15,11 @@ __all__ = [
 class Network(BaseEntity):
     """"""
 
+    @cached_property
+    def message(self) -> Message:
+        """"""
+        return Message(self)
+
     @type_checker
     def join(
             self,
@@ -33,8 +38,3 @@ class Network(BaseEntity):
             params=params,
             timeout=timeout,
         )
-
-    @cached_property
-    def message(self) -> Message:
-        """"""
-        return Message(self)

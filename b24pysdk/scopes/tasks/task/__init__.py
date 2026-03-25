@@ -8,7 +8,7 @@ from ..._base_entity import BaseEntity
 from .chat import Chat
 from .counters import Counters
 from .favorite import Favorite
-from .file import File
+from .files import Files
 from .history import History
 from .result import Result
 
@@ -36,9 +36,9 @@ class Task(BaseEntity):
         return Favorite(self)
 
     @cached_property
-    def file(self) -> File:
+    def files(self) -> Files:
         """"""
-        return File(self)
+        return Files(self)
 
     @cached_property
     def history(self) -> History:
@@ -165,6 +165,25 @@ class Task(BaseEntity):
             timeout=timeout,
         )
 
+    @type_checker
+    def defer(
+            self,
+            task_id: int,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params = {
+            "taskId": task_id,
+        }
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.defer,
+            params=params,
+            timeout=timeout,
+        )
+
     def get(
             self,
             bitrix_id: int,
@@ -268,6 +287,44 @@ class Task(BaseEntity):
         )
 
     @type_checker
+    def mute(
+            self,
+            bitrix_id: int,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params = {
+            "id": bitrix_id,
+        }
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.mute,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def pause(
+            self,
+            task_id: int,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params = {
+            "taskId": task_id,
+        }
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.pause,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
     def renew(
             self,
             task_id: int,
@@ -319,6 +376,25 @@ class Task(BaseEntity):
 
         return self._make_bitrix_api_request(
             api_wrapper=self.startwatch,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def stopwatch(
+            self,
+            task_id: int,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params = {
+            "taskId": task_id,
+        }
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.stopwatch,
             params=params,
             timeout=timeout,
         )

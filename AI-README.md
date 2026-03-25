@@ -23,8 +23,9 @@ b24pysdk/
 │   └── version.py             # Constant definitions for API versions
 ├── credentials/               # Core classes for working with authentication and connection workflow
 │   └── _utils/                # Utility functions and helpers
-├── error/                     # Error handling and exceptions
-│   ├── _http_responce.py      # HTTP responces
+├── errors/                    # Error handling and exceptions
+│   ├── _http_responses.py     # HTTP responses
+│   ├── oauth.py               # OAuth-specific errors
 │   └── v3.py                  # Error handling for v3 Bitrix API
 ├── events/                    # Core classes for requests, responses, events
 ├── log/                       # Logging utilities
@@ -117,7 +118,7 @@ b24pysdk/
 2. **Batch Operations**: Efficiently manages batch requests, crucial for handling large datasets.
 3. **Configuration**: Adjustable settings included in `_config.py` to manage API call timeouts, retry mechanisms, and token configurations for robust performance.
 4. **Error Handling**:
-     - Implements comprehensive error management via `BitrixAPIError` and `BitrixRequestTimeout` from `error.py`.
+     - Implements comprehensive error management via `BitrixAPIError` and `BitrixRequestTimeout` from `b24pysdk.errors`.
      - Provides detailed error descriptions for problematic API calls, enhancing debugging and reliability.
 
 ### Standard API Methods
@@ -305,65 +306,72 @@ except Exception as error:
 #### Exception hierarchy
 
 
-Use `b24pysdk.error` for v1/v2 wrappers and `b24pysdk.error.v3` for the newer API surface.
+Use `b24pysdk.errors` for v1/v2 wrappers, `b24pysdk.errors.oauth` for OAuth-specific exceptions, and `b24pysdk.errors.v3` for the newer API surface.
 ```plaintext
 BitrixSDKException (Exception)
-├─ BitrixOAuthException
 ├─ BitrixValidationError
 ├─ BitrixResponseError
 ├─ BitrixRequestError
-│   ├─ BitrixOAuthRequestError
-│   ├─ BitrixRequestTimeout
-│   │   └─ BitrixOAuthRequestTimeout
-│   └─ BitrixResponseJSONDecodeError 
-│       ├─ BitrixResponse302JSONDecodeError 
-│       ├─ BitrixResponse403JSONDecodeError 
-│       └─ BitrixResponse500JSONDecodeError 
-└─ BaseBitrixAPIError 
-    └─ BitrixAPIError (v1/v2, b24pysdk.error)
-    │   ├─ BitrixAPIBadRequest
-    │   │   ├─ BitrixAPIInvalidArgValue
-    │   │   ├─ BitrixAPIInvalidRequest
-    │   │   │   └─ BitrixOAuthInvalidRequest 
-    │   │   ├─ BitrixOAuthInvalidClient 
-    │   │   └─ BitrixOAuthInvalidGrant 
-    │   ├─ BitrixAPIUnauthorized 
-    │   │   ├─ BitrixAPIAuthorizationError
-    │   │   ├─ BitrixAPIErrorOAuth
-    │   │   ├─ BitrixAPIExpiredToken
-    │   │   ├─ BitrixAPIMethodConfirmWaiting
-    │   │   ├─ BitrixAPIInvalidToken
-    │   │   └─ BitrixAPINoAuthFound
-    │   ├─ BitrixAPIForbidden 
-    │   │   ├─ BitrixAPIAccessDenied
-    │   │   ├─ BitrixAPIAllowedOnlyIntranetUser
-    │   │   ├─ BitrixAPIInsufficientScope
-    │   │   │   └─ BitrixOAuthInsufficientScope
-    │   │   ├─ BitrixAPIInvalidCredentials
-    │   │   ├─ BitrixAPIMethodConfirmDenied
-    │   │   ├─ BitrixAPIUserAccessError
-    │   │   ├─ BitrixAPIWrongAuthType
-    │   │   └─ BitrixOAuthInvalidScope 
-    │   ├─ BitrixAPINotFound 
-    │   ├─ BitrixAPIMethodNotAllowed 
-    │   ├─ BitrixAPIOperationTimeLimit 
-    │   ├─ BitrixAPIInternalServerError 
-    │   │   └─ BitrixAPIErrorUnexpectedAnswer
-    │   ├─ BitrixAPIServiceUnavailable 
-    │   │   ├─ BitrixAPIOverloadLimit
-    │   │   └─ BitrixAPIQueryLimitExceeded
-    │   ├─ BitrixOauthWrongClient
-    │   └─ BitrixAPITooManyRequests
-    └─ BitrixAPIError (v3, b24pysdk.error.v3)
-        ├─ BitrixAPIBadRequest 
-        │   ├─ BitrixAPIEntityNotFoundException
-        │   ├─ BitrixAPIInvalidFilterException
-        │   ├─ BitrixAPIInvalidPaginationException
-        │   ├─ BitrixAPIUnknownDTOPropertyException
-        │   ├─ BitrixAPIValidationDTOValidationException
-        │   └─ BitrixAPIValidationRequestValidationException
-        └─ BitrixAPIUnauthorized
-            └─ BitrixAPIAccessDeniedException
+├─ BitrixRequestTimeout
+├─ BitrixResponseJSONDecodeError
+│   ├─ BitrixResponse302JSONDecodeError
+│   ├─ BitrixResponse403JSONDecodeError
+│   └─ BitrixResponse500JSONDecodeError
+├─ BaseBitrixAPIError 
+│   └─ BitrixAPIError (v1/v2, b24pysdk.errors)
+│    │   ├─ BitrixAPIBadRequest
+│    │   │   ├─ BitrixAPIInvalidArgValue
+│    │   │   ├─ BitrixAPIInvalidRequest
+│    │   │   │   └─ BitrixOAuthInvalidRequest 
+│    │   │   ├─ BitrixOAuthInvalidClient 
+│    │   │   └─ BitrixOAuthInvalidGrant 
+│    │   ├─ BitrixAPIUnauthorized 
+│    │   │   ├─ BitrixAPIAuthorizationError
+│    │   │   ├─ BitrixAPIErrorOAuth
+│    │   │   ├─ BitrixAPIExpiredToken
+│    │   │   ├─ BitrixAPIMethodConfirmWaiting
+│    │   │   ├─ BitrixAPIInvalidToken
+│    │   │   └─ BitrixAPINoAuthFound
+│    │   ├─ BitrixAPIForbidden 
+│    │   │   ├─ BitrixAPIAccessDenied
+│    │   │   ├─ BitrixAPIAllowedOnlyIntranetUser
+│    │   │   ├─ BitrixAPIInsufficientScope
+│    │   │   │   └─ BitrixOAuthInsufficientScope
+│    │   │   ├─ BitrixAPIInvalidCredentials
+│    │   │   ├─ BitrixAPIMethodConfirmDenied
+│    │   │   ├─ BitrixAPIUserAccessError
+│    │   │   ├─ BitrixAPIWrongAuthType
+│    │   │   └─ BitrixOAuthInvalidScope 
+│    │   ├─ BitrixAPINotFound 
+│    │   ├─ BitrixAPIMethodNotAllowed 
+│    │   ├─ BitrixAPIOperationTimeLimit 
+│    │   ├─ BitrixAPIInternalServerError 
+│    │   │   └─ BitrixAPIErrorUnexpectedAnswer
+│    │   ├─ BitrixAPIServiceUnavailable 
+│    │   │   ├─ BitrixAPIOverloadLimit
+│    │   │   └─ BitrixAPIQueryLimitExceeded
+│    │   ├─ BitrixOauthWrongClient
+│    │   └─ BitrixAPITooManyRequests
+│    └─ BitrixAPIError (v3, b24pysdk.errors.v3)
+│        ├─ BitrixAPIBadRequest 
+│        │   ├─ BitrixAPIEntityNotFoundException
+│        │   ├─ BitrixAPIInvalidFilterException
+│        │   ├─ BitrixAPIInvalidPaginationException
+│        │   ├─ BitrixAPIUnknownDTOPropertyException
+│        │   ├─ BitrixAPIValidationDTOValidationException
+│        │   └─ BitrixAPIValidationRequestValidationException
+│        └─ BitrixAPIUnauthorized
+│            └─ BitrixAPIAccessDeniedException
+└─ BitrixOAuthException (oauth, b24pysdk.errors.oauth)
+    ├─ BitrixOAuthRequestError
+    ├─ BitrixOAuthRequestTimeout
+    ├─ BitrixOauthWrongClient
+    ├─ BitrixOAuthInvalidClient
+    ├─ BitrixOAuthInvalidRequest
+    ├─ BitrixOAuthInvalidGrant
+    ├─ BitrixOAuthNotInstalled
+    ├─ BitrixOAuthInsufficientScope
+    └─ BitrixOAuthInvalidScope
 ```
 
 #### Handles API errors gracefully, providing error descriptions for failed method calls.
@@ -371,7 +379,7 @@ BitrixSDKException (Exception)
 ```python
 from b24pysdk.credentials.bitrix_token import BitrixToken
 from b24pysdk import Client
-from b24pysdk.error import (
+from b24pysdk.errors import (
     BitrixAPIError,
     BitrixRequestTimeout,
     BitrixAPIBadRequest,
@@ -410,7 +418,7 @@ except BitrixAPIError as e:
 ```python
 from b24pysdk.credentials.bitrix_token import BitrixToken
 from b24pysdk import Client
-from b24pysdk.error.v3 import BitrixAPIError
+from b24pysdk.errors.v3 import BitrixAPIError
 
 bitrix_token = BitrixToken(domain="example.bitrix24.com", auth_token="user_id/webhook_key")
 client = Client(bitrix_token, prefer_version=3)
@@ -486,7 +494,7 @@ logger = StreamLogger()
 
 cfg = Config()
 cfg.configure(
-    default_timeout=(3.05, 10),       # seconds or tuple (default_connection_timeout, default_read_timeout)
+    default_timeout=(3.05, 10),       # seconds or tuple (connect_timeout, read_timeout)
     default_max_retries=3,            # number of retries on transient errors
     default_initial_retry_delay=1,    # seconds
     default_retry_delay_increment=1,  # seconds
@@ -495,8 +503,8 @@ cfg.configure(
 
 # other way to pass default timeout values
 cfg.configure(
-    default_connection_timeout=3.05,
-    default_read_timeout=10,          # seconds or tuple (connect_timeout, read_timeout)
+    default_connect_timeout=3.05,
+    default_read_timeout=10,          # seconds
     default_max_retries=3,            # number of retries on transient errors
     default_initial_retry_delay=1,    # seconds
     default_retry_delay_increment=1,  # seconds

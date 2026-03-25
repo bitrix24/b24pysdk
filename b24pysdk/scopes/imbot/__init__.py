@@ -1,11 +1,10 @@
 from functools import cached_property
-from typing import Optional, Text
+from typing import Annotated, Literal, Optional, Text, Union
 
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import JSONDict, Timeout
+from ...utils.types import B24BoolStrict, JSONDict, Timeout
 from .._base_scope import BaseScope
-from .app import App
 from .bot import Bot
 from .chat import Chat
 from .command import Command
@@ -19,11 +18,6 @@ __all__ = [
 
 class Imbot(BaseScope):
     """"""
-
-    @cached_property
-    def app(self) -> App:
-        """"""
-        return App(self)
 
     @cached_property
     def bot(self) -> Bot:
@@ -60,16 +54,17 @@ class Imbot(BaseScope):
             event_message_add: Optional[Text] = None,
             event_welcome_message: Optional[Text] = None,
             event_bot_delete: Optional[Text] = None,
-            type: Optional[Text] = None,
-            openline: Optional[Text] = None,
+            type: Optional[Annotated[Text, Literal["B", "O", "H", "S"]]] = None,
+            openline: Optional[Union[bool, B24BoolStrict]] = None,
             client_id: Optional[Text] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
-        params["CODE"] = code
-        params["PROPERTIES"] = properties
+        params = {
+            "CODE": code,
+            "PROPERTIES": properties,
+        }
 
         if event_handler is not None:
             params["EVENT_HANDLER"] = event_handler
@@ -87,7 +82,7 @@ class Imbot(BaseScope):
             params["TYPE"] = type
 
         if openline is not None:
-            params["OPENLINE"] = openline
+            params["OPENLINE"] = B24BoolStrict(openline).to_b24()
 
         if client_id is not None:
             params["CLIENT_ID"] = client_id
@@ -108,7 +103,7 @@ class Imbot(BaseScope):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        params = {}
 
         if bot_id is not None:
             params["BOT_ID"] = bot_id
@@ -133,9 +128,10 @@ class Imbot(BaseScope):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
-        params["BOT_ID"] = bot_id
-        params["FIELDS"] = fields
+        params = {
+            "BOT_ID": bot_id,
+            "FIELDS": fields,
+        }
 
         if client_id is not None:
             params["CLIENT_ID"] = client_id

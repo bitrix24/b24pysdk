@@ -15,6 +15,11 @@ __all__ = [
 class Chat(BaseEntity):
     """"""
 
+    @cached_property
+    def user(self) -> User:
+        """"""
+        return User(self)
+
     @type_checker
     def add(  # noqa: C901
             self,
@@ -118,7 +123,7 @@ class Chat(BaseEntity):
     @type_checker
     def leave(
             self,
-            chat_id: Union[int, Text],
+            chat_id: int,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
@@ -137,7 +142,7 @@ class Chat(BaseEntity):
     @type_checker
     def set_owner(
             self,
-            chat_id: Union[int, Text],
+            chat_id: int,
             user_id: Union[int, Text],
             *,
             timeout: Timeout = None,
@@ -158,7 +163,7 @@ class Chat(BaseEntity):
     @type_checker
     def update_avatar(
             self,
-            chat_id: Union[int, Text],
+            chat_id: int,
             avatar: Text,
             *,
             timeout: Timeout = None,
@@ -179,7 +184,7 @@ class Chat(BaseEntity):
     @type_checker
     def update_color(
             self,
-            chat_id: Union[int, Text],
+            chat_id: int,
             color: Text,
             *,
             timeout: Timeout = None,
@@ -200,7 +205,7 @@ class Chat(BaseEntity):
     @type_checker
     def update_title(
             self,
-            chat_id: Union[int, Text],
+            chat_id: int,
             title: Text,
             *,
             timeout: Timeout = None,
@@ -217,8 +222,3 @@ class Chat(BaseEntity):
             params=params,
             timeout=timeout,
         )
-
-    @cached_property
-    def user(self) -> User:
-        """"""
-        return User(self)

@@ -16,9 +16,10 @@ class Consent(BaseEntity):
     @type_checker
     def add(
             self,
+            agreement_id: int,
+            ip: Text,
             *,
-            agreement_id: Optional[Text] = None,
-            ip: Optional[Text] = None,
+            user_id: Optional[int] = None,
             url: Optional[Text] = None,
             origin_id: Optional[Text] = None,
             originator_id: Optional[Text] = None,
@@ -26,13 +27,13 @@ class Consent(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        params = {
+            "AGREEMENT_ID": agreement_id,
+            "IP": ip,
+        }
 
-        if agreement_id is not None:
-            params["agreement_id"] = agreement_id
-
-        if ip is not None:
-            params["ip"] = ip
+        if user_id is not None:
+            params["USER_ID"] = user_id
 
         if url is not None:
             params["url"] = url

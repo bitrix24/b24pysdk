@@ -12,6 +12,6 @@ class Extra(BaseEntity):
     """"""
 
     @cached_property
-    def config(self) -> Service:
+    def service(self) -> Service:
         """"""
         return Service(self)

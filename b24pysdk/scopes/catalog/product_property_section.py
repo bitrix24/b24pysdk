@@ -26,8 +26,9 @@ class ProductPropertySection(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["propertyId"] = property_id
+        params: JSONDict = {
+            "propertyId": property_id,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
@@ -80,9 +81,10 @@ class ProductPropertySection(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
-        params["propertyId"] = property_id
-        params["fields"] = fields
+        params: JSONDict = {
+            "propertyId": property_id,
+            "fields": fields,
+        }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.set,

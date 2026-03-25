@@ -15,6 +15,11 @@ __all__ = [
 class Session(BaseEntity):
     """"""
 
+    @cached_property
+    def message(self) -> Message:
+        """"""
+        return Message(self)
+
     @type_checker
     def finish(
             self,
@@ -33,11 +38,6 @@ class Session(BaseEntity):
             params=params,
             timeout=timeout,
         )
-
-    @cached_property
-    def message(self) -> Message:
-        """"""
-        return Message(self)
 
     @type_checker
     def operator(
