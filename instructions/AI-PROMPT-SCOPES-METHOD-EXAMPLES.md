@@ -97,24 +97,23 @@ Style requirements for all examples (mandatory):
 - For list-capable methods:
   - `.as_list()` example must use `... .as_list().response`
   - `.as_list_fast()` example must use `... .as_list_fast(...).response`
+  - In `.as_list()` / `.as_list_fast()` examples, iterate over `result` with `for item in result:` and print/log each item.
+  - Do not use `print(result)` directly for `.as_list()` / `.as_list_fast()` examples.
 - Always show `result` extraction in success branch:
   - `result = bitrix_response.result`
 - Keep examples structurally close to other SDK docs:
-  - First prepare input data blocks (`fields`, `filter`, `order`, `params`, dates, IDs).
-  - Then perform the SDK call.
+  - Pass values directly in method arguments.
+  - Do not create separate pre-call payload blocks only to forward them into the call.
   - Then process result.
   - Then handle errors.
 - Prefer readable multi-step examples instead of one-line calls.
 - For create/update methods:
-  - Build payload in dedicated variables before the call.
-  - Example:
-    - `fields = {...}`
-    - `params = {...}` (only if method supports it)
-    - `client.<scope>.<method>(fields=fields, params=params)`
+  - Pass supported values directly in call arguments.
 - For date/time values, use realistic Python values (`datetime`, `timedelta`, `.isoformat()` where needed).
 - Response handling style:
   - If method result is expected as entity id, print/log that ID.
   - If method returns collection/object, print/log normalized result.
+  - For iterator/generator results (typical for `.as_list()` / `.as_list_fast()`), consume via loop before output.
 - Keep snippets clean and minimal:
   - Do NOT add inline comments in code blocks.
   - Do NOT add debug/service prints (timestamps, "checking...", etc.).
@@ -144,9 +143,34 @@ except BitrixAPIError as error:
         sep="\n",
     )
 except BitrixSDKException as error:
-    print("Bitrix SDK error", error.message, sep="\n")
+    print(f"Bitrix SDK error: {error.message}")
 except Exception as error:
-    print("Unexpected error", error, sep="\n")
+    print(f"Unexpected error: {error}")
+```
+
+Mandatory snippet template for list methods (`.as_list()` / `.as_list_fast()`):
+```python
+from b24pysdk.errors import BitrixAPIError, BitrixSDKException
+
+try:
+    bitrix_response = client.<scope_chain>.<method_name>(
+        <method_specific_param_1>=...,
+        <method_specific_param_2>=...,
+    ).<list_mode>.response
+    result = bitrix_response.result
+    for item in result:
+        print(item)
+except BitrixAPIError as error:
+    print(
+        "Bitrix API error",
+        f"error: {error.error}",
+        f"error_description: {error.error_description}",
+        sep="\n",
+    )
+except BitrixSDKException as error:
+    print(f"Bitrix SDK error: {error.message}")
+except Exception as error:
+    print(f"Unexpected error: {error}")
 ```
 
 Mandatory snippet template for API v3 (use exactly this structure when `API_VERSION = 3`):
@@ -171,9 +195,9 @@ except BitrixAPIError as error:
     if error.has_validation:
         print(f"validation: {error.validation}")
 except BitrixSDKException as error:
-    print("Bitrix SDK error", error.message, sep="\n")
+    print(f"Bitrix SDK error: {error.message}")
 except Exception as error:
-    print("Unexpected error", error, sep="\n")
+    print(f"Unexpected error: {error}")
 ```
 
 Parameter mapping rule (mandatory):
