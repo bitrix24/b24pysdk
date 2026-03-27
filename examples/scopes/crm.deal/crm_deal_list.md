@@ -1,26 +1,21 @@
-# user.userfield.list
+# crm.deal.list
 
 ## Description
-Returns user fields filtered and sorted by supported user field attributes.
+Returns a filtered and ordered list of deals.
 
 ## Regular Example (Python SDK)
 ```python
 from b24pysdk.client import BaseClient
 from b24pysdk.errors import BitrixAPIError, BitrixSDKException
 
-order = {
-    "ID": "desc",
-    "SORT": "asc",
-}
-filter = {
-    "USER_TYPE_ID": "string",
-    "SHOW_IN_LIST": "Y",
-}
+client: BaseClient
 
 try:
-    bitrix_response = client.user.userfield.list(
-        order=order,
-        filter=filter,
+    bitrix_response = client.crm.deal.list(
+        select=["ID", "TITLE", "STAGE_ID", "OPPORTUNITY", "ASSIGNED_BY_ID", "DATE_CREATE"],
+        filter={">OPPORTUNITY": 1000, "!STAGE_ID": "WON", "=OPENED": "Y"},
+        order={"DATE_CREATE": "DESC", "ID": "DESC"},
+        start=0,
     ).response
     result = bitrix_response.result
     print(result)
@@ -32,9 +27,9 @@ except BitrixAPIError as error:
         sep="\n",
     )
 except BitrixSDKException as error:
-    print("Bitrix SDK error", error.message, sep="\n")
+    print(f"Bitrix SDK error: {error.message}")
 except Exception as error:
-    print("Unexpected error", error, sep="\n")
+    print(f"Unexpected error: {error}")
 ```
 
 ## as_list Example
@@ -42,17 +37,13 @@ except Exception as error:
 from b24pysdk.client import BaseClient
 from b24pysdk.errors import BitrixAPIError, BitrixSDKException
 
-order = {
-    "ID": "desc",
-}
-filter = {
-    "SHOW_IN_LIST": "Y",
-}
+client: BaseClient
 
 try:
-    bitrix_response = client.user.userfield.list(
-        order=order,
-        filter=filter,
+    bitrix_response = client.crm.deal.list(
+        select=["ID", "TITLE", "STAGE_ID"],
+        filter={"!STAGE_ID": "LOSE"},
+        order={"ID": "ASC"},
     ).as_list().response
     result = bitrix_response.result
     for item in result:
@@ -65,9 +56,9 @@ except BitrixAPIError as error:
         sep="\n",
     )
 except BitrixSDKException as error:
-    print("Bitrix SDK error", error.message, sep="\n")
+    print(f"Bitrix SDK error: {error.message}")
 except Exception as error:
-    print("Unexpected error", error, sep="\n")
+    print(f"Unexpected error: {error}")
 ```
 
 ## as_list_fast Example
@@ -75,17 +66,13 @@ except Exception as error:
 from b24pysdk.client import BaseClient
 from b24pysdk.errors import BitrixAPIError, BitrixSDKException
 
-order = {
-    "ID": "desc",
-}
-filter = {
-    "SHOW_IN_LIST": "Y",
-}
+client: BaseClient
 
 try:
-    bitrix_response = client.user.userfield.list(
-        order=order,
-        filter=filter,
+    bitrix_response = client.crm.deal.list(
+        select=["ID", "TITLE", "STAGE_ID"],
+        filter={"!STAGE_ID": "LOSE"},
+        order={"ID": "DESC"},
     ).as_list_fast(descending=True).response
     result = bitrix_response.result
     for item in result:
@@ -98,13 +85,13 @@ except BitrixAPIError as error:
         sep="\n",
     )
 except BitrixSDKException as error:
-    print("Bitrix SDK error", error.message, sep="\n")
+    print(f"Bitrix SDK error: {error.message}")
 except Exception as error:
-    print("Unexpected error", error, sep="\n")
+    print(f"Unexpected error: {error}")
 ```
 
 ## Response Shape
-`result` is a list of user field objects. Each item can include keys such as `ID`, `ENTITY_ID`, `FIELD_NAME`, `USER_TYPE_ID`, flags like `SHOW_IN_LIST`, and nested `SETTINGS`. The REST response also includes `total`.
+`result` is a list of deal objects; paging fields can include `total` and `next`.
 
 ## Notes
-`user.userfield.list` is list-capable, so both `.as_list()` and `.as_list_fast()` are available.
+`crm.deal.list` is list-capable, so both `.as_list()` and `.as_list_fast()` examples are included.
