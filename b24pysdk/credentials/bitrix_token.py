@@ -34,7 +34,7 @@ def _bitrix_app_required(func: Callable) -> Callable:
 
     @wraps(func)
     def wrapper(self: "AbstractBitrixToken", *args, **kwargs):
-        if self.bitrix_app is NotImplemented:
+        if self.bitrix_app is NotImplemented or self.bitrix_app is None:
             raise AttributeError(f"'bitrix_app' is not implimented for {self}")
         return func(self, *args, **kwargs)
 
