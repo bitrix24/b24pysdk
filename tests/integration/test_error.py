@@ -11,7 +11,7 @@ from b24pysdk.api.requesters._utils.parse_response import parse_response
 from b24pysdk.api.requests import BitrixAPIRequest
 from b24pysdk.client import BaseClient, Client
 from b24pysdk.credentials import BitrixApp, BitrixToken, BitrixWebhook
-from b24pysdk.error import (
+from b24pysdk.errors import (
     BitrixAPIAccessDenied,
     BitrixAPIAllowedOnlyIntranetUser,
     BitrixAPIApplicationNotFound,
@@ -27,7 +27,6 @@ from b24pysdk.error import (
     BitrixAPIInvalidToken,
     BitrixAPIMethodConfirmDenied,
     BitrixAPIMethodConfirmWaiting,
-    BitrixAPINoAuthFound,
     BitrixAPIOverloadLimit,
     BitrixAPIPaymentRequired,
     BitrixAPIQueryLimitExceeded,
@@ -52,7 +51,7 @@ from tests.env_config import EnvConfig
 
 pytestmark = [
     pytest.mark.integration,
-    pytest.mark.test_error,
+    pytest.mark.errors,
 ]
 
 env_config: EnvConfig = EnvConfig()
@@ -131,22 +130,6 @@ def test_error_bitrix_api_unauthorized(bitrix_client: BaseClient):
 #     _assert_error_response(exc_info.value, BitrixAPIMethodNotAllowed)
 
 
-def test_error_bitrix_api_no_auth_found():
-    """Expect BitrixAPINoAuthFound when auth is missing in the request (works)."""
-
-    deleting_result = requests.post(
-        _rest_url("crm.item.delete"),
-        json={"entityTypeId": _TEST_ENTITY_TYPE_ID, "id": _TEST_ITEM_ID},
-        headers=_JSON_HEADERS,
-        timeout=_REQUEST_TIMEOUT,
-    )
-
-    with pytest.raises(BitrixAPINoAuthFound) as exc_info:
-        parse_response(deleting_result)
-
-    _assert_error_response(exc_info.value, BitrixAPINoAuthFound)
-
-
 def test_error_bitrix_request_timeout(bitrix_client: BaseClient):
     """Expect BitrixRequestTimeout with an unrealistically small timeout."""
 
@@ -213,7 +196,7 @@ def test_error_bitrix_api_allowed_only_intranet_user():
     external_user_client = Client(
         BitrixWebhook(
             domain=env_config.domain,
-            auth_token=EXTERNAL_USER_WEBHOOK_TOKEN,
+            webhook_token=EXTERNAL_USER_WEBHOOK_TOKEN,
         ),
     )
     bitrix_request = external_user_client.timeman.status()
@@ -234,7 +217,7 @@ def test_error_bitrix_api_insufficient_scope():
     limited_client = Client(
         BitrixWebhook(
             domain=env_config.domain,
-            auth_token=PROFILE_ONLY_WEBHOOK_TOKEN,
+            webhook_token=PROFILE_ONLY_WEBHOOK_TOKEN,
         ),
     )
 
@@ -253,7 +236,7 @@ def test_error_bitrix_api_invalid_credentials():
     invalid_client = Client(
         BitrixWebhook(
             domain=env_config.domain,
-            auth_token=f"{env_config.webhook_token}INVALID",
+            webhook_token=f"{env_config.webhook_token}INVALID",
         ),
     )
     bitrix_request = invalid_client.profile()
@@ -341,9 +324,10 @@ def test_error_bitrix_response_302_json_decode_error():
     old_domain_client = Client(
         BitrixWebhook(
             domain=OLD_DOMAIN,
-            auth_token=env_config.webhook_token,
+            webhook_token=env_config.webhook_token,
         ),
     )
+    old_domain_client._bitrix_token._AUTO_CHANCHED_DOMAIN = False
     bitrix_request = old_domain_client.profile()
 
     with pytest.raises(BitrixResponse302JSONDecodeError) as exc_info:

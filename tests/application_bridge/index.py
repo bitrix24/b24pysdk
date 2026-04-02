@@ -10,17 +10,22 @@ from tests.constants import OAUTH_DATA_FILE
 
 app = FastAPI()
 
+_BASE_DIR: Path = Path(__file__).resolve().parent
+_HTML_FILE: Path = _BASE_DIR / "index.html"
+_OAUTH_FILE: Path = _BASE_DIR.parent.parent / OAUTH_DATA_FILE
+
 
 @app.post("/")
 async def index(request: Request):
     try:
         form_data = await request.form()
 
-        placement_data = {**form_data, **request.query_params}
-        oauth_placement_data = OAuthPlacementData.from_dict(placement_data)
-        oauth_file_path = Path(__file__).parent.parent.parent / OAUTH_DATA_FILE
+        placement_data = dict(request.query_params)
+        placement_data.update(form_data)
 
-        with Path(oauth_file_path).open("w", encoding="utf-8") as file:
+        oauth_placement_data = OAuthPlacementData.from_dict(placement_data)
+
+        with _OAUTH_FILE.open("w", encoding="utf-8") as file:
             json.dump(
                 oauth_placement_data.oauth_token.to_dict(),
                 file,
@@ -30,7 +35,7 @@ async def index(request: Request):
             )
 
         return FileResponse(
-            path="index.html",
+            path=_HTML_FILE,
             media_type="text/html",
         )
 

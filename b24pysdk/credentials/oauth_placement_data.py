@@ -23,10 +23,15 @@ if PYTHON_VERSION >= (3, 10):
 
 @dataclass(**_DATACLASS_KWARGS)
 class OAuthPlacementData:
-    """"""
+    """
+    Represents OAuth placement data received from Bitrix24.
+
+    Combines OAuth token information with metadata about the application
+    installation context (domain, protocol, language, placement, etc.).
+    """
 
     class ValidationError(BitrixValidationError):
-        """"""
+        """Raised when placement data validation fails."""
 
     oauth_token: OAuthToken
     domain: Text
@@ -40,6 +45,22 @@ class OAuthPlacementData:
 
     @classmethod
     def from_dict(cls, payload: Mapping[Text, Any], /) -> "OAuthPlacementData":
+        """
+        Create an OAuthPlacementData instance from placement payload.
+
+        Args:
+            payload: Mapping containing Bitrix24 placement data fields such as
+                'DOMAIN', 'PROTOCOL', 'LANG', 'APP_SID', 'member_id',
+                'status', 'PLACEMENT', and 'PLACEMENT_OPTIONS'.
+
+        Returns:
+            OAuthPlacementData instance.
+
+        Raises:
+            OAuthPlacementData.ValidationError: If required fields are missing
+                or payload contains invalid values.
+        """
+
         try:
             oauth_token = OAuthToken.from_placement_data(payload)
 
@@ -74,7 +95,18 @@ class OAuthPlacementData:
             raise cls.ValidationError(f"Invalid placement data: {error}") from error
 
     def validate_against_app_info(self, app_info: "B24AppInfoResult") -> bool:
-        """"""
+        """
+        Validate placement data against application installation info.
+
+        Args:
+            app_info: Application info result containing installation metadata.
+
+        Returns:
+            True if placement data matches the application installation.
+
+        Raises:
+            OAuthPlacementData.ValidationError: If validation fails.
+        """
         if all((
                 self.member_id == app_info.install.member_id,
                 self.domain == app_info.install.domain,
@@ -84,5 +116,10 @@ class OAuthPlacementData:
             raise self.ValidationError("Invalid placement data")
 
     def to_dict(self) -> JSONDict:
-        """"""
+        """
+        Convert the OAuthPlacementData instance to a dictionary.
+
+        Returns:
+            Dictionary representation of the placement data.
+        """
         return asdict(self)

@@ -5,7 +5,9 @@ from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
 from .....utils.types import JSONDict, Timeout
 from ...._base_entity import BaseEntity
+from .access import Access
 from .chat import Chat
+from .field import Field
 from .file import File
 
 __all__ = [
@@ -25,6 +27,16 @@ class Task(BaseEntity):
     def file(self) -> File:
         """"""
         return File(self)
+
+    @cached_property
+    def access(self) -> Access:
+        """"""
+        return Access(self)
+
+    @cached_property
+    def field(self) -> Field:
+        """"""
+        return Field(self)
 
     @type_checker
     def add(
@@ -110,3 +122,4 @@ class Task(BaseEntity):
             params=params,
             timeout=timeout,
         )
+

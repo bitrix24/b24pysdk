@@ -26,13 +26,15 @@ if PYTHON_VERSION >= (3, 10):
 
 @dataclass(**_DATACLASS_KWARGS)
 class Auth(ABC):
-    """Base authentication payload returned by Bitrix24 events.
+    """
+    Base authentication payload returned by Bitrix24 events.
 
-    This model captures the common fields present in all event auth payloads.
+    Contains common fields shared across all event authentication payloads,
+    such as portal identifiers and endpoint URLs.
     """
 
     class ValidationError(BitrixValidationError):
-        """"""
+        """Raised when Auth payload validation fails."""
 
     member_id: Text
     client_endpoint: Text
@@ -41,6 +43,18 @@ class Auth(ABC):
 
     @classmethod
     def _validate_payload(cls, payload: Mapping[Text, Any], /) -> JSONDict:
+        """
+        Extract and validate base Auth fields from payload.
+
+        Args:
+            payload: Raw payload received from Bitrix24.
+
+        Returns:
+            Dictionary with validated base fields.
+
+        Raises:
+            KeyError: If required fields are missing.
+        """
         return {
             "member_id": payload["member_id"],
             "client_endpoint": payload["client_endpoint"],
@@ -50,6 +64,18 @@ class Auth(ABC):
 
     @classmethod
     def from_dict(cls, payload: Mapping[Text, Any], /) -> "Auth":
+        """
+        Create an Auth instance from payload.
+
+        Args:
+            payload: Raw payload received from Bitrix24.
+
+        Returns:
+            Auth instance.
+
+        Raises:
+            Auth.ValidationError: If validation fails.
+        """
         try:
             return cls(**cls._validate_payload(payload))
         except KeyError as error:
@@ -59,11 +85,27 @@ class Auth(ABC):
 
     @property
     def portal_domain(self) -> Text:
-        """Return the portal domain derived from the client endpoint URL."""
+        """
+        Extract portal domain from the client endpoint URL.
+
+        Returns:
+            Hostname part of the client endpoint URL.
+        """
         return urlparse(self.client_endpoint).hostname
 
     def validate_against_app_info(self, app_info: "B24AppInfoResult") -> bool:
-        """Validate auth data against Bitrix24 application info."""
+        """
+        Validate Auth data against application installation info.
+
+        Args:
+            app_info: Application info result.
+
+        Returns:
+            True if validation succeeds.
+
+        Raises:
+            Auth.ValidationError: If validation fails.
+        """
         if all((
                 self.member_id == app_info.install.member_id,
                 self.portal_domain == app_info.install.domain,
@@ -73,15 +115,22 @@ class Auth(ABC):
             raise self.ValidationError("Invalid auth")
 
     def to_dict(self) -> JSONDict:
-        """"""
+        """
+        Convert Auth instance to dictionary.
+
+        Returns:
+            Dictionary representation of the auth payload.
+        """
         return asdict(self)
 
 
 @dataclass(**_DATACLASS_KWARGS)
 class EventOAuth(Auth):
-    """OAuth payload for Bitrix24 events with optional user context.
+    """
+    OAuth payload for Bitrix24 event handlers.
 
-    OAuth fields may be absent for system events executed without a user.
+    May include user-related OAuth context. For system events,
+    OAuth data may be absent.
     """
 
     application_token: Text
@@ -92,6 +141,16 @@ class EventOAuth(Auth):
 
     @classmethod
     def _validate_payload(cls, payload: Mapping[Text, Any], /) -> JSONDict:
+        """
+        Extract and validate EventOAuth-specific fields.
+
+        Args:
+            payload: Raw event payload.
+
+        Returns:
+            Dictionary with validated EventOAuth fields.
+        """
+
         oauth_token = OAuthToken.from_dict(payload) if payload.get("access_token") else None
 
         scope_value = payload.get("scope")
@@ -110,6 +169,18 @@ class EventOAuth(Auth):
 
     @classmethod
     def from_dict(cls, payload: Mapping[Text, Any], /) -> "EventOAuth":
+        """
+        Create an EventOAuth instance from payload.
+
+        Args:
+            payload: Raw event payload.
+
+        Returns:
+            EventOAuth instance.
+
+        Raises:
+            EventOAuth.ValidationError: If validation fails.
+        """
         try:
             return cls(**cls._validate_payload(payload))
         except KeyError as error:
@@ -119,11 +190,27 @@ class EventOAuth(Auth):
 
     @property
     def is_system(self) -> bool:
-        """Return True when the event has no user OAuth context."""
+        """
+        Indicates whether the event was triggered without user context.
+
+        Returns:
+            True if no OAuth token is present, otherwise False.
+        """
         return not bool(self.oauth_token)
 
     def validate_against_app_info(self, app_info: "B24AppInfoResult") -> bool:
-        """Validate event auth data against Bitrix24 application info."""
+        """
+        Validate event OAuth data against application info.
+
+        Args:
+            app_info: Application info result.
+
+        Returns:
+            True if validation succeeds.
+
+        Raises:
+            EventOAuth.ValidationError: If validation fails.
+        """
         if all((
                 super(EventOAuth, self).validate_against_app_info(app_info),
                 self.user_id is None or self.user_id == app_info.user_id,
@@ -135,7 +222,11 @@ class EventOAuth(Auth):
 
 @dataclass(**_DATACLASS_KWARGS)
 class RenewedOAuth(Auth):
-    """OAuth payload returned after refreshing an access token."""
+    """
+    OAuth payload returned after token refresh.
+
+    Always contains a valid OAuth token and user context.
+    """
 
     oauth_token: OAuthToken
     user_id: int
@@ -144,6 +235,15 @@ class RenewedOAuth(Auth):
 
     @classmethod
     def _validate_payload(cls, payload: Mapping[Text, Any], /) -> JSONDict:
+        """
+        Extract and validate RenewedOAuth fields.
+
+        Args:
+            payload: Raw OAuth refresh response.
+
+        Returns:
+            Dictionary with validated fields.
+        """
         return super(RenewedOAuth, cls)._validate_payload(payload) | {
             "oauth_token": OAuthToken.from_dict(payload),
             "user_id": int(payload["user_id"]),
@@ -153,6 +253,18 @@ class RenewedOAuth(Auth):
 
     @classmethod
     def from_dict(cls, payload: Mapping[Text, Any], /) -> "RenewedOAuth":
+        """
+        Create a RenewedOAuth instance from payload.
+
+        Args:
+            payload: Raw OAuth refresh response.
+
+        Returns:
+            RenewedOAuth instance.
+
+        Raises:
+            RenewedOAuth.ValidationError: If validation fails.
+        """
         try:
             return cls(**cls._validate_payload(payload))
         except KeyError as error:
@@ -161,7 +273,18 @@ class RenewedOAuth(Auth):
             raise cls.ValidationError(f"Invalid renewed OAuth payload: {error}") from error
 
     def validate_against_app_info(self, app_info: "B24AppInfoResult") -> bool:
-        """Validate refreshed OAuth data against Bitrix24 application info."""
+        """
+        Validate refreshed OAuth data against application info.
+
+        Args:
+            app_info: Application info result.
+
+        Returns:
+            True if validation succeeds.
+
+        Raises:
+            RenewedOAuth.ValidationError: If validation fails.
+        """
         if all((
                 super(RenewedOAuth, self).validate_against_app_info(app_info),
                 self.user_id == app_info.user_id,
@@ -173,16 +296,41 @@ class RenewedOAuth(Auth):
 
 @dataclass(**_DATACLASS_KWARGS)
 class WorkflowOAuth(RenewedOAuth):
-    """OAuth payload for workflow robot events in business processes."""
+    """
+    OAuth payload for Bitrix24 business process (workflow) events.
+
+    Extends RenewedOAuth with application token required for workflow execution.
+    """
 
     application_token: Text
 
     @classmethod
     def _validate_payload(cls, payload: Mapping[Text, Any], /) -> JSONDict:
+        """
+        Extract and validate WorkflowOAuth fields.
+
+        Args:
+            payload: Raw workflow event payload.
+
+        Returns:
+            Dictionary with validated fields.
+        """
         return super(WorkflowOAuth, cls)._validate_payload(payload) | {"application_token": payload["application_token"]}
 
     @classmethod
     def from_dict(cls, payload: Mapping[Text, Any], /) -> "WorkflowOAuth":
+        """
+        Create a WorkflowOAuth instance from payload.
+
+        Args:
+            payload: Raw workflow event payload.
+
+        Returns:
+            WorkflowOAuth instance.
+
+        Raises:
+            WorkflowOAuth.ValidationError: If validation fails.
+        """
         try:
             return cls(**cls._validate_payload(payload))
         except KeyError as error:
@@ -191,7 +339,18 @@ class WorkflowOAuth(RenewedOAuth):
             raise cls.ValidationError(f"Invalid workflow OAuth payload: {error}") from error
 
     def validate_against_app_info(self, app_info: "B24AppInfoResult") -> bool:
-        """Validate workflow OAuth data against Bitrix24 application info."""
+        """
+        Validate workflow OAuth data against application info.
+
+        Args:
+            app_info: Application info result.
+
+        Returns:
+            True if validation succeeds.
+
+        Raises:
+            WorkflowOAuth.ValidationError: If validation fails.
+        """
         try:
             return super(WorkflowOAuth, self).validate_against_app_info(app_info)
         except self.ValidationError as error:

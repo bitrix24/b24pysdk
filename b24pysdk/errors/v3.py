@@ -1,12 +1,13 @@
 import dataclasses as _dc
 import functools as _ft
-import typing
+import typing as _tp
 
 from .. import _constants
-from . import BaseBitrixAPIError as _BaseBitrixAPIError
-from ._http_responses import HTTPResponseBadRequest, HTTPResponseUnauthorized
+from . import BitrixBaseAPIBadRequest as _BitrixBaseAPIBadRequest
+from . import BitrixBaseAPIError as _BaseBitrixAPIError
+from . import BitrixBaseAPIUnauthorized as _BitrixBaseAPIUnauthorized
 
-if typing.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:
     from ..utils import types as _types
 
 _DATACLASS_KWARGS = {"eq": False, "frozen": True}
@@ -37,8 +38,8 @@ class Validation:
     name and corresponding error message.
     """
 
-    field: typing.Text
-    message: typing.Text
+    field: _tp.Text
+    message: _tp.Text
 
     @classmethod
     def from_dict(cls, json_response: "_types.JSONDict") -> "Validation":
@@ -60,9 +61,9 @@ class Error:
     and optional validation details.
     """
 
-    code: typing.Text
-    message: typing.Text
-    validation: typing.Optional[typing.List[Validation]]
+    code: _tp.Text
+    message: _tp.Text
+    validation: _tp.Optional[_tp.List[Validation]]
 
     @classmethod
     def from_dict(cls, json_response: "_types.JSONDict") -> "Error":
@@ -105,7 +106,7 @@ class BitrixAPIError(_BaseBitrixAPIError):
     The parsed error object is available via the `error` property.
     """
 
-    CODE: typing.ClassVar[typing.Text] = NotImplemented
+    CODE: _tp.ClassVar[_tp.Text] = NotImplemented
 
     __slots__ = ()
 
@@ -123,7 +124,7 @@ class BitrixAPIError(_BaseBitrixAPIError):
         return Error.from_dict(self.json_response["error"])
 
     @property
-    def code(self) -> typing.Text:
+    def code(self) -> _tp.Text:
         """
         Error code returned by the API.
 
@@ -135,7 +136,7 @@ class BitrixAPIError(_BaseBitrixAPIError):
         return self.error.code
 
     @property
-    def validation(self) -> typing.Optional[typing.List[Validation]]:
+    def validation(self) -> _tp.Optional[_tp.List[Validation]]:
         """
         Validation errors returned by the API.
 
@@ -162,13 +163,13 @@ class BitrixAPIError(_BaseBitrixAPIError):
 
 # Exceptions by status code
 
-class BitrixAPIBadRequest(BitrixAPIError, HTTPResponseBadRequest):
+class BitrixAPIBadRequest(_BitrixBaseAPIBadRequest, BitrixAPIError):
     """Bad Request (400)."""
 
     __slots__ = ()
 
 
-class BitrixAPIUnauthorized(BitrixAPIError, HTTPResponseUnauthorized):
+class BitrixAPIUnauthorized(_BitrixBaseAPIUnauthorized, BitrixAPIError):
     """Unauthorized (401)."""
 
     __slots__ = ()

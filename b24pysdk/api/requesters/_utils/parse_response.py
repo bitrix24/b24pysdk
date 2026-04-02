@@ -78,7 +78,7 @@ _EXCEPTIONS_BY_ERROR: Dict[Text, Type[errors.BitrixAPIError]] = {
     "ERROR_OAUTH": errors.BitrixAPIErrorOAuth,
     "EXPIRED_TOKEN": errors.BitrixAPIExpiredToken,
     "METHOD_CONFIRM_WAITING": errors.BitrixAPIMethodConfirmWaiting,
-    "NO_AUTH_FOUND": errors.BitrixAPINoAuthFound,
+    "NO_AUTH_FOUND": errors_oauth.BitrixOAuthNoAuthFound,
     "NOT_INSTALLED": errors_oauth.BitrixOAuthNotInstalled,
     "INVALID_TOKEN": errors.BitrixAPIInvalidToken,
     "PAYMENT_REQUIRED": errors.BitrixAPIPaymentRequired,

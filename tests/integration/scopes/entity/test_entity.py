@@ -10,7 +10,7 @@ from b24pysdk.client import BaseClient
 from ....constants import SDK_NAME
 
 pytestmark = [
-    # pytest.mark.integration,
+    pytest.mark.integration,
     pytest.mark.entity,
 ]
 
@@ -21,7 +21,7 @@ _ACCESS: Dict = {"AU": "R"}
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_entity_add")
 def test_entity_add(bitrix_client: BaseClient, cache: Cache):
-    """"""
+    """Test entity.add method."""
 
     entity_name: Text = f"ENTITY_{str(Config().get_local_datetime().timestamp() * (10 ** 6))[:8]}"
 
@@ -43,7 +43,7 @@ def test_entity_add(bitrix_client: BaseClient, cache: Cache):
 @pytest.mark.oauth_only
 @pytest.mark.dependency(name="test_entity_get", depends=["test_entity_add"])
 def test_entity_get(bitrix_client: BaseClient, cache: Cache):
-    """"""
+    """Test entity.get method."""
 
     entity_name = cache.get("entity_name", None)
     assert isinstance(entity_name, str), "Entity name should be cached after addition"
@@ -62,8 +62,9 @@ def test_entity_get(bitrix_client: BaseClient, cache: Cache):
 
 
 @pytest.mark.oauth_only
+@pytest.mark.dependency(name="test_entity_get_as_list", depends=["test_entity_get"])
 def test_entity_get_as_list(bitrix_client: BaseClient):
-    """"""
+    """Test entity.get().as_list method."""
 
     bitrix_response = bitrix_client.entity.get().as_list().response
 
@@ -81,9 +82,9 @@ def test_entity_get_as_list(bitrix_client: BaseClient):
 
 
 @pytest.mark.oauth_only
-@pytest.mark.dependency(name="test_entity_update", depends=["test_entity_add"])
+@pytest.mark.dependency(name="test_entity_update", depends=["test_entity_get_as_list"])
 def test_entity_update(bitrix_client: BaseClient, cache: Cache):
-    """"""
+    """Test entity.update method."""
 
     entity_name = cache.get("entity_name", None)
     assert isinstance(entity_name, str), "Entity name should be cached"
@@ -101,9 +102,9 @@ def test_entity_update(bitrix_client: BaseClient, cache: Cache):
 
 
 @pytest.mark.oauth_only
-@pytest.mark.dependency(name="test_entity_rights", depends=["test_entity_add"])
+@pytest.mark.dependency(name="test_entity_rights", depends=["test_entity_update"])
 def test_entity_rights(bitrix_client: BaseClient, cache: Cache):
-    """"""
+    """Test entity.rights method."""
 
     entity_name = cache.get("entity_name", None)
     assert isinstance(entity_name, str), "Entity name should be cached"
@@ -120,9 +121,9 @@ def test_entity_rights(bitrix_client: BaseClient, cache: Cache):
 
 
 @pytest.mark.oauth_only
-@pytest.mark.dependency(name="test_entity_delete", depends=["test_entity_add"])
+@pytest.mark.dependency(name="test_entity_delete", depends=["test_entity_rights"])
 def test_entity_delete(bitrix_client: BaseClient, cache: Cache):
-    """"""
+    """Test entity.delete method."""
 
     entity_name = cache.get("entity_name", None)
     assert isinstance(entity_name, str), "Entity name should be cached"

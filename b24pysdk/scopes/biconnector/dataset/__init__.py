@@ -1,9 +1,11 @@
+from functools import cached_property
 from typing import Iterable, Optional, Text
 
-from ...api.requests import BitrixAPIRequest
-from ...utils.functional import type_checker
-from ...utils.types import JSONDict, Timeout
-from ._base_biconnector import BaseBiconnector
+from ....api.requests import BitrixAPIRequest
+from ....utils.functional import type_checker
+from ....utils.types import JSONDict, Timeout
+from .._base_biconnector import BaseBiconnector
+from .fields import Fields
 
 __all__ = [
     "Dataset",
@@ -16,24 +18,10 @@ class Dataset(BaseBiconnector):
     Documentation: https://apidocs.bitrix24.com/api-reference/biconnector/dataset/index.html
     """
 
-    @type_checker
-    def fields(
-            self,
-            *,
-            timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """
-        Retrieve a description of dataset fields.
-
-        Documentation: https://apidocs.bitrix24.com/api-reference/biconnector/dataset/biconnector-dataset-fields.html
-
-        Args:
-            timeout: Timeout in seconds.
-
-        Returns:
-            Instance of BitrixAPIRequest.
-        """
-        return super().fields(timeout=timeout)
+    @cached_property
+    def fields(self) -> Fields:
+        """Dataset fields endpoints: biconnector.dataset.fields.*"""
+        return Fields(self)
 
     @type_checker
     def add(

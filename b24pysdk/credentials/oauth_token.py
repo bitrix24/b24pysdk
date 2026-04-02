@@ -19,10 +19,14 @@ if PYTHON_VERSION >= (3, 10):
 
 @dataclass(**_DATACLASS_KWARGS)
 class OAuthToken:
-    """"""
+    """
+    Represents an OAuth token used for authenticating requests to Bitrix24 API.
+
+    Contains access token, optional refresh token, and expiration metadata.
+    """
 
     class ValidationError(BitrixValidationError):
-        """"""
+        """Raised when OAuth token payload validation fails."""
 
     access_token: Text
     refresh_token: Optional[Text]
@@ -31,7 +35,20 @@ class OAuthToken:
 
     @classmethod
     def from_dict(cls, payload: Mapping[Text, Any], /) -> "OAuthToken":
-        """"""
+        """
+        Create an OAuthToken instance from a standard OAuth response payload.
+
+        Args:
+            payload: Mapping containing OAuth fields such as
+                'access_token', 'refresh_token', 'expires', 'expires_in'.
+
+        Returns:
+            OAuthToken instance.
+
+        Raises:
+            OAuthToken.ValidationError: If required fields are missing
+                or payload contains invalid values.
+        """
         try:
             return cls(
                 access_token=payload["access_token"],
@@ -46,7 +63,20 @@ class OAuthToken:
 
     @classmethod
     def from_placement_data(cls, payload: Mapping[Text, Any], /) -> "OAuthToken":
-        """"""
+        """
+        Create an OAuthToken instance from Bitrix24 placement data.
+
+        Args:
+            payload: Mapping containing placement fields such as
+                'AUTH_ID', 'REFRESH_ID', 'AUTH_EXPIRES'.
+
+        Returns:
+            OAuthToken instance.
+
+        Raises:
+            OAuthToken.ValidationError: If required fields are missing
+                or payload contains invalid values.
+        """
 
         try:
             access_token = payload["AUTH_ID"]
@@ -69,14 +99,30 @@ class OAuthToken:
 
     @property
     def is_one_off(self) -> bool:
-        """"""
+        """
+        Indicates whether the token is a one-off token (no refresh token available).
+
+        Returns:
+            True if refresh_token is None, otherwise False.
+        """
         return self.refresh_token is None
 
     @property
     def has_expired(self) -> Optional[bool]:
-        """"""
+        """
+        Check whether the token has expired.
+
+        Returns:
+            True if expired, False if not expired,
+            None if expiration time is not defined.
+        """
         return self.expires and self.expires <= Config().get_local_datetime()
 
     def to_dict(self) -> JSONDict:
-        """"""
+        """
+        Convert the OAuthToken instance to a dictionary.
+
+        Returns:
+            Dictionary representation of the token.
+        """
         return asdict(self)

@@ -1,6 +1,6 @@
 from datetime import datetime
 from functools import wraps
-from typing import TYPE_CHECKING, Any, Callable, Final, Literal, Mapping, Optional, Sequence, Text, Tuple, Union, overload
+from typing import TYPE_CHECKING, Any, Callable, Final, Literal, Mapping, Optional, Sequence, Text, Union, overload
 
 from .._config import Config
 from ..api.callers import call_batch, call_batches, call_list, call_list_fast, call_method
@@ -44,44 +44,48 @@ def _bitrix_app_required(func: Callable) -> Callable:
 class AbstractBitrixToken:
     """Base token wrapper with retry logic, token refresh, and client helpers."""
 
-    _AUTO_REFRESH: bool = True
-    """"""
+    _AUTO_CHANCHED_DOMAIN: bool = True
+    """Automatically switch token domain on 302 redirect to another portal domain."""
+
+    _AUTO_REFRESH_EXPIRED_TOKEN: bool = True
+    """Automatically refresh expired OAuth tokens when possible."""
 
     domain: Text = NotImplemented
-    """"""
+    """Bitrix portal domain used for API requests."""
 
     auth_token: Text = NotImplemented
-    """"""
+    """Current access token (OAuth token or webhook token)."""
 
     refresh_token: Optional[Text] = NotImplemented
-    """"""
+    """OAuth refresh token, if available."""
 
     expires: Optional[datetime] = NotImplemented
-    """"""
+    """OAuth access token expiration datetime."""
 
     expires_in: Optional[int] = NotImplemented
-    """"""
+    """OAuth access token lifetime in seconds."""
 
     bitrix_app: Optional["AbstractBitrixApp"] = NotImplemented
-    """"""
+    """Bitrix application object used for OAuth flows."""
 
     oauth_token_renewed_signal: BitrixSignalInstance = BitrixSignalInstance.create_signal(OAuthTokenRenewedEvent)
-    """"""
+    """Signal emitted after successful OAuth token refresh."""
 
     portal_domain_changed_signal: BitrixSignalInstance = BitrixSignalInstance.create_signal(PortalDomainChangedEvent)
-    """"""
+    """Signal emitted after automatic portal domain change."""
 
     def __str__(self):
+        """Return a concise token representation for logs/debug output."""
         return f"<{('Application', 'Webhook')[self.is_webhook]} token of portal {self.domain}>"
 
     @property
     def is_webhook(self) -> bool:
-        """"""
+        """Whether this token is a webhook token (without bound app)."""
         return not bool(getattr(self, "bitrix_app", None))
 
     @property
     def _auth_data(self) -> JSONDict:
-        """"""
+        """Build auth payload used by low-level API callers."""
         return dict(
             domain=self.domain,
             auth_token=self.auth_token,
@@ -92,6 +96,7 @@ class AbstractBitrixToken:
     # noinspection PyMethodParameters
     @classproperty
     def _config(cls) -> Config:
+        """"""
         return Config()
 
     @property
@@ -170,10 +175,10 @@ class AbstractBitrixToken:
         """"""
         return self._execute_with_retries(lambda: self.bitrix_app.get_app_info(self.auth_token, **kwargs))
 
-    def _refresh_and_set_oauth_token(self):
+    def refresh_and_set_oauth_token(self, **kwargs):
         """"""
 
-        renewed_oauth_token = self.refresh_oauth_token()
+        renewed_oauth_token = self.refresh_oauth_token(**kwargs)
 
         self.oauth_token = renewed_oauth_token.oauth_token
 
@@ -184,8 +189,8 @@ class AbstractBitrixToken:
     def __expired_token_handler(self) -> bool:
         """"""
 
-        if not self._AUTO_REFRESH:
-            self._config.logger.warning(
+        if not self._AUTO_REFRESH_EXPIRED_TOKEN:
+            self._config.logger.info(
                 "Token expired: auto-refresh is disabled",
                 context=dict(
                     bitrix_token=str(self),
@@ -222,11 +227,13 @@ class AbstractBitrixToken:
             ),
         )
 
-        self._refresh_and_set_oauth_token()
+        self.refresh_and_set_oauth_token()
 
         return True
 
     def _check_and_change_domain(self, new_domain: Text) -> bool:
+        """"""
+
         if not new_domain or new_domain == self.domain:
             return False
 
@@ -250,6 +257,17 @@ class AbstractBitrixToken:
             return func()
 
         except BitrixResponse302JSONDecodeError as error:
+            if not self._AUTO_CHANCHED_DOMAIN:
+                self._config.logger.info(
+                    "Caught BitrixResponse302JSONDecodeError, but auto-domain-change is disabled",
+                    context=dict(
+                        bitrix_token=str(self),
+                        old_domain=self.domain,
+                        new_domain=error.new_domain,
+                    ),
+                )
+                raise
+
             if self._check_and_change_domain(error.new_domain):
                 self._config.logger.info(
                     "Domain changed, retrying request",
@@ -520,6 +538,17 @@ class BitrixToken(AbstractBitrixToken):
             expires_in: Optional[int] = None,
             bitrix_app: Optional["AbstractBitrixApp"] = None,
     ):
+        """
+        Initialize a token bound to a specific Bitrix portal.
+
+        Args:
+            domain: Portal domain, for example ``example.bitrix24.com``.
+            auth_token: OAuth access token or webhook token string.
+            refresh_token: OAuth refresh token.
+            expires: OAuth access token expiration datetime.
+            expires_in: OAuth access token lifetime in seconds.
+            bitrix_app: Bitrix app used to refresh OAuth tokens.
+        """
         self.domain = domain
         self.auth_token = auth_token
         self.refresh_token = refresh_token
@@ -574,6 +603,16 @@ class BitrixTokenLocal(AbstractBitrixTokenLocal):
             expires_in: Optional[int] = None,
             bitrix_app: "AbstractBitrixAppLocal",
     ):
+        """
+        Initialize a token for local Bitrix app context.
+
+        Args:
+            auth_token: OAuth access token.
+            refresh_token: OAuth refresh token.
+            expires: OAuth access token expiration datetime.
+            expires_in: OAuth access token lifetime in seconds.
+            bitrix_app: Local Bitrix app bound to the current portal.
+        """
         self.auth_token = auth_token
         self.refresh_token = refresh_token
         self.expires = expires
@@ -622,40 +661,50 @@ class BitrixWebhook(BitrixToken):
             self,
             *,
             domain: Text,
-            auth_token: Text,
+            webhook_token: Text,
     ):
-        super().__init__(domain=domain, auth_token=auth_token)
+        """
+        Initialize a webhook token wrapper.
 
-    @property
-    def __auth_token_parts(self) -> Tuple[int, Text]:
-        """Return parsed (user_id, webhook_key) from auth_token."""
+        Args:
+            domain: Portal domain, for example ``example.bitrix24.com``.
+            webhook_token: Webhook token in ``user_id/webhook_key`` format.
+        """
+        super().__init__(domain=domain, auth_token=self._normalize_token(webhook_token))
 
-        parts = self.auth_token.strip("/").split("/")
+    @classmethod
+    def _normalize_token(cls, webhook_token: Text) -> Text:
+        """Validate and normalize webhook token to ``user_id/webhook_key`` format."""
 
-        if len(parts) != self.__AUTH_TOKEN_PARTS_COUNT:
+        parts = webhook_token.strip("/").split("/")
+
+        if len(parts) != cls.__AUTH_TOKEN_PARTS_COUNT:
             raise ValueError(
-                f"Invalid webhook auth_token format: "
-                f"expected 'user_id/webhook_key', got {self.auth_token!r}",
+                f"Invalid webhook token format: "
+                f"expected 'user_id/webhook_key', got {webhook_token!r}",
             )
 
         user_id, webhook_key = parts
 
         if not user_id.isdigit():
             raise ValueError(
-                f"Invalid webhook auth_token format: "
+                f"Invalid webhook token format: "
                 f"expected numeric user_id, got {user_id!r}",
             )
 
-        return int(user_id), webhook_key
+        if not webhook_key:
+            raise ValueError("Invalid webhook token format: webhook_key is empty")
+
+        return f"{int(user_id)}/{webhook_key}"
 
     @property
     def user_id(self) -> int:
         """Return the webhook user_id parsed from auth_token."""
-        user_id, _ = self.__auth_token_parts
-        return user_id
+        user_id_str, _ = self.auth_token.split("/", maxsplit=1)
+        return int(user_id_str)
 
     @property
     def webhook_key(self) -> Text:
         """Return the webhook key parsed from auth_token."""
-        _, webhook_key = self.__auth_token_parts
+        _, webhook_key = self.auth_token.split("/", maxsplit=1)
         return webhook_key

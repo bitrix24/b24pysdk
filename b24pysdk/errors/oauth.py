@@ -7,7 +7,7 @@ from . import BitrixAPIUnauthorized as _BitrixAPIUnauthorized
 from . import BitrixRequestError as _BitrixRequestError
 from . import BitrixRequestTimeout as _BitrixRequestTimeout
 from . import BitrixSDKException as _BitrixSDKException
-from ._http_responses import HTTPResponseOK
+from ._http_responses import HTTPResponseOK as _HTTPResponseOK
 
 __all__ = [
     "BitrixOAuthException",
@@ -16,6 +16,7 @@ __all__ = [
     "BitrixOAuthInvalidGrant",
     "BitrixOAuthInvalidRequest",
     "BitrixOAuthInvalidScope",
+    "BitrixOAuthNoAuthFound",
     "BitrixOAuthNotInstalled",
     "BitrixOAuthRequestError",
     "BitrixOAuthRequestTimeout",
@@ -55,8 +56,15 @@ class BitrixOAuthRequestTimeout(_BitrixRequestTimeout, BitrixOAuthException):
 
 # 200
 
-class BitrixOauthWrongClient(_BitrixAPIError, BitrixOAuthException, HTTPResponseOK):
-    """OAuth client credentials are invalid."""
+class BitrixOauthWrongClient(_BitrixAPIError, BitrixOAuthException, _HTTPResponseOK):
+    """OAuth app client_id is invalid.
+
+    Example
+    -------
+    {
+        "error": "wrong_client",
+    }
+    """
 
     ERROR = "WRONG_CLIENT"
 
@@ -66,7 +74,17 @@ class BitrixOauthWrongClient(_BitrixAPIError, BitrixOAuthException, HTTPResponse
 # 400
 
 class BitrixOAuthInvalidClient(_BitrixAPIBadRequest, BitrixOAuthException):
-    """Invalid OAuth client credentials."""
+    """Invalid OAuth client_secret.
+
+    Also, can be returned by `/rest/app.info/` when access token is invalid
+    but has token-like format.
+
+    Example
+    -------
+    {
+        "error": "invalid_client",
+    }
+    """
 
     ERROR = "INVALID_CLIENT"
 
@@ -75,11 +93,13 @@ class BitrixOAuthInvalidClient(_BitrixAPIBadRequest, BitrixOAuthException):
 
 class BitrixOAuthInvalidGrant(_BitrixAPIBadRequest, BitrixOAuthException):
     """
-    Invalid OAuth authorization grant.
+    Invalid OAuth refresh_token.
 
-    Typically returned by `/oauth/token/` when the provided
-    authorization code or refresh token is invalid, expired,
-    revoked, or already used.
+    Example
+    -------
+    {
+        "error": "invalid_grant",
+    }
     """
 
     ERROR = "INVALID_GRANT"
@@ -88,15 +108,49 @@ class BitrixOAuthInvalidGrant(_BitrixAPIBadRequest, BitrixOAuthException):
 
 
 class BitrixOAuthInvalidRequest(_BitrixAPIInvalidRequest, BitrixOAuthException):
-    """Invalid OAuth authorization request."""
+    """Invalid OAuth token refresh request.
+
+    Returned when the `refresh_token` parameter is missing or empty.
+
+    Example
+    -------
+    {
+        "error": "invalid_request",
+        "error_description": "No "refresh_token" parameter found",
+    }
+    """
 
     __slots__ = ()
 
 
 # 401
 
+class BitrixOAuthNoAuthFound(_BitrixAPIUnauthorized, BitrixOAuthException):
+    """Wrong authorization data in OAuth-related context.
+
+    Example
+    -------
+    {
+        "error": "NO_AUTH_FOUND",
+        "error_description": "Wrong authorization data",
+    }
+    """
+
+    ERROR = "NO_AUTH_FOUND"
+
+    __slots__ = ()
+
+
 class BitrixOAuthNotInstalled(_BitrixAPIUnauthorized, BitrixOAuthException):
-    """Application is not installed on the portal."""
+    """Application was removed from the portal.
+
+    Example
+    -------
+    {
+        "error": "NOT_INSTALLED",
+        "error_description": "Application not installed",
+    }
+    """
 
     ERROR = "NOT_INSTALLED"
 
@@ -106,13 +160,29 @@ class BitrixOAuthNotInstalled(_BitrixAPIUnauthorized, BitrixOAuthException):
 # 403
 
 class BitrixOAuthInsufficientScope(_BitrixAPIInsufficientScope, BitrixOAuthException):
-    """OAuth token does not provide sufficient permissions."""
+    """OAuth token does not provide sufficient permissions.
+
+    Example
+    -------
+    {
+        "error": "insufficient_scope",
+        "error_description": "The request requires higher privileges than provided by the access token",
+    }
+    """
 
     __slots__ = ()
 
 
 class BitrixOAuthInvalidScope(_BitrixAPIForbidden, BitrixOAuthException):
-    """Requested OAuth scope exceeds application permissions."""
+    """Requested OAuth scope exceeds application permissions.
+
+    Example
+    -------
+    {
+        "error": "INVALID_SCOPE",
+        "error_description": "Given scope exceeds permissions associated with given grant",
+    }
+    """
 
     ERROR = "INVALID_SCOPE"
 

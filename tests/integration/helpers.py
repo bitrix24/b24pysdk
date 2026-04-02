@@ -34,7 +34,7 @@ def _make_client_from_webhook() -> BaseClient:
 
     webhook_token = BitrixWebhook(
         domain=env_config.domain,
-        auth_token=env_config.webhook_token,
+        webhook_token=env_config.webhook_token,
     )
 
     return Client(webhook_token)

@@ -1,17 +1,17 @@
 from functools import cached_property
 
-from .......api.requests import BitrixAPIRequest
-from .......utils.functional import type_checker
-from .......utils.types import JSONDict, Timeout
-from ......_base_entity import BaseEntity
+from ......api.requests import BitrixAPIRequest
+from ......utils.functional import type_checker
+from ......utils.types import Timeout
+from ....._base_entity import BaseEntity
 from .field import Field
 
 __all__ = [
-    "Message",
+    "Access",
 ]
 
 
-class Message(BaseEntity):
+class Access(BaseEntity):
     """"""
 
     @cached_property
@@ -20,20 +20,20 @@ class Message(BaseEntity):
         return Field(self)
 
     @type_checker
-    def send(
+    def get(
             self,
-            fields: JSONDict,
+            bitrix_id: int,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
         params = {
-            "fields": fields,
+            "id": bitrix_id,
         }
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.send,
+            api_wrapper=self.get,
             params=params,
             timeout=timeout,
         )

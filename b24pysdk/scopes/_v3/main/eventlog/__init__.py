@@ -1,9 +1,11 @@
+from functools import cached_property
 from typing import Iterable, Optional, Text
 
-from ....api.requests import BitrixAPIRequest
-from ....utils.functional import type_checker
-from ....utils.types import JSONDict, Timeout
-from ..._base_entity import BaseEntity
+from .....api.requests import BitrixAPIRequest
+from .....utils.functional import type_checker
+from .....utils.types import JSONDict, Timeout
+from ...._base_entity import BaseEntity
+from .field import Field
 
 __all__ = [
     "Eventlog",
@@ -12,6 +14,11 @@ __all__ = [
 
 class Eventlog(BaseEntity):
     """"""
+
+    @cached_property
+    def field(self) -> Field:
+        """"""
+        return Field(self)
 
     @type_checker
     def get(

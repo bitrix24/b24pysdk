@@ -36,7 +36,6 @@ if typing.TYPE_CHECKING:
     from ..utils import types as _types
 
 __all__ = [
-    "BaseBitrixAPIError",
     "BitrixAPIAccessDenied",
     "BitrixAPIAllowedOnlyIntranetUser",
     "BitrixAPIApplicationNotFound",
@@ -57,7 +56,6 @@ __all__ = [
     "BitrixAPIMethodConfirmDenied",
     "BitrixAPIMethodConfirmWaiting",
     "BitrixAPIMethodNotAllowed",
-    "BitrixAPINoAuthFound",
     "BitrixAPINotFound",
     "BitrixAPIOperationTimeLimit",
     "BitrixAPIOverloadLimit",
@@ -258,7 +256,7 @@ class BitrixResponse500JSONDecodeError(BitrixResponseJSONDecodeError, HTTPRespon
     __slots__ = ()
 
 
-class BaseBitrixAPIError(BitrixResponseError):
+class BitrixBaseAPIError(BitrixResponseError):
     """
     Base class for Bitrix API errors represented by a JSON response body.
 
@@ -299,10 +297,76 @@ class BaseBitrixAPIError(BitrixResponseError):
         self.json_response = json_response
 
 
+# ------------------------ Base exceptions for all API versions ------------------------
+
+
+class BitrixBaseAPIBadRequest(BitrixBaseAPIError, HTTPResponseBadRequest):
+    """Bad Request (400)."""
+
+    __slots__ = ()
+
+
+class BitrixBaseAPIUnauthorized(BitrixBaseAPIError, HTTPResponseUnauthorized):
+    """Unauthorized (401)."""
+
+    __slots__ = ()
+
+
+class BitrixBaseAPIForbidden(BitrixBaseAPIError, HTTPResponseForbidden):
+    """Forbidden (403)."""
+
+    __slots__ = ()
+
+
+class BitrixBaseAPINotFound(BitrixBaseAPIError, HTTPResponseNotFound):
+    """Not Found (404).
+
+    Raised when the specified resource cannot be located on the server.
+    """
+
+    __slots__ = ()
+
+
+class BitrixBaseAPIMethodNotAllowed(BitrixBaseAPIError, HTTPResponseMethodNotAllowed):
+    """Method Not Allowed (405).
+
+    Indicates that the HTTP method used in the request is not allowed for the requested resource.
+    """
+
+    __slots__ = ()
+
+
+class BitrixBaseAPIGone(BitrixBaseAPIError, HTTPResponseGone):
+    """Gone (410)."""
+
+    __slots__ = ()
+
+
+class BitrixBaseAPITooManyRequests(BitrixBaseAPIError, HTTPResponseTooManyRequests):
+    """Too Many Requests (429)."""
+
+    __slots__ = ()
+
+
+class BitrixBaseAPIInternalServerError(BitrixBaseAPIError, HTTPResponseInternalServerError):
+    """Internal server error (500)."""
+
+    __slots__ = ()
+
+
+class BitrixBaseAPIServiceUnavailable(BitrixBaseAPIError, HTTPResponseServiceUnavailable):
+    """Service Unavailable (503).
+
+    Raised when the API service is temporarily unavailable, often due to maintenance or server overload.
+    """
+
+    __slots__ = ()
+
+
 # ------------------------ Exceptions for API v1 and v2 ------------------------
 
 
-class BitrixAPIError(BaseBitrixAPIError):
+class BitrixAPIError(BitrixBaseAPIError):
     """
     Base class for Bitrix REST API errors identified by a string error code.
 
@@ -348,67 +412,56 @@ class BitrixAPIError(BaseBitrixAPIError):
         return self.json_response.get("error_description") or ""
 
 
-# Exceptions by status code
-
-class BitrixAPIBadRequest(BitrixAPIError, HTTPResponseBadRequest):
+class BitrixAPIBadRequest(BitrixBaseAPIBadRequest, BitrixAPIError):
     """Bad Request (400)."""
 
     __slots__ = ()
 
 
-class BitrixAPIUnauthorized(BitrixAPIError, HTTPResponseUnauthorized):
+class BitrixAPIUnauthorized(BitrixBaseAPIUnauthorized, BitrixAPIError):
     """Unauthorized (401)."""
 
     __slots__ = ()
 
 
-class BitrixAPIForbidden(BitrixAPIError, HTTPResponseForbidden):
+class BitrixAPIForbidden(BitrixBaseAPIForbidden, BitrixAPIError):
     """Forbidden (403)."""
 
     __slots__ = ()
 
 
-class BitrixAPINotFound(BitrixAPIError, HTTPResponseNotFound):
-    """Not Found (404).
-
-    Raised when the specified resource cannot be located on the server.
-    """
+class BitrixAPINotFound(BitrixBaseAPINotFound, BitrixAPIError):
+    """Not Found (404)."""
 
     __slots__ = ()
 
 
-class BitrixAPIMethodNotAllowed(BitrixAPIError, HTTPResponseMethodNotAllowed):
-    """Method Not Allowed (405).
-
-    Indicates that the HTTP method used in the request is not allowed for the requested resource.
-    """
+class BitrixAPIMethodNotAllowed(BitrixBaseAPIMethodNotAllowed, BitrixAPIError):
+    """Method Not Allowed (405)."""
 
     __slots__ = ()
 
 
-class BitrixAPIGone(BitrixAPIError, HTTPResponseGone):
+class BitrixAPIGone(BitrixBaseAPIGone, BitrixAPIError):
     """Gone (410)."""
 
     __slots__ = ()
 
 
-class BitrixAPITooManyRequests(BitrixAPIError, HTTPResponseTooManyRequests):
+class BitrixAPITooManyRequests(BitrixBaseAPITooManyRequests, BitrixAPIError):
     """Too Many Requests (429)."""
 
     __slots__ = ()
 
 
-class BitrixAPIInternalServerError(BitrixAPIError, HTTPResponseInternalServerError):
+class BitrixAPIInternalServerError(BitrixBaseAPIInternalServerError, BitrixAPIError):
     """Internal server error (500)."""
 
     __slots__ = ()
 
 
-class BitrixAPIServiceUnavailable(BitrixAPIError, HTTPResponseServiceUnavailable):
-    """Service Unavailable (503).
-
-    Raised when the API service is temporarily unavailable, often due to maintenance or server overload.
-    """
+class BitrixAPIServiceUnavailable(BitrixBaseAPIServiceUnavailable, BitrixAPIError):
+    """Service Unavailable (503)."""
 
     __slots__ = ()
 
@@ -596,24 +649,6 @@ class BitrixAPIMethodConfirmWaiting(BitrixAPIUnauthorized):
     """
 
     ERROR = "METHOD_CONFIRM_WAITING"
-
-    __slots__ = ()
-
-
-class BitrixAPINoAuthFound(BitrixAPIUnauthorized):
-    """Authorization data was not found in the request.
-
-    Raised when no valid authentication credentials are present.
-
-    Example
-    -------
-    {
-        "error": "NO_AUTH_FOUND",
-        "error_description": "Wrong authorization data",
-    }
-    """
-
-    ERROR = "NO_AUTH_FOUND"
 
     __slots__ = ()
 
