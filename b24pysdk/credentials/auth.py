@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
 __all__ = [
     "EventOAuth",
+    "OAuth",
     "RenewedOAuth",
     "WorkflowOAuth",
 ]
@@ -125,7 +126,98 @@ class Auth(ABC):
 
 
 @dataclass(**_DATACLASS_KWARGS)
-class EventOAuth(Auth):
+class OAuth(Auth):
+    """
+    Base OAuth payload shared by event and refreshed-token auth models.
+    """
+
+    oauth_token: OAuthToken
+    user_id: int
+    scope: List[Text]
+    status: B24AppStatus
+
+    @classmethod
+    def _validate_payload(cls, payload: Mapping[Text, Any], /) -> JSONDict:
+        """
+        Extract and validate OAuth fields.
+
+        Args:
+            payload: Raw OAuth payload.
+
+        Returns:
+            Dictionary with validated OAuth fields.
+        """
+
+        oauth_token = OAuthToken.from_dict(payload) if payload.get("access_token") else None
+
+        scope_value = payload.get("scope")
+        scope = scope_value.split(",") if scope_value is not None else None
+
+        status_value = payload.get("status")
+        status = B24AppStatus(status_value) if status_value is not None else None
+
+        return super(OAuth, cls)._validate_payload(payload) | {
+            "oauth_token": oauth_token,
+            "user_id": int(payload["user_id"]) if payload.get("user_id") is not None else None,
+            "scope": scope,
+            "status": status,
+        }
+
+    @classmethod
+    def from_dict(cls, payload: Mapping[Text, Any], /) -> "OAuth":
+        """
+        Create an OAuth instance from payload.
+
+        Args:
+            payload: Raw OAuth payload.
+
+        Returns:
+            OAuth instance.
+
+        Raises:
+            OAuth.ValidationError: If validation fails.
+        """
+        try:
+            return cls(**cls._validate_payload(payload))
+        except KeyError as error:
+            raise cls.ValidationError(f"Missing required field in OAuth payload: {error.args[0]}") from error
+        except Exception as error:
+            raise cls.ValidationError(f"Invalid OAuth payload: {error}") from error
+
+    @property
+    def is_system(self) -> bool:
+        """
+        Indicates whether the event was triggered without user context.
+
+        Returns:
+            True if no OAuth token is present, otherwise False.
+        """
+        return not bool(self.oauth_token)
+
+    def validate_against_app_info(self, app_info: "B24AppInfoResult") -> bool:
+        """
+        Validate OAuth data against application info.
+
+        Args:
+            app_info: Application info result.
+
+        Returns:
+            True if validation succeeds.
+
+        Raises:
+            OAuth.ValidationError: If validation fails.
+        """
+        if all((
+                super(OAuth, self).validate_against_app_info(app_info),
+                self.user_id is None or self.user_id == app_info.user_id,
+        )):
+            return True
+        else:
+            raise self.ValidationError("Invalid OAuth")
+
+
+@dataclass(**_DATACLASS_KWARGS)
+class EventOAuth(OAuth):
     """
     OAuth payload for Bitrix24 event handlers.
 
@@ -133,11 +225,11 @@ class EventOAuth(Auth):
     OAuth data may be absent.
     """
 
+    oauth_token: Optional[OAuthToken]
+    user_id: Optional[int]
+    scope: Optional[List[Text]]
+    status: Optional[B24AppStatus]
     application_token: Text
-    oauth_token: Optional[OAuthToken] = None
-    user_id: Optional[int] = None
-    scope: Optional[List[Text]] = None
-    status: Optional[B24AppStatus] = None
 
     @classmethod
     def _validate_payload(cls, payload: Mapping[Text, Any], /) -> JSONDict:
@@ -150,21 +242,8 @@ class EventOAuth(Auth):
         Returns:
             Dictionary with validated EventOAuth fields.
         """
-
-        oauth_token = OAuthToken.from_dict(payload) if payload.get("access_token") else None
-
-        scope_value = payload.get("scope")
-        scope = scope_value.split(",") if scope_value is not None else None
-
-        status_value = payload.get("status")
-        status = B24AppStatus(status_value) if status_value is not None else None
-
         return super(EventOAuth, cls)._validate_payload(payload) | {
             "application_token": payload["application_token"],
-            "oauth_token": oauth_token,
-            "user_id": int(payload["user_id"]) if payload.get("user_id") is not None else None,
-            "scope": scope,
-            "status": status,
         }
 
     @classmethod
@@ -188,16 +267,6 @@ class EventOAuth(Auth):
         except Exception as error:
             raise cls.ValidationError(f"Invalid event OAuth payload: {error}") from error
 
-    @property
-    def is_system(self) -> bool:
-        """
-        Indicates whether the event was triggered without user context.
-
-        Returns:
-            True if no OAuth token is present, otherwise False.
-        """
-        return not bool(self.oauth_token)
-
     def validate_against_app_info(self, app_info: "B24AppInfoResult") -> bool:
         """
         Validate event OAuth data against application info.
@@ -211,27 +280,19 @@ class EventOAuth(Auth):
         Raises:
             EventOAuth.ValidationError: If validation fails.
         """
-        if all((
-                super(EventOAuth, self).validate_against_app_info(app_info),
-                self.user_id is None or self.user_id == app_info.user_id,
-        )):
-            return True
-        else:
-            raise self.ValidationError("Invalid event OAuth")
+        try:
+            return super(EventOAuth, self).validate_against_app_info(app_info)
+        except self.ValidationError as error:
+            raise self.ValidationError("Invalid event OAuth") from error
 
 
 @dataclass(**_DATACLASS_KWARGS)
-class RenewedOAuth(Auth):
+class RenewedOAuth(OAuth):
     """
     OAuth payload returned after token refresh.
 
     Always contains a valid OAuth token and user context.
     """
-
-    oauth_token: OAuthToken
-    user_id: int
-    scope: List[Text]
-    status: B24AppStatus
 
     @classmethod
     def _validate_payload(cls, payload: Mapping[Text, Any], /) -> JSONDict:
@@ -244,12 +305,21 @@ class RenewedOAuth(Auth):
         Returns:
             Dictionary with validated fields.
         """
-        return super(RenewedOAuth, cls)._validate_payload(payload) | {
-            "oauth_token": OAuthToken.from_dict(payload),
-            "user_id": int(payload["user_id"]),
-            "scope": payload["scope"].split(","),
-            "status": B24AppStatus(payload["status"]),
-        }
+        validated_payload = super(RenewedOAuth, cls)._validate_payload(payload)
+
+        if validated_payload["oauth_token"] is None:
+            raise cls.ValidationError("Missing required field in renewed OAuth payload: access_token")
+
+        if validated_payload["user_id"] is None:
+            raise cls.ValidationError("Missing required field in renewed OAuth payload: user_id")
+
+        if validated_payload["scope"] is None:
+            raise cls.ValidationError("Missing required field in renewed OAuth payload: scope")
+
+        if validated_payload["status"] is None:
+            raise cls.ValidationError("Missing required field in renewed OAuth payload: status")
+
+        return validated_payload
 
     @classmethod
     def from_dict(cls, payload: Mapping[Text, Any], /) -> "RenewedOAuth":

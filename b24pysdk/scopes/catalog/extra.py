@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Extra(BaseEntity):
-    """"""
+    """Handle operations related to Bitrix24 catalog extras.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/catalog/extra/index.html
+    """
 
     @type_checker
     def get(
@@ -20,7 +23,19 @@ class Extra(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Retrieve information about a specific catalog extra by its identifier.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/extra/catalog-extra-get.html
+
+        This method returns details of the extra markup with the specified identifier.
+
+        Args:
+            bitrix_id: Identifier of the extra markup in Bitrix24;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest."""
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -38,7 +53,17 @@ class Extra(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Retrieve field descriptions for the catalog extra entity.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/extra/catalog-extra-get-fields.html
+
+        Returns a map of field identifiers to their descriptions.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest."""
         return self._make_bitrix_api_request(
             api_wrapper=self.get_fields,
             timeout=timeout,
@@ -54,7 +79,44 @@ class Extra(BaseEntity):
             start: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Retrieve a list of catalog extras by filter.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/extra/catalog-extra-list.html
+
+        Use select to limit returned fields, filter to constrain results, order to sort, and start for pagination.
+
+        Args:
+            select: Fields to be selected. If omitted or empty, all available fields are returned;
+
+            filter: Object format:
+                {
+                    "field_1": "value_1",
+
+                    ...,
+
+                    "field_N": "value_N",
+
+                }, where the key may include a prefix to refine filtering behavior;
+
+            order: Object format:
+                {
+                    field_1: value_1,
+
+                    ...,
+
+                }
+                where
+
+                - field_n is the name of the field by which the selection will be sorted
+
+                - value_n is a string value equals to 'ASC' (ascending sort) or 'DESC' (descending sort);
+
+            start: Value to start the selection from for paginated output;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest."""
 
         params: JSONDict = dict()
 

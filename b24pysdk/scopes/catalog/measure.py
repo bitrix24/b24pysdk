@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Measure(BaseEntity):
-    """"""
+    """Handle operations related to Bitrix24 catalog measures.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/catalog/measure/
+    """
 
     @type_checker
     def add(
@@ -20,7 +23,30 @@ class Measure(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Create a new unit of measurement.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/measure/catalog-measure-add.html
+
+        Args:
+            fields: Object format:
+                {
+                    "code": integer,
+
+                    "isDefault": "Y" | "N",
+
+                    "measureTitle": string,
+
+                    "symbol": string,
+
+                    "symbolIntl": string,
+
+                    "symbolLetterIntl": string,
+                };
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest."""
 
         params: JSONDict = {
             "fields": fields,
@@ -39,7 +65,17 @@ class Measure(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete a unit of measurement by its identifier.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/measure/catalog-measure-delete.html
+
+        Args:
+            bitrix_id: Identifier of the measure;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest."""
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -58,7 +94,17 @@ class Measure(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Retrieve information about a unit of measurement by its identifier.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/measure/catalog-measure-get.html
+
+        Args:
+            bitrix_id: Identifier of the measure;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest."""
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -76,7 +122,18 @@ class Measure(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Retrieve the list of available fields for the measure entity.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/measure/catalog-measure-get-fields.html
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+
+        """
+
         return self._make_bitrix_api_request(
             api_wrapper=self.get_fields,
             timeout=timeout,
@@ -92,7 +149,33 @@ class Measure(BaseEntity):
             start: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Retrieve a list of units of measurement.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/measure/catalog-measure-list.html
+
+        The method returns a list of measurement units.
+
+        Args:
+            select: Iterable of field names to select. If omitted or empty, all available fields are returned;
+
+            filter: Object format:
+                {
+                    "field_1": "value_1",
+
+                    ...,
+
+                    "field_N": "value_N",
+                };
+                where keys correspond to the catalog_measure fields;
+
+            order: Optional sorting options;
+
+            start: Optional numeric value controlling the starting position;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest."""
 
         params: JSONDict = dict()
 
@@ -126,7 +209,32 @@ class Measure(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update an existing unit of measurement.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/measure/catalog-measure-update.html
+
+        Args:
+            bitrix_id: Identifier of the measure;
+
+            fields: Object format:
+                {
+                    "code": integer,
+
+                    "isDefault": "Y" | "N",
+
+                    "measureTitle": string,
+
+                    "symbol": string,
+
+                    "symbolIntl": string,
+
+                    "symbolLetterIntl": string,
+                };
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest."""
 
         params: JSONDict = {
             "id": bitrix_id,

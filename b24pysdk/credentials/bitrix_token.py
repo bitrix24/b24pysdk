@@ -16,9 +16,11 @@ from .oauth_token import OAuthToken
 if TYPE_CHECKING:
     from ..api.responses import BitrixAppInfoResponse
     from ..client import BaseClient, ClientV1, ClientV2, ClientV3
-    from .auth import RenewedOAuth
+    from .auth import OAuth, RenewedOAuth
     from .bitrix_app import AbstractBitrixApp, AbstractBitrixAppLocal
+    from .oauth_event_data import OAuthEventData
     from .oauth_placement_data import OAuthPlacementData
+    from .oauth_workflow_data import OAuthWorkflowData
 
 __all__ = [
     "AbstractBitrixToken",
@@ -178,12 +180,12 @@ class AbstractBitrixToken:
     def refresh_and_set_oauth_token(self, **kwargs):
         """"""
 
-        renewed_oauth_token = self.refresh_oauth_token(**kwargs)
+        renewed_oauth = self.refresh_oauth_token(**kwargs)
 
-        self.oauth_token = renewed_oauth_token.oauth_token
+        self.oauth_token = renewed_oauth.oauth_token
 
         self.oauth_token_renewed_signal.emit(OAuthTokenRenewedEvent(
-            renewed_oauth_token=renewed_oauth_token,
+            renewed_oauth_token=renewed_oauth,
         ))
 
     def __expired_token_handler(self) -> bool:
@@ -557,23 +559,6 @@ class BitrixToken(AbstractBitrixToken):
         self.bitrix_app = bitrix_app
 
     @classmethod
-    def from_renewed_oauth_token(
-            cls,
-            renewed_oauth_token: "RenewedOAuth",
-            bitrix_app: "AbstractBitrixApp",
-    ) -> "BitrixToken":
-        """"""
-        oauth_token = renewed_oauth_token.oauth_token
-        return cls(
-            domain=renewed_oauth_token.portal_domain,
-            auth_token=oauth_token.access_token,
-            refresh_token=oauth_token.refresh_token,
-            expires=oauth_token.expires,
-            expires_in=oauth_token.expires_in,
-            bitrix_app=bitrix_app,
-        )
-
-    @classmethod
     def from_oauth_placement_data(
             cls,
             oauth_placement_data: "OAuthPlacementData",
@@ -589,6 +574,47 @@ class BitrixToken(AbstractBitrixToken):
             expires_in=oauth_token.expires_in,
             bitrix_app=bitrix_app,
         )
+
+    @classmethod
+    def from_oauth(
+            cls,
+            oauth: "OAuth",
+            bitrix_app: "AbstractBitrixApp",
+    ) -> "BitrixToken":
+        """"""
+        oauth_token = oauth.oauth_token
+        return cls(
+            domain=oauth.portal_domain,
+            auth_token=oauth_token.access_token,
+            refresh_token=oauth_token.refresh_token,
+            expires=oauth_token.expires,
+            expires_in=oauth_token.expires_in,
+            bitrix_app=bitrix_app,
+        )
+
+    @classmethod
+    def from_oauth_event_data(
+            cls,
+            oauth_event_data: "OAuthEventData",
+            bitrix_app: "AbstractBitrixApp",
+    ) -> "BitrixToken":
+        """"""
+
+        auth = oauth_event_data.auth
+
+        if auth.oauth_token is None:
+            raise ValueError("Event auth data does not contain OAuth token")
+
+        return cls.from_oauth(oauth=auth, bitrix_app=bitrix_app)
+
+    @classmethod
+    def from_oauth_workflow_data(
+            cls,
+            oauth_workflow_data: "OAuthWorkflowData",
+            bitrix_app: "AbstractBitrixApp",
+    ) -> "BitrixToken":
+        """"""
+        return cls.from_oauth(oauth=oauth_workflow_data.auth, bitrix_app=bitrix_app)
 
 
 class BitrixTokenLocal(AbstractBitrixTokenLocal):
@@ -620,22 +646,6 @@ class BitrixTokenLocal(AbstractBitrixTokenLocal):
         self.bitrix_app = bitrix_app
 
     @classmethod
-    def from_renewed_oauth_token(
-            cls,
-            renewed_oauth_token: "RenewedOAuth",
-            bitrix_app: "AbstractBitrixAppLocal",
-    ) -> "BitrixTokenLocal":
-        """"""
-        oauth_token = renewed_oauth_token.oauth_token
-        return cls(
-            auth_token=oauth_token.access_token,
-            refresh_token=oauth_token.refresh_token,
-            expires=oauth_token.expires,
-            expires_in=oauth_token.expires_in,
-            bitrix_app=bitrix_app,
-        )
-
-    @classmethod
     def from_oauth_placement_data(
             cls,
             oauth_placement_data: "OAuthPlacementData",
@@ -650,6 +660,46 @@ class BitrixTokenLocal(AbstractBitrixTokenLocal):
             expires_in=oauth_token.expires_in,
             bitrix_app=bitrix_app,
         )
+
+    @classmethod
+    def from_oauth(
+            cls,
+            oauth: "OAuth",
+            bitrix_app: "AbstractBitrixAppLocal",
+    ) -> "BitrixTokenLocal":
+        """"""
+        oauth_token = oauth.oauth_token
+        return cls(
+            auth_token=oauth_token.access_token,
+            refresh_token=oauth_token.refresh_token,
+            expires=oauth_token.expires,
+            expires_in=oauth_token.expires_in,
+            bitrix_app=bitrix_app,
+        )
+
+    @classmethod
+    def from_oauth_event_data(
+            cls,
+            oauth_event_data: "OAuthEventData",
+            bitrix_app: "AbstractBitrixAppLocal",
+    ) -> "BitrixTokenLocal":
+        """"""
+
+        auth = oauth_event_data.auth
+
+        if auth.oauth_token is None:
+            raise ValueError("Event auth data does not contain OAuth token")
+
+        return cls.from_oauth(oauth=auth, bitrix_app=bitrix_app)
+
+    @classmethod
+    def from_oauth_workflow_data(
+            cls,
+            oauth_workflow_data: "OAuthWorkflowData",
+            bitrix_app: "AbstractBitrixAppLocal",
+    ) -> "BitrixTokenLocal":
+        """"""
+        return cls.from_oauth(oauth=oauth_workflow_data.auth, bitrix_app=bitrix_app)
 
 
 class BitrixWebhook(BitrixToken):

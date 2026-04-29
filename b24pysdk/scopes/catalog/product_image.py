@@ -11,7 +11,10 @@ __all__ = [
 
 
 class ProductImage(BaseEntity):
-    """"""
+    """Handle operations related to Bitrix24 catalog product images.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product-image/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -25,7 +28,32 @@ class ProductImage(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add an image to a product, parent product (SKU), variation, or service.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product-image/catalog-product-image-add.html
+
+        This method adds images to a product, parent product, variation, or service.
+
+        Args:
+            fields: Object format:
+                {
+                    "productId": Identifier of the product, parent product (SKU), variation, or service;
+
+                    "type": Image type: 'DETAIL_PICTURE', 'PREVIEW_PICTURE', or 'MORE_PHOTO';
+                };
+
+            file_content: Array format:
+                [
+                    "file name",
+
+                    "file content in base64",
+                ];
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         if file_content.__class__ is not list:
             file_content = list(file_content)
@@ -49,7 +77,22 @@ class ProductImage(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete a product image by product and image identifiers.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product-image/catalog-product-image-delete.html
+
+        This method removes an image from a product, parent product, variation, or service.
+
+        Args:
+            product_id: Identifier of the product, parent product (SKU), variation, or service;
+
+            bitrix_id: Identifier of the product image;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "productId": product_id,
@@ -70,7 +113,22 @@ class ProductImage(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Retrieve information about a specific product image.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product-image/catalog-product-image-get.html
+
+        This method returns information about a specific product image, main product, variation, or service.
+
+        Args:
+            product_id: Identifier of the product, parent product (SKU), variation, or service;
+
+            bitrix_id: Identifier of the product image;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "productId": product_id,
@@ -89,7 +147,18 @@ class ProductImage(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Retrieve available fields of the product image entity.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product-image/catalog-product-image-get-fields.html
+
+        This method returns the available fields for a product image, main product, variation, or service.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
         return self._make_bitrix_api_request(
             api_wrapper=self.get_fields,
             timeout=timeout,
@@ -104,7 +173,24 @@ class ProductImage(BaseEntity):
             start: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the list of product images.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product-image/catalog-product-image-list.html
+
+        The method returns a list of product images, parent product images, variations, or services.
+
+        Args:
+            product_id: Identifier of the product, parent product (SKU), variation, or service;
+
+            select: Iterable with field names to return for each image;
+
+            start: Start position for fetching the next page of results;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "productId": product_id,

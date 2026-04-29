@@ -1,4 +1,4 @@
-from .auth import EventOAuth, RenewedOAuth, WorkflowOAuth
+from .auth import EventOAuth, OAuth, RenewedOAuth, WorkflowOAuth
 from .bitrix_app import AbstractBitrixApp, AbstractBitrixAppLocal, BitrixApp, BitrixAppLocal
 from .bitrix_token import AbstractBitrixToken, AbstractBitrixTokenLocal, BitrixToken, BitrixTokenLocal, BitrixWebhook
 from .oauth_event_data import OAuthEventData
@@ -17,6 +17,7 @@ __all__ = [
     "BitrixTokenLocal",
     "BitrixWebhook",
     "EventOAuth",
+    "OAuth",
     "OAuthEventData",
     "OAuthPlacementData",
     "OAuthToken",

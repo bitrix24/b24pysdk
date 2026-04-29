@@ -58,13 +58,17 @@ def test_placement_get(bitrix_client: BaseClient):
 
     assert len(bound_placements) >= 1, "Expected at least one bound placement to be returned"
 
-    bound_placement = bound_placements[0]
+    for bound_placement in bound_placements:
+        assert isinstance(bound_placement, dict)
 
-    assert isinstance(bound_placement, dict)
-
-    assert bound_placement.get("placement") == _PLACEMENT, "Placement name does not match"
-    assert bound_placement.get("handler") == _HANDLER, "Placement handler does not match"
-    assert bound_placement.get("langAll") == _LANG_ALL, "Placement lang_all does not match"
+        if all((
+            bound_placement.get("placement") == _PLACEMENT,
+            bound_placement.get("handler") == _HANDLER,
+            bound_placement.get("langAll") == _LANG_ALL,
+        )):
+            break
+    else:
+        pytest.fail(f"Placement '{_PLACEMENT}' with handler '{_HANDLER}' should be found")
 
 
 @pytest.mark.oauth_only

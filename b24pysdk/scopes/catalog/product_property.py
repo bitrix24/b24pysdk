@@ -11,7 +11,10 @@ __all__ = [
 
 
 class ProductProperty(BaseEntity):
-    """"""
+    """Handle operations related to Bitrix24 catalog product properties.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product-property/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -24,7 +27,20 @@ class ProductProperty(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add product property or variation.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product-property/catalog-product-property-add.html
+
+        The method adds a property to a product or variation.
+
+        Args:
+            fields: Set of fields for the new property;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "fields": fields,
@@ -43,7 +59,20 @@ class ProductProperty(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete product property or variation
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product-property/catalog-product-property-delete.html
+
+        The method removes a product property or variation.
+
+        Args:
+            bitrix_id: Identifier of the property;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -62,7 +91,20 @@ class ProductProperty(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get product or variation property by ID
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product-property/catalog-product-property-get.html
+
+        The method returns the values of the product or variation property fields.
+
+        Args:
+            bitrix_id: Identifier of the property;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -80,7 +122,18 @@ class ProductProperty(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get product or variation property fields
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product-property/catalog-product-property-get-fields.html
+
+        The method returns the fields of product or variation properties.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
         return self._make_bitrix_api_request(
             api_wrapper=self.get_fields,
             timeout=timeout,
@@ -96,7 +149,45 @@ class ProductProperty(BaseEntity):
             start: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of properties
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product-property/catalog-product-property-list.html
+
+        The method returns a list of product properties and variations based on the filter.
+
+        Args:
+            select: An array containing the list of fields to select;
+
+            filter: Object format:
+                {
+                    "field_1": "value_1",
+
+                    ...,
+
+                    "field_N": "value_N",
+                }
+                where possible keys correspond to product property fields;
+
+            order: Object format:
+                {
+                    field_1: value_1,
+
+                    ...,
+                }
+
+                where
+
+                - field_n is the field name to sort by;
+
+                - value_n is 'ASC' for ascending or 'DESC' for descending;
+
+            start: Starting position for pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = dict()
 
@@ -129,7 +220,22 @@ class ProductProperty(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update product or variation property
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product-property/catalog-product-property-update.html
+
+        The method modifies the fields of a product or variation property.
+
+        Args:
+            bitrix_id: Property identifier;
+
+            fields: Set of fields to update the property;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

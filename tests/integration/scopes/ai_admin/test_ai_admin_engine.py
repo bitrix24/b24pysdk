@@ -13,7 +13,6 @@ pytestmark = [
     pytest.mark.ai_admin_engine,
 ]
 
-_COMPLETIONS_URL: str = "https://example.com"
 _ENGINE_FIELDS = ("CODE", "NAME")
 
 
@@ -29,7 +28,7 @@ def test_register(bitrix_client: BaseClient, cache: Cache):
         name=engine_name,
         code=engine_code,
         category="text",
-        completions_url=_COMPLETIONS_URL,
+        completions_url="https://httpbin.org/status/200",
     ).response
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
@@ -73,7 +72,7 @@ def test_list(bitrix_client: BaseClient, cache: Cache):
 
 
 @pytest.mark.oauth_only
-@pytest.mark.dependency(name="test_ai_admin_engine_unregister", depends=["test_ai_admin_engine_register"])
+@pytest.mark.dependency(name="test_ai_admin_engine_unregister", depends=["test_ai_admin_engine_list"])
 def test_unregister(bitrix_client: BaseClient, cache: Cache):
     """"""
 

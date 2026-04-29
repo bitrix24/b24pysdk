@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Price(BaseEntity):
-    """"""
+    """Handle operations related to Bitrix24 catalog prices.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/catalog/price/index.html
+    """
 
     @type_checker
     def add(
@@ -20,7 +23,34 @@ class Price(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Create a product price.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/price/catalog-price-add.html
+
+        The method adds a new price for a product.
+
+        Args:
+            fields: Object format:
+                {
+                    "catalogGroupId": integer,
+
+                    "currency": string,
+
+                    "price": number,
+
+                    "productId": integer,
+
+                    "quantityFrom": integer,
+
+                    "quantityTo": integer,
+
+                    "extraId": integer
+                };
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest."""
 
         params: JSONDict = {
             "fields": fields,
@@ -39,7 +69,19 @@ class Price(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete a product price by its identifier.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/price/catalog-price-delete.html
+
+        The method removes the product price.
+
+        Args:
+            bitrix_id: Identifier of the price resource;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest."""
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -58,7 +100,19 @@ class Price(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Retrieve fields of a product price by its identifier.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/price/catalog-price-get.html
+
+        The method returns information about the product price by its ID.
+
+        Args:
+            bitrix_id: Identifier of the price resource;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest."""
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -76,7 +130,17 @@ class Price(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Fetch the list of available fields for the price resource.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/price/catalog-price-get-fields.html
+
+        The method returns the fields of a product's price.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest."""
         return self._make_bitrix_api_request(
             api_wrapper=self.get_fields,
             timeout=timeout,
@@ -92,7 +156,42 @@ class Price(BaseEntity):
             start: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of prices by filter.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/price/catalog-price-list.html
+
+        The method returns a list of product prices based on the filter.
+
+        Args:
+            select: List of fields corresponding to available fields;
+
+            filter: Object format:
+                {
+                    field_1: value_1,
+
+                    ...,
+                };
+
+            order: Object format:
+
+                {
+                    field_1: value_1,
+
+                    ...,
+                }
+
+                where
+
+                - field_1 is the name of the field by which the selection will be sorted;
+
+                - value_1 is a string value equal to 'ASC' (ascending sort) or 'DESC' (descending sort);
+
+            start: Page number for HTTPS pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest."""
 
         params: JSONDict = dict()
 
@@ -124,7 +223,29 @@ class Price(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Modify the collection of prices for a product.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/price/catalog-price-modify.html
+
+        The method updates the product price collection.
+
+        Args:
+            fields: Object format:
+                {
+                    "product": {
+
+                        "id": integer,
+
+                        "prices": [
+                            ...
+                        ]
+                    }
+                };
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest."""
 
         params: JSONDict = {
             "fields": fields,
@@ -144,7 +265,34 @@ class Price(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update fields of a product price.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/price/catalog-price-update.html
+
+        Args:
+            bitrix_id: Identifier of the price resource;
+
+            fields: Object format:
+                {
+                    "catalogGroupId": integer,
+
+                    "currency": string,
+
+                    "price": number,
+
+                    "productId": integer,
+
+                    "quantityFrom": integer,
+
+                    "quantityTo": integer,
+
+                    "extraId": integer
+                };
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest."""
 
         params: JSONDict = {
             "id": bitrix_id,
