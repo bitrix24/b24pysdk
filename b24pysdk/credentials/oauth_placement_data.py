@@ -1,15 +1,17 @@
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from typing import TYPE_CHECKING, Any, Mapping, Optional, Text
 
 from .._constants import PYTHON_VERSION
 from ..constants import B24AppStatus, Protocol
 from ..errors import BitrixValidationError
 from ..utils.types import JSONDict
+from .bitrix_token import BitrixToken
 from .oauth_token import OAuthToken
 
 if TYPE_CHECKING:
     from ..api.responses import B24AppInfoResult
+    from .bitrix_app import AbstractBitrixApp
 
 __all__ = [
     "OAuthPlacementData",
@@ -42,6 +44,9 @@ class OAuthPlacementData:
     status: B24AppStatus
     placement: Optional[Text] = None
     placement_options: Optional[JSONDict] = None
+
+    if TYPE_CHECKING:
+        _app_info: "B24AppInfoResult" = field(init=False)
 
     @classmethod
     def from_dict(cls, payload: Mapping[Text, Any], /) -> "OAuthPlacementData":
@@ -93,6 +98,15 @@ class OAuthPlacementData:
 
         except Exception as error:
             raise cls.ValidationError(f"Invalid placement data: {error}") from error
+
+    def get_app_info(self, bitrix_app: "AbstractBitrixApp") -> "B24AppInfoResult":
+        """"""
+
+        if not hasattr(self, "_app_info"):
+            bitrix_token = BitrixToken.from_oauth_placement_data(oauth_placement_data=self, bitrix_app=bitrix_app)
+            object.__setattr__(self, "_app_info", bitrix_token.get_app_info().result)
+
+        return self._app_info
 
     def validate_against_app_info(self, app_info: "B24AppInfoResult") -> bool:
         """

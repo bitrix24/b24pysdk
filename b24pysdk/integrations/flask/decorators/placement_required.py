@@ -7,64 +7,57 @@ placements, slider applications, or other embedded app entry points.
 
 from functools import wraps
 from http import HTTPStatus
-from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, TypeVar, Union, cast, overload
+from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, Union, overload
 
 from flask import g
 
 from ...._config import Config
-from ....credentials import BitrixToken, OAuthPlacementData
+from ....credentials import OAuthPlacementData
 from ....errors import BitrixAPIError, BitrixSDKException, BitrixValidationError
-from ._utils import _make_json_response
+from ....utils.types import JSONDict
+from ..dependencies import get_request_params
+from ._utils import make_json_response
 from .collect_request_params import collect_request_params
 
 if TYPE_CHECKING:
     from ....credentials import AbstractBitrixApp
-    from ..types import CollectedParamsRequest, PlacementAppInfoRequest, PlacementRequest
 
 __all__ = [
     "placement_required",
-    "validate_placement_app_info_request",
-    "validate_placement_request",
+    "validate_placement_params",
 ]
 
 _FT = TypeVar("_FT", bound=Callable[..., Any])
 
 
-def validate_placement_request(request: "CollectedParamsRequest") -> "PlacementRequest":
-    """Parse Bitrix24 placement auth payload from ``request.params``."""
-    request.oauth_placement_data = OAuthPlacementData.from_dict(request.params)
-    return cast("PlacementRequest", request)
-
-
-def validate_placement_app_info_request(
-    request: "PlacementRequest",
+def validate_placement_params(
+    params: JSONDict,
     *,
-    bitrix_app: "AbstractBitrixApp",
-) -> "PlacementAppInfoRequest":
-    """Resolve Bitrix24 ``app.info`` and validate the placement token against it."""
+    bitrix_app: Optional["AbstractBitrixApp"] = None,
+) -> OAuthPlacementData:
+    """Parse Bitrix24 placement payload from collected params and optionally validate it."""
 
-    try:
-        bitrix_token = BitrixToken.from_oauth_placement_data(
-            oauth_placement_data=request.oauth_placement_data,
-            bitrix_app=bitrix_app,
-        )
-        app_info = bitrix_token.get_app_info().result
-    except BitrixAPIError as error:
-        raise BitrixValidationError(error.message) from error
+    oauth_placement_data = OAuthPlacementData.from_dict(params)
 
-    if not (
-        request.oauth_placement_data.validate_against_app_info(app_info)
-        and app_info.client_id == bitrix_app.client_id
-    ):
-        raise BitrixValidationError("Invalid placement auth data")
+    if bitrix_app is not None:
+        try:
+            app_info = oauth_placement_data.get_app_info(bitrix_app)
+        except BitrixAPIError as error:
+            raise BitrixValidationError(error.message) from error
 
-    request.app_info = app_info
+        if not (oauth_placement_data.validate_against_app_info(app_info) and app_info.client_id == bitrix_app.client_id):
+            raise BitrixValidationError("Invalid placement auth data")
 
-    return cast("PlacementAppInfoRequest", request)
+    return oauth_placement_data
 
 
 @overload
-def placement_required(handler_func: _FT, /) -> _FT: ...
+def placement_required(
+    handler_func: _FT,
+    /,
+    *,
+    bitrix_app: Optional["AbstractBitrixApp"] = None,
+) -> _FT: ...
 
 
 @overload
@@ -72,18 +65,7 @@ def placement_required(
     handler_func: None = None,
     /,
     *,
-    require_app_validation: Literal[False] = False,
-    bitrix_app: None = None,
-) -> Callable[[_FT], _FT]: ...
-
-
-@overload
-def placement_required(
-    handler_func: None = None,
-    /,
-    *,
-    require_app_validation: Literal[True],
-    bitrix_app: "AbstractBitrixApp",
+    bitrix_app: Optional["AbstractBitrixApp"] = None,
 ) -> Callable[[_FT], _FT]: ...
 
 
@@ -91,7 +73,6 @@ def placement_required(
     handler_func: Optional[_FT] = None,
     /,
     *,
-    require_app_validation: bool = False,
     bitrix_app: Optional["AbstractBitrixApp"] = None,
 ) -> Union[_FT, Callable[[_FT], _FT]]:
     """
@@ -102,19 +83,12 @@ def placement_required(
     - any other exception -> ``500 Internal Server Error``
     """
 
-    if require_app_validation and bitrix_app is None:
-        raise ValueError("'bitrix_app' is required when 'require_app_validation' is True")
-
     def decorator(func: _FT) -> _FT:
         @wraps(func)
         @collect_request_params
         def wrapper(*args: Any, **kwargs: Any):
-            request = g.b24_request
             try:
-                request = validate_placement_request(request)
-
-                if require_app_validation:
-                    request = validate_placement_app_info_request(request, bitrix_app=bitrix_app)
+                g.oauth_placement_data = validate_placement_params(get_request_params(), bitrix_app=bitrix_app)
 
             except BitrixValidationError as error:
                 Config().logger.info(
@@ -123,7 +97,7 @@ def placement_required(
                         "error": error.message,
                     },
                 )
-                return _make_json_response({"error": error.message}, HTTPStatus.UNAUTHORIZED)
+                return make_json_response({"error": error.message}, HTTPStatus.UNAUTHORIZED)
 
             except BitrixSDKException as error:
                 Config().logger.warning(
@@ -132,7 +106,7 @@ def placement_required(
                         "error": error.message,
                     },
                 )
-                return _make_json_response({"error": "Internal server error"}, HTTPStatus.INTERNAL_SERVER_ERROR)
+                return make_json_response({"error": "Internal server error"}, HTTPStatus.INTERNAL_SERVER_ERROR)
 
             except Exception as error:  # noqa: BLE001
                 Config().logger.error(
@@ -141,7 +115,7 @@ def placement_required(
                         "error": str(error),
                     },
                 )
-                return _make_json_response({"error": "Internal server error"}, HTTPStatus.INTERNAL_SERVER_ERROR)
+                return make_json_response({"error": "Internal server error"}, HTTPStatus.INTERNAL_SERVER_ERROR)
 
             return func(*args, **kwargs)
 

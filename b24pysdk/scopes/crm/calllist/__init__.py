@@ -75,7 +75,7 @@ class Calllist(BaseCRM):
     @type_checker
     def get(
             self,
-            bitrix_id,
+            bitrix_id: int,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:

@@ -1,14 +1,15 @@
 from http import HTTPStatus
-from typing import Any
 
-from flask import jsonify
+from flask import Response, jsonify
+
+from b24pysdk.utils.types import JSONDict
 
 __all__ = [
-    "_make_json_response",
+    "make_json_response",
 ]
 
 
-def _make_json_response(payload: dict[str, Any], status_code: HTTPStatus):
+def make_json_response(payload: JSONDict, status_code: HTTPStatus) -> Response:
     response = jsonify(payload)
     response.status_code = status_code
     return response

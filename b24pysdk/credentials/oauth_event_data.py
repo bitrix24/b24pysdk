@@ -1,4 +1,4 @@
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Mapping, Optional, Text
 
@@ -11,6 +11,7 @@ from .auth import EventOAuth
 
 if TYPE_CHECKING:
     from ..api.responses import B24AppInfoResult
+    from .bitrix_app import AbstractBitrixApp
 
 __all__ = [
     "OAuthEventData",
@@ -34,6 +35,9 @@ class OAuthEventData:
     ts: datetime
     auth: EventOAuth
     data: Optional[JSONDict] = None
+
+    if TYPE_CHECKING:
+        _app_info: "B24AppInfoResult" = field(init=False)
 
     @classmethod
     def from_dict(cls, payload: Mapping[Text, Any], /) -> "OAuthEventData":
@@ -64,6 +68,10 @@ class OAuthEventData:
     def is_system(self) -> bool:
         """"""
         return self.auth.is_system
+
+    def get_app_info(self, bitrix_app: "AbstractBitrixApp") -> "B24AppInfoResult":
+        """"""
+        return self.auth.get_app_info(bitrix_app)
 
     def validate_against_app_info(self, app_info: "B24AppInfoResult") -> bool:
         """"""

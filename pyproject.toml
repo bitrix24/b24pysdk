@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "b24pysdk"
-version = "1.0.0"
+version = "1.1.0"
 authors = [
     { name = "Bitrix24", email = "pypi@bitrixsoft.com" }
 ]
@@ -39,7 +39,7 @@ flask = [
 ]
 dev = [
     "pre-commit",
-    "ruff==0.15.8",
+    "ruff==0.15.12",
 ]
 test = [
     "environs>=11.0.0",

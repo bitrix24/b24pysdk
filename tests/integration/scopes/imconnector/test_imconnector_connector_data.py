@@ -23,7 +23,7 @@ def test_set(bitrix_client: BaseClient):
     register_response = bitrix_client.imconnector.register(
         bitrix_id=connector_id,
         name=f"{SDK_NAME} Connector",
-        icon={"DATA_IMAGE": "https://dev.1c-bitrix.com/images/main/logo-2x.png"},
+        icon={"DATA_IMAGE": "https://dev.1c-bitrix.ru/images/main/logo-2x.png"},
         placement_handler="https://example.com/handler",
     ).response
 

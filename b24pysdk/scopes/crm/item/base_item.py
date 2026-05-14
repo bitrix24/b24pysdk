@@ -41,7 +41,7 @@ class BaseItem(BaseCRM, ABC):
             params["entityTypeId"] = entity_type_id
 
         if use_original_uf_names is not None:
-            params["originalUfNames"] = B24BoolStrict(use_original_uf_names).to_b24()
+            params["useOriginalUfNames"] = B24BoolStrict(use_original_uf_names).to_b24()
 
         return self._make_bitrix_api_request(
             api_wrapper=self._fields,

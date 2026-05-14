@@ -57,7 +57,7 @@ class BaseDetail(BaseCRM):
             self,
             bitrix_id: int,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get entity by ID.
 
@@ -158,7 +158,7 @@ class BaseDetail(BaseCRM):
     @abstractmethod
     def delete(
             self,
-            bitrix_id,
+            bitrix_id: int,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:

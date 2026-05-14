@@ -16,5 +16,5 @@ __all__ = [
 __title__: Final[Text] = "b24pysdk"
 """Package name used for distribution and identification."""
 
-__version__: Final[Text] = "1.0.0"
+__version__: Final[Text] = "1.1.0"
 """Current SDK version following semantic versioning."""

@@ -42,6 +42,7 @@ from .timeman import Timeman
 from .user import User
 from .userconsent import Userconsent
 from .userfieldconfig import Userfieldconfig
+from .userfieldtype import Userfieldtype
 from .vote import Vote
 from .voximplant import Voximplant
 
@@ -89,6 +90,7 @@ __all__ = [
     "User",
     "Userconsent",
     "Userfieldconfig",
+    "Userfieldtype",
     "Vote",
     "Voximplant",
     "v3",

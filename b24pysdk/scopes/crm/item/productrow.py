@@ -210,10 +210,10 @@ class Productrow(BaseCRM):
     @type_checker
     def set(
             self,
-            *,
             owner_id: int,
             owner_type: Text,
             product_rows: Iterable[JSONDict],
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Save product row.
@@ -241,7 +241,7 @@ class Productrow(BaseCRM):
         params = {
             "ownerId": owner_id,
             "ownerType": owner_type,
-            "product_rows": product_rows,
+            "productRows": product_rows,
         }
 
         return self._make_bitrix_api_request(
@@ -253,9 +253,9 @@ class Productrow(BaseCRM):
     @type_checker
     def get_available_for_payment(
             self,
-            *,
             owner_id: int,
             owner_type: Text,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get unpaid product items.

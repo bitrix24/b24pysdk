@@ -78,7 +78,7 @@ class Logmessage(BaseCRM):
     def list(
             self,
             entity_type_id: int,
-            entity_id: id,
+            entity_id: int,
             *,
             order: Optional[JSONDict] = None,
             start: Optional[int] = None,

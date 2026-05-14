@@ -3,7 +3,7 @@ from typing import Optional
 
 from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
-from .....utils.types import JSONDict
+from .....utils.types import JSONDict, Timeout
 from ..._base_crm import BaseCRM
 from .delivery import Delivery
 from .product import Product
@@ -32,10 +32,10 @@ class Payment(BaseCRM):
     @type_checker
     def add(
             self,
-            *,
             entity_type_id: int,
             entity_id: int,
-            timeout: Optional[int] = None,
+            *,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Add payment.
 
@@ -65,11 +65,12 @@ class Payment(BaseCRM):
             timeout=timeout,
         )
 
+    @type_checker
     def get(
             self,
             bitrix_id: int,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get payment by ID.
 
@@ -90,12 +91,12 @@ class Payment(BaseCRM):
     @type_checker
     def list(
             self,
-            *,
             entity_type_id: int,
             entity_id: int,
+            *,
             filter: Optional[JSONDict] = None,
             order: Optional[JSONDict] = None,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of payments.
 
@@ -155,12 +156,13 @@ class Payment(BaseCRM):
             timeout=timeout,
         )
 
+    @type_checker
     def update(
             self,
             bitrix_id: int,
             fields: JSONDict,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update payment fields.
 
@@ -190,7 +192,7 @@ class Payment(BaseCRM):
             self,
             bitrix_id: int,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Delete payment.
 
@@ -213,7 +215,7 @@ class Payment(BaseCRM):
             self,
             bitrix_id: int,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Change payment status to "Paid".
 
@@ -244,7 +246,8 @@ class Payment(BaseCRM):
     def unpay(
             self,
             bitrix_id: int,
-            timeout: Optional[int] = None,
+            *,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Change payment status to "Unpaid".
 

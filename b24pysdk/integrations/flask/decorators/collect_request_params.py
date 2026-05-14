@@ -1,9 +1,10 @@
 from functools import wraps
-from typing import Any, Callable, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, TypeVar
 
 from flask import g, request
 
-from ..types import CollectedParamsRequest
+if TYPE_CHECKING:
+    from b24pysdk.utils.types import JSONDict
 
 __all__ = [
     "collect_request_params",
@@ -14,11 +15,10 @@ _FT = TypeVar("_FT", bound=Callable[..., Any])
 
 def collect_request_params(handler_func: _FT) -> _FT:
     """
-    Collect Flask request parameters into ``g.b24_request.params``.
+    Collect Flask request parameters into ``g.params``.
 
-    This helper reads the current request from ``flask.request``, builds a
-    dedicated SDK request object, stores it in ``flask.g.b24_request``, and
-    leaves it available through ``flask.g`` for the wrapped handler.
+    This helper reads the current request from ``flask.request`` and stores a
+    normalized mapping in ``flask.g.params`` for the wrapped handler.
 
     Merge behavior
     --------------
@@ -27,16 +27,17 @@ def collect_request_params(handler_func: _FT) -> _FT:
     - values from ``request.form`` overwrite keys from JSON and query string.
     - multi-value keys are stored as ``list``.
 
-    The function is idempotent: if ``g.b24_request`` already exists, it is
-    reused without rebuilding.
+    The function is idempotent: if ``g.params`` already exists, it is reused
+    without rebuilding.
     """
 
     @wraps(handler_func)
     def wrapper(*args: Any, **kwargs: Any):
-        if not hasattr(g, "b24_request"):
-            params: dict[str, Any] = {}
+        if not hasattr(g, "params"):
+            params: "JSONDict" = {}
 
             request_json = request.get_json(silent=True)
+
             if isinstance(request_json, dict):
                 params = request_json
 
@@ -45,7 +46,7 @@ def collect_request_params(handler_func: _FT) -> _FT:
                     values = source.getlist(key)
                     params[key] = values if len(values) > 1 else values[0]
 
-            g.b24_request = CollectedParamsRequest(params=params)
+            g.params = params
 
         return handler_func(*args, **kwargs)
 

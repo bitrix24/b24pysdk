@@ -30,18 +30,6 @@ Install from PyPI:
 pip install b24pysdk
 ```
 
-## Migration from b24pysdk v0.1.0a1 to v0.2.0a1
-
-If you started using the library with version 0.1.0a1, the following notes describe the key differences you need to account for when upgrading:
-
-1. If you used `BitrixTimeout` or `BitrixOAuthTimeout`, make sure to update them to their new names — `BitrixRequestTimeout` and `BitrixOAuthRequestTimeout` respectively.
-2. When using the Config class, you should now pass arguments with the `default_` prefix, such as `default_initial_retry_delay` or `default_max_retries`.
-3. The `B24BoolStr` class has been removed from `b24pysdk.utils.types`. Use `B24BoolLit` from `b24pysdk.constants` instead.
-4. The `B24BatchMethodTuple` help type has been added to `b24pysdk.utils.types` instead `B24BatchRequestData`.
-5. The Requests and Responses classes are now available under the following paths:
-   - `from b24pysdk.bitrix_api.requests import *`
-   - `from b24pysdk.bitrix_api.responses import *`
-
 ### Test environment (Docker-only, no local installs)
 
 Local development and tests run inside Docker containers only. Nothing is installed to your host Python.

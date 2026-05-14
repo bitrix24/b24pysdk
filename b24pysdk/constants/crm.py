@@ -86,7 +86,7 @@ class ContentType(_enum.IntEnum):
 
 
 class DuplicateCommunicationType(_enum.StrEnum):
-    """Communication types used in crm.duplicate.find_by_comm."""
+    """Communication types used in crm.duplicate.findbycomm."""
     EMAIL = "EMAIL"
     PHONE = "PHONE"
 

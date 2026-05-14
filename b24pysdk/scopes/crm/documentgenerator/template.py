@@ -2,7 +2,7 @@ from typing import Iterable, Optional, Text
 
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import JSONDict, JSONList, Timeout
+from ....utils.types import JSONDict, Timeout
 from .._base_crm import BaseCRM
 
 __all__ = [
@@ -20,10 +20,10 @@ class Template(BaseCRM):
     def getfields(
             self,
             bitrix_id: int,
-            *,
             entity_type_id: int,
+            *,
             entity_id: Optional[int] = None,
-            values: Optional[JSONList] = None,
+            values: Optional[JSONDict] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get document template fields.
@@ -39,7 +39,7 @@ class Template(BaseCRM):
 
             entity_id: Identifier of the entity being used;
 
-            values: Array of additional values;
+            values: Object of additional values;
 
             timeout: Timeout in seconds.
 

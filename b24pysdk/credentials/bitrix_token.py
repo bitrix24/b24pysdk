@@ -602,7 +602,7 @@ class BitrixToken(AbstractBitrixToken):
 
         auth = oauth_event_data.auth
 
-        if auth.oauth_token is None:
+        if auth.is_system:
             raise ValueError("Event auth data does not contain OAuth token")
 
         return cls.from_oauth(oauth=auth, bitrix_app=bitrix_app)
@@ -687,7 +687,7 @@ class BitrixTokenLocal(AbstractBitrixTokenLocal):
 
         auth = oauth_event_data.auth
 
-        if auth.oauth_token is None:
+        if auth.is_system:
             raise ValueError("Event auth data does not contain OAuth token")
 
         return cls.from_oauth(oauth=auth, bitrix_app=bitrix_app)
@@ -702,7 +702,7 @@ class BitrixTokenLocal(AbstractBitrixTokenLocal):
         return cls.from_oauth(oauth=oauth_workflow_data.auth, bitrix_app=bitrix_app)
 
 
-class BitrixWebhook(BitrixToken):
+class BitrixWebhook(AbstractBitrixToken):
     """Token wrapper for webhook auth tokens."""
 
     __AUTH_TOKEN_PARTS_COUNT: Final[int] = 2
@@ -720,7 +720,8 @@ class BitrixWebhook(BitrixToken):
             domain: Portal domain, for example ``example.bitrix24.com``.
             webhook_token: Webhook token in ``user_id/webhook_key`` format.
         """
-        super().__init__(domain=domain, auth_token=self._normalize_token(webhook_token))
+        self.auth_token = self._normalize_token(webhook_token)
+        self.domain = domain
 
     @classmethod
     def _normalize_token(cls, webhook_token: Text) -> Text:

@@ -49,6 +49,7 @@ class Currency(BaseCRM):
         """
         return self._fields(timeout=timeout)
 
+    @type_checker
     def add(
             self,
             fields: JSONDict,

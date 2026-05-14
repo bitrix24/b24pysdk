@@ -2,67 +2,62 @@
 
 from functools import wraps
 from http import HTTPStatus
-from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, TypeVar, Union, cast, overload
+from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, Union, overload
 
 from flask import g
 
 from ...._config import Config
-from ....credentials import BitrixToken, OAuthEventData
+from ....credentials import OAuthEventData
 from ....errors import BitrixAPIError, BitrixSDKException, BitrixValidationError
-from ._utils import _make_json_response
+from ....utils.types import JSONDict
+from ..dependencies import get_request_params
+from ._utils import make_json_response
 from .collect_request_params import collect_request_params
 
 if TYPE_CHECKING:
     from ....credentials import AbstractBitrixApp
-    from ..types import CollectedParamsRequest, EventAppInfoRequest, EventRequest
 
 __all__ = [
     "event_required",
-    "validate_event_app_info_request",
-    "validate_event_request",
+    "validate_event_params",
 ]
 
 _FT = TypeVar("_FT", bound=Callable[..., Any])
 
 
-def validate_event_request(request: "CollectedParamsRequest") -> "EventRequest":
-    """Parse Bitrix24 event payload from ``request.params``."""
-    request.oauth_event_data = OAuthEventData.from_dict(request.params)
-    return cast("EventRequest", request)
-
-
-def validate_event_app_info_request(
-    request: "EventRequest",
+def validate_event_params(
+    params: JSONDict,
     *,
-    bitrix_app: "AbstractBitrixApp",
-) -> "EventAppInfoRequest":
-    """Resolve Bitrix24 ``app.info`` and validate event auth payload."""
+    bitrix_app: Optional["AbstractBitrixApp"] = None,
+) -> OAuthEventData:
+    """Parse Bitrix24 event payload from collected params and optionally validate it."""
 
-    if request.oauth_event_data.auth.oauth_token is None:
-        raise BitrixValidationError("System event auth data cannot be validated via app.info without external installation context")
+    oauth_event_data = OAuthEventData.from_dict(params)
 
-    try:
-        bitrix_token = BitrixToken.from_oauth_event_data(
-            oauth_event_data=request.oauth_event_data,
-            bitrix_app=bitrix_app,
-        )
-        app_info = bitrix_token.get_app_info().result
-    except BitrixAPIError as error:
-        raise BitrixValidationError(error.message) from error
+    if bitrix_app is not None:
+        if oauth_event_data.is_system:
+            raise BitrixValidationError(
+                "System event cannot be validated via app.info",
+            )
 
-    if not (
-        request.oauth_event_data.validate_against_app_info(app_info)
-        and app_info.client_id == bitrix_app.client_id
-    ):
-        raise BitrixValidationError("Invalid event auth data")
+        try:
+            app_info = oauth_event_data.get_app_info(bitrix_app)
+        except BitrixAPIError as error:
+            raise BitrixValidationError(error.message) from error
 
-    request.app_info = app_info
+        if not (oauth_event_data.validate_against_app_info(app_info) and app_info.client_id == bitrix_app.client_id):
+            raise BitrixValidationError("Invalid event auth data")
 
-    return cast("EventAppInfoRequest", request)
+    return oauth_event_data
 
 
 @overload
-def event_required(handler_func: _FT, /) -> _FT: ...
+def event_required(
+    handler_func: _FT,
+    /,
+    *,
+    bitrix_app: Optional["AbstractBitrixApp"] = None,
+) -> _FT: ...
 
 
 @overload
@@ -70,18 +65,7 @@ def event_required(
     handler_func: None = None,
     /,
     *,
-    require_app_validation: Literal[False] = False,
-    bitrix_app: None = None,
-) -> Callable[[_FT], _FT]: ...
-
-
-@overload
-def event_required(
-    handler_func: None = None,
-    /,
-    *,
-    require_app_validation: Literal[True],
-    bitrix_app: "AbstractBitrixApp",
+    bitrix_app: Optional["AbstractBitrixApp"] = None,
 ) -> Callable[[_FT], _FT]: ...
 
 
@@ -89,7 +73,6 @@ def event_required(
     handler_func: Optional[_FT] = None,
     /,
     *,
-    require_app_validation: bool = False,
     bitrix_app: Optional["AbstractBitrixApp"] = None,
 ) -> Union[_FT, Callable[[_FT], _FT]]:
     """
@@ -100,19 +83,12 @@ def event_required(
     - any other exception -> ``500 Internal Server Error``
     """
 
-    if require_app_validation and bitrix_app is None:
-        raise ValueError("'bitrix_app' is required when 'require_app_validation' is True")
-
     def decorator(func: _FT) -> _FT:
         @wraps(func)
         @collect_request_params
         def wrapper(*args: Any, **kwargs: Any):
-            request = g.b24_request
             try:
-                request = validate_event_request(request)
-
-                if require_app_validation:
-                    request = validate_event_app_info_request(request, bitrix_app=bitrix_app)
+                g.oauth_event_data = validate_event_params(get_request_params(), bitrix_app=bitrix_app)
 
             except BitrixValidationError as error:
                 Config().logger.info(
@@ -121,7 +97,7 @@ def event_required(
                         "error": error.message,
                     },
                 )
-                return _make_json_response({"error": error.message}, HTTPStatus.UNAUTHORIZED)
+                return make_json_response({"error": error.message}, HTTPStatus.UNAUTHORIZED)
 
             except BitrixSDKException as error:
                 Config().logger.warning(
@@ -130,16 +106,16 @@ def event_required(
                         "error": error.message,
                     },
                 )
-                return _make_json_response({"error": "Internal server error"}, HTTPStatus.INTERNAL_SERVER_ERROR)
+                return make_json_response({"error": "Internal server error"}, HTTPStatus.INTERNAL_SERVER_ERROR)
 
             except Exception as error:  # noqa: BLE001
                 Config().logger.error(
                     "Unexpected error during Bitrix24 event request processing",
                     context={
-                        "error": repr(error),
+                        "error": str(error),
                     },
                 )
-                return _make_json_response({"error": "Internal server error"}, HTTPStatus.INTERNAL_SERVER_ERROR)
+                return make_json_response({"error": "Internal server error"}, HTTPStatus.INTERNAL_SERVER_ERROR)
 
             return func(*args, **kwargs)
 

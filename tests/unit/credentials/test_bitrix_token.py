@@ -10,7 +10,7 @@ pytestmark = [
     pytest.mark.bitrix_token,
 ]
 
-_DOMAIN = "test.bitrix24.com"
+_DOMAIN = "test.bitrix24.ru"
 _AUTH_TOKEN = "access_token_123"  # noqa: S105
 _REFRESH_TOKEN = "refresh_token_123"  # noqa: S105
 _CODE = "oauth_code_123"

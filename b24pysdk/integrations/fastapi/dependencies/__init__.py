@@ -1,11 +1,14 @@
 from .collect_request_params import collect_request_params
-from .event_required import event_required
-from .placement_required import placement_required
-from .workflow_required import workflow_required
+from .event_dependency import event_dependency, get_event_dependency
+from .placement_dependency import get_placement_dependency, placement_dependency
+from .workflow_dependency import get_workflow_dependency, workflow_dependency
 
 __all__ = [
     "collect_request_params",
-    "event_required",
-    "placement_required",
-    "workflow_required",
+    "event_dependency",
+    "get_event_dependency",
+    "get_placement_dependency",
+    "get_workflow_dependency",
+    "placement_dependency",
+    "workflow_dependency",
 ]

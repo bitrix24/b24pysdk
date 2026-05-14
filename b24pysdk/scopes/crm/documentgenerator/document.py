@@ -21,6 +21,7 @@ class Document(BaseCRM):
             self,
             bitrix_id: int,
             *,
+            values: Optional[JSONDict] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get document fields.
@@ -32,6 +33,8 @@ class Document(BaseCRM):
         Args:
             bitrix_id: Document identifier;
 
+            values: Temporary override values used to recalculate document fields without saving them;
+
             timeout: Timeout in seconds.
 
         Returns:
@@ -42,6 +45,9 @@ class Document(BaseCRM):
             "id": bitrix_id,
         }
 
+        if values is not None:
+            params["values"] = values
+
         return self._make_bitrix_api_request(
             api_wrapper=self.getfields,
             params=params,
@@ -51,12 +57,13 @@ class Document(BaseCRM):
     @type_checker
     def add(
             self,
-            *,
             template_id: int,
             entity_type_id: int,
             entity_id: int,
-            values: JSONDict,
-            stamps_enabled: bool,
+            *,
+            values: Optional[JSONDict] = None,
+            stamps_enabled: Optional[int] = None,
+            fields: Optional[JSONDict] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Create a new document.
@@ -74,7 +81,9 @@ class Document(BaseCRM):
 
             values: Additional field values;
 
-            stamps_enabled: Stamps and signatures, where True - enable, False - disable;
+            stamps_enabled: Stamps and signatures flag, where 1 - enable, 0 - disable;
+
+            fields: Additional field descriptors for document generation;
 
             timeout: Timeout in seconds.
 
@@ -86,9 +95,16 @@ class Document(BaseCRM):
             "templateId": template_id,
             "entityTypeId": entity_type_id,
             "entityId": entity_id,
-            "values": values,
-            "stampsEnabled": stamps_enabled,
         }
+
+        if values is not None:
+            params["values"] = values
+
+        if stamps_enabled is not None:
+            params["stampsEnabled"] = int(stamps_enabled)
+
+        if fields is not None:
+            params["fields"] = fields
 
         return self._make_bitrix_api_request(
             api_wrapper=self.add,
@@ -184,8 +200,8 @@ class Document(BaseCRM):
             self,
             bitrix_id: int,
             *,
-            values: JSONDict,
-            stamps_enabled: bool,
+            values: Optional[JSONDict] = None,
+            stamps_enabled: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update document.
@@ -197,9 +213,9 @@ class Document(BaseCRM):
         Args:
             bitrix_id: Document identifier;
 
-            values: Array of new field values for the document;
+            values: Object of new field values for the document;
 
-            stamps_enabled: Stamps and signatures, where True - enable, False - disable;
+            stamps_enabled: Stamps and signatures flag, where 1 - enable, 0 - disable;
 
             timeout: Timeout in seconds.
 
@@ -209,9 +225,13 @@ class Document(BaseCRM):
 
         params = {
             "id": bitrix_id,
-            "values": values,
-            "stampsEnabled": stamps_enabled,
         }
+
+        if values is not None:
+            params["values"] = values
+
+        if stamps_enabled is not None:
+            params["stampsEnabled"] = int(stamps_enabled)
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,
@@ -247,7 +267,7 @@ class Document(BaseCRM):
             self,
             bitrix_id: int,
             *,
-            status: bool,
+            status: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Enable and disable public link for document.
@@ -259,7 +279,7 @@ class Document(BaseCRM):
         Args:
             bitrix_id: Document identifier;
 
-            status: Status of the public link for the document, where True - enable, False - disable;
+            status: Status of the public link for the document, where 1 - enable, 0 - disable;
 
             timeout: Timeout in seconds.
 
@@ -269,8 +289,10 @@ class Document(BaseCRM):
 
         params = {
             "id": bitrix_id,
-            "status": status,
         }
+
+        if status is not None:
+            params["status"] = int(status)
 
         return self._make_bitrix_api_request(
             api_wrapper=self.enablepublicurl,
@@ -281,15 +303,8 @@ class Document(BaseCRM):
     @type_checker
     def upload(
             self,
+            fields: JSONDict,
             *,
-            file_content: Text,
-            region: Text,
-            entity_type_id: int,
-            entity_id: int,
-            title: Text,
-            number: int,
-            pdf_content: Optional[Text] = None,
-            image_content: Optional[Text] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Upload and attach the generated document.
@@ -299,21 +314,8 @@ class Document(BaseCRM):
         The method uploads a generated document and attaches it to the specified entity.
 
         Args:
-            file_content: Content of the docx file in base64;
-
-            region: Country;
-
-            entity_type_id: Identifier of the CRM entity type;
-
-            entity_id: Identifier of the CRM entity;
-
-            title: Document title;
-
-            number: Document number;
-
-            pdf_content: Content of the pdf file in base64;
-
-            image_content: Content of the image in base64;
+            fields: Object with upload parameters, including entityTypeId, entityId, fileContent, region,
+                title, number, and optional pdfContent/imageContent;
 
             timeout: Timeout in seconds.
 
@@ -322,19 +324,8 @@ class Document(BaseCRM):
         """
 
         params = {
-            "fileContent": file_content,
-            "region": region,
-            "entityTypeId": entity_type_id,
-            "entityId": entity_id,
-            "title": title,
-            "number": number,
+            "fields": fields,
         }
-
-        if pdf_content is not None:
-            params["pdfContent"] = pdf_content
-
-        if image_content is not None:
-            params["imageContent"] = image_content
 
         return self._make_bitrix_api_request(
             api_wrapper=self.upload,

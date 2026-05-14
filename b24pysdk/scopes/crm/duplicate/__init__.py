@@ -24,11 +24,11 @@ class Duplicate(BaseCRM):
         return VolatileType(self)
 
     @type_checker
-    def find_by_comm(
+    def findbycomm(
             self,
-            *,
             type: Annotated[Text, Literal["EMAIL", "PHONE"]],
             values: Iterable[Text],
+            *,
             entity_type: Optional[Annotated[Text, Literal["LEAD", "CONTACT", "COMPANY"]]] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
@@ -74,7 +74,7 @@ class Duplicate(BaseCRM):
             params["entity_type"] = entity_type
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.find_by_comm,
+            api_wrapper=self.findbycomm,
             params=params,
             timeout=timeout,
         )

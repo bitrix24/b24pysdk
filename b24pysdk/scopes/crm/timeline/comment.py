@@ -100,9 +100,9 @@ class Comment(BaseCRM):
     @type_checker
     def list(
             self,
+            filter: JSONDict,
             *,
             select: Optional[Iterable[Text]] = None,
-            filter: Optional[JSONDict] = None,
             order: Optional[JSONDict] = None,
             start: Optional[int] = None,
             timeout: Timeout = None,
@@ -150,8 +150,8 @@ class Comment(BaseCRM):
             Instance of BitrixAPIRequest
         """
         return self._list(
-            select=select,
             filter=filter,
+            select=select,
             order=order,
             start=start,
             timeout=timeout,
@@ -163,8 +163,8 @@ class Comment(BaseCRM):
             bitrix_id: int,
             fields: JSONDict,
             *,
-            entity_type_id: int,
-            entity_id: int,
+            entity_type_id: Optional[int] = None,
+            entity_id: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update comment.
@@ -187,9 +187,9 @@ class Comment(BaseCRM):
                         ]
                 };
 
-            entity_type_id: Integer identifier of the CRM entity type to which the comment is attached;
+            entity_type_id: Optional CRM entity type identifier to narrow the comment binding context;
 
-            entity_id: Integer identifier of the CRM entity to which the comment is attached;
+            entity_id: Optional CRM entity identifier to narrow the comment binding context;
 
             timeout: Timeout in seconds.
 
@@ -200,9 +200,13 @@ class Comment(BaseCRM):
         params = {
             "id": bitrix_id,
             "fields": fields,
-            "entityTypeId": entity_type_id,
-            "entityId": entity_id,
         }
+
+        if entity_type_id is not None:
+            params["entityTypeId"] = entity_type_id
+
+        if entity_id is not None:
+            params["entityId"] = entity_id
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,
@@ -215,8 +219,8 @@ class Comment(BaseCRM):
             self,
             bitrix_id: int,
             *,
-            entity_type_id: int,
-            entity_id: int,
+            entity_type_id: Optional[int] = None,
+            entity_id: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Delete comment.
@@ -228,9 +232,9 @@ class Comment(BaseCRM):
         Args:
             bitrix_id: Integer identifier of the deal of type Comment;
 
-            entity_type_id: Integer identifier of the CRM entity type to which the comment is attached;
+            entity_type_id: Optional CRM entity type identifier to narrow the comment binding context;
 
-            entity_id: Integer identifier of the CRM entity to which the comment is attached;
+            entity_id: Optional CRM entity identifier to narrow the comment binding context;
 
             timeout: Timeout in seconds.
 
@@ -240,9 +244,13 @@ class Comment(BaseCRM):
 
         params = {
             "id": bitrix_id,
-            "entityTypeId": entity_type_id,
-            "entityId": entity_id,
         }
+
+        if entity_type_id is not None:
+            params["entityTypeId"] = entity_type_id
+
+        if entity_id is not None:
+            params["entityId"] = entity_id
 
         return self._make_bitrix_api_request(
             api_wrapper=self.delete,

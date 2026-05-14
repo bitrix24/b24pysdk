@@ -1,4 +1,4 @@
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, List, Mapping, Optional, Text
 
@@ -12,6 +12,7 @@ from .auth import WorkflowOAuth
 
 if TYPE_CHECKING:
     from ..api.responses import B24AppInfoResult
+    from .bitrix_app import AbstractBitrixApp
 
 __all__ = [
     "OAuthWorkflowData",
@@ -40,6 +41,9 @@ class OAuthWorkflowData:
     ts: datetime
     auth: WorkflowOAuth
     properties: Optional[JSONDict] = None
+
+    if TYPE_CHECKING:
+        _app_info: "B24AppInfoResult" = field(init=False)
 
     @classmethod
     def from_dict(cls, workflow_data: Mapping[Text, Any]) -> "OAuthWorkflowData":
@@ -76,9 +80,9 @@ class OAuthWorkflowData:
         except Exception as error:
             raise cls.ValidationError(f"Invalid workflow data: {error}") from error
 
-    def to_dict(self) -> JSONDict:
+    def get_app_info(self, bitrix_app: "AbstractBitrixApp") -> "B24AppInfoResult":
         """"""
-        return asdict(self)
+        return self.auth.get_app_info(bitrix_app)
 
     def validate_against_app_info(self, app_info: "B24AppInfoResult") -> bool:
         """"""
@@ -86,3 +90,7 @@ class OAuthWorkflowData:
             return self.auth.validate_against_app_info(app_info)
         except self.auth.ValidationError as error:
             raise self.ValidationError("Invalid oauth workflow data") from error
+
+    def to_dict(self) -> JSONDict:
+        """"""
+        return asdict(self)

@@ -2,67 +2,57 @@
 
 from functools import wraps
 from http import HTTPStatus
-from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, TypeVar, Union, cast, overload
+from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, Union, overload
 
 from flask import g
 
 from ...._config import Config
-from ....credentials import BitrixToken, OAuthWorkflowData
+from ....credentials import OAuthWorkflowData
 from ....errors import BitrixAPIError, BitrixSDKException, BitrixValidationError
-from ._utils import _make_json_response
+from ....utils.types import JSONDict
+from ..dependencies import get_request_params
+from ._utils import make_json_response
 from .collect_request_params import collect_request_params
 
 if TYPE_CHECKING:
     from ....credentials import AbstractBitrixApp
-    from ..types import CollectedParamsRequest, WorkflowAppInfoRequest, WorkflowRequest
 
 __all__ = [
-    "validate_app_info_workflow_data_request",
-    "validate_workflow_data_request",
+    "validate_workflow_params",
     "workflow_required",
 ]
 
 _FT = TypeVar("_FT", bound=Callable[..., Any])
 
 
-def validate_workflow_data_request(request: "CollectedParamsRequest") -> "WorkflowRequest":
-    """Parse Bitrix24 workflow payload from ``request.params``."""
-    request.oauth_workflow_data = OAuthWorkflowData.from_dict(request.params)
-    return cast("WorkflowRequest", request)
-
-
-def validate_app_info_workflow_data_request(
-    request: "WorkflowRequest",
+def validate_workflow_params(
+    params: JSONDict,
     *,
-    bitrix_app: "AbstractBitrixApp",
-) -> "WorkflowAppInfoRequest":
-    """Resolve Bitrix24 ``app.info`` and validate workflow robot auth payload."""
+    bitrix_app: Optional["AbstractBitrixApp"] = None,
+) -> OAuthWorkflowData:
+    """Parse Bitrix24 workflow payload from collected params and optionally validate it."""
 
-    if request.oauth_workflow_data.auth.oauth_token is None:
-        raise BitrixValidationError("Workflow auth data does not contain OAuth token")
+    oauth_workflow_data = OAuthWorkflowData.from_dict(params)
 
-    try:
-        bitrix_token = BitrixToken.from_oauth_workflow_data(
-            oauth_workflow_data=request.oauth_workflow_data,
-            bitrix_app=bitrix_app,
-        )
-        app_info = bitrix_token.get_app_info().result
-    except BitrixAPIError as error:
-        raise BitrixValidationError(error.message) from error
+    if bitrix_app is not None:
+        try:
+            app_info = oauth_workflow_data.get_app_info(bitrix_app)
+        except BitrixAPIError as error:
+            raise BitrixValidationError(error.message) from error
 
-    if not (
-        request.oauth_workflow_data.validate_against_app_info(app_info)
-        and app_info.client_id == bitrix_app.client_id
-    ):
-        raise BitrixValidationError("Invalid workflow auth data")
+        if not (oauth_workflow_data.validate_against_app_info(app_info) and app_info.client_id == bitrix_app.client_id):
+            raise BitrixValidationError("Invalid workflow auth data")
 
-    request.app_info = app_info
-
-    return cast("WorkflowAppInfoRequest", request)
+    return oauth_workflow_data
 
 
 @overload
-def workflow_required(handler_func: _FT, /) -> _FT: ...
+def workflow_required(
+    handler_func: _FT,
+    /,
+    *,
+    bitrix_app: Optional["AbstractBitrixApp"] = None,
+) -> _FT: ...
 
 
 @overload
@@ -70,18 +60,7 @@ def workflow_required(
     handler_func: None = None,
     /,
     *,
-    require_app_validation: Literal[False] = False,
-    bitrix_app: None = None,
-) -> Callable[[_FT], _FT]: ...
-
-
-@overload
-def workflow_required(
-    handler_func: None = None,
-    /,
-    *,
-    require_app_validation: Literal[True],
-    bitrix_app: "AbstractBitrixApp",
+    bitrix_app: Optional["AbstractBitrixApp"] = None,
 ) -> Callable[[_FT], _FT]: ...
 
 
@@ -89,7 +68,6 @@ def workflow_required(
     handler_func: Optional[_FT] = None,
     /,
     *,
-    require_app_validation: bool = False,
     bitrix_app: Optional["AbstractBitrixApp"] = None,
 ) -> Union[_FT, Callable[[_FT], _FT]]:
     """
@@ -100,19 +78,12 @@ def workflow_required(
     - any other exception -> ``500 Internal Server Error``
     """
 
-    if require_app_validation and bitrix_app is None:
-        raise ValueError("'bitrix_app' is required when 'require_app_validation' is True")
-
     def decorator(func: _FT) -> _FT:
         @wraps(func)
         @collect_request_params
         def wrapper(*args: Any, **kwargs: Any):
-            request = g.b24_request
             try:
-                request = validate_workflow_data_request(request)
-
-                if require_app_validation:
-                    request = validate_app_info_workflow_data_request(request, bitrix_app=bitrix_app)
+                g.oauth_workflow_data = validate_workflow_params(get_request_params(), bitrix_app=bitrix_app)
 
             except BitrixValidationError as error:
                 Config().logger.info(
@@ -121,7 +92,7 @@ def workflow_required(
                         "error": error.message,
                     },
                 )
-                return _make_json_response({"error": error.message}, HTTPStatus.UNAUTHORIZED)
+                return make_json_response({"error": error.message}, HTTPStatus.UNAUTHORIZED)
 
             except BitrixSDKException as error:
                 Config().logger.warning(
@@ -130,16 +101,16 @@ def workflow_required(
                         "error": error.message,
                     },
                 )
-                return _make_json_response({"error": "Internal server error"}, HTTPStatus.INTERNAL_SERVER_ERROR)
+                return make_json_response({"error": "Internal server error"}, HTTPStatus.INTERNAL_SERVER_ERROR)
 
             except Exception as error:  # noqa: BLE001
                 Config().logger.error(
                     "Unexpected error during Bitrix24 workflow request processing",
                     context={
-                        "error": repr(error),
+                        "error": str(error),
                     },
                 )
-                return _make_json_response({"error": "Internal server error"}, HTTPStatus.INTERNAL_SERVER_ERROR)
+                return make_json_response({"error": "Internal server error"}, HTTPStatus.INTERNAL_SERVER_ERROR)
 
             return func(*args, **kwargs)
 

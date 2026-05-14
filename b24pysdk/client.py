@@ -102,6 +102,7 @@ class BaseClient(ABC):
         "user",
         "userconsent",
         "userfieldconfig",
+        "userfieldtype",
         "vote",
         "voximplant",
     )
@@ -150,6 +151,7 @@ class BaseClient(ABC):
     timeman: scopes.Timeman
     user: scopes.User
     userfieldconfig: scopes.Userfieldconfig
+    userfieldtype: scopes.Userfieldtype
     userconsent: scopes.Userconsent
     vote: scopes.Vote
     voximplant: scopes.Voximplant
@@ -232,6 +234,7 @@ class BaseClient(ABC):
         self.timeman = scopes.Timeman(self)
         self.user = scopes.User(self)
         self.userfieldconfig = scopes.Userfieldconfig(self)
+        self.userfieldtype = scopes.Userfieldtype(self)
         self.userconsent = scopes.Userconsent(self)
         self.vote = scopes.Vote(self)
         self.voximplant = scopes.Voximplant(self)

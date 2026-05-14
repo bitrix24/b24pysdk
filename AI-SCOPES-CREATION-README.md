@@ -185,7 +185,7 @@ class Workgroup(BaseEntity):
 
 ### 6. How to Add Public Wrapper Methods
 
-- **Naming:** Method names in Python must mirror the Bitrix24 REST method names. When the remote endpoint uses camelCase, define the wrapper in snake_case; the framework will convert it back to camelCase. Leading or trailing underscores are permissible when needed to avoid keyword collisions (for example, `_fields`, `import_`).
+- **Naming:** Method names in Python must mirror the Bitrix24 REST method names. When the remote endpoint uses camelCase, define the wrapper in snake_case; the framework will convert it back to camelCase. If the REST suffix is already a single lowercase token without camelCase boundaries (for example, `findbycomm`, `getexternallink`), keep the public wrapper name exactly as in REST and do not insert synthetic underscores or private alias helpers only to reconstruct the method name. Leading or trailing underscores are permissible when needed to avoid keyword collisions (for example, `_fields`, `import_`).
 - **Signature:** Parameters documented at the top level in Bitrix24 REST documentation must be expressed in snake_case. Always include `timeout: Timeout = None`. For parameters described as arrays, annotate them with `Iterable` (or a concrete subtype) and convert them to `list` internally if necessary. Example:
 
 ```python

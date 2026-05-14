@@ -73,7 +73,7 @@ class Preset(BaseDetail):
             self,
             bitrix_id: int,
             *,
-            timeout: Optional[int] = None,
+            timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get entity by ID.
 
@@ -183,7 +183,7 @@ class Preset(BaseDetail):
     @type_checker
     def delete(
             self,
-            bitrix_id,
+            bitrix_id: int,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
