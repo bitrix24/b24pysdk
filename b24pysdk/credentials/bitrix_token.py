@@ -253,7 +253,7 @@ class AbstractBitrixToken:
         """"""
 
         try:
-            if self.has_expired:
+            if not self.is_webhook and self.has_expired:
                 self.__expired_token_handler()
 
             return func()
@@ -722,6 +722,10 @@ class BitrixWebhook(AbstractBitrixToken):
         """
         self.auth_token = self._normalize_token(webhook_token)
         self.domain = domain
+        self.refresh_token = None
+        self.expires = None
+        self.expires_in = None
+        self.bitrix_app = None
 
     @classmethod
     def _normalize_token(cls, webhook_token: Text) -> Text:
