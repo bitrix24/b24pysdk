@@ -116,6 +116,15 @@ jobs:
               - 'b24pysdk/scopes/server.py'
               - 'tests/integration/scopes/test_server.py'
 
+      # Always run a minimal webhook smoke test to catch core token/request regressions.
+      - name: Run scope profile tests in Docker
+        run: |
+          docker run --rm \
+            -e B24_DOMAIN=$B24_DOMAIN \
+            -e B24_WEBHOOK=$B24_WEBHOOK \
+            b24pysdk-ci \
+            pytest -m "profile"
+
       - name: Run scope crm_address tests in Docker
         if: ${{ steps.filter.outputs.scope_crm_address == 'true' }}
         run: |
@@ -232,14 +241,6 @@ jobs:
             -e B24_WEBHOOK=$B24_WEBHOOK \
             b24pysdk-ci \
             pytest -m "placement"
-
-      - name: Run scope profile tests in Docker
-        run: |
-          docker run --rm \
-            -e B24_DOMAIN=$B24_DOMAIN \
-            -e B24_WEBHOOK=$B24_WEBHOOK \
-            b24pysdk-ci \
-            pytest -m "profile"
 
       - name: Run scope scope tests in Docker
         if: ${{ steps.filter.outputs.scope_scope == 'true' }}

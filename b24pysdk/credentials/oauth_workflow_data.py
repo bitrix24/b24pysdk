@@ -26,10 +26,10 @@ if PYTHON_VERSION >= (3, 10):
 
 @dataclass(**_DATACLASS_KWARGS)
 class OAuthWorkflowData:
-    """"""
+    """Bitrix24 workflow robot callback payload with parsed auth data."""
 
     class ValidationError(BitrixValidationError):
-        """"""
+        """Raised when workflow callback payload validation fails."""
 
     workflow_id: Text
     code: Text
@@ -47,6 +47,17 @@ class OAuthWorkflowData:
 
     @classmethod
     def from_dict(cls, workflow_data: Mapping[Text, Any]) -> "OAuthWorkflowData":
+        """
+        Create a workflow payload model from raw Bitrix24 request parameters.
+
+        Args:
+            workflow_data: Raw workflow robot callback parameters. Flattened
+                keys such as ``auth[member_id]`` are accepted and normalized
+                internally.
+
+        Returns:
+            Parsed workflow robot payload.
+        """
         try:
             parsed_workflow_data = parse_flattened_keys(workflow_data)
 
@@ -81,16 +92,32 @@ class OAuthWorkflowData:
             raise cls.ValidationError(f"Invalid workflow data: {error}") from error
 
     def get_app_info(self, bitrix_app: "AbstractBitrixApp") -> "B24AppInfoResult":
-        """"""
+        """
+        Resolve Bitrix24 ``app.info`` through the workflow auth payload.
+
+        Args:
+            bitrix_app: SDK application object used to call ``app.info``.
+                Required when integrations validate that the workflow callback
+                belongs to the expected application.
+
+        Returns:
+            Bitrix24 application installation information.
+        """
         return self.auth.get_app_info(bitrix_app)
 
     def validate_against_app_info(self, app_info: "B24AppInfoResult") -> bool:
-        """"""
+        """
+        Validate workflow auth data against Bitrix24 ``app.info`` result.
+
+        Args:
+            app_info: Application installation information returned by
+                ``app.info``.
+        """
         try:
             return self.auth.validate_against_app_info(app_info)
         except self.auth.ValidationError as error:
             raise self.ValidationError("Invalid oauth workflow data") from error
 
     def to_dict(self) -> JSONDict:
-        """"""
+        """Convert the workflow payload to a dictionary."""
         return asdict(self)

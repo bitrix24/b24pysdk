@@ -30,7 +30,20 @@ def validate_event_params(
     *,
     bitrix_app: Optional["AbstractBitrixApp"] = None,
 ) -> OAuthEventData:
-    """Parse Bitrix24 event payload from collected params and optionally validate it."""
+    """
+    Parse Bitrix24 event payload from collected params.
+
+    Args:
+        params: Request parameters stored in ``flask.g`` by
+            ``collect_request_params``.
+        bitrix_app: Optional SDK application object. When passed, the helper
+            calls Bitrix24 ``app.info`` with event OAuth data and validates
+            that the callback belongs to this application. System events cannot
+            be validated this way because they do not contain a user OAuth token.
+
+    Returns:
+        Parsed event callback payload.
+    """
 
     oauth_event_data = OAuthEventData.from_dict(params)
 
@@ -77,6 +90,14 @@ def event_required(
 ) -> Union[_FT, Callable[[_FT], _FT]]:
     """
     Decorate a Flask view that receives Bitrix24 event callbacks.
+
+    Args:
+        handler_func: Flask route handler. The decorator supports both
+            ``@event_required`` and ``@event_required(...)`` forms.
+        bitrix_app: Optional SDK application object. Pass it when event
+            callbacks must be validated through Bitrix24 ``app.info``. If
+            omitted, the decorator only parses the payload and stores it in
+            ``flask.g.oauth_event_data``.
 
     Error handling:
     - ``BitrixValidationError`` -> ``401 Unauthorized``

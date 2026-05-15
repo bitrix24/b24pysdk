@@ -26,7 +26,19 @@ def validate_event_params(
     *,
     bitrix_app: Optional["AbstractBitrixApp"] = None,
 ) -> OAuthEventData:
-    """Parse Bitrix24 event payload from normalized params and optionally validate it."""
+    """
+    Parse Bitrix24 event payload from normalized params.
+
+    Args:
+        params: Request parameters collected by ``collect_request_params``.
+        bitrix_app: Optional SDK application object. When passed, the helper
+            calls Bitrix24 ``app.info`` with event OAuth data and validates
+            that the callback belongs to this application. System events cannot
+            be validated this way because they do not contain a user OAuth token.
+
+    Returns:
+        Parsed event callback payload.
+    """
 
     oauth_event_data = OAuthEventData.from_dict(params)
 
@@ -54,7 +66,14 @@ def get_event_dependency(
     *,
     bitrix_app: Optional["AbstractBitrixApp"] = None,
 ) -> _EventDependency:
-    """Create a FastAPI dependency that resolves Bitrix24 event payload."""
+    """
+    Create a FastAPI dependency that resolves Bitrix24 event payload.
+
+    Args:
+        bitrix_app: Optional SDK application object. Pass it when the incoming
+            event callback must be validated through Bitrix24 ``app.info``.
+            If omitted, the dependency only parses and returns event data.
+    """
 
     async def _event_dependency(
             params: Annotated[JSONDict, Depends(collect_request_params)],

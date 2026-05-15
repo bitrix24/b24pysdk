@@ -25,10 +25,15 @@ if PYTHON_VERSION >= (3, 10):
 
 @dataclass(**_DATACLASS_KWARGS)
 class OAuthEventData:
-    """"""
+    """
+    Bitrix24 event callback payload with parsed auth data.
+
+    The model accepts both user-context events with OAuth token data and system
+    events where OAuth token fields are absent.
+    """
 
     class ValidationError(BitrixValidationError):
-        """"""
+        """Raised when event callback payload validation fails."""
 
     event: Text
     event_handler_id: int
@@ -41,6 +46,16 @@ class OAuthEventData:
 
     @classmethod
     def from_dict(cls, payload: Mapping[Text, Any], /) -> "OAuthEventData":
+        """
+        Create an event payload model from raw Bitrix24 request parameters.
+
+        Args:
+            payload: Raw event callback parameters. Flattened keys such as
+                ``auth[member_id]`` are accepted and normalized internally.
+
+        Returns:
+            Parsed event callback payload.
+        """
         try:
             parsed_payload = parse_flattened_keys(payload)
 
@@ -66,20 +81,36 @@ class OAuthEventData:
 
     @property
     def is_system(self) -> bool:
-        """"""
+        """Whether the event has no user OAuth token and cannot call ``app.info``."""
         return self.auth.is_system
 
     def get_app_info(self, bitrix_app: "AbstractBitrixApp") -> "B24AppInfoResult":
-        """"""
+        """
+        Resolve Bitrix24 ``app.info`` through the event auth payload.
+
+        Args:
+            bitrix_app: SDK application object used to call ``app.info``.
+                Required when integrations validate that the event belongs to
+                the expected application.
+
+        Returns:
+            Bitrix24 application installation information.
+        """
         return self.auth.get_app_info(bitrix_app)
 
     def validate_against_app_info(self, app_info: "B24AppInfoResult") -> bool:
-        """"""
+        """
+        Validate event auth data against Bitrix24 ``app.info`` result.
+
+        Args:
+            app_info: Application installation information returned by
+                ``app.info``.
+        """
         try:
             return self.auth.validate_against_app_info(app_info)
         except self.auth.ValidationError as error:
             raise self.ValidationError("Invalid oauth event data") from error
 
     def to_dict(self) -> JSONDict:
-        """"""
+        """Convert the event payload to a dictionary."""
         return asdict(self)

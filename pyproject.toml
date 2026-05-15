@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "b24pysdk"
-version = "1.1.0"
+version = "1.1.1"
 authors = [
     { name = "Bitrix24", email = "pypi@bitrixsoft.com" }
 ]
@@ -14,7 +14,7 @@ description = "An official Python library for the Bitrix24 REST API"
 license = { file = "LICENSE" }
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.9"
-keywords = ["bitrix24", "rest", "api"]
+keywords = ["Bitrix24", "REST", "API", "SDK"]
 classifiers = []
 
 dependencies = [
@@ -39,7 +39,7 @@ flask = [
 ]
 dev = [
     "pre-commit",
-    "ruff==0.15.12",
+    "ruff==0.15.13",
 ]
 test = [
     "environs>=11.0.0",

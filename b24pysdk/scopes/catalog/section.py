@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Section(BaseEntity):
-    """"""
+    """Handle sections in trade catalog
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/catalog/section/index.html
+    """
 
     @type_checker
     def add(
@@ -20,7 +23,20 @@ class Section(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add section in the catalog
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/section/catalog-section-add.html
+
+        The method adds a section to the catalog.
+
+        Args:
+            fields: Field values for creating a new catalog section;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "fields": fields,
@@ -39,7 +55,20 @@ class Section(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete catalog section
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/section/catalog-section-delete.html
+
+        The method removes a section from the catalog.
+
+        Args:
+            bitrix_id: Identifier of the catalog section;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -58,7 +87,20 @@ class Section(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get fields value
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/section/catalog-section-get.html
+
+        The method returns the field values of the trade catalog section by its identifier.
+
+        Args:
+            bitrix_id: Identifier of the catalog section;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -76,7 +118,18 @@ class Section(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get fields of the catalog section
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/section/catalog-section-get-fields.html
+
+        The method returns the available fields of the catalog section.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
         return self._make_bitrix_api_request(
             api_wrapper=self.get_fields,
             timeout=timeout,
@@ -92,7 +145,45 @@ class Section(BaseEntity):
             start: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of sections
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/section/catalog-section-list.html
+
+        The method returns a list of sections in the trade catalog
+
+        Args:
+            select: An array with the list of fields to select;
+
+             filter: Object format:
+                {
+                    "field_1": "value_1",
+
+                    ...,
+
+                    "field_N": "value_N",
+                }
+                where possible values for field correspond to the fields of the catalog section;
+
+            order: Object format:
+                {
+                    field_1: value_1,
+
+                    ...,
+                }
+
+                where
+
+                - field_n is the field name to sort by;
+
+                - value_n is 'asc' for ascending or 'desc' for descending;
+
+            start: Starting position for pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = dict()
 
@@ -125,7 +216,22 @@ class Section(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update the catalog section
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/section/catalog-section-update.html
+
+        The method modifies a section of the catalog.
+
+        Args:
+            bitrix_id: Identifier of the catalog section;
+
+            fields: Field values for updating a new catalog section;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

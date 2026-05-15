@@ -195,7 +195,18 @@ class OAuth(Auth):
             raise cls.ValidationError(f"Invalid OAuth payload: {error}") from error
 
     def get_app_info(self, bitrix_app: "AbstractBitrixApp") -> "B24AppInfoResult":
-        """"""
+        """
+        Resolve and cache Bitrix24 ``app.info`` for this OAuth payload.
+
+        Args:
+            bitrix_app: SDK application object with client credentials. It is
+                required because ``app.info`` is called through the application
+                OAuth endpoint using the access token from this payload.
+
+        Returns:
+            Bitrix24 application installation information used by integrations
+            to validate incoming event, workflow, and placement payloads.
+        """
 
         if not hasattr(self, "_app_info"):
             bitrix_token = BitrixToken.from_oauth(oauth=self, bitrix_app=bitrix_app)
@@ -324,7 +335,17 @@ class EventOAuth(OAuth):
         return not bool(self.oauth_token)
 
     def get_app_info(self, bitrix_app: "AbstractBitrixApp") -> "B24AppInfoResult":
-        """"""
+        """
+        Resolve ``app.info`` for a user-context event OAuth payload.
+
+        Args:
+            bitrix_app: SDK application object used to call Bitrix24
+                ``app.info``. System events cannot use this method because they
+                do not contain a user OAuth token.
+
+        Returns:
+            Bitrix24 application installation information.
+        """
 
         if self.is_system:
             raise ValueError("Cannot get app info for system event: OAuth token is missing")

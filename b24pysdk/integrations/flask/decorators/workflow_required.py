@@ -30,7 +30,19 @@ def validate_workflow_params(
     *,
     bitrix_app: Optional["AbstractBitrixApp"] = None,
 ) -> OAuthWorkflowData:
-    """Parse Bitrix24 workflow payload from collected params and optionally validate it."""
+    """
+    Parse Bitrix24 workflow robot payload from collected params.
+
+    Args:
+        params: Request parameters stored in ``flask.g`` by
+            ``collect_request_params``.
+        bitrix_app: Optional SDK application object. When passed, the helper
+            calls Bitrix24 ``app.info`` with workflow OAuth data and validates
+            that the robot callback belongs to this application.
+
+    Returns:
+        Parsed workflow robot payload.
+    """
 
     oauth_workflow_data = OAuthWorkflowData.from_dict(params)
 
@@ -72,6 +84,14 @@ def workflow_required(
 ) -> Union[_FT, Callable[[_FT], _FT]]:
     """
     Decorate a Flask view that receives Bitrix24 workflow robot callbacks.
+
+    Args:
+        handler_func: Flask route handler. The decorator supports both
+            ``@workflow_required`` and ``@workflow_required(...)`` forms.
+        bitrix_app: Optional SDK application object. Pass it when workflow
+            callbacks must be validated through Bitrix24 ``app.info``. If
+            omitted, the decorator only parses the payload and stores it in
+            ``flask.g.oauth_workflow_data``.
 
     Error handling:
     - ``BitrixValidationError`` -> ``401 Unauthorized``

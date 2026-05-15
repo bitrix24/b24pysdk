@@ -100,7 +100,18 @@ class OAuthPlacementData:
             raise cls.ValidationError(f"Invalid placement data: {error}") from error
 
     def get_app_info(self, bitrix_app: "AbstractBitrixApp") -> "B24AppInfoResult":
-        """"""
+        """
+        Resolve and cache Bitrix24 ``app.info`` for this placement launch.
+
+        Args:
+            bitrix_app: SDK application object with client credentials. It is
+                used together with the placement OAuth token to call
+                Bitrix24 ``app.info``.
+
+        Returns:
+            Bitrix24 application installation information used to validate that
+            the placement launch belongs to the expected application.
+        """
 
         if not hasattr(self, "_app_info"):
             bitrix_token = BitrixToken.from_oauth_placement_data(oauth_placement_data=self, bitrix_app=bitrix_app)

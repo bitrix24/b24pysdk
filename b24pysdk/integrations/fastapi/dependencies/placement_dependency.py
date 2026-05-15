@@ -40,7 +40,18 @@ def validate_placement_params(
     *,
     bitrix_app: Optional["AbstractBitrixApp"] = None,
 ) -> OAuthPlacementData:
-    """Parse Bitrix24 placement auth payload from normalized params and optionally validate it."""
+    """
+    Parse Bitrix24 placement auth payload from normalized params.
+
+    Args:
+        params: Request parameters collected by ``collect_request_params``.
+        bitrix_app: Optional SDK application object. When passed, the helper
+            calls Bitrix24 ``app.info`` with the placement OAuth token and
+            validates that the payload belongs to this application.
+
+    Returns:
+        Parsed placement payload.
+    """
 
     oauth_placement_data = OAuthPlacementData.from_dict(params)
 
@@ -63,7 +74,14 @@ def get_placement_dependency(
     *,
     bitrix_app: Optional["AbstractBitrixApp"] = None,
 ) -> _PlacementDependency:
-    """Create a FastAPI dependency that resolves Bitrix24 placement payload."""
+    """
+    Create a FastAPI dependency that resolves Bitrix24 placement payload.
+
+    Args:
+        bitrix_app: Optional SDK application object. Pass it when the incoming
+            placement launch must be validated through Bitrix24 ``app.info``.
+            If omitted, the dependency only parses and returns placement data.
+    """
 
     async def _placement_dependency(
             params: Annotated[JSONDict, Depends(collect_request_params)],

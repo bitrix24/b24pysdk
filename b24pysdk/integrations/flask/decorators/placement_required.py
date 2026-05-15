@@ -35,7 +35,19 @@ def validate_placement_params(
     *,
     bitrix_app: Optional["AbstractBitrixApp"] = None,
 ) -> OAuthPlacementData:
-    """Parse Bitrix24 placement payload from collected params and optionally validate it."""
+    """
+    Parse Bitrix24 placement payload from collected params.
+
+    Args:
+        params: Request parameters stored in ``flask.g`` by
+            ``collect_request_params``.
+        bitrix_app: Optional SDK application object. When passed, the helper
+            calls Bitrix24 ``app.info`` with the placement OAuth token and
+            validates that the payload belongs to this application.
+
+    Returns:
+        Parsed placement payload.
+    """
 
     oauth_placement_data = OAuthPlacementData.from_dict(params)
 
@@ -77,6 +89,14 @@ def placement_required(
 ) -> Union[_FT, Callable[[_FT], _FT]]:
     """
     Decorate a Flask view that receives Bitrix24 placement requests.
+
+    Args:
+        handler_func: Flask route handler. The decorator supports both
+            ``@placement_required`` and ``@placement_required(...)`` forms.
+        bitrix_app: Optional SDK application object. Pass it when placement
+            launches must be validated through Bitrix24 ``app.info``. If
+            omitted, the decorator only parses the payload and stores it in
+            ``flask.g.oauth_placement_data``.
 
     Error handling:
     - ``BitrixValidationError`` -> ``401 Unauthorized``

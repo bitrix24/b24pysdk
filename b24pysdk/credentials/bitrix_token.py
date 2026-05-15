@@ -564,7 +564,14 @@ class BitrixToken(AbstractBitrixToken):
             oauth_placement_data: "OAuthPlacementData",
             bitrix_app: "AbstractBitrixApp",
     ) -> "BitrixToken":
-        """"""
+        """
+        Create an OAuth token wrapper from placement launch data.
+
+        Args:
+            oauth_placement_data: Parsed Bitrix24 placement payload.
+            bitrix_app: SDK application object bound to the OAuth token. It is
+                required for token refresh and ``app.info`` validation.
+        """
         oauth_token = oauth_placement_data.oauth_token
         return cls(
             domain=oauth_placement_data.domain,
@@ -581,7 +588,14 @@ class BitrixToken(AbstractBitrixToken):
             oauth: "OAuth",
             bitrix_app: "AbstractBitrixApp",
     ) -> "BitrixToken":
-        """"""
+        """
+        Create an OAuth token wrapper from a parsed OAuth auth payload.
+
+        Args:
+            oauth: Parsed OAuth auth payload containing portal and token data.
+            bitrix_app: SDK application object bound to the OAuth token. It is
+                required for token refresh and ``app.info`` validation.
+        """
         oauth_token = oauth.oauth_token
         return cls(
             domain=oauth.portal_domain,
@@ -598,7 +612,14 @@ class BitrixToken(AbstractBitrixToken):
             oauth_event_data: "OAuthEventData",
             bitrix_app: "AbstractBitrixApp",
     ) -> "BitrixToken":
-        """"""
+        """
+        Create an OAuth token wrapper from event callback auth data.
+
+        Args:
+            oauth_event_data: Parsed Bitrix24 event callback payload.
+            bitrix_app: SDK application object bound to the OAuth token. It is
+                required for token refresh and ``app.info`` validation.
+        """
 
         auth = oauth_event_data.auth
 
@@ -613,7 +634,14 @@ class BitrixToken(AbstractBitrixToken):
             oauth_workflow_data: "OAuthWorkflowData",
             bitrix_app: "AbstractBitrixApp",
     ) -> "BitrixToken":
-        """"""
+        """
+        Create an OAuth token wrapper from workflow callback auth data.
+
+        Args:
+            oauth_workflow_data: Parsed Bitrix24 workflow robot payload.
+            bitrix_app: SDK application object bound to the OAuth token. It is
+                required for token refresh and ``app.info`` validation.
+        """
         return cls.from_oauth(oauth=oauth_workflow_data.auth, bitrix_app=bitrix_app)
 
 
@@ -651,7 +679,14 @@ class BitrixTokenLocal(AbstractBitrixTokenLocal):
             oauth_placement_data: "OAuthPlacementData",
             bitrix_app: "AbstractBitrixAppLocal",
     ) -> "BitrixTokenLocal":
-        """"""
+        """
+        Create a local-app OAuth token wrapper from placement launch data.
+
+        Args:
+            oauth_placement_data: Parsed Bitrix24 placement payload.
+            bitrix_app: Local SDK application object. It supplies the portal
+                domain and is required for token refresh and ``app.info`` validation.
+        """
         oauth_token = oauth_placement_data.oauth_token
         return cls(
             auth_token=oauth_token.access_token,
@@ -667,7 +702,14 @@ class BitrixTokenLocal(AbstractBitrixTokenLocal):
             oauth: "OAuth",
             bitrix_app: "AbstractBitrixAppLocal",
     ) -> "BitrixTokenLocal":
-        """"""
+        """
+        Create a local-app OAuth token wrapper from a parsed OAuth auth payload.
+
+        Args:
+            oauth: Parsed OAuth auth payload containing token data.
+            bitrix_app: Local SDK application object. It supplies the portal
+                domain and is required for token refresh and ``app.info`` validation.
+        """
         oauth_token = oauth.oauth_token
         return cls(
             auth_token=oauth_token.access_token,
@@ -683,7 +725,14 @@ class BitrixTokenLocal(AbstractBitrixTokenLocal):
             oauth_event_data: "OAuthEventData",
             bitrix_app: "AbstractBitrixAppLocal",
     ) -> "BitrixTokenLocal":
-        """"""
+        """
+        Create a local-app OAuth token wrapper from event callback auth data.
+
+        Args:
+            oauth_event_data: Parsed Bitrix24 event callback payload.
+            bitrix_app: Local SDK application object. It supplies the portal
+                domain and is required for token refresh and ``app.info`` validation.
+        """
 
         auth = oauth_event_data.auth
 
@@ -698,7 +747,14 @@ class BitrixTokenLocal(AbstractBitrixTokenLocal):
             oauth_workflow_data: "OAuthWorkflowData",
             bitrix_app: "AbstractBitrixAppLocal",
     ) -> "BitrixTokenLocal":
-        """"""
+        """
+        Create a local-app OAuth token wrapper from workflow callback auth data.
+
+        Args:
+            oauth_workflow_data: Parsed Bitrix24 workflow robot payload.
+            bitrix_app: Local SDK application object. It supplies the portal
+                domain and is required for token refresh and ``app.info`` validation.
+        """
         return cls.from_oauth(oauth=oauth_workflow_data.auth, bitrix_app=bitrix_app)
 
 

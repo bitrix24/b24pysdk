@@ -15,12 +15,10 @@ from .documentgenerator import Documentgenerator
 from .duplicate import Duplicate
 from .entity import Entity
 from .enum import Enum
-from .invoice import Invoice
 from .item import Item
 from .lead import Lead
 from .multifield import Multifield
 from .orderentity import Orderentity
-from .product import Product
 from .quote import Quote
 from .requisite import Requisite
 from .settings import Settings
@@ -116,11 +114,6 @@ class CRM(BaseScope):
         return Item(self)
 
     @cached_property
-    def invoice(self) -> Invoice:
-        """"""
-        return Invoice(self)
-
-    @cached_property
     def lead(self) -> Lead:
         """"""
         return Lead(self)
@@ -134,11 +127,6 @@ class CRM(BaseScope):
     def orderentity(self) -> Orderentity:
         """"""
         return Orderentity(self)
-
-    @cached_property
-    def product(self) -> Product:
-        """"""
-        return Product(self)
 
     @cached_property
     def quote(self) -> Quote:

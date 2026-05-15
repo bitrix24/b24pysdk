@@ -26,7 +26,18 @@ def validate_workflow_params(
     *,
     bitrix_app: Optional["AbstractBitrixApp"] = None,
 ) -> OAuthWorkflowData:
-    """Parse Bitrix24 workflow payload from normalized params and optionally validate it."""
+    """
+    Parse Bitrix24 workflow robot payload from normalized params.
+
+    Args:
+        params: Request parameters collected by ``collect_request_params``.
+        bitrix_app: Optional SDK application object. When passed, the helper
+            calls Bitrix24 ``app.info`` with workflow OAuth data and validates
+            that the robot callback belongs to this application.
+
+    Returns:
+        Parsed workflow robot payload.
+    """
 
     oauth_workflow_data = OAuthWorkflowData.from_dict(params)
 
@@ -49,7 +60,14 @@ def get_workflow_dependency(
     *,
     bitrix_app: Optional["AbstractBitrixApp"] = None,
 ) -> _WorkflowDependency:
-    """Create a FastAPI dependency that resolves Bitrix24 workflow payload."""
+    """
+    Create a FastAPI dependency that resolves Bitrix24 workflow robot payload.
+
+    Args:
+        bitrix_app: Optional SDK application object. Pass it when the incoming
+            workflow callback must be validated through Bitrix24 ``app.info``.
+            If omitted, the dependency only parses and returns workflow data.
+    """
 
     async def _workflow_dependency(params: Annotated[JSONDict, Depends(collect_request_params)]) -> OAuthWorkflowData:
         try:

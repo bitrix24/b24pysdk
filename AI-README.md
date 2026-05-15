@@ -97,7 +97,8 @@ b24pysdk/
 │   ├── profile.py             # Profile related scope module
 │   ├── scope.py               # Scope related scope module
 │   ├── server.py              # Server related scope module
-│   └── userfieldconfig.py     # Base class for working with userfields
+│   ├── userfieldconfig.py     # Base class for working with userfields
+│   └── userfieldtype.py       # Base class for working with types of custom fields
 ├── signals/                   # Handling different request types
 ├── utils/                     # Utility functions and helpers
 ├── _config.py                 # Configuration and settings management
@@ -556,3 +557,96 @@ class MyBitrixToken(BitrixToken):
    def portal_domain_changed_handler(self, event: PortalDomainChangedEvent):
       print(self, f"Old domain: {event.old_domain}, new domain: {event.new_domain}")
 ```
+
+## Integrations Module
+
+The integrations module provides framework-specific adapters for handling Bitrix24 callbacks and placement launches in Python web frameworks.
+
+Supported frameworks:
+
+- Django
+- FastAPI
+- Flask
+
+Each integration supports:
+
+- placement launches,
+- event callbacks,
+- workflow robot callbacks.
+
+The module simplifies request parsing, authentication validation against app.info, and access to structured Bitrix24 payload data.
+
+### Django Integration
+
+Provides decorators for Django views that process Bitrix24 requests.
+
+#### Main functionality
+- Decorators for placement, event, and workflow handlers
+- Automatic request parameter collection
+- Parsed Bitrix24 payload injection into the request object
+- Optional validation via bitrix_app
+- Typed request objects for static typing support
+
+#### Purpose
+
+Designed for Django applications that need native Bitrix24 integration within the standard Django request lifecycle.
+
+Key features
+- @placement_required
+- @event_required
+- @workflow_required
+- Typed request classes:
+  - PlacementRequest
+  - EventRequest
+  - WorkflowRequest
+- Automatic 401 and 500 error handling
+  
+### FastAPI Integration
+
+Provides dependency-based handling for Bitrix24 callbacks and placements.
+
+#### Main functionality
+- FastAPI dependencies for placement, event, and workflow endpoints
+- Automatic payload parsing into typed OAuth models
+- Optional validation against app.info
+- Support for async handlers and dependency injection
+
+#### Purpose
+
+Designed for async FastAPI applications requiring clean and type-safe Bitrix24 integration.
+
+Key features
+- Dependency factories:
+    - placement_dependency
+    - event_dependency
+    - workflow_dependency
+- Typed payload models:
+    - OAuthPlacementData
+    - OAuthEventData
+    - OAuthWorkflowData
+- Automatic HTTP error handling
+
+### Flask Integration
+
+Provides decorators and helper accessors for Bitrix24 request handling in Flask applications.
+
+#### Main functionality
+- Decorators for placement, event, and workflow routes
+- Automatic payload parsing into flask.g
+- Typed helper accessors
+- Optional validation using bitrix_app
+
+#### Purpose
+
+Designed for lightweight Flask applications that require simple Bitrix24 integration.
+
+Key features
+- @placement_required
+- @event_required
+- @workflow_required
+- Payload storage in flask.g
+- Helper accessors:
+    - get_oauth_placement_data()
+    - get_oauth_event_data()
+    - get_oauth_workflow_data()
+- Automatic 401 and 500 responses
