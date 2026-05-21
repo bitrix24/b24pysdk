@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Document(BaseEntity):
-    """"""
+    """Handle custom fields for inventory accounting documents.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/catalog/userfield-document/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -57,7 +60,22 @@ class Document(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update user field values
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/userfield-document/catalog-userfield-document-update.html
+
+        The method updates the values of user fields in inventory accounting documents.
+
+        Args:
+            document_id: Identifier of the inventory accounting document;
+
+            fields: Fields to be updated;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "documentId": document_id,

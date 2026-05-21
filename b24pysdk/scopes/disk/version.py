@@ -9,7 +9,10 @@ __all__ = [
 
 
 class Version(BaseEntity):
-    """"""
+    """The method helps handle file versions.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/disk/version/index.html
+    """
 
     @type_checker
     def get(
@@ -18,7 +21,20 @@ class Version(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get file version
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/disk/version/disk-version-get.html
+
+        The method returns the version of a file.
+
+        Args:
+            bitrix_id: Identifier of the file version;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params = {
             "id": bitrix_id,

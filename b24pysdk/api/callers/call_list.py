@@ -249,7 +249,7 @@ class _ListCaller(BaseCaller):
         if self._limit:
             total = min(total, self._limit)
 
-        if next_step and (self._limit is None or total < self._limit):
+        if next_step and (self._limit is None or self._limit > self._STEP):
             batch_response = self._fetch_batches_response(
                 methods=self._generate_methods_for_batch(
                     next_step=next_step,

@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Storeproduct(BaseEntity):
-    """"""
+    """Methods for handling inventory balancies.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/catalog/store-product/index.html
+    """
 
     @type_checker
     def get(
@@ -20,7 +23,20 @@ class Storeproduct(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get product inventory by ID
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/store-product/catalog-store-product-get.html
+
+        The method returns information about the product inventory by the record ID.
+
+        Args:
+            bitrix_id: Record ID of the inventory;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -38,7 +54,18 @@ class Storeproduct(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get inventory balance list
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/store-product/catalog-store-product-get-fields.html
+
+        The method returns the fields of product inventory balances.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
         return self._make_bitrix_api_request(
             api_wrapper=self.get_fields,
             timeout=timeout,
@@ -54,7 +81,45 @@ class Storeproduct(BaseEntity):
             start: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of inventory balances
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/store-product/catalog-store-product-list.html
+
+        The method returns a list of product inventory balances by filter.
+
+        Args:
+            select: An array with a list of fields to be selected;
+
+            filter: Object format:
+                {
+                    "field_1": "value_1",
+
+                    ...,
+
+                    "field_N": "value_N",
+                }
+                where possible values for field correspond to the fields of the catalog store product;
+
+            order: Object format:
+                {
+                    field_1: value_1,
+
+                    ...,
+                }
+
+                where
+
+                - field_n is the field name to sort by;
+
+                - value_n is 'asc' for ascending or 'desc' for descending;
+
+            start: Starting position for pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = dict()
 

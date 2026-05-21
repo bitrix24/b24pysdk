@@ -180,7 +180,7 @@ class Config:
         """
 
         if api_v3_methods is not None:
-            self.api_v3_methods = api_v3_methods if isinstance(api_v3_methods, tuple) else tuple(api_v3_methods)
+            self.api_v3_methods = api_v3_methods
 
         if default_initial_retry_delay is not None:
             self.default_initial_retry_delay = default_initial_retry_delay
@@ -432,11 +432,12 @@ class Config:
         Parameters
         ----------
         value : Iterable[Text]
-            Iterable of method names.
+            Iterable of method names. A plain string is not accepted because
+            it would otherwise be interpreted as an iterable of characters.
         """
 
-        if not isinstance(value, typing.Iterable):
-            raise TypeError("api_v3_methods must be an iterable of strings")
+        if isinstance(value, (str, bytes)) or not isinstance(value, typing.Iterable):
+            raise TypeError("api_v3_methods must be an iterable of strings, not a string")
 
         api_v3_methods = value if isinstance(value, tuple) else tuple(value)
 

@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Sku(BaseEntity):
-    """"""
+    """Methods for working with parent products.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/sku/index.html
+    """
 
     @type_checker
     def add(
@@ -20,7 +23,20 @@ class Sku(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add parent product
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/sku/catalog-product-sku-add.html
+
+        This method adds a parent product to the trade catalog.
+
+        Args:
+            fields: Field values for adding the parent product;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+              Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "fields": fields,
@@ -39,7 +55,20 @@ class Sku(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete head product
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/sku/catalog-product-sku-delete.html
+
+        This method deletes the head product.
+
+        Args:
+            bitrix_id: Identifier of the head product;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -58,7 +87,20 @@ class Sku(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Download main product files
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/sku/catalog-product-sku-download.html
+
+        This method downloads main product files based on the provided parameters.
+
+        Args:
+            fields: Field values for downloading main product files;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "fields": fields,
@@ -77,7 +119,20 @@ class Sku(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the values of the parent product fields
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/sku/catalog-product-sku-get.html
+
+        The method returns the values of the parent product fields by identifier.
+
+        Args:
+            bitrix_id: Identifier of the parent product;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -96,7 +151,20 @@ class Sku(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get parent product fields
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/sku/catalog-product-sku-get-fields-by-filter.html
+
+        The method returns the fields of the parent product based on the filter.
+
+        Args:
+            filter: Filter to retrieve all fields of the parent product;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "filter": filter,
@@ -118,7 +186,45 @@ class Sku(BaseEntity):
             start: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the list of the parents product
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/sku/catalog-product-sku-list.html
+
+        The method returns a list of parent products based on the filter.
+
+        Args:
+            select: An array with a list of fields to be selected;
+
+            filter: Object format:
+                {
+                    "field_1": "value_1",
+
+                    ...,
+
+                    "field_N": "value_N",
+                }
+                where possible values for field correspond to the fields of the product sku object;
+
+            order: Object format:
+                {
+                    field_1: value_1,
+
+                    ...,
+                }
+
+                where
+
+                - field_n is the field name to sort by;
+
+                - value_n is 'asc' for ascending or 'desc' for descending;
+
+            start: Starting position for pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         if select.__class__ is not list:
             select = list(select)
@@ -148,7 +254,22 @@ class Sku(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add parent product
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/sku/catalog-product-sku-update.html
+
+        This method adds a parent product to the trade catalog.
+
+        Args:
+            bitrix_id: Identifier of the parent product;
+
+            fields: Field values for updating the main product;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

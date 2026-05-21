@@ -62,7 +62,16 @@ class BitrixAPIBatchesRequest(BitrixAPIBaseRequest[BitrixAPIBatchResponse], Gene
     @property
     def _bitrix_api_requests_type_string(self) -> Text:
         """"""
-        return type(self._bitrix_api_requests[0]).__name__ if self._bitrix_api_requests else "BitrixAPIRequests"
+
+        if not self._bitrix_api_requests:
+            return "BitrixAPIRequests"
+
+        if isinstance(self._bitrix_api_requests, Mapping):
+            bitrix_api_request = next(iter(self._bitrix_api_requests.values()))
+        else:
+            bitrix_api_request = self._bitrix_api_requests[0]
+
+        return type(bitrix_api_request).__name__
 
     @property
     def _bitrix_api_requests_string(self) -> Text:

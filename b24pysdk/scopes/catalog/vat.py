@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Vat(BaseEntity):
-    """"""
+    """Handle VAT rates in trade catalog.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/catalog/vat/index.html
+    """
 
     @type_checker
     def add(
@@ -20,7 +23,20 @@ class Vat(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add VAT rate
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/vat/catalog-vat-add.html
+
+        This method adds a new VAT rate.
+
+        Args:
+            fields: Field values for creating a new VAT rate;
+
+            timeout: Timeout in seconds;
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "fields": fields,
@@ -39,7 +55,20 @@ class Vat(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete VAT rate
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/vat/catalog-vat-delete.html
+
+        This method deletes a VAT rate.
+
+        Args:
+            bitrix_id: Identifier of the VAT rate;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -58,7 +87,20 @@ class Vat(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get VAT rate field values
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/vat/catalog-vat-get.html
+
+        This method retrieves information about the VAT rate by its identifier.
+
+        Args:
+            bitrix_id: Identifier of the VAT rate;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -76,7 +118,18 @@ class Vat(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get VAT rate fields
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/vat/catalog-vat-get-fields.html
+
+        The method returns the fields of the VAT rate.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
         return self._make_bitrix_api_request(
             api_wrapper=self.get_fields,
             timeout=timeout,
@@ -93,7 +146,45 @@ class Vat(BaseEntity):
             limit: Optional[int] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of VAT rates
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/vat/catalog-vat-list.html
+
+        The method returns a list of VAT rates based on the filter.
+
+        Args:
+            select: An array with a list of fields to be selected;
+
+            filter: Object format:
+                {
+                    "field_1": "value_1",
+
+                    ...,
+
+                    "field_N": "value_N",
+                }
+                where possible values for field correspond to the fields of the catalog VAT object;
+
+            order: Object format:
+                {
+                    field_1: value_1,
+
+                    ...,
+                }
+
+                where
+
+                - field_n is the field name to sort by;
+
+                - value_n is 'asc' for ascending or 'desc' for descending;
+
+            start: Starting position for pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = dict()
 
@@ -129,7 +220,22 @@ class Vat(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update VAT rate
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/vat/catalog-vat-update.html
+
+        This method updates the VAT rate.
+
+        Args:
+            bitrix_id: Identifier of the VAT rate;
+
+            fields: Field values for updating the VAT rate;
+
+            timeout: Timeout in seconds;
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
