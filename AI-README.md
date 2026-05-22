@@ -42,6 +42,10 @@ b24pysdk/
 │   ├── oauth.py               # OAuth-specific errors
 │   └── v3.py                  # Error handling for v3 Bitrix API
 ├── events/                    # Core classes for requests, responses, events
+├── integrations/              # Framework-specific integration adapters
+│   ├── django                 # Decorators and utilities for Django views
+│   ├── fastapi                # Dependency-based request handling for FastAPI
+│   └── flask                  # Decorators and request helpers for Flask applications
 ├── log/                       # Logging utilities
 │   ├── abstract_logger.py     # Logger interface required to implement
 │   ├── base_logger.py         # Abstract logger class with basic logger interface implementation

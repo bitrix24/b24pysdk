@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Document(BaseEntity):
-    """"""
+    """Methods for working with documents.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/document-generator/index.html
+    """
 
     @type_checker
     def add(
@@ -24,7 +27,31 @@ class Document(BaseEntity):
         fields: Optional[JSONDict] = None,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Create a new document
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/document-generator/document-generator-document-add.html
+
+        The method creates a new document based on a template.
+
+        Args:
+            template_id: Template identifier;
+
+            value: External identifier of the object for which the document is being generated;
+
+            values: Object format:
+                {
+                    'field': 'value'
+                } - field values of the document in the format;
+
+            stamps_enabled: Seal and signature mode;
+
+            fields: Description of how to interpret and format values from values;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "templateId": template_id,
@@ -55,7 +82,20 @@ class Document(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete document
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/document-generator/document-generator-document-delete.html
+
+        The method removes a document by its identifier.
+
+        Args:
+            bitrix_id: Document identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -75,7 +115,22 @@ class Document(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Enable or disable public link for document
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/document-generator/document-generator-document-enable-public-url.html
+
+        The method enables or disables the public link for a document.
+
+        Args:
+            bitrix_id: Document identifier;
+
+            status: Status of the public link;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -95,7 +150,20 @@ class Document(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get document by ID
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/document-generator/document-generator-document-get.html
+
+        The method returns information about a document by its ID.
+
+        Args:
+            bitrix_id: Document identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -113,7 +181,18 @@ class Document(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the list of fields for the document
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/document-generator/document-generator-document-get-fields.html
+
+        The method returns the fields of the document, along with their current and base values.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         return self._make_bitrix_api_request(
             api_wrapper=self.getfields,
@@ -130,7 +209,48 @@ class Document(BaseEntity):
         start: Optional[int] = None,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the list of documents
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/document-generator/document-generator-document-list.html
+
+        The method returns a list of documents based on the filter.
+
+        Args:
+            select: An array containing the list of fields to return;
+
+            order: Object format:
+
+                {
+                    field_1: value_1,
+
+                    ...,
+                }
+
+                where
+
+                - field_n is the name of the field by which the selection will be sorted
+
+                - value_n is a string value equals to 'asc' (ascending sort) or 'desc' (descending sort);
+
+            filter: Object in the format:
+
+                {
+                    field_1: value_1,
+
+                    field_2: value_2,
+
+                    ...,
+
+                    field_n: value_n,
+                };
+
+            start: This parameter is used to manage pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {}
 
@@ -164,7 +284,29 @@ class Document(BaseEntity):
         fields: Optional[JSONDict] = None,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update existing document
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/document-generator/document-generator-document-update.html
+
+        The method updates a document with new field values.
+
+        Args:
+            bitrix_id: Document identifier;
+
+            values: Object format:
+                {
+                    'field': 'value'
+                } - field values of the document in the format;
+
+            stamps_enabled: Seal and signature mode;
+
+            fields: Description of how to interpret and format values from values;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
