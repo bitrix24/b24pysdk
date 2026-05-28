@@ -37,6 +37,7 @@ if typing.TYPE_CHECKING:
 
 __all__ = [
     "BitrixAPIAccessDenied",
+    "BitrixAPIAccessError",
     "BitrixAPIAllowedOnlyIntranetUser",
     "BitrixAPIApplicationNotFound",
     "BitrixAPIAuthorizationError",
@@ -703,6 +704,14 @@ class BitrixAPIAccessDenied(BitrixAPIForbidden):
     """
 
     ERROR = "ACCESS_DENIED"
+
+    __slots__ = ()
+
+
+class BitrixAPIAccessError(BitrixAPIForbidden):
+    """"""
+
+    ERROR = "ACCESS_ERROR"
 
     __slots__ = ()
 

@@ -20,8 +20,9 @@ class Document(BaseEntity):
     def add(
         self,
         template_id: int,
+        provider_class_name: Text,
+        value: Text,
         *,
-        value: Optional[Text] = None,
         values: Optional[JSONDict] = None,
         stamps_enabled: Optional[Union[bool, int]] = None,
         fields: Optional[JSONDict] = None,
@@ -35,6 +36,8 @@ class Document(BaseEntity):
 
         Args:
             template_id: Template identifier;
+
+            provider_class_name: Data provider class name;
 
             value: External identifier of the object for which the document is being generated;
 
@@ -55,10 +58,9 @@ class Document(BaseEntity):
 
         params: JSONDict = {
             "templateId": template_id,
+            "providerClassName": provider_class_name,
+            "value": value,
         }
-
-        if value is not None:
-            params["value"] = value
 
         if values is not None:
             params["values"] = values

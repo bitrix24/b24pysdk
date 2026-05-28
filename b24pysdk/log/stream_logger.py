@@ -5,7 +5,12 @@ from .base_logger import BaseLogger
 
 
 class StreamLogger(BaseLogger):
-    """"""
+    """
+    Logger implementation that writes records to a stream.
+
+    Uses StreamHandler by default and supports optional context output
+    through ContextFormatter.
+    """
 
     _DEFAULT_FMT: Text = "%(asctime)s [%(levelname)s] %(message)s"
     _DEFAULT_HANDLER_TYPE = logging.StreamHandler
@@ -13,9 +18,15 @@ class StreamLogger(BaseLogger):
 
     __slots__ = ("_formatter",)
 
-    _formatter: Optional[logging.Formatter]
+    _formatter: logging.Formatter
 
     class ContextFormatter(logging.Formatter):
+        """
+        Formatter that appends logging context to formatted messages.
+
+        If a log record contains a non-empty ``context`` attribute, it is added
+        to the end of the message.
+        """
 
         def format(self, record: logging.LogRecord) -> Text:
             message = super().format(record)
@@ -55,10 +66,13 @@ class StreamLogger(BaseLogger):
         return self._formatter
 
     def set_handler(self, handler: logging.Handler):
+        """Add a handler to the logger and apply the current formatter to it."""
         handler.setFormatter(self._formatter)
         super().set_handler(handler)
 
     def set_formatter(self, formatter: logging.Formatter):
+        """Set formatter for all existing and future handlers."""
+
         self._formatter = formatter
 
         for handler in self.handlers:

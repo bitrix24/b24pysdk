@@ -6,7 +6,15 @@ from .abstract_logger import AbstractLogger
 
 
 class BaseLogger(AbstractLogger):
-    """"""
+    """
+    Base implementation of the SDK logger interface.
+
+    Wraps a standard logging.Logger instance and provides common handler,
+    level, and context-aware logging behavior for SDK loggers.
+
+    Logger instances with the same name share the same underlying
+    logging.Logger and its handlers.
+    """
 
     _DEFAULT_HANDLER_TYPE: Type[logging.Handler]
     _DEFAULT_LEVEL: int
@@ -42,7 +50,7 @@ class BaseLogger(AbstractLogger):
         self._logger = logging.getLogger(self._name)
         self._logger.propagate = False
 
-        self.set_level(level or self.get_default_level())
+        self.set_level(level if level is not None else self.get_default_level())
 
         if not self.handlers:
             for handler in (handlers or (self.get_default_handler_type()(),)):
@@ -70,6 +78,7 @@ class BaseLogger(AbstractLogger):
 
     @property
     def level(self) -> int:
+        """Current logger level."""
         return self._logger.level
 
     def _log(
@@ -85,6 +94,7 @@ class BaseLogger(AbstractLogger):
             message: Text,
             context: Optional[Mapping[Text, Any]] = None,
     ):
+        """Log a debug message."""
         self._log(self.DEBUG, message, context)
 
     def info(
@@ -92,6 +102,7 @@ class BaseLogger(AbstractLogger):
             message: Text,
             context: Optional[Mapping[Text, Any]] = None,
     ):
+        """Log an informational message."""
         self._log(self.INFO, message, context)
 
     def warning(
@@ -99,6 +110,7 @@ class BaseLogger(AbstractLogger):
             message: Text,
             context: Optional[Mapping[Text, Any]] = None,
     ):
+        """Log a warning message."""
         self._log(self.WARNING, message, context)
 
     def error(
@@ -106,6 +118,7 @@ class BaseLogger(AbstractLogger):
             message: Text,
             context: Optional[Mapping[Text, Any]] = None,
     ):
+        """Log an error message."""
         self._log(self.ERROR, message, context)
 
     def critical(
@@ -113,6 +126,7 @@ class BaseLogger(AbstractLogger):
             message: Text,
             context: Optional[Mapping[Text, Any]] = None,
     ):
+        """Log a critical error message."""
         self._log(self.CRITICAL, message, context)
 
     def log(
@@ -121,20 +135,26 @@ class BaseLogger(AbstractLogger):
             message: Text,
             context: Optional[Mapping[Text, Any]] = None,
     ):
+        """Log a message with the specified logging level."""
         self._log(level, message, context)
 
     def set_level(self, level: int):
+        """Set logger and handler logging level."""
+
         self._logger.setLevel(level)
 
         for handler in self.handlers:
             handler.setLevel(level)
 
     def set_handler(self, handler: logging.Handler):
+        """Add a handler to the underlying logger."""
         handler.setLevel(self.level)
         self._logger.addHandler(handler)
 
     def remove_handler(self, handler: logging.Handler):
+        """Remove a handler from the underlying logger."""
         self._logger.removeHandler(handler)
 
     def clear_handlers(self):
+        """Remove all handlers from the underlying logger."""
         self._logger.handlers.clear()

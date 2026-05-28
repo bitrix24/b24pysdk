@@ -14,4 +14,8 @@ if PYTHON_VERSION >= (3, 10):
 
 @dataclass(**_DATACLASS_KWARGS)
 class BaseBitrixEvent:
-    """"""
+    """
+    Base class for SDK events.
+
+    Used as a common parent for all events emitted by the Bitrix24 SDK.
+    """

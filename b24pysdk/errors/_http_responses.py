@@ -30,6 +30,7 @@ class HTTPResponse(ABC):
     """
 
     STATUS_CODE: ClassVar[HTTPStatus] = NotImplemented
+    """HTTP status code represented by the response class."""
 
     response: requests.Response
 

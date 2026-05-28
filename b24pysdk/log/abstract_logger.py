@@ -3,14 +3,19 @@ from typing import Any, ClassVar, Dict, Mapping, Optional, Text
 
 
 class AbstractLogger:
-    """"""
+    """
+    Base logger interface used by the SDK.
 
-    NOTSET = logging.NOTSET
-    DEBUG = logging.DEBUG
-    INFO = logging.INFO
-    WARNING = logging.WARNING
-    ERROR = logging.ERROR
-    CRITICAL = logging.CRITICAL
+    Defines common logging levels and the logging methods expected from
+    concrete logger implementations.
+    """
+
+    NOTSET: int = logging.NOTSET
+    DEBUG: int = logging.DEBUG
+    INFO: int = logging.INFO
+    WARNING: int = logging.WARNING
+    ERROR: int = logging.ERROR
+    CRITICAL: int = logging.CRITICAL
 
     LOG_LEVELS: ClassVar[Dict[Text, int]] = {
         "NOTSET": NOTSET,

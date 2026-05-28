@@ -16,6 +16,13 @@ if PYTHON_VERSION >= (3, 10):
 
 @dataclass(**_DATACLASS_KWARGS)
 class PortalDomainChangedEvent(BaseBitrixEvent):
-    """"""
+    """
+    Event emitted when a Bitrix24 portal domain changes.
+
+    Attributes:
+        old_domain: Previous portal domain.
+        new_domain: Updated portal domain.
+    """
+
     old_domain: Text
     new_domain: Text

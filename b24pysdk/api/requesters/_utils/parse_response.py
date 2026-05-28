@@ -84,6 +84,7 @@ _EXCEPTIONS_BY_ERROR: Dict[Text, Type[errors.BitrixAPIError]] = {
     "PAYMENT_REQUIRED": errors.BitrixAPIPaymentRequired,
     # 403
     "ACCESS_DENIED": errors.BitrixAPIAccessDenied,
+    "ACCESS_ERROR": errors.BitrixAPIAccessError,
     "ALLOWED_ONLY_INTRANET_USER": errors.BitrixAPIAllowedOnlyIntranetUser,
     "INSUFFICIENT_SCOPE": errors.BitrixAPIInsufficientScope,
     "INVALID_CREDENTIALS": errors.BitrixAPIInvalidCredentials,

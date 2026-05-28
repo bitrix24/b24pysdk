@@ -32,12 +32,13 @@ __all__ = [
 
 
 def _bitrix_app_required(func: Callable) -> Callable:
-    """"""
+    """Require a token to be bound to a Bitrix app before calling an OAuth-only method."""
 
     @wraps(func)
     def wrapper(self: "AbstractBitrixToken", *args, **kwargs):
+        """Validate that ``self.bitrix_app`` is available, then call the wrapped method."""
         if self.bitrix_app is NotImplemented or self.bitrix_app is None:
-            raise AttributeError(f"'bitrix_app' is not implimented for {self}")
+            raise AttributeError(f"'bitrix_app' is not implemented for {self}")
         return func(self, *args, **kwargs)
 
     return wrapper
@@ -46,7 +47,7 @@ def _bitrix_app_required(func: Callable) -> Callable:
 class AbstractBitrixToken:
     """Base token wrapper with retry logic, token refresh, and client helpers."""
 
-    _AUTO_CHANCHED_DOMAIN: bool = True
+    _AUTO_CHANGED_DOMAIN: bool = True
     """Automatically switch token domain on 302 redirect to another portal domain."""
 
     _AUTO_REFRESH_EXPIRED_TOKEN: bool = True
@@ -98,22 +99,22 @@ class AbstractBitrixToken:
     # noinspection PyMethodParameters
     @classproperty
     def _config(cls) -> Config:
-        """"""
+        """Return the global SDK configuration used by token helpers and API callers."""
         return Config()
 
     @property
     def is_one_off(self) -> bool:
-        """"""
+        """Whether this OAuth token cannot be refreshed because it has no refresh token."""
         return self.refresh_token is None
 
     @property
     def has_expired(self) -> Optional[bool]:
-        """"""
+        """Return whether the OAuth access token is expired, or ``None`` if expiration is unknown."""
         return self.expires and self.expires <= self._config.get_local_datetime()
 
     @property
     def oauth_token(self) -> OAuthToken:
-        """"""
+        """Return current OAuth credentials as an ``OAuthToken`` value object."""
         return OAuthToken(
             access_token=self.auth_token,
             refresh_token=self.refresh_token,
@@ -123,7 +124,7 @@ class AbstractBitrixToken:
 
     @oauth_token.setter
     def oauth_token(self, oauth_token: OAuthToken):
-        """"""
+        """Replace stored OAuth credentials with values from ``oauth_token``."""
         self.auth_token = oauth_token.access_token
         self.refresh_token = oauth_token.refresh_token
         self.expires = oauth_token.expires
@@ -159,26 +160,80 @@ class AbstractBitrixToken:
             prefer_version: Union[B24APIVersionLiteral, B24APIVersion] = B24APIVersion.V2,
             **kwargs,
     ) -> "BaseClient":
-        """"""
+        """
+        Create a high-level SDK client that uses this token for all API calls.
+
+        Args:
+            prefer_version: Preferred API version for resolving scopes and methods.
+                ``V2`` is used by default; pass ``V1`` or ``V3`` to get a
+                version-specific client surface.
+            **kwargs: Extra options forwarded to the client constructor.
+
+        Returns:
+            A client instance bound to this token.
+        """
         return Client(self, prefer_version=prefer_version, **kwargs)
 
     @_bitrix_app_required
     def get_oauth_token(self, code: Text, **kwargs) -> "RenewedOAuth":
-        """"""
+        """
+        Exchange an OAuth authorization code for access and refresh tokens.
+
+        This method is available only for tokens bound to a Bitrix app. Webhook
+        tokens do not have an OAuth app context and will raise ``AttributeError``.
+
+        Args:
+            code: Authorization code received from Bitrix OAuth redirect.
+            **kwargs: Extra request options forwarded to the app OAuth client.
+
+        Returns:
+            OAuth response wrapper with the renewed token and raw response data.
+        """
         return self.bitrix_app.get_oauth_token(code=code, **kwargs)
 
     @_bitrix_app_required
     def refresh_oauth_token(self, **kwargs) -> "RenewedOAuth":
-        """"""
+        """
+        Refresh the current OAuth access token using ``refresh_token``.
+
+        The method delegates the refresh request to the bound Bitrix app. It
+        does not mutate this token object by itself; use
+        ``refresh_and_set_oauth_token`` when the stored credentials must be
+        updated after refresh.
+
+        Args:
+            **kwargs: Extra request options forwarded to the app OAuth client.
+
+        Returns:
+            OAuth response wrapper with the refreshed token and raw response data.
+        """
         return self.bitrix_app.refresh_oauth_token(refresh_token=self.refresh_token, **kwargs)
 
     @_bitrix_app_required
     def get_app_info(self, **kwargs) -> "BitrixAppInfoResponse":
-        """"""
+        """
+        Request information about the app installation for the current access token.
+
+        The call is executed through the common retry layer, so expired OAuth
+        tokens can be refreshed and portal-domain redirects can be handled before
+        returning the response.
+
+        Args:
+            **kwargs: Extra request options forwarded to the app-info request.
+
+        Returns:
+            Parsed ``app.info`` response for the bound application.
+        """
         return self._execute_with_retries(lambda: self.bitrix_app.get_app_info(self.auth_token, **kwargs))
 
     def refresh_and_set_oauth_token(self, **kwargs):
-        """"""
+        """
+        Refresh OAuth credentials, store them on this token, and emit a renewal signal.
+
+        Use this when the token object should continue making API calls after
+        expiration. Subscribers of ``oauth_token_renewed_signal`` can persist the
+        renewed access and refresh tokens in application storage.
+        """
 
         renewed_oauth = self.refresh_oauth_token(**kwargs)
 
@@ -189,7 +244,14 @@ class AbstractBitrixToken:
         ))
 
     def __expired_token_handler(self) -> bool:
-        """"""
+        """
+        Try to recover from an expired access token.
+
+        Returns:
+            ``True`` when a refresh was performed and the original API call can
+            be retried. ``False`` when refresh is disabled or impossible, for
+            example for webhooks or one-off OAuth tokens.
+        """
 
         if not self._AUTO_REFRESH_EXPIRED_TOKEN:
             self._config.logger.info(
@@ -234,7 +296,15 @@ class AbstractBitrixToken:
         return True
 
     def _check_and_change_domain(self, new_domain: Text) -> bool:
-        """"""
+        """
+        Update the portal domain after a Bitrix redirect and emit a change signal.
+
+        Args:
+            new_domain: Portal domain returned by Bitrix in a redirect response.
+
+        Returns:
+            ``True`` when the stored domain changed, otherwise ``False``.
+        """
 
         if not new_domain or new_domain == self.domain:
             return False
@@ -250,7 +320,15 @@ class AbstractBitrixToken:
         return True
 
     def _execute_with_retries(self, func: Callable[[], Any]):
-        """"""
+        """
+        Execute ``func`` with SDK-level recovery for expired tokens and domain redirects.
+
+        Before the first call, an expired OAuth token is refreshed when possible.
+        If Bitrix responds with a redirect encoded as
+        ``BitrixResponse302JSONDecodeError``, the token domain is updated and
+        the call is retried once. If Bitrix reports an expired token, the token
+        is refreshed and the call is retried once when refresh is possible.
+        """
 
         try:
             if not self.is_webhook and self.has_expired:
@@ -259,7 +337,7 @@ class AbstractBitrixToken:
             return func()
 
         except BitrixResponse302JSONDecodeError as error:
-            if not self._AUTO_CHANCHED_DOMAIN:
+            if not self._AUTO_CHANGED_DOMAIN:
                 self._config.logger.info(
                     "Caught BitrixResponse302JSONDecodeError, but auto-domain-change is disabled",
                     context=dict(
@@ -297,7 +375,7 @@ class AbstractBitrixToken:
             raise
 
     def _call_with_retries(self, call_func: Callable[..., JSONDict], parameters: JSONDict) -> JSONDict:
-        """"""
+        """Call a low-level API function with token auth data and retry handling."""
         return self._execute_with_retries(lambda: call_func(**self._auth_data, **parameters))
 
     def call_method(
@@ -514,16 +592,16 @@ class AbstractBitrixTokenLocal(AbstractBitrixToken):
     """Token wrapper bound to a local Bitrix app."""
 
     bitrix_app: "AbstractBitrixAppLocal" = NotImplemented
-    """"""
+    """Local Bitrix application that supplies the current portal domain."""
 
     @property
     def domain(self) -> Text:
-        """"""
+        """Return the portal domain from the bound local Bitrix app."""
         return self.bitrix_app.domain
 
     @domain.setter
     def domain(self, domain: Text):
-        """"""
+        """Update the portal domain on the bound local Bitrix app."""
         self.bitrix_app.domain = domain
 
 

@@ -64,7 +64,7 @@ class BitrixAPIBatchesRequest(BitrixAPIBaseRequest[BitrixAPIBatchResponse], Gene
         """"""
 
         if not self._bitrix_api_requests:
-            return "BitrixAPIRequests"
+            return self.__class__.__name__
 
         if isinstance(self._bitrix_api_requests, Mapping):
             bitrix_api_request = next(iter(self._bitrix_api_requests.values()))

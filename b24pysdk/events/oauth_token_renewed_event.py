@@ -19,5 +19,11 @@ if PYTHON_VERSION >= (3, 10):
 
 @dataclass(**_DATACLASS_KWARGS)
 class OAuthTokenRenewedEvent(BaseBitrixEvent):
-    """"""
+    """
+    Event emitted when an OAuth token is renewed.
+
+    Attributes:
+        renewed_oauth_token: Newly received OAuth token data.
+    """
+
     renewed_oauth_token: "RenewedOAuth"
