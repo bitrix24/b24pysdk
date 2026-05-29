@@ -12,7 +12,7 @@ __all__ = [
 
 
 class _MethodCaller(BaseCaller):
-    """"""
+    """Caller for one Bitrix REST method request."""
 
     __slots__ = ()
 
@@ -27,6 +27,13 @@ class _MethodCaller(BaseCaller):
             bitrix_token: Optional[BitrixTokenProtocol] = None,
             **kwargs,
     ):
+        """
+        Initialize a single-method caller.
+
+        Args mirror ``call_method`` and are normalized by ``BaseCaller``. The
+        caller later builds the correct REST URL for webhook/OAuth auth mode and
+        for the selected API version.
+        """
         super().__init__(
             domain=domain,
             auth_token=auth_token,
@@ -40,17 +47,28 @@ class _MethodCaller(BaseCaller):
 
     @property
     def _dynamic_auth_token(self) -> Text:
-        """"""
+        """
+        Return the auth-token path fragment used by webhook URLs.
+
+        Webhook calls include ``user_id/webhook_key`` in the URL path. OAuth
+        calls pass the access token in request parameters, so this fragment is
+        empty for OAuth mode.
+        """
         return ("", f"{self._auth_token}/")[self._is_webhook]
 
     @property
     def _base_url(self) -> Text:
-        """"""
+        """Return the portal REST base URL, without method or auth suffix."""
         return f"https://{self._domain}/rest"
 
     @property
     def _url(self) -> Text:
-        """"""
+        """
+        Build the concrete method URL for the selected API version.
+
+        V1/V2 calls use the classic ``/rest/{auth}/{method}.json`` format.
+        V3 calls use ``/rest/api/{auth}/{method}`` and do not append ``.json``.
+        """
         if self._api_version == B24APIVersion.V3:
             return f"{self._base_url}/api/{self._dynamic_auth_token}{self._api_method}"
         else:
@@ -58,14 +76,19 @@ class _MethodCaller(BaseCaller):
 
     @property
     def _dynamic_params(self) -> JSONDict:
-        """"""
+        """
+        Return request parameters with OAuth auth injected when needed.
+
+        Webhook authentication is already encoded in the URL, so webhook calls
+        send only method parameters. OAuth calls add ``auth`` to the payload.
+        """
         if self._is_webhook:
             return self._params
         else:
             return self._params | {"auth": self._auth_token}
 
     def call(self) -> JSONDict:
-        """"""
+        """Execute the configured method request and log request/response context."""
         self._config.logger.debug(
             "start call_method",
             context=dict(
@@ -102,20 +125,27 @@ def call_method(
         **kwargs,
 ) -> JSONDict:
     """
-    Call a Bitrix API method
+    Call one Bitrix REST API method.
+
+    The function builds a low-level method caller and returns the parsed JSON
+    response from Bitrix. Webhook calls put the webhook token into the URL path;
+    OAuth calls send the access token as the ``auth`` parameter. When
+    ``prefer_version`` is V3 and the method is registered as V3-capable, the
+    call uses the ``/rest/api/`` endpoint.
 
     Args:
-        domain: bitrix portal domain
-        auth_token: auth token
-        is_webhook: whether the method is being called using webhook token
-        api_method: name of the bitrix API method to call, e.g. crm.deal.add
-        params: API method parameters
-        timeout: timeout in seconds
-        prefer_version: preferred API version to resolve the method against
-        bitrix_token:
+        domain: Bitrix24 portal domain.
+        auth_token: OAuth access token or webhook token.
+        is_webhook: Whether ``auth_token`` is a webhook token.
+        api_method: Bitrix REST method name, for example ``crm.deal.add``.
+        params: Method parameters sent to Bitrix.
+        timeout: Request timeout in seconds.
+        prefer_version: Preferred API version to resolve the method against.
+        bitrix_token: Optional high-level token wrapper used by nested calls.
+        **kwargs: Extra requester options, such as retry configuration.
 
     Returns:
-        dictionary containing the result of the API method call and information about call time
+        Parsed Bitrix response containing method result and timing metadata.
     """
     return _MethodCaller(
         domain=domain,

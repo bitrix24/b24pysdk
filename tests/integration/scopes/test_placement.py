@@ -10,6 +10,7 @@ from ...constants import SDK_NAME
 
 pytestmark = [
     pytest.mark.integration,
+    pytest.mark.scopes,
     pytest.mark.placement,
 ]
 

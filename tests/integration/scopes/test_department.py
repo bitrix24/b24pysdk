@@ -10,6 +10,7 @@ from ...constants import BITRIX_PORTAL_OWNER_ID, HEAD_DEPARTMENT_ID, SDK_NAME, S
 
 pytestmark = [
     pytest.mark.integration,
+    pytest.mark.scopes,
     pytest.mark.department,
 ]
 

@@ -345,6 +345,9 @@ class EventOAuth(OAuth):
 
         Returns:
             Bitrix24 application installation information.
+
+        Raises:
+            ValueError: If the event is a system event without OAuth token.
         """
 
         if self.is_system:
@@ -438,10 +441,9 @@ class WorkflowOAuth(OAuth):
     """
     OAuth payload for Bitrix24 business process (workflow) events.
 
-    Extends :class:`RenewedOAuth` with workflow ``application_token``.
+    Extends :class:`OAuth` with workflow ``application_token``.
 
-    Workflow robot callbacks carry the same mandatory OAuth context as
-    refreshed OAuth payloads:
+    Workflow robot callbacks carry mandatory OAuth context:
 
     - access token
     - refresh token
@@ -450,8 +452,6 @@ class WorkflowOAuth(OAuth):
 
     In addition, Bitrix24 workflow payloads include
     ``application_token``, which is required for workflow execution.
-    Because of that shape, this class inherits from :class:`RenewedOAuth`
-    instead of plain :class:`OAuth`.
     """
 
     application_token: Text
@@ -510,10 +510,10 @@ class WorkflowOAuth(OAuth):
 
         Validation rules
         ----------------
-        The payload is treated as valid when :class:`RenewedOAuth` validation
-        succeeds. Workflow-specific ``application_token`` is parsed and stored
-        here, but it is not validated against ``app.info`` because that API
-        response does not expose a comparable application token field.
+        The payload is treated as valid when :class:`OAuth` validation succeeds.
+        Workflow-specific ``application_token`` is parsed and stored here, but it is
+        not validated against ``app.info`` because that API response does not expose
+        a comparable application token field.
         """
         try:
             return super(WorkflowOAuth, self).validate_against_app_info(app_info)

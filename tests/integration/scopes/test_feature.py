@@ -8,6 +8,7 @@ from b24pysdk.constants import B24BoolLit
 
 pytestmark = [
     pytest.mark.integration,
+    pytest.mark.scopes,
     pytest.mark.feature,
 ]
 

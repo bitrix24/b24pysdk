@@ -13,7 +13,14 @@ __all__ = [
 
 
 class _BatchesCaller(BaseCaller):
-    """"""
+    """
+    Caller that executes an arbitrary number of methods via classic batch chunks.
+
+    Bitrix classic batch has a per-request command limit. This caller splits a
+    large method collection into chunks, executes each chunk with ``call_batch``,
+    and merges all batch responses into one response shaped like a normal batch
+    result.
+    """
 
     _API_METHOD: Final[Text] = "batch"
     _BATCH_RESULT_FIELDS: Final[Tuple] = ("result", "result_error", "result_total", "result_next", "result_time")
@@ -36,6 +43,22 @@ class _BatchesCaller(BaseCaller):
             bitrix_token: Optional[BitrixTokenProtocol] = None,
             **kwargs,
     ):
+        """
+        Initialize a multi-batch caller.
+
+        Args:
+            domain: Bitrix24 portal domain.
+            auth_token: OAuth access token or webhook token.
+            is_webhook: Whether ``auth_token`` is a webhook token.
+            methods: Mapping or sequence of ``(api_method, params)`` tuples.
+            halt: Stop processing further chunks when a batch response contains
+                command errors.
+            prefer_version: Preferred API version for resolving the ``batch``
+                calls.
+            bitrix_token: Optional token wrapper used to execute nested calls
+                through retry and refresh logic.
+            **kwargs: Extra requester options forwarded to ``call_batch``.
+        """
         super().__init__(
             domain=domain,
             auth_token=auth_token,
@@ -49,7 +72,7 @@ class _BatchesCaller(BaseCaller):
         self._halt = halt
 
     def _fetch_batch_response(self, methods: B24Requests) -> JSONDict:
-        """"""
+        """Execute one classic batch chunk using the current auth context."""
         return call_batch(
             domain=self._domain,
             auth_token=self._auth_token,
@@ -61,7 +84,12 @@ class _BatchesCaller(BaseCaller):
         )
 
     def _get_flat_methods(self) -> List[Tuple[Key, B24RequestTuple]]:
-        """"""
+        """
+        Return methods as ``(result_key, request_tuple)`` pairs.
+
+        Mapping input keeps caller-provided keys. Sequence input receives
+        numeric indexes so merged results can still be addressed consistently.
+        """
         if isinstance(self._methods, Mapping):
             return list(self._methods.items())
         else:
@@ -70,8 +98,12 @@ class _BatchesCaller(BaseCaller):
     @staticmethod
     def _force_dict(collection: Union[Dict, List]) -> JSONDict:
         """
-        Batch method can return its results in the form of either a dictionary or a list.
-        This function converts results to dictionaries for uniformity.
+        Normalize a batch result section to a dictionary.
+
+        Bitrix can return command results as either a dictionary keyed by
+        command names or a list keyed by command position. The merge code works
+        with dictionaries, so list-shaped sections are converted to
+        ``{"0": item0, "1": item1, ...}``.
         """
         if isinstance(collection, dict):
             return collection
@@ -79,7 +111,13 @@ class _BatchesCaller(BaseCaller):
             return {str(index): element for index, element in enumerate(collection)}
 
     def _combine_responses(self, responses: JSONList) -> JSONDict:
-        """"""
+        """
+        Merge several classic batch responses into a single batch-like response.
+
+        Command result sections are normalized to dictionaries and combined by
+        key. Timing fields are aggregated so the final response describes the
+        whole multi-batch operation.
+        """
 
         first_response, last_response = responses[0], responses[-1]
 
@@ -130,7 +168,13 @@ class _BatchesCaller(BaseCaller):
         return combined_response
 
     def call(self) -> JSONDict:
-        """"""
+        """
+        Execute all configured methods, splitting them into batch-size chunks.
+
+        If the collection fits into one classic batch request, the method
+        delegates directly to ``call_batch``. Larger collections are split into
+        ``MAX_BATCH_SIZE`` chunks and their responses are merged.
+        """
 
         total_methods = len(self._methods)
 
@@ -195,24 +239,27 @@ def call_batches(
         **kwargs,
 ) -> JSONDict:
     """
-    Using 'batch' API method, call multiple API methods in one hit to Bitrix for performance benefits. Unlike call_batch(), works with any number of API methods
+    Execute any number of Bitrix REST methods through classic batch requests.
 
-    Note: one call to batch method allows you to make up to 50 actual REST API requests in one hit, mitigating requests intensity limits.
+    Unlike ``call_batch``, this helper accepts collections larger than one
+    classic batch request. It splits them into ``MAX_BATCH_SIZE`` chunks,
+    executes the chunks sequentially, and returns a merged batch-like response.
 
     Args:
-        domain: bitrix portal domain
-        auth_token: auth token
-        is_webhook: whether the method is being called using webhook token
-        methods:
-                Collection of methods to call. Each item in a collection should be a tuple containing rest api method and its parameters.
-                If the collection provided is a mapping, its keys are used to assosiate methods with their respective results.
-        halt: whether to halt the sequence of requests in case of an error
-        timeout: timeout in seconds
-        prefer_version: preferred API version to resolve the batch method against
-        bitrix_token:
+        domain: Bitrix24 portal domain.
+        auth_token: OAuth access token or webhook token.
+        is_webhook: Whether ``auth_token`` is a webhook token.
+        methods: Mapping or sequence of ``(api_method, params)`` tuples. Mapping
+            keys are used as result keys returned by Bitrix.
+        halt: Stop processing further chunks when a command error appears.
+        timeout: Request timeout in seconds.
+        prefer_version: Preferred API version to resolve the ``batch`` method.
+        bitrix_token: Optional token wrapper used by nested execution.
+        **kwargs: Extra requester options, such as retry configuration.
 
     Returns:
-        dictionary containing the result of the batch method call and information about call time
+        Parsed merged batch response with command results, errors, pagination
+        metadata returned by Bitrix, and aggregated timing.
     """
     return _BatchesCaller(
         domain=domain,

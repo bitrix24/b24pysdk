@@ -7,6 +7,7 @@ from b24pysdk.client import BaseClient
 
 pytestmark = [
     pytest.mark.integration,
+    pytest.mark.scopes,
     pytest.mark.scope,
 ]
 

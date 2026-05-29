@@ -14,7 +14,14 @@ __all__ = [
 
 
 class _BatchCaller(BaseCaller):
-    """"""
+    """
+    Caller for one classic Bitrix ``batch`` request.
+
+    The classic batch API accepts a ``cmd`` mapping where every value is encoded
+    as ``method?query``. This caller validates the number of commands according
+    to the SDK classic batch limit and serializes method tuples into that
+    Bitrix format.
+    """
 
     _API_METHOD: Final[Text] = "batch"
     _MAX_BATCH_SIZE: Final[int] = MAX_BATCH_SIZE
@@ -38,6 +45,24 @@ class _BatchCaller(BaseCaller):
             bitrix_token: Optional[BitrixTokenProtocol] = None,
             **kwargs,
     ):
+        """
+        Initialize a classic batch request.
+
+        Args:
+            domain: Bitrix24 portal domain.
+            auth_token: OAuth access token or webhook token.
+            is_webhook: Whether ``auth_token`` is a webhook token.
+            methods: Mapping or sequence of ``(api_method, params)`` tuples.
+            halt: Whether Bitrix should stop executing commands after the first
+                failed command.
+            ignore_size_limit: When ``True``, truncate command collection to the
+                SDK batch limit instead of raising ``ValueError``.
+            prefer_version: Preferred API version for resolving the ``batch``
+                call itself.
+            bitrix_token: Optional token wrapper used to execute nested calls
+                through retry and refresh logic.
+            **kwargs: Extra requester options forwarded to lower-level callers.
+        """
         super().__init__(
             domain=domain,
             auth_token=auth_token,
@@ -52,7 +77,13 @@ class _BatchCaller(BaseCaller):
         self._methods = self._validate_methods(methods)
 
     def _validate_methods(self, methods: B24Requests) -> B24Requests:
-        """"""
+        """
+        Validate command count against the classic batch size limit.
+
+        Returns the original collection when it fits the limit. If the
+        collection is too large, either truncates it when ``ignore_size_limit``
+        is enabled or raises ``ValueError`` to prevent an invalid API request.
+        """
         if len(methods) > self._MAX_BATCH_SIZE:
             if self._ignore_size_limit:
 
@@ -70,7 +101,13 @@ class _BatchCaller(BaseCaller):
 
     @property
     def _cmd(self) -> Dict[Key, Text]:
-        """"""
+        """
+        Serialize batch method tuples into Bitrix ``cmd`` format.
+
+        Mapping input preserves caller-provided keys in the response. Sequence
+        input uses numeric indexes. Method parameters are URL-encoded because
+        the classic batch endpoint expects each command as a query string.
+        """
 
         cmd: Dict[Key, Text] = dict()
 
@@ -85,11 +122,17 @@ class _BatchCaller(BaseCaller):
 
     @property
     def _dynamic_params(self) -> JSONDict:
-        """"""
+        """Return the payload expected by the classic Bitrix ``batch`` method."""
         return dict(cmd=self._cmd, halt=self._halt)
 
     def _fetch_response(self) -> JSONDict:
-        """"""
+        """
+        Execute the batch request through the token wrapper or raw method caller.
+
+        When a ``BitrixToken`` wrapper is available, nested execution goes
+        through token retry/refresh logic. Otherwise the function calls the
+        low-level ``call_method`` directly with stored auth context.
+        """
         if self._bitrix_token:
             return self._bitrix_token.call_method(
                 api_method=self._api_method,
@@ -107,7 +150,7 @@ class _BatchCaller(BaseCaller):
             )
 
     def call(self) -> JSONDict:
-        """"""
+        """Execute the configured batch request and return the parsed response."""
         return self._fetch_response()
 
 
@@ -157,25 +200,30 @@ def call_batch(
         **kwargs,
 ) -> JSONDict:
     """
-    Using 'batch' API method, call multiple API methods in one hit to Bitrix for performance benefits.
+    Execute multiple Bitrix REST methods in one classic ``batch`` request.
 
-    Note: one call to batch method allows you to make up to 50 actual REST API requests in one hit, mitigating requests intensity limits.
+    The classic batch endpoint accepts up to ``MAX_BATCH_SIZE`` commands in one
+    call. This helper is intended for one physical batch request; use
+    ``call_batches`` when the command collection can exceed that limit and
+    should be split into several batch requests automatically.
 
     Args:
-        domain: bitrix portal domain
-        auth_token: auth token
-        is_webhook: whether the method is being called using webhook token
-        methods:
-                Collection of methods to call. Each item in a collection should be a tuple containing rest api method and its parameters.
-                If the collection provided is a mapping, its keys are used to assosiate methods with their respective results.
-        halt: whether to halt the sequence of requests in case of an error
-        ignore_size_limit: if the number of methods exceeds maximum, truncate methods sequence instead of raising an error
-        timeout: timeout in seconds
-        prefer_version: preferred API version to resolve the batch method against
-        bitrix_token:
+        domain: Bitrix24 portal domain.
+        auth_token: OAuth access token or webhook token.
+        is_webhook: Whether ``auth_token`` is a webhook token.
+        methods: Mapping or sequence of ``(api_method, params)`` tuples. Mapping
+            keys are used as result keys returned by Bitrix.
+        halt: Whether Bitrix should stop on the first command error.
+        ignore_size_limit: Truncate to ``MAX_BATCH_SIZE`` instead of raising when
+            too many commands are passed.
+        timeout: Request timeout in seconds.
+        prefer_version: Preferred API version to resolve the ``batch`` method.
+        bitrix_token: Optional token wrapper used by nested execution.
+        **kwargs: Extra requester options, such as retry configuration.
 
     Returns:
-        dictionary containing the result of the batch method call and information about call time
+        Parsed Bitrix batch response with command results, command errors, and
+        timing metadata.
     """
     return _BatchCaller(
         domain=domain,

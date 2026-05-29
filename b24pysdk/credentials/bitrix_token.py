@@ -177,10 +177,17 @@ class AbstractBitrixToken:
     @_bitrix_app_required
     def get_oauth_token(self, code: Text, **kwargs) -> "RenewedOAuth":
         """
-        Exchange an OAuth authorization code for access and refresh tokens.
+        Send an authorization-code request to the Bitrix24 authorization server.
+
+        The authorization server exchanges the one-time ``code`` received from
+        the OAuth redirect for an access token and a refresh token using the
+        Bitrix24 OAuth token endpoint.
 
         This method is available only for tokens bound to a Bitrix app. Webhook
         tokens do not have an OAuth app context and will raise ``AttributeError``.
+
+        Documentation:
+            https://apidocs.bitrix24.com/settings/oauth/index.html
 
         Args:
             code: Authorization code received from Bitrix OAuth redirect.
@@ -194,12 +201,17 @@ class AbstractBitrixToken:
     @_bitrix_app_required
     def refresh_oauth_token(self, **kwargs) -> "RenewedOAuth":
         """
-        Refresh the current OAuth access token using ``refresh_token``.
+        Send a refresh-token request to the Bitrix24 authorization server.
 
-        The method delegates the refresh request to the bound Bitrix app. It
-        does not mutate this token object by itself; use
+        The authorization server exchanges the current ``refresh_token`` for a
+        new access token and a new refresh token. This method delegates the
+        request to the bound Bitrix app and does not mutate this token object by
+        itself; use
         ``refresh_and_set_oauth_token`` when the stored credentials must be
         updated after refresh.
+
+        Documentation:
+            https://apidocs.bitrix24.com/settings/oauth/auto-renewal.html
 
         Args:
             **kwargs: Extra request options forwarded to the app OAuth client.
@@ -212,11 +224,18 @@ class AbstractBitrixToken:
     @_bitrix_app_required
     def get_app_info(self, **kwargs) -> "BitrixAppInfoResponse":
         """
-        Request information about the app installation for the current access token.
+        Send an ``app.info`` request to the Bitrix24 authorization server.
+
+        The method requests information about the app installation for the
+        current access token using the OAuth-server ``app.info`` endpoint
+        (``https://oauth.bitrix24.tech/rest/app.info/``).
 
         The call is executed through the common retry layer, so expired OAuth
         tokens can be refreshed and portal-domain redirects can be handled before
         returning the response.
+
+        Documentation:
+            https://apidocs.bitrix24.com/settings/oauth/simple-way.html?#inline-code-id-yrbn8t1t
 
         Args:
             **kwargs: Extra request options forwarded to the app-info request.
@@ -337,12 +356,14 @@ class AbstractBitrixToken:
             return func()
 
         except BitrixResponse302JSONDecodeError as error:
+            old_domain = self.domain
+
             if not self._AUTO_CHANGED_DOMAIN:
                 self._config.logger.info(
                     "Caught BitrixResponse302JSONDecodeError, but auto-domain-change is disabled",
                     context=dict(
                         bitrix_token=str(self),
-                        old_domain=self.domain,
+                        old_domain=old_domain,
                         new_domain=error.new_domain,
                     ),
                 )
@@ -353,7 +374,7 @@ class AbstractBitrixToken:
                     "Domain changed, retrying request",
                     context=dict(
                         bitrix_token=str(self),
-                        old_domain=self.domain,
+                        old_domain=old_domain,
                         new_domain=error.new_domain,
                     ),
                 )
@@ -363,7 +384,7 @@ class AbstractBitrixToken:
                     "Caught BitrixResponse302JSONDecodeError, but domain did not change!",
                     context=dict(
                         bitrix_token=str(self),
-                        old_domain=self.domain,
+                        old_domain=old_domain,
                         new_domain=error.new_domain,
                     ),
                 )

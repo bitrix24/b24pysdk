@@ -19,22 +19,29 @@ def call(
         retry_delay_increment: Optional[Number] = None,
 ) -> JSONDict:
     """
-    Performs a call to the Bitrix API
+    Perform one HTTP request to a concrete Bitrix REST URL.
+
+    This is the lowest-level caller in the SDK. It does not know which Bitrix
+    method is being called and does not add authentication by itself; callers
+    above this function build the URL and parameters first. The function
+    delegates request execution, retry handling, and response parsing to
+    ``BitrixAPIRequester``.
 
     Args:
-        url: url to which the requests should be sent
-        params: API method parameters
-        files: files attached to the requests
-        timeout: timeout in seconds
-        max_retries: maximum number of retries that will occur when server is not responding
-        initial_retry_delay: initial delay between retries in seconds
-        retry_delay_increment: amount by which delay between retries will increment after each retry
+        url: Absolute Bitrix REST endpoint URL.
+        params: Request parameters sent in the request body.
+        files: Files attached to the request.
+        timeout: Request timeout in seconds.
+        max_retries: Maximum retry attempts for transport-level failures.
+        initial_retry_delay: Delay before the first retry, in seconds.
+        retry_delay_increment: Increment added to retry delay after each retry.
 
     Returns:
-        Response returned by the API server
+        Parsed JSON response returned by the Bitrix API server.
+
     Raises:
-        BitrixRequestError: if failed to establish HTTP connection
-        BitrixRequestTimeout: if the requests timed out
+        BitrixRequestError: If the HTTP connection cannot be established.
+        BitrixRequestTimeout: If the request times out.
     """
     return BitrixAPIRequester(
         url=url,

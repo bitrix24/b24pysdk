@@ -327,7 +327,7 @@ def test_error_bitrix_response_302_json_decode_error():
             webhook_token=env_config.webhook_token,
         ),
     )
-    old_domain_client._bitrix_token._AUTO_CHANCHED_DOMAIN = False
+    old_domain_client._bitrix_token._AUTO_CHANGED_DOMAIN = False
     bitrix_request = old_domain_client.profile()
 
     with pytest.raises(BitrixResponse302JSONDecodeError) as exc_info:

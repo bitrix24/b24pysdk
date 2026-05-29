@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from .bitrix_time_response import BitrixTimeResponse
 
 __all__ = [
-    "AbatractBitrixAPIListResponse",
+    "AbstractBitrixAPIListResponse",
     "BitrixAPIListFastResponse",
     "BitrixAPIListResponse",
 ]
@@ -24,12 +24,12 @@ if PYTHON_VERSION >= (3, 10):
 
 
 @dataclass(**_DATACLASS_KWARGS)
-class AbatractBitrixAPIListResponse(AbstractBitrixResponse[_BALRST], ABC, Generic[_BALRST]):
+class AbstractBitrixAPIListResponse(AbstractBitrixResponse[_BALRST], ABC, Generic[_BALRST]):
     """"""
 
 
 @dataclass(**_DATACLASS_KWARGS)
-class BitrixAPIListResponse(AbatractBitrixAPIListResponse[JSONList]):
+class BitrixAPIListResponse(AbstractBitrixAPIListResponse[JSONList]):
     """"""
 
     def __repr__(self):
@@ -48,7 +48,7 @@ class BitrixAPIListResponse(AbatractBitrixAPIListResponse[JSONList]):
 
 
 @dataclass(**_DATACLASS_KWARGS)
-class BitrixAPIListFastResponse(AbatractBitrixAPIListResponse[JSONDictGenerator]):
+class BitrixAPIListFastResponse(AbstractBitrixAPIListResponse[JSONDictGenerator]):
     """"""
 
     time: InitVar[JSONDict]

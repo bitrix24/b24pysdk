@@ -14,10 +14,17 @@ __all__ = [
 
 
 class _ListCaller(BaseCaller):
-    """"""
+    """
+    Caller for classic list methods that return ``total``/``next`` pagination.
 
-    _ALLOWED_PARAMS_FOR_OPTIMIZATION_BY_ID: Final[Tuple] = ("filter", "select")
-    _FILTER_ID_KEYS: Final[Tuple] = ("id", "@id")
+    The caller fetches the first page with a normal method call, then uses batch
+    requests to load remaining pages by ``start`` offsets. It also has a
+    shortcut for requests that filter only by a list of IDs: in that case the ID
+    list is split into chunks and fetched through batch calls.
+    """
+
+    _ALLOWED_PARAMS_FOR_OPTIMIZATION_BY_ID: Final[Tuple[Text, ...]] = ("filter", "select")
+    _FILTER_ID_KEYS: Final[Tuple[Text, ...]] = ("id", "@id")
     _HALT: Final[bool] = True
     _STEP: Final[int] = MAX_BATCH_SIZE
 
@@ -39,6 +46,23 @@ class _ListCaller(BaseCaller):
             bitrix_token: Optional[BitrixTokenProtocol] = None,
             **kwargs,
     ):
+        """
+        Initialize a classic list caller.
+
+        Args:
+            domain: Bitrix24 portal domain.
+            auth_token: OAuth access token or webhook token.
+            is_webhook: Whether ``auth_token`` is a webhook token.
+            api_method: List-like REST method name.
+            params: Method parameters, usually including ``filter`` and
+                ``select``.
+            limit: Maximum number of items to return, or ``None`` for all
+                available items reported by Bitrix.
+            prefer_version: Preferred API version. V3 list methods are rejected
+                because this caller relies on classic ``start`` pagination.
+            bitrix_token: Optional token wrapper used for retry/refresh logic.
+            **kwargs: Extra requester options forwarded to lower-level calls.
+        """
         super().__init__(
             domain=domain,
             auth_token=auth_token,
@@ -56,14 +80,18 @@ class _ListCaller(BaseCaller):
 
     def _check_filter_by_id_only(self) -> Tuple[Text, Text, List[int]]:
         """
-        Checks if method params contain only single filter by list of ids
+        Detect whether the request can be optimized as ID-only filtering.
+
+        The optimization is safe only when method parameters contain no
+        meaningful keys except ``filter`` and ``select``, and the filter itself
+        contains only ``id`` or ``@id`` with an iterable list of IDs. Such
+        requests can be split into independent batch commands by ID chunks
+        instead of using ``start`` pagination.
 
         Returns:
-            key by which filter values can be accessed
-
-            key by which list of ids in filter can be accessed
-
-            list of ids to filter by if params satisfy the condition, otherwise None
+            A tuple containing the actual filter key, the actual ID-filter key,
+            and the list of IDs. Empty strings/list mean the optimization is not
+            applicable.
         """
 
         filter_key: Text = ""
@@ -86,6 +114,9 @@ class _ListCaller(BaseCaller):
             else:
                 return filter_key, filter_id_key, filter_ids
 
+        if not filter_id_key:
+            return filter_key, filter_id_key, filter_ids
+
         filter_id_value = self._params[filter_key][filter_id_key]
 
         if isinstance(filter_id_value, Iterable) and not isinstance(filter_id_value, (str, bytes)):
@@ -100,10 +131,14 @@ class _ListCaller(BaseCaller):
             filter_ids: List[int],
     ) -> List[B24RequestTuple]:
         """
-        Generates list of methods, using call_list() api_method and params, slicing ids from filter parameter in chunks
+        Generate batch commands for the ID-filter optimization.
+
+        The ID list is split into chunks of ``_STEP`` IDs. Each generated command
+        reuses the original method and parameters but replaces the ID filter
+        value with the current chunk.
 
         Returns:
-            list of B24BatchMethodTuple, ready to be used by call_batches()
+            List of ``(api_method, params)`` tuples ready for ``call_batches``.
         """
 
         methods: List[B24RequestTuple] = list()
@@ -121,13 +156,18 @@ class _ListCaller(BaseCaller):
             total: int,
     ) -> List[B24RequestTuple]:
         """
-        Generates list of methods, using call_list() api_method and params, adding pagination parameter
+        Generate batch commands for classic ``start`` pagination.
+
+        Each command reuses the original method and parameters and adds a
+        ``start`` offset. Offsets begin from ``next_step`` returned by the first
+        Bitrix response and continue up to ``total``.
+
         Args:
-            next_step: index from which generation starts
-            total: total number of list method's results
+            next_step: First ``start`` offset that still needs to be fetched.
+            total: Total number of items to retrieve.
 
         Returns:
-            list of B24BatchMethodTuple, ready to be used by call_batches()
+            List of ``(api_method, params)`` tuples ready for ``call_batches``.
         """
 
         methods: List[B24RequestTuple] = list()
@@ -139,7 +179,12 @@ class _ListCaller(BaseCaller):
         return methods
 
     def _fetch_first_response(self) -> JSONDict:
-        """"""
+        """
+        Fetch the first page using the original method parameters.
+
+        The first response is required because classic Bitrix list methods
+        expose ``total`` and ``next`` only in the normal list response.
+        """
         if self._bitrix_token:
             return self._bitrix_token.call_method(
                 api_method=self._api_method,
@@ -157,7 +202,7 @@ class _ListCaller(BaseCaller):
             )
 
     def _fetch_batches_response(self, methods: List[B24RequestTuple]) -> JSONDict:
-        """"""
+        """Execute generated pagination or ID-filter requests through batches."""
         return call_batches(
             domain=self._domain,
             auth_token=self._auth_token,
@@ -169,7 +214,13 @@ class _ListCaller(BaseCaller):
         )
 
     def _unwrap_result(self, result: JSONDict) -> JSONList:
-        """"""
+        """
+        Extract the list payload from a Bitrix list response.
+
+        Many Bitrix methods wrap list data under one or more object keys, for
+        example ``{"items": [...]}``. This method follows the first value until
+        it reaches the actual list.
+        """
 
         while isinstance(result, dict):
             result = next(iter(result.values()))
@@ -180,7 +231,7 @@ class _ListCaller(BaseCaller):
             raise TypeError(f"Bitrix API method {self._api_method!r} is not a list-type method!")
 
     def _unwrap_batch_result(self, batch_result: JSONDict) -> JSONList:
-        """"""
+        """Flatten list payloads from all command results in a batch response."""
 
         result_list = list()
 
@@ -195,7 +246,7 @@ class _ListCaller(BaseCaller):
         return result_list
 
     def _add_time(self, time: JSONDict):
-        """"""
+        """Merge timing metadata from an additional batch response into ``_time``."""
 
         self._time["finish"] = time["finish"]
         self._time["duration"] += time["duration"]
@@ -213,7 +264,13 @@ class _ListCaller(BaseCaller):
             self._time["operating"] = self._time.get("operating", 0) + operating
 
     def call(self) -> JSONDict:
-        """"""
+        """
+        Fetch list items with classic Bitrix pagination and return a normalized response.
+
+        Returns ``{"result": [...], "time": ...}`` regardless of the original
+        wrapper key used by the Bitrix method. When possible, remaining pages
+        are fetched through batch requests for fewer HTTP round trips.
+        """
 
         filter_key, filter_id_key, filter_ids = self._check_filter_by_id_only()
 
@@ -276,21 +333,27 @@ def call_list(
         **kwargs,
 ) -> JSONDict:
     """
-    Retrieve large number of items using batch API method and accounting for pagination
+    Retrieve items from a classic Bitrix list method using batch pagination.
+
+    The helper is designed for V1/V2 list methods that return classic Bitrix
+    pagination fields such as ``total`` and ``next`` and accept ``start`` as the
+    page offset. V3 ``/rest/api`` methods are not supported by this helper
+    because their pagination contract is different.
 
     Args:
-        domain: bitrix portal domain
-        auth_token: auth token
-        is_webhook: whether the method is being called using webhook token
-        api_method: name of the bitrix API method to call, e.g. crm.deal.list
-        params: API method parameters
-        limit: max number of items to retrieve
-        timeout: timeout in seconds
-        prefer_version: preferred API version to resolve the method against
-        bitrix_token:
+        domain: Bitrix24 portal domain.
+        auth_token: OAuth access token or webhook token.
+        is_webhook: Whether ``auth_token`` is a webhook token.
+        api_method: List-like REST method name, for example ``crm.deal.list``.
+        params: Method parameters sent to Bitrix.
+        limit: Maximum number of items to retrieve.
+        timeout: Request timeout in seconds.
+        prefer_version: Preferred API version to resolve the method against.
+        bitrix_token: Optional token wrapper used by nested execution.
+        **kwargs: Extra requester options, such as retry configuration.
 
     Returns:
-        dictionary containing list of items returned by called API method and information about call time
+        Dictionary with flattened ``result`` list and aggregated ``time`` data.
     """
     return _ListCaller(
         domain=domain,

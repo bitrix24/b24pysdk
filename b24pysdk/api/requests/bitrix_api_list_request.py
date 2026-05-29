@@ -2,7 +2,7 @@ from abc import ABC
 from typing import TYPE_CHECKING, Generic, Optional, TypeVar
 
 from ...utils.types import JSONDict
-from ..responses import AbatractBitrixAPIListResponse, BitrixAPIListFastResponse, BitrixAPIListResponse
+from ..responses import AbstractBitrixAPIListResponse, BitrixAPIListFastResponse, BitrixAPIListResponse
 from .bitrix_api_base_request import BitrixAPIBaseRequest
 
 if TYPE_CHECKING:
@@ -13,7 +13,7 @@ __all__ = [
     "BitrixAPIListRequest",
 ]
 
-_BALRPT = TypeVar("_BALRPT", bound=AbatractBitrixAPIListResponse)
+_BALRPT = TypeVar("_BALRPT", bound=AbstractBitrixAPIListResponse)
 
 
 class _AbstractBitrixAPIListRequest(BitrixAPIBaseRequest[_BALRPT], ABC, Generic[_BALRPT]):

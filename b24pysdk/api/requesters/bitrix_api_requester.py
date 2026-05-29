@@ -53,10 +53,10 @@ class BitrixAPIRequester(BaseRequester):
         return requests.post(
             url=self._url,
             json=self._params,
-            timeout=self._timeout,
-            files=self._files,
-            allow_redirects=self._ALLOW_REDIRECTS,
             headers=self._headers,
+            files=self._files,
+            timeout=self._timeout,
+            allow_redirects=self._ALLOW_REDIRECTS,
         )
 
     def _post(self) -> requests.Response:

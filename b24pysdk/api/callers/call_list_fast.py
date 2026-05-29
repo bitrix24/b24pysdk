@@ -15,7 +15,14 @@ __all__ = [
 
 
 class _ListFastCaller(BaseCaller):
-    """"""
+    """
+    Caller for fast classic list retrieval by moving ID window.
+
+    Instead of relying on Bitrix ``total`` counting, this caller orders results
+    by an ID-like field, disables total calculation with ``start=-1``, and uses
+    batch requests whose filters depend on the last ID returned by the previous
+    page. This is useful for large V1/V2 datasets where total counting is slow.
+    """
 
     _DEFAULT_ID_FIELD: Final[Text] = "ID"
     _DEFAULT_ORDER_PATTERN: Final[Callable[[Text, Text], JSONDict]] = staticmethod(lambda id_field, sorting: {"order": {id_field: sorting}})
@@ -76,6 +83,23 @@ class _ListFastCaller(BaseCaller):
             bitrix_token: Optional[BitrixTokenProtocol] = None,
             **kwargs,
     ):
+        """
+        Initialize fast list retrieval state.
+
+        Args:
+            domain: Bitrix24 portal domain.
+            auth_token: OAuth access token or webhook token.
+            is_webhook: Whether ``auth_token`` is a webhook token.
+            api_method: List-like REST method name.
+            params: Base method parameters. They are merged with generated
+                ordering, filter, and ``start=-1`` parameters.
+            descending: Retrieve items by descending ID-like field when ``True``.
+            limit: Maximum number of yielded items, or ``None`` for all items.
+            prefer_version: Preferred API version. V3 methods are rejected
+                because this caller uses classic filtering and batch syntax.
+            bitrix_token: Optional token wrapper used for retry/refresh logic.
+            **kwargs: Extra requester options forwarded to lower-level calls.
+        """
         super().__init__(
             domain=domain,
             auth_token=auth_token,
@@ -92,8 +116,8 @@ class _ListFastCaller(BaseCaller):
         self._limit = limit
         self._now_datetime = self._config.get_local_datetime()
         self._time = dict(
-            start=self._timesampt,
-            finish=self._timesampt,
+            start=self._timestamp,
+            finish=self._timestamp,
             duration=0,
             processing=0,
             date_start=self._now_datetime.isoformat(timespec="seconds"),
@@ -108,7 +132,13 @@ class _ListFastCaller(BaseCaller):
         self._results = None
 
     def _get_initial_request_id_field(self) -> Optional[Text]:
-        """"""
+        """
+        Resolve the request-side ID field configured for the current method.
+
+        Some methods use lower-case or method-specific ID field names. The
+        lookup first tries the full method name and then progressively trims
+        suffixes, allowing family-level configuration such as ``crm.type``.
+        """
 
         api_method = self._api_method
         request_id_field = self._REQUEST_ID_FIELDS.get(api_method)
@@ -120,7 +150,13 @@ class _ListFastCaller(BaseCaller):
         return request_id_field
 
     def _get_order_pattern(self) -> Callable[[Text, Text], JSONDict]:
-        """"""
+        """
+        Resolve how the current method expresses sorting by ID.
+
+        Most methods use ``{"order": {id_field: sorting}}``. A few older
+        methods use top-level ``SORT``/``ORDER`` parameters, so this method
+        selects the proper pattern for the API method family.
+        """
 
         api_method = self._api_method
         order_pattern = self._ORDER_PATTERNS.get(api_method)
@@ -133,37 +169,42 @@ class _ListFastCaller(BaseCaller):
 
     @property
     def _cmp(self) -> Literal[">", "<"]:
-        """"""
+        """Return the comparison operator used to advance the ID window."""
         return (">", "<")[self._descending]
 
     @property
     def _dynamic_request_id_field(self) -> Text:
-        """"""
+        """
+        Return the ID field name used in generated request filters.
+
+        Preference order is explicit method configuration, then the ID field
+        detected from the first response, then the default ``ID`` field.
+        """
         return self._request_id_field or self._response_id_field or self._DEFAULT_ID_FIELD
 
     @property
     def _prop(self) -> Text:
-        """"""
+        """Return the Bitrix filter key for the moving ID boundary."""
         return f"{self._cmp}{self._dynamic_request_id_field}"
 
     @property
     def _sorting(self) -> Literal["ASC", "DESC"]:
-        """"""
+        """Return Bitrix sort direction matching the requested traversal order."""
         return ("ASC", "DESC")[self._descending]
 
     @property
     def _order_by_id(self) -> JSONDict:
-        """"""
+        """Return ordering parameters for the current ID field and direction."""
         return self._order_pattern(self._dynamic_request_id_field, self._sorting)
 
     @property
-    def _timesampt(self) -> float:
-        """"""
+    def _timestamp(self) -> float:
+        """Return the fixed timestamp used for synthetic aggregated time fields."""
         return self._now_datetime.timestamp()
 
     @staticmethod
     def _force_values(collection: Union[JSONDict, JSONList]) -> Iterable[Union[JSONDict, JSONList]]:
-        """"""
+        """Return iterable values for either dict-shaped or list-shaped results."""
         if isinstance(collection, dict):
             return collection.values()
         else:
@@ -171,12 +212,17 @@ class _ListFastCaller(BaseCaller):
 
     @property
     def _results_values(self) -> Iterable[Union[JSONDict, JSONList]]:
-        """"""
+        """Return iterable page payloads from the most recent batch result."""
         return self._force_values(self._results)
 
     def _deep_merge(self, *dicts: Dict) -> Dict:
         """
-        Merges nested dictionaries recursively
+        Merge nested dictionaries recursively.
+
+        Later dictionaries override earlier scalar values. Nested dictionaries
+        are merged recursively so generated filter/order parameters can be
+        layered on top of caller-provided parameters without discarding unrelated
+        nested keys.
         """
 
         result_dict: Dict = dict()
@@ -196,7 +242,7 @@ class _ListFastCaller(BaseCaller):
         return result_dict
 
     def _add_time(self, time: JSONDict):
-        """"""
+        """Accumulate Bitrix timing metadata from one method or batch response."""
 
         self._time["finish"] = time["finish"]
         self._time["duration"] += time["duration"]
@@ -214,7 +260,13 @@ class _ListFastCaller(BaseCaller):
             self._time["operating"] = self._time.get("operating", 0) + operating
 
     def _unwrap_result(self, result: JSONDict) -> Tuple[Optional[Text], JSONList]:
-        """"""
+        """
+        Extract the list payload and remember its wrapper key.
+
+        Bitrix list methods often return data under a wrapper such as
+        ``{"items": [...]}``. The wrapper is needed later to build batch
+        expressions that reference previous batch results.
+        """
 
         wrapper = None
 
@@ -227,7 +279,12 @@ class _ListFastCaller(BaseCaller):
             raise TypeError(f"Bitrix API method {self._api_method!r} is not a list-type method!")
 
     def _get_path(self, index: int) -> Text:
-        """"""
+        """
+        Build a Bitrix batch expression pointing to the previous request result.
+
+        The generated expression is used inside later batch commands to read the
+        last item ID from the previous command and continue the moving ID window.
+        """
 
         path = f"$result[req_{index - 1}]"
 
@@ -238,7 +295,12 @@ class _ListFastCaller(BaseCaller):
 
     def _get_filter_by_id(self, index: int) -> JSONDict:
         """
-        Generate filter by id
+        Generate the moving ID filter for one command in a batch chain.
+
+        The first command uses the stored ``_last_id`` from the previous batch,
+        if any. Later commands reference the previous command's last returned
+        item through a Bitrix batch expression, allowing a single batch request
+        to fetch several consecutive pages.
         """
 
         if index == 0:
@@ -250,7 +312,12 @@ class _ListFastCaller(BaseCaller):
         return {"filter": {self._prop: f"{self._get_path(index)}[{self._MAX_BATCH_SIZE - 1}][{self._response_id_field}]"}}
 
     def _generate_method_params(self, index: int = 0) -> JSONDict:
-        """"""
+        """
+        Build parameters for one fast-list request.
+
+        The result merges caller parameters with generated ordering, moving-ID
+        filter, and ``start=-1`` to skip total counting.
+        """
         return self._deep_merge(
             self._params,
             self._order_by_id,
@@ -260,10 +327,15 @@ class _ListFastCaller(BaseCaller):
 
     def _generate_batch_methods(self) -> Dict[Text, B24RequestTuple]:
         """
-        Generates list of methods, using call_list_fast() api_method and params, adding filter by ID
+        Generate one chain of fast-list batch commands.
+
+        Every command uses the same API method with generated order, filter, and
+        ``start=-1`` parameters. Commands are named ``req_0``, ``req_1``, ...
+        because later filters reference earlier command results by these names.
 
         Returns:
-            dict of B24BatchMethodTuple, ready to be used by call_batches()
+            Dictionary of request names to ``(api_method, params)`` tuples ready
+            for ``call_batch``.
         """
 
         methods: Dict[Text, B24RequestTuple] = dict()
@@ -275,7 +347,12 @@ class _ListFastCaller(BaseCaller):
         return methods
 
     def _fetch_first_response(self) -> JSONDict:
-        """"""
+        """
+        Fetch the first page outside batch to discover wrapper and ID field names.
+
+        Later batch commands depend on the response wrapper and ID field found
+        in this initial response.
+        """
         if self._bitrix_token:
             return self._bitrix_token.call_method(
                 api_method=self._api_method,
@@ -293,7 +370,7 @@ class _ListFastCaller(BaseCaller):
             )
 
     def _fetch_next_batch_response(self) -> JSONDict:
-        """"""
+        """Fetch the next chain of pages through one classic batch request."""
         return call_batch(
             domain=self._domain,
             auth_token=self._auth_token,
@@ -305,7 +382,12 @@ class _ListFastCaller(BaseCaller):
         )
 
     def _extract_response_id_field(self, result_value: JSONDict) -> Text:
-        """"""
+        """
+        Detect the actual ID key returned by Bitrix in a result item.
+
+        The comparison is case-insensitive because different methods may return
+        ``ID`` or ``id``. The detected key is reused in batch expressions.
+        """
 
         for key in result_value:
             if key.upper() == self._DEFAULT_ID_FIELD:
@@ -314,7 +396,12 @@ class _ListFastCaller(BaseCaller):
         raise ValueError("ID key is not found in Bitrix responses!")
 
     def _update_last_id(self, new_last_id: int):
-        """"""
+        """
+        Store the last emitted ID and guard against infinite pagination loops.
+
+        If Bitrix returns the same boundary ID twice, the moving filter would
+        keep requesting the same page forever, so the method raises ``ValueError``.
+        """
         if new_last_id != self._last_id:
             self._last_id = new_last_id
         else:
@@ -325,7 +412,13 @@ class _ListFastCaller(BaseCaller):
             )
 
     def _generate_result(self) -> JSONDictGenerator:
-        """"""
+        """
+        Yield items one by one while fetching additional pages as needed.
+
+        The generator starts with a normal method call, then repeatedly requests
+        chained batch pages until a short page is returned or ``limit`` is
+        reached.
+        """
 
         response = self._fetch_first_response()
 
@@ -362,7 +455,13 @@ class _ListFastCaller(BaseCaller):
             self._results = batch_response["result"]["result"]
 
     def call(self) -> JSONDict:
-        """"""
+        """
+        Return a lazy result generator and accumulated timing metadata.
+
+        The ``result`` value is a generator. Items are fetched progressively as
+        the consumer iterates over it, while ``time`` is updated by the caller
+        as pages are loaded.
+        """
         return dict(result=self._generate_result(), time=self._time)
 
 
@@ -381,25 +480,29 @@ def call_list_fast(
         **kwargs,
 ) -> JSONDict:
     """
-    Retrieve large number of items in a performant way using filter by ID and start=-1 parameter to disable the count of items
+    Retrieve a large classic list result using ID-window pagination.
 
     Note:
-        On small sets of items (2550 entries and less), call_list() has better performance and should be used instead
+        On small sets of items (2550 entries and less), ``call_list`` can be
+        faster because it uses the classic ``total``/``next`` pagination flow.
+        This helper is optimized for large V1/V2 datasets and is not compatible
+        with V3 ``/rest/api`` list methods.
 
     Args:
-        domain: bitrix portal domain
-        auth_token: auth token
-        is_webhook: whether the method is being called using webhook token
-        api_method: name of the bitrix API method to call, e.g. crm.deal.list
-        params: API method parameters
-        limit: max number of items to retrieve
-        descending: whether items should be retrieved in descending order
-        timeout: timeout in seconds
-        prefer_version: preferred API version to resolve the method against
-        bitrix_token:
+        domain: Bitrix24 portal domain.
+        auth_token: OAuth access token or webhook token.
+        is_webhook: Whether ``auth_token`` is a webhook token.
+        api_method: List-like REST method name, for example ``crm.deal.list``.
+        params: Base method parameters sent to Bitrix.
+        descending: Retrieve items in descending ID order when ``True``.
+        limit: Maximum number of items to retrieve.
+        timeout: Request timeout in seconds.
+        prefer_version: Preferred API version to resolve the method against.
+        bitrix_token: Optional token wrapper used by nested execution.
+        **kwargs: Extra requester options, such as retry configuration.
 
     Returns:
-        dictionary containing list of items returned by called API method and information about call time
+        Dictionary with a lazy ``result`` generator and aggregated ``time`` data.
     """
     return _ListFastCaller(
         domain=domain,
