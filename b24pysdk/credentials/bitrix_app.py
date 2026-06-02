@@ -26,7 +26,7 @@ class AbstractBitrixApp:
     """OAuth client secret issued by Bitrix24."""
 
     def __str__(self):
-        return f"<{('Market', 'Local')[self.is_local]} {self.__class__.__name__} with client_id={self.client_id}>"
+        return f"<{'Local' if self.is_local else 'Market'} {self.__class__.__name__} with client_id={self.client_id}>"
 
     @property
     def is_local(self) -> bool:

@@ -1,5 +1,5 @@
 import json
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from typing import TYPE_CHECKING, Any, Mapping, Optional, Text
 
 from .._constants import PYTHON_VERSION
@@ -23,8 +23,16 @@ if PYTHON_VERSION >= (3, 10):
     _DATACLASS_KWARGS["slots"] = True
 
 
+class _AppInfoCacheMixin:
+
+    __slots__ = ("_app_info",)
+
+    if TYPE_CHECKING:
+        _app_info: "B24AppInfoResult"
+
+
 @dataclass(**_DATACLASS_KWARGS)
-class OAuthPlacementData:
+class OAuthPlacementData(_AppInfoCacheMixin):
     """
     Represents OAuth placement data received from Bitrix24.
 
@@ -44,9 +52,6 @@ class OAuthPlacementData:
     status: B24AppStatus
     placement: Optional[Text] = None
     placement_options: Optional[JSONDict] = None
-
-    if TYPE_CHECKING:
-        _app_info: "B24AppInfoResult" = field(init=False)
 
     @classmethod
     def from_dict(cls, payload: Mapping[Text, Any], /) -> "OAuthPlacementData":

@@ -115,14 +115,14 @@ class _ListFastCaller(BaseCaller):
         self._descending = descending
         self._limit = limit
         self._now_datetime = self._config.get_local_datetime()
-        self._time = dict(
-            start=self._timestamp,
-            finish=self._timestamp,
-            duration=0,
-            processing=0,
-            date_start=self._now_datetime.isoformat(timespec="seconds"),
-            date_finish=self._now_datetime.isoformat(timespec="seconds"),
-        )
+        self._time = {
+            "start": self._timestamp,
+            "finish": self._timestamp,
+            "duration": 0,
+            "processing": 0,
+            "date_start": self._now_datetime.isoformat(timespec="seconds"),
+            "date_finish": self._now_datetime.isoformat(timespec="seconds"),
+        }
         self._counter = 0
         self._last_id = 0
         self._request_id_field = self._get_initial_request_id_field()
@@ -170,7 +170,7 @@ class _ListFastCaller(BaseCaller):
     @property
     def _cmp(self) -> Literal[">", "<"]:
         """Return the comparison operator used to advance the ID window."""
-        return (">", "<")[self._descending]
+        return "<" if self._descending else ">"
 
     @property
     def _dynamic_request_id_field(self) -> Text:
@@ -190,7 +190,7 @@ class _ListFastCaller(BaseCaller):
     @property
     def _sorting(self) -> Literal["ASC", "DESC"]:
         """Return Bitrix sort direction matching the requested traversal order."""
-        return ("ASC", "DESC")[self._descending]
+        return "DESC" if self._descending else "ASC"
 
     @property
     def _order_by_id(self) -> JSONDict:
@@ -225,7 +225,7 @@ class _ListFastCaller(BaseCaller):
         nested keys.
         """
 
-        result_dict: Dict = dict()
+        result_dict: Dict = {}
 
         for current_dict in dicts:
             for key, value in current_dict.items():
@@ -305,11 +305,19 @@ class _ListFastCaller(BaseCaller):
 
         if index == 0:
             if self._last_id:
-                return {"filter": {self._prop: self._last_id}}
+                return {
+                    "filter": {
+                        self._prop: self._last_id,
+                    },
+                }
             else:
                 return {}
 
-        return {"filter": {self._prop: f"{self._get_path(index)}[{self._MAX_BATCH_SIZE - 1}][{self._response_id_field}]"}}
+        return {
+            "filter": {
+                self._prop: f"{self._get_path(index)}[{self._MAX_BATCH_SIZE - 1}][{self._response_id_field}]",
+            },
+        }
 
     def _generate_method_params(self, index: int = 0) -> JSONDict:
         """
@@ -322,7 +330,7 @@ class _ListFastCaller(BaseCaller):
             self._params,
             self._order_by_id,
             self._get_filter_by_id(index=index),
-            dict(start=self._START),
+            {"start": self._START},
         )
 
     def _generate_batch_methods(self) -> Dict[Text, B24RequestTuple]:
@@ -338,7 +346,7 @@ class _ListFastCaller(BaseCaller):
             for ``call_batch``.
         """
 
-        methods: Dict[Text, B24RequestTuple] = dict()
+        methods: Dict[Text, B24RequestTuple] = {}
 
         for index in range(self._MAX_BATCH_SIZE):
             method_params = self._generate_method_params(index=index)
@@ -458,11 +466,15 @@ class _ListFastCaller(BaseCaller):
         """
         Return a lazy result generator and accumulated timing metadata.
 
-        The ``result`` value is a generator. Items are fetched progressively as
-        the consumer iterates over it, while ``time`` is updated by the caller
-        as pages are loaded.
+        The ``result`` value is a one-time generator. Items are fetched progressively as
+        the consumer iterates over it, while ``time`` is updated as pages are loaded.
+        Final timing values are available only after the generator has been fully
+        consumed.
         """
-        return dict(result=self._generate_result(), time=self._time)
+        return {
+            "result": self._generate_result(),
+            "time": self._time,
+        }
 
 
 def call_list_fast(
@@ -502,7 +514,10 @@ def call_list_fast(
         **kwargs: Extra requester options, such as retry configuration.
 
     Returns:
-        Dictionary with a lazy ``result`` generator and aggregated ``time`` data.
+        BitrixAPIFastListResponse containing a lazy one-time ``result`` generator
+        and a mutable ``time`` dictionary. The ``time`` dictionary is updated while
+        the generator is consumed, so final timing values are available only after
+        the result generator has been fully iterated.
     """
     return _ListFastCaller(
         domain=domain,

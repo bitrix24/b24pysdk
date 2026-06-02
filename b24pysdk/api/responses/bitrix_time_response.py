@@ -18,7 +18,12 @@ if PYTHON_VERSION >= (3, 10):
 
 @dataclass(**_DATACLASS_KWARGS)
 class BitrixTimeResponse:
-    """"""
+    """
+    Timing metadata returned by Bitrix24 API responses.
+
+    Stores request timing, server processing time, and optional operating-limit
+    data returned by Bitrix24.
+    """
 
     start: float
     finish: float
@@ -30,7 +35,16 @@ class BitrixTimeResponse:
     operating: Optional[float] = None
 
     @classmethod
-    def from_dict(cls, json_response: JSONDict) -> "BitrixTimeResponse":
+    def from_dict(cls, json_response: JSONDict, /) -> "BitrixTimeResponse":
+        """
+        Create a BitrixTimeResponse instance from raw timing data.
+
+        Args:
+            json_response: Raw ``time`` section from a Bitrix24 response.
+
+        Returns:
+            Parsed timing metadata.
+        """
         return cls(
             start=json_response["start"],
             finish=json_response["finish"],
@@ -43,4 +57,10 @@ class BitrixTimeResponse:
         )
 
     def to_dict(self) -> JSONDict:
+        """
+        Convert timing metadata to dictionary.
+
+        Returns:
+            Dictionary representation of the timing metadata.
+        """
         return asdict(self)

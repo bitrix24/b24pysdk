@@ -1,4 +1,4 @@
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from typing import TYPE_CHECKING, Any, List, Mapping, Optional, Text
 from urllib.parse import urlparse
 
@@ -127,8 +127,16 @@ class Auth:
         return asdict(self)
 
 
+class _AuthAppInfoCache(Auth):
+
+    __slots__ = ("_app_info",)
+
+    if TYPE_CHECKING:
+        _app_info: "B24AppInfoResult"
+
+
 @dataclass(**_DATACLASS_KWARGS)
-class OAuth(Auth):
+class OAuth(_AuthAppInfoCache):
     """
     Base OAuth payload shared by Bitrix24 auth models with user OAuth context.
 
@@ -151,9 +159,6 @@ class OAuth(Auth):
     user_id: int
     scope: List[Text]
     status: B24AppStatus
-
-    if TYPE_CHECKING:
-        _app_info: "B24AppInfoResult" = field(init=False)
 
     @classmethod
     def _validate_payload(cls, payload: Mapping[Text, Any], /) -> JSONDict:

@@ -12,7 +12,12 @@ __all__ = [
 
 
 class BitrixAPIRequester(BaseRequester):
-    """"""
+    """
+    Requester for Bitrix24 REST API calls.
+
+    Sends JSON POST requests to prepared Bitrix24 REST URLs and converts
+    transport-level failures into SDK request exceptions.
+    """
 
     _ALLOW_REDIRECTS: Final[bool] = False
     _HEADERS: Final[Dict] = {"Content-Type": "application/json"}
@@ -34,6 +39,18 @@ class BitrixAPIRequester(BaseRequester):
             initial_retry_delay: Optional[Number] = None,
             retry_delay_increment: Optional[Number] = None,
     ):
+        """
+        Initialize a Bitrix24 REST API requester.
+
+        Args:
+            url: Prepared Bitrix24 REST API endpoint URL.
+            params: JSON-compatible request body parameters.
+            files: Optional files passed to ``requests.post``.
+            timeout: Request timeout.
+            max_retries: Maximum number of request attempts.
+            initial_retry_delay: Delay before the first retry.
+            retry_delay_increment: Additional delay added after each used retry.
+        """
         super().__init__(
             timeout=timeout,
             max_retries=max_retries,
@@ -46,11 +63,27 @@ class BitrixAPIRequester(BaseRequester):
 
     @property
     def _headers(self) -> Dict:
-        """"""
+        """Return default SDK headers extended with JSON content type."""
         return self._get_default_headers() | self._HEADERS
 
     def _request(self) -> requests.Response:
-        return requests.post(
+        """
+        Execute one raw Bitrix24 REST API POST request.
+
+        Returns:
+            Raw HTTP response returned by ``requests``.
+        """
+
+        self._config.logger.debug(
+            "start bitrix_api_request",
+            context={
+                "method": "POST",
+                "url": self._url,
+                "timeout": self._timeout,
+            },
+        )
+
+        response = requests.post(
             url=self._url,
             json=self._params,
             headers=self._headers,
@@ -59,17 +92,26 @@ class BitrixAPIRequester(BaseRequester):
             allow_redirects=self._ALLOW_REDIRECTS,
         )
 
+        self._config.logger.debug(
+            "finish bitrix_api_request",
+            context={
+                "response": str(response),
+            },
+        )
+
+        return response
+
     def _post(self) -> requests.Response:
         """
-        Makes a POST-requests to given url
+        Send a POST request to the Bitrix24 REST endpoint.
 
         Returns:
-            Response returned by the server
+            Raw HTTP response returned by the server.
 
         Raises:
-            ConnectionToBitrixError: if failed to establish HTTP connection
-
-            BitrixRequestTimeout: if the requests timed out
+            BitrixRequestTimeout: If the request times out.
+            BitrixRequestError: If ``requests`` fails before receiving a valid
+                HTTP response.
         """
 
         try:
@@ -82,5 +124,10 @@ class BitrixAPIRequester(BaseRequester):
             raise BitrixRequestError(original_error=error) from error
 
     def call(self) -> JSONDict:
-        """"""
+        """
+        Execute the request and parse the Bitrix24 response.
+
+        Returns:
+            Parsed JSON-compatible response dictionary.
+        """
         return self._parse_response(self._post())

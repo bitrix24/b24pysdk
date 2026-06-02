@@ -121,23 +121,23 @@ class _BatchesCaller(BaseCaller):
 
         first_response, last_response = responses[0], responses[-1]
 
-        combined_response: JSONDict = dict(
-            result=dict(
-                result=dict(),
-                result_error=dict(),
-                result_total=dict(),
-                result_next=dict(),
-                result_time=dict(),
-            ),
-            time=dict(
-                start=first_response["time"]["start"],
-                finish=last_response["time"]["finish"],
-                duration=0,
-                processing=0,
-                date_start=first_response["time"]["date_start"],
-                date_finish=last_response["time"]["date_finish"],
-            ),
-        )
+        combined_response: JSONDict = {
+            "result": {
+                "result": {},
+                "result_error": {},
+                "result_total": {},
+                "result_next": {},
+                "result_time": {},
+            },
+            "time": {
+                "start": first_response["time"]["start"],
+                "finish": last_response["time"]["finish"],
+                "duration": 0,
+                "processing": 0,
+                "date_start": first_response["time"]["date_start"],
+                "date_finish": last_response["time"]["date_finish"],
+            },
+        }
 
         combined_result: JSONDict = combined_response["result"]
         combined_time: JSONDict = combined_response["time"]

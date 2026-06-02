@@ -30,7 +30,7 @@ class _ListCaller(BaseCaller):
 
     __slots__ = ("_limit", "_time")
 
-    _limit: int
+    _limit: Optional[int]
     _time: Optional[JSONDict]
 
     def __init__(
@@ -141,7 +141,7 @@ class _ListCaller(BaseCaller):
             List of ``(api_method, params)`` tuples ready for ``call_batches``.
         """
 
-        methods: List[B24RequestTuple] = list()
+        methods: List[B24RequestTuple] = []
 
         for start in range(0, len(filter_ids), self._STEP):
             id_chunk = filter_ids[start:start + self._STEP]
@@ -170,7 +170,7 @@ class _ListCaller(BaseCaller):
             List of ``(api_method, params)`` tuples ready for ``call_batches``.
         """
 
-        methods: List[B24RequestTuple] = list()
+        methods: List[B24RequestTuple] = []
 
         for start in range(next_step, total, self._STEP):
             page_params = self._params | {"start": start}

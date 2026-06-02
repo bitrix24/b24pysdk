@@ -1,4 +1,4 @@
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, List, Mapping, Optional, Text
 
@@ -41,9 +41,6 @@ class OAuthWorkflowData:
     ts: datetime
     auth: WorkflowOAuth
     properties: Optional[JSONDict] = None
-
-    if TYPE_CHECKING:
-        _app_info: "B24AppInfoResult" = field(init=False)
 
     @classmethod
     def from_dict(cls, workflow_data: Mapping[Text, Any]) -> "OAuthWorkflowData":

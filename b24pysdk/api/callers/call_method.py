@@ -54,7 +54,7 @@ class _MethodCaller(BaseCaller):
         calls pass the access token in request parameters, so this fragment is
         empty for OAuth mode.
         """
-        return ("", f"{self._auth_token}/")[self._is_webhook]
+        return f"{self._auth_token}/" if self._is_webhook else ""
 
     @property
     def _base_url(self) -> Text:
@@ -89,26 +89,30 @@ class _MethodCaller(BaseCaller):
 
     def call(self) -> JSONDict:
         """Execute the configured method request and log request/response context."""
+
         self._config.logger.debug(
             "start call_method",
-            context=dict(
-                domain=self._domain,
-                is_webhook=self._is_webhook,
-                method=self._api_method,
-                parameters=self._params,
-            ),
+            context={
+                "domain": self._domain,
+                "is_webhook": self._is_webhook,
+                "method": self._api_method,
+                "parameters": self._params,
+            },
         )
+
         json_response = call(
             url=self._url,
             params=self._dynamic_params,
             **self._kwargs,
         )
+
         self._config.logger.debug(
             "finish call_method",
-            context=dict(
-                json_response=json_response,
-            ),
+            context={
+                "json_response": json_response,
+            },
         )
+
         return json_response
 
 

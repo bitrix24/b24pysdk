@@ -17,7 +17,12 @@ if PYTHON_VERSION >= (3, 10):
 
 @dataclass(**_DATACLASS_KWARGS)
 class BitrixAPIResponse(AbstractBitrixResponse[B24APIResult]):
-    """"""
+    """
+    Standard Bitrix24 API response.
+
+    Represents a regular REST API response containing ``result`` and ``time``,
+    with optional pagination metadata returned by list-like methods.
+    """
 
     next: Optional[int]
     total: Optional[int]
@@ -32,7 +37,16 @@ class BitrixAPIResponse(AbstractBitrixResponse[B24APIResult]):
         )
 
     @classmethod
-    def from_dict(cls, json_response: JSONDict) -> "BitrixAPIResponse":
+    def from_dict(cls, json_response: JSONDict, /) -> "BitrixAPIResponse":
+        """
+        Create a BitrixAPIResponse instance from raw JSON response.
+
+        Args:
+            json_response: Raw JSON response returned by Bitrix24.
+
+        Returns:
+            Parsed standard API response.
+        """
         return cls(
             result=json_response["result"],
             time=cls._convert_time(json_response["time"]),

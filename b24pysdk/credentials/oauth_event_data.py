@@ -1,4 +1,4 @@
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Mapping, Optional, Text
 
@@ -40,9 +40,6 @@ class OAuthEventData:
     ts: datetime
     auth: EventOAuth
     data: Optional[JSONDict] = None
-
-    if TYPE_CHECKING:
-        _app_info: "B24AppInfoResult" = field(init=False)
 
     @classmethod
     def from_dict(cls, payload: Mapping[Text, Any], /) -> "OAuthEventData":

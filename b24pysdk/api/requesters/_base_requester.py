@@ -19,7 +19,12 @@ __all__ = [
 
 
 class BaseRequester(ABC):
-    """"""
+    """
+    Base class for Bitrix24 HTTP requesters.
+
+    Provides shared configuration, default SDK headers, request ID generation,
+    response parsing, and retry handling for concrete requester implementations.
+    """
 
     _DEFAULT_REQUEST_ID_HEADER_NAME: Final[Text] = DEFAULT_REQUEST_ID_HEADER_NAME
     _SDK_VERSION: Final[Text] = SDK_VERSION
@@ -56,6 +61,19 @@ class BaseRequester(ABC):
             initial_retry_delay: Optional[Number] = None,
             retry_delay_increment: Optional[Number] = None,
     ):
+        """
+        Initialize requester configuration.
+
+        Args:
+            timeout: Request timeout. Falsy values fall back to the global SDK
+                default timeout.
+            max_retries: Maximum number of request attempts. Falsy values fall
+                back to the global SDK default retry count.
+            initial_retry_delay: Delay before the first retry. Falsy values fall
+                back to the global SDK default initial retry delay.
+            retry_delay_increment: Additional delay added after each used retry.
+                Falsy values fall back to the global SDK default increment.
+        """
         self._config = Config()
         self._timeout = timeout or self._config.default_timeout
         self._max_retries = max_retries or self._config.default_max_retries
@@ -66,11 +84,17 @@ class BaseRequester(ABC):
     @property
     @abstractmethod
     def _headers(self) -> Dict:
-        """"""
+        """Return headers used for the concrete request type."""
         raise NotImplementedError
 
     def _get_default_headers(self) -> Dict[Text, Text]:
-        """"""
+        """
+        Build default SDK headers for outgoing requests.
+
+        Returns:
+            Headers containing JSON accept metadata, SDK version information,
+            Python version information, user agent, and request ID.
+        """
         return {
             "Accept": "application/json",
             "Accept-Charset": "utf-8",
@@ -82,12 +106,20 @@ class BaseRequester(ABC):
 
     @abstractmethod
     def _request(self, *args, **kwargs) -> requests.Response:
-        """"""
+        """Execute a single HTTP request without retry/error wrapping."""
         raise NotImplementedError
 
     @classmethod
     def _parse_response(cls, response: requests.Response) -> JSONDict:
-        """"""
+        """
+        Parse and validate a Bitrix24 HTTP response.
+
+        Args:
+            response: Raw HTTP response returned by ``requests``.
+
+        Returns:
+            Parsed JSON-compatible response dictionary.
+        """
         return parse_response(response)
 
     @property
@@ -98,15 +130,27 @@ class BaseRequester(ABC):
     @property
     def _retry_timeout(self) -> float:
         """
-        Calculates timeout between retries based on amount of retries used
+        Calculate delay before the next retry.
 
         Returns:
-            time to wait before next requests in seconds
+            Number of seconds to sleep before the next request attempt.
         """
         return self._initial_retry_delay + self._used_retries * self._retry_delay_increment
 
     def _request_with_retries(self, *args, **kwargs) -> requests.Response:
-        """"""
+        """
+        Execute request with retry handling for temporary service unavailability.
+
+        Retries are performed only for HTTP 503 responses. Other responses are
+        returned immediately and parsed by higher-level code.
+
+        Returns:
+            HTTP response from the last request attempt.
+
+        Raises:
+            RuntimeError: If all retry attempts are exhausted without receiving
+                a response that should be returned to the caller.
+        """
 
         self._retries_remaining = self._max_retries
 
@@ -118,18 +162,18 @@ class BaseRequester(ABC):
             if self._retries_remaining and response.status_code == HTTPStatus.SERVICE_UNAVAILABLE:
                 self._config.logger.warning(
                     "Service unavailable!",
-                    context=dict(
-                        url=response.url,
-                        retry_count=self._used_retries,
-                        max_retries=self._max_retries,
-                        retries_remaining=self._retries_remaining,
-                    ),
+                    context={
+                        "url": response.url,
+                        "retry_count": self._used_retries,
+                        "max_retries": self._max_retries,
+                        "retries_remaining": self._retries_remaining,
+                    },
                 )
                 self._config.logger.info(
                     "Sleep before retry",
-                    context=dict(
-                        sleep_time=self._retry_timeout,
-                    ),
+                    context={
+                        "sleep_time": self._retry_timeout,
+                    },
                 )
                 time.sleep(self._retry_timeout)
                 continue
@@ -138,11 +182,11 @@ class BaseRequester(ABC):
 
         raise RuntimeError(
             f"Request failed after {self._max_retries} attempts. "
-            "No valid responses was received from the server.",
+            "No valid response was received from the server.",
         )
 
     def _find_exists(self) -> Optional[Text]:
-        """Find an existing requests id in environment variables."""
+        """Find an existing request ID in environment variables."""
 
         for key in self._KEY_NAME_VARIANTS:
             request_id = os.environ.get(key)
@@ -154,11 +198,11 @@ class BaseRequester(ABC):
 
     @staticmethod
     def _generate() -> Text:
-        """Generate a new UUIDv7 requests ID."""
+        """Generate a new UUIDv7 request ID."""
         return str(uuid7())
 
     def get_request_id(self) -> Text:
-        """Get existing requests id or generate a new one."""
+        """Get an existing request ID or generate a new one."""
 
         request_id = self._find_exists()
 

@@ -19,7 +19,14 @@ __all__ = [
 
 @dataclass(**_DATACLASS_KWARGS)
 class B24APIBatchResult:
-    """"""
+    """
+    Result payload of a Bitrix24 batch response.
+
+    Stores per-command batch results, errors, pagination metadata, and timing
+    data. The collection shape follows the original batch request shape:
+    mapping requests produce mapping results, while sequence requests produce
+    list results.
+    """
 
     result: Union[Dict[Text, B24APIResult], List[B24APIResult]]
     result_error: Union[JSONDict, JSONList]
@@ -38,17 +45,27 @@ class B24APIBatchResult:
         )
 
     @classmethod
-    def from_dict(cls, json_response: JSONDict) -> "B24APIBatchResult":
+    def from_dict(cls, json_response: JSONDict, /) -> "B24APIBatchResult":
+        """
+        Create a B24APIBatchResult instance from raw batch result data.
+
+        Args:
+            json_response: Raw ``result`` section of a Bitrix24 batch response.
+
+        Returns:
+            Parsed batch result payload.
+        """
+
         json_result_time = json_response["result_time"]
 
         if isinstance(json_result_time, dict):
-            result_time = dict()
+            result_time = {}
 
             for key, time_value in json_result_time.items():
                 result_time[key] = BitrixTimeResponse.from_dict(time_value)
 
         else:
-            result_time = list()
+            result_time = []
 
             for time_value in json_result_time:
                 result_time.append(BitrixTimeResponse.from_dict(time_value))
@@ -62,15 +79,35 @@ class B24APIBatchResult:
         )
 
     def to_dict(self) -> JSONDict:
+        """
+        Convert batch result payload to dictionary.
+
+        Returns:
+            Dictionary representation of the batch result.
+        """
         return asdict(self)
 
 
 @dataclass(**_DATACLASS_KWARGS)
 class BitrixAPIBatchResponse(AbstractBitrixResponse[B24APIBatchResult]):
-    """"""
+    """
+    Typed Bitrix24 batch response.
+
+    Contains parsed batch command results in ``result`` and aggregated Bitrix24
+    timing metadata in ``time``.
+    """
 
     @classmethod
-    def from_dict(cls, json_response: JSONDict) -> "BitrixAPIBatchResponse":
+    def from_dict(cls, json_response: JSONDict, /) -> "BitrixAPIBatchResponse":
+        """
+        Create a BitrixAPIBatchResponse instance from raw JSON response.
+
+        Args:
+            json_response: Raw JSON response returned by Bitrix24 batch call.
+
+        Returns:
+            Parsed Bitrix batch response.
+        """
         return cls(
             result=B24APIBatchResult.from_dict(json_response["result"]),
             time=cls._convert_time(json_response["time"]),

@@ -21,7 +21,12 @@ if PYTHON_VERSION >= (3, 10):
 
 @dataclass(**_DATACLASS_KWARGS)
 class B24AppInfoInstall:
-    """"""
+    """
+    Bitrix24 application installation metadata.
+
+    Describes the current application installation on a portal, including
+    installation status, portal identifiers, granted scopes, and endpoint URLs.
+    """
 
     installed: bool
     version: int
@@ -34,7 +39,16 @@ class B24AppInfoInstall:
     member_type: Text
 
     @classmethod
-    def from_dict(cls, json_response: JSONDict) -> "B24AppInfoInstall":
+    def from_dict(cls, json_response: JSONDict, /) -> "B24AppInfoInstall":
+        """
+        Create a B24AppInfoInstall instance from raw install data.
+
+        Args:
+            json_response: Raw ``install`` section from ``app.info`` response.
+
+        Returns:
+            Parsed application installation metadata.
+        """
         return cls(
             installed=json_response["installed"],
             version=int(json_response["version"]),
@@ -48,12 +62,23 @@ class B24AppInfoInstall:
         )
 
     def to_dict(self) -> JSONDict:
+        """
+        Convert installation metadata to dictionary.
+
+        Returns:
+            Dictionary representation of the installation metadata.
+        """
         return asdict(self)
 
 
 @dataclass(**_DATACLASS_KWARGS)
 class B24AppInfoResult:
-    """"""
+    """
+    Parsed result of the Bitrix24 ``app.info`` method.
+
+    Contains OAuth application metadata, granted scopes, token expiration
+    timestamp, installation information, and current user identifier.
+    """
 
     client_id: Text
     scope: List[Text]
@@ -62,7 +87,16 @@ class B24AppInfoResult:
     user_id: int
 
     @classmethod
-    def from_dict(cls, json_response: JSONDict) -> "B24AppInfoResult":
+    def from_dict(cls, json_response: JSONDict, /) -> "B24AppInfoResult":
+        """
+        Create a B24AppInfoResult instance from raw ``app.info`` result data.
+
+        Args:
+            json_response: Raw ``result`` section from ``app.info`` response.
+
+        Returns:
+            Parsed application info result.
+        """
         return cls(
             client_id=json_response["client_id"],
             scope=json_response["scope"].split(","),
@@ -72,15 +106,35 @@ class B24AppInfoResult:
         )
 
     def to_dict(self) -> JSONDict:
+        """
+        Convert application info result to dictionary.
+
+        Returns:
+            Dictionary representation of the application info result.
+        """
         return asdict(self)
 
 
 @dataclass(**_DATACLASS_KWARGS)
 class BitrixAppInfoResponse(AbstractBitrixResponse[B24AppInfoResult]):
-    """"""
+    """
+    Typed response for the Bitrix24 ``app.info`` method.
+
+    Stores parsed application information in ``result`` and Bitrix24 timing
+    metadata in ``time``.
+    """
 
     @classmethod
-    def from_dict(cls, json_response: JSONDict) -> "BitrixAppInfoResponse":
+    def from_dict(cls, json_response: JSONDict, /) -> "BitrixAppInfoResponse":
+        """
+        Create a BitrixAppInfoResponse instance from raw JSON response.
+
+        Args:
+            json_response: Raw JSON response returned by ``app.info``.
+
+        Returns:
+            Parsed ``app.info`` response.
+        """
         return cls(
             result=B24AppInfoResult.from_dict(json_response["result"]),
             time=cls._convert_time(json_response["time"]),

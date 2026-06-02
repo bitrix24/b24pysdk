@@ -8,8 +8,8 @@ the Bitrix REST API. It includes:
 - ClientV1 / ClientV2 / ClientV3 — version-specific API clients
 - Client — factory function that returns the appropriate client version
 
-Each client exposes Bitrix API scopes as attributes (e.g. `crm`, `user`,
-`task`) which provide access to the corresponding API methods.
+Each client exposes Bitrix API scopes as attributes (e.g. ``crm``, ``user``,
+``task``) which provide access to the corresponding API methods.
 """
 
 import inspect
@@ -42,16 +42,15 @@ class BaseClient(ABC):
     """
     Base class for Bitrix API clients.
 
-    This class provides common functionality shared by all API client
-    versions, including:
+    Provides common functionality shared by all API client versions:
 
     - scope initialization
-    - batch request execution
+    - lazy batch request creation
     - API method discovery
-    - configuration forwarding to API requests
+    - forwarding request configuration to API request objects
 
-    Concrete client implementations (ClientV1, ClientV2, ClientV3)
-    specify the Bitrix REST API version used for requests.
+    Concrete client implementations define the Bitrix REST API version used
+    for requests.
     """
 
     VERSION: ClassVar[Union[B24APIVersion, B24APIVersionLiteral]] = NotImplemented
@@ -70,7 +69,6 @@ class BaseClient(ABC):
         "crm",
         "department",
         "disk",
-        "documentation",
         "documentgenerator",
         "entity",
         "event",
@@ -169,25 +167,13 @@ class BaseClient(ABC):
         """
         Initialize the Bitrix API client.
 
-        Parameters
-        ----------
-        bitrix_token : BitrixTokenFullProtocol
-            Authentication token used to access the Bitrix REST API.
-
-        timeout : Timeout, optional
-            Default request timeout.
-
-        max_retries : int, optional
-            Maximum number of retry attempts for failed requests.
-
-        initial_retry_delay : Number, optional
-            Delay before the first retry attempt.
-
-        retry_delay_increment : Number, optional
-            Increment added to retry delay after each retry.
-
-        **kwargs
-            Additional options passed to API request objects.
+        Args:
+            bitrix_token: Authentication token used to access the Bitrix REST API.
+            timeout: Default request timeout.
+            max_retries: Maximum number of request attempts.
+            initial_retry_delay: Delay before the first retry attempt.
+            retry_delay_increment: Increment added to retry delay after each attempt.
+            **kwargs: Additional options passed to API request objects.
         """
 
         self._bitrix_token = bitrix_token
@@ -200,7 +186,6 @@ class BaseClient(ABC):
         self.bizproc = scopes.Bizproc(self)
         self.calendar = scopes.Calendar(self)
         self.catalog = scopes.Catalog(self)
-        self.documentation = scopes_v3.Documentation(self)
         self.crm = scopes.CRM(self)
         self.department = scopes.Department(self)
         self.disk = scopes.Disk(self)
@@ -294,16 +279,23 @@ class BaseClient(ABC):
             **kwargs,
     ) -> BitrixAPIBatchRequest:
         """
-        Execute multiple API requests in a single batch call.
+        Create a lazy request object for executing API requests in one batch.
+
+        The request is not sent immediately. It is executed when ``call()``,
+        ``response``, ``result`` or ``time`` is accessed.
 
         Args:
-            bitrix_api_requests: Collection of BitrixAPIRequest objects to execute.
-            halt: If True, stops processing on first error. Returns results up to that point.
-            ignore_size_limit: Ignore batch size limitations if True.
-            timeout: Timeout for the batch request in seconds.
+            bitrix_api_requests: Mapping or sequence of ``BitrixAPIRequest``
+                objects to execute.
+            halt: Whether to stop batch execution after the first failed command.
+            ignore_size_limit: When ``False``, raise ``ValueError`` if the command
+                collection exceeds the SDK batch limit. When ``True``, truncate
+                the collection to the allowed number of commands.
+            timeout: Request timeout for the batch call.
+            **kwargs: Extra options overriding client-level request options.
 
         Returns:
-            BitrixAPIBatchRequest instance for executing the batch.
+            Lazy single-batch request object.
         """
 
         kwargs = self._kwargs | kwargs
@@ -327,7 +319,7 @@ class BaseClient(ABC):
             halt: bool = False,
             timeout: Timeout = None,
             **kwargs,
-    ) -> BitrixAPIBatchRequest[Mapping[Key, "BitrixAPIRequest"]]: ...
+    ) -> BitrixAPIBatchesRequest[Mapping[Key, "BitrixAPIRequest"]]: ...
 
     @overload
     def call_batches(
@@ -337,25 +329,31 @@ class BaseClient(ABC):
             halt: bool = False,
             timeout: Timeout = None,
             **kwargs,
-    ) -> BitrixAPIBatchRequest[Sequence["BitrixAPIRequest"]]: ...
+    ) -> BitrixAPIBatchesRequest[Sequence["BitrixAPIRequest"]]: ...
 
     def call_batches(
             self,
             bitrix_api_requests: Union[Mapping[Key, "BitrixAPIRequest"], Sequence["BitrixAPIRequest"]],
+            *,
             halt: bool = False,
             timeout: Timeout = None,
             **kwargs,
     ) -> BitrixAPIBatchesRequest:
         """
-        Execute multiple API requests in parallel batches.
+        Create a lazy request object for executing API requests across batches.
+
+        The request is not sent immediately. It is executed when ``call()``,
+        ``response``, ``result`` or ``time`` is accessed.
 
         Args:
-            bitrix_api_requests: Collection of BitrixAPIRequest objects to execute.
-            halt: If True, stops processing on first error. Returns results up to that point.
-            timeout: Timeout for the batches request in seconds.
+            bitrix_api_requests: Mapping or sequence of ``BitrixAPIRequest``
+                objects to execute.
+            halt: Whether to stop batch execution after the first failed command.
+            timeout: Request timeout for batch calls.
+            **kwargs: Extra options overriding client-level request options.
 
         Returns:
-            BitrixAPIBatchesRequest instance for executing parallel batches.
+            Lazy multi-batch request object.
         """
 
         kwargs = self._kwargs | kwargs
@@ -372,31 +370,18 @@ class BaseClient(ABC):
 
     def __get_context_by_path(self, path: Text) -> BaseContext:
         """
-        Resolve a context object using a dot-separated path.
+        Resolve a context object by dot-separated path.
 
-        Examples
-        --------
-        "crm.lead"
-        "user"
-        "tasks.task"
+        Args:
+            path: Dot-separated path to the context, for example ``crm.lead``
+                or ``tasks.task``.
 
-        Parameters
-        ----------
-        path : Text
-            Dot-separated path to the context.
-
-        Returns
-        -------
-        BaseContext
+        Returns:
             Resolved context object.
 
-        Raises
-        ------
-        ValueError
-            If the path cannot be resolved.
-
-        TypeError
-            If the resolved object is not a BaseContext instance.
+        Raises:
+            ValueError: If the path is empty or cannot be resolved.
+            TypeError: If the resolved object is not a ``BaseContext`` instance.
         """
 
         if not path:
@@ -422,16 +407,12 @@ class BaseClient(ABC):
 
     def __collect_api_methods(self, context: Union[BaseContext, "BaseClient"]) -> List[Text]:
         """
-        Recursively collect API method names from a context.
+        Recursively collect supported API method names from a context.
 
-        Parameters
-        ----------
-        context : BaseContext or BaseClient
-            Context to inspect.
+        Args:
+            context: Client or context object to inspect.
 
-        Returns
-        -------
-        List[Text]
+        Returns:
             List of available API method names.
         """
 
@@ -454,14 +435,18 @@ class BaseClient(ABC):
 
     def get_supported_api_methods(self, context: Optional[Union[BaseContext, Text]] = None) -> List[Text]:
         """
-        Get a list of all supported API methods.
+        Return supported API method names.
 
         Args:
-            context: Optional context object or path to filter methods.
-                     If None, returns all available methods.
+            context: Optional context object or dot-separated path. If omitted,
+                methods from all available scopes are returned.
 
         Returns:
             List of available API method names.
+
+        Raises:
+            TypeError: If ``context`` is not ``None``, ``str`` or ``BaseContext``.
+            ValueError: If a string path cannot be resolved.
         """
 
         if context is None:
@@ -483,17 +468,15 @@ class BaseClient(ABC):
 
     def print_supported_api_methods(self, context: Optional[Union[BaseContext, Text]] = None):
         """
-        Print supported API methods.
+        Print supported API method names.
 
-        This is a convenience wrapper around :meth:`get_supported_api_methods`
-        that prints the discovered API methods to stdout in sorted order,
-        followed by the total number of methods.
+        This is a convenience wrapper around ``get_supported_api_methods`` that
+        prints discovered methods to stdout in sorted order, followed by the
+        total number of methods.
 
-        Parameters
-        ----------
-        context : BaseContext or str, optional
-            Context object or dot-separated API path used to filter methods.
-            If omitted, methods from all available scopes are printed.
+        Args:
+            context: Optional context object or dot-separated path. If omitted,
+                methods from all available scopes are printed.
         """
 
         supported_api_methods = self.get_supported_api_methods(context)
@@ -506,7 +489,7 @@ class ClientV1(BaseClient):
     """
     Bitrix REST API v1 client.
 
-    Provides access to API scopes supported by the Bitrix API.
+    Provides access to API scopes supported by Bitrix REST API v1.
     """
 
     VERSION = B24APIVersion.V1
@@ -527,6 +510,17 @@ class ClientV1(BaseClient):
             retry_delay_increment: Optional[Number] = None,
             **kwargs,
     ):
+        """
+        Initialize Bitrix REST API v1 client.
+
+        Args:
+            bitrix_token: Authentication token used for API access.
+            timeout: Default request timeout.
+            max_retries: Maximum number of request attempts.
+            initial_retry_delay: Delay before the first retry attempt.
+            retry_delay_increment: Increment added to retry delay after each attempt.
+            **kwargs: Additional options passed to API request objects.
+        """
         super().__init__(
             bitrix_token,
             timeout=timeout,
@@ -542,8 +536,8 @@ class ClientV2(ClientV1):
     """
     Bitrix REST API v2 client.
 
-    This client extends the v1 client with additional API methods
-    introduced in Bitrix REST API v2.
+    Extends the v1 client with API methods and behavior preferred for Bitrix
+    REST API v2.
     """
 
     VERSION = B24APIVersion.V2
@@ -555,8 +549,7 @@ class ClientV3(BaseClient):
     """
     Bitrix REST API v3 client.
 
-    This client exposes the modern Bitrix REST API v3 which uses a
-    structured request/response model and different scope definitions.
+    Exposes API v3 scopes and uses v3 request resolution by default.
     """
 
     VERSION = B24APIVersion.V3
@@ -583,6 +576,17 @@ class ClientV3(BaseClient):
             retry_delay_increment: Optional[Number] = None,
             **kwargs,
     ):
+        """
+        Initialize Bitrix REST API v3 client.
+
+        Args:
+            bitrix_token: Authentication token used for API access.
+            timeout: Default request timeout.
+            max_retries: Maximum number of request attempts.
+            initial_retry_delay: Delay before the first retry attempt.
+            retry_delay_increment: Increment added to retry delay after each attempt.
+            **kwargs: Additional options passed to API request objects.
+        """
         super().__init__(
             bitrix_token,
             timeout=timeout,
@@ -650,39 +654,22 @@ def Client(  # noqa: N802
         **kwargs,
 ) -> BaseClient:
     """
-    Client factory function.
+    Create a Bitrix API client for the requested API version.
 
-    Creates a Bitrix API client instance for the requested API version.
+    Args:
+        bitrix_token: Authentication token used for API access.
+        prefer_version: Preferred Bitrix REST API version.
+        timeout: Default request timeout.
+        max_retries: Maximum number of request attempts.
+        initial_retry_delay: Delay before the first retry attempt.
+        retry_delay_increment: Increment added to retry delay after each attempt.
+        **kwargs: Additional options passed to API request objects.
 
-    Parameters
-    ----------
-    bitrix_token : BitrixTokenFullProtocol
-        Authentication token used for API access.
-
-    prefer_version : int or B24APIVersion, default V2
-        Preferred Bitrix API version.
-
-    timeout : Timeout, optional
-        Default request timeout.
-
-    max_retries : int, optional
-        Maximum retry attempts.
-
-    initial_retry_delay : Number, optional
-        Initial delay between retries.
-
-    retry_delay_increment : Number, optional
-        Retry delay increment.
-
-    Returns
-    -------
-    BaseClient
+    Returns:
         Client instance corresponding to the requested API version.
 
-    Raises
-    ------
-    ValueError
-        If an unsupported API version is specified.
+    Raises:
+        ValueError: If an unsupported API version is specified.
     """
 
     if prefer_version == ClientV1.VERSION:

@@ -14,7 +14,13 @@ _BARQT = TypeVar("_BARQT", bound=AbstractBitrixAPIRequest)
 
 
 class BaseContext(ABC):
-    """"""
+    """
+    Base class for SDK API contexts.
+
+    A context represents a namespace in the Bitrix24 REST API method tree.
+    It builds dotted API method paths from nested context objects and creates
+    lazy request objects bound to the current client token and requester options.
+    """
 
     __slots__ = ()
 
@@ -24,38 +30,89 @@ class BaseContext(ABC):
     # noinspection PyMethodParameters
     @classproperty
     def _name(cls) -> Text:
+        """
+        Return context name used in API method paths.
+
+        By default, the lower-cased class name is used as the path segment.
+
+        Returns:
+            Context path segment.
+        """
         return cls.__name__.lower()
 
     @property
     @abstractmethod
     def _context(self) -> Union["BaseContext", "BaseClient"]:
-        """"""
+        """
+        Return parent context or client.
+
+        Concrete context classes must provide the object from which token,
+        requester options, and parent path are inherited.
+
+        Returns:
+            Parent context or root client.
+        """
         raise NotImplementedError
 
     @property
     def _bitrix_token(self) -> BitrixTokenFullProtocol:
-        """"""
+        """
+        Return Bitrix token inherited from the parent context.
+
+        Returns:
+            Token-like object used to execute API calls.
+        """
         return getattr(self._context, "_bitrix_token")
 
     @property
     def _kwargs(self) -> JSONDict:
-        """"""
+        """
+        Return requester options inherited from the parent context.
+
+        Returns:
+            Dictionary of options forwarded to API request execution.
+        """
         return getattr(self._context, "_kwargs")
 
     @property
     def _path(self) -> Text:
-        """"""
+        """
+        Build dotted API context path.
+
+        Returns:
+            Full context path assembled from parent path and current context
+            name, for example ``crm.deal``.
+        """
         base_path = getattr(self._context, "_path", None)
         return f"{base_path}.{self._name}" if base_path else self._name
 
     @staticmethod
     def __to_camel_case(snake_str: Text) -> Text:
-        """Converts Python methods names to camelCase to be used in _get_api_method"""
+        """
+        Convert snake_case name to lowerCamelCase.
+
+        Used to transform Python wrapper method names into Bitrix24 REST method
+        segments.
+
+        Args:
+            snake_str: Python-style snake_case name.
+
+        Returns:
+            lowerCamelCase representation.
+        """
         first, *parts = snake_str.split("_")
         return "".join((first.lower(), *(part.title() for part in parts)))
 
     def _get_api_method(self, api_wrapper: Callable[..., _BARQT]) -> Text:
-        """"""
+        """
+        Build Bitrix24 REST API method name for a wrapper method.
+
+        Args:
+            api_wrapper: Wrapper method used to infer the final method segment.
+
+        Returns:
+            Full Bitrix24 REST API method name.
+        """
         api_wrapper_name = getattr(api_wrapper, "__name__", None)
         return f"{self}.{self.__to_camel_case(api_wrapper_name.strip('_'))}" if api_wrapper_name else str(self)
 
@@ -67,7 +124,19 @@ class BaseContext(ABC):
             bitrix_api_request_type: Type[_BARQT] = BitrixAPIRequest,
             **kwargs,
     ) -> _BARQT:
-        """"""
+        """
+        Create a lazy Bitrix24 API request object.
+
+        Args:
+            api_wrapper: Wrapper method used to infer the API method name.
+            params: Optional request parameters.
+            timeout: Optional request timeout overriding inherited options.
+            bitrix_api_request_type: Request class to instantiate.
+            **kwargs: Extra requester options overriding inherited options.
+
+        Returns:
+            Lazy request object bound to the current Bitrix token.
+        """
 
         kwargs = self._kwargs | kwargs
 

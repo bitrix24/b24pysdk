@@ -55,8 +55,9 @@ class _BatchCaller(BaseCaller):
             methods: Mapping or sequence of ``(api_method, params)`` tuples.
             halt: Whether Bitrix should stop executing commands after the first
                 failed command.
-            ignore_size_limit: When ``True``, truncate command collection to the
-                SDK batch limit instead of raising ``ValueError``.
+            ignore_size_limit: When ``False``, raise ``ValueError`` if the command
+                collection exceeds the SDK batch limit. When ``True``, truncate the
+                collection to the allowed number of commands.
             prefer_version: Preferred API version for resolving the ``batch``
                 call itself.
             bitrix_token: Optional token wrapper used to execute nested calls
@@ -109,7 +110,7 @@ class _BatchCaller(BaseCaller):
         the classic batch endpoint expects each command as a query string.
         """
 
-        cmd: Dict[Key, Text] = dict()
+        cmd: Dict[Key, Text] = {}
 
         if isinstance(self._methods, Mapping):
             for key, (api_method, params) in self._methods.items():
@@ -214,8 +215,9 @@ def call_batch(
         methods: Mapping or sequence of ``(api_method, params)`` tuples. Mapping
             keys are used as result keys returned by Bitrix.
         halt: Whether Bitrix should stop on the first command error.
-        ignore_size_limit: Truncate to ``MAX_BATCH_SIZE`` instead of raising when
-            too many commands are passed.
+        ignore_size_limit: When ``False``, enforce the Bitrix24 batch command
+            limit before sending the request. When ``True``, skip raising an error
+            for oversized batches and process only the allowed number of commands.
         timeout: Request timeout in seconds.
         prefer_version: Preferred API version to resolve the ``batch`` method.
         bitrix_token: Optional token wrapper used by nested execution.

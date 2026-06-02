@@ -23,7 +23,13 @@ _BARQST = TypeVar(
 
 
 class BitrixAPIBatchesRequest(BitrixAPIBaseRequest[BitrixAPIBatchResponse], Generic[_BARQST]):
-    """"""
+    """
+    Lazy request object for executing multiple Bitrix24 batch requests.
+
+    Accepts a mapping or sequence of ``BitrixAPIRequest`` objects, converts
+    them into batch-compatible request tuples, and executes them through
+    ``call_batches``.
+    """
 
     _API_METHOD: Final[Text] = "batch"
 
@@ -40,6 +46,15 @@ class BitrixAPIBatchesRequest(BitrixAPIBaseRequest[BitrixAPIBatchResponse], Gene
             halt: bool = False,
             **kwargs,
     ):
+        """
+        Initialize a multi-batch request.
+
+        Args:
+            bitrix_token: Token-like object used to execute Bitrix24 API calls.
+            bitrix_api_requests: Mapping or sequence of request objects to execute.
+            halt: Whether to stop batch execution after the first failed command.
+            **kwargs: Extra options forwarded to the token call.
+        """
         super().__init__(
             bitrix_token=bitrix_token,
             api_method=self._API_METHOD,
@@ -61,7 +76,13 @@ class BitrixAPIBatchesRequest(BitrixAPIBaseRequest[BitrixAPIBatchResponse], Gene
 
     @property
     def _bitrix_api_requests_type_string(self) -> Text:
-        """"""
+        """
+        Return the contained request class name for human-readable output.
+
+        Returns:
+            Request type name for the first item, or this class name when the
+            request collection is empty.
+        """
 
         if not self._bitrix_api_requests:
             return self.__class__.__name__
@@ -75,7 +96,12 @@ class BitrixAPIBatchesRequest(BitrixAPIBaseRequest[BitrixAPIBatchResponse], Gene
 
     @property
     def _bitrix_api_requests_string(self) -> Text:
-        """"""
+        """
+        Return a compact description of the wrapped request collection.
+
+        Returns:
+            String containing collection type, size, and request item type.
+        """
         return f"<{type(self._bitrix_api_requests).__name__} of {len(self._bitrix_api_requests)} {self._bitrix_api_requests_type_string}>"
 
     @overload
@@ -86,17 +112,25 @@ class BitrixAPIBatchesRequest(BitrixAPIBaseRequest[BitrixAPIBatchResponse], Gene
 
     @property
     def _methods(self) -> B24Requests:
-        """"""
+        """
+        Convert wrapped request objects into Bitrix batch method definitions.
+
+        Preserves mapping keys for mapping input and preserves order for
+        sequence input.
+
+        Returns:
+            Batch request definitions accepted by token batch callers.
+        """
 
         if isinstance(self._bitrix_api_requests, Mapping):
-            methods = dict()
+            methods = {}
 
             for key, bitrix_api_request in self._bitrix_api_requests.items():
                 bitrix_api_request: "BitrixAPIRequest"
                 methods[key] = bitrix_api_request._as_tuple
 
         else:
-            methods = list()
+            methods = []
 
             for bitrix_api_request in self._bitrix_api_requests:
                 bitrix_api_request: "BitrixAPIRequest"
@@ -106,11 +140,24 @@ class BitrixAPIBatchesRequest(BitrixAPIBaseRequest[BitrixAPIBatchResponse], Gene
 
     @staticmethod
     def _convert_response(json_response: JSONDict) -> BitrixAPIBatchResponse:
-        """"""
+        """
+        Convert raw JSON response into ``BitrixAPIBatchResponse``.
+
+        Args:
+            json_response: Raw JSON response returned by Bitrix24.
+
+        Returns:
+            Parsed Bitrix batch response.
+        """
         return BitrixAPIBatchResponse.from_dict(json_response)
 
     def _call(self) -> JSONDict:
-        """"""
+        """
+        Execute wrapped requests using the multi-batch caller.
+
+        Returns:
+            Raw JSON response returned by ``call_batches``.
+        """
         return self._bitrix_token.call_batches(
             methods=self._methods,
             halt=self._halt,
@@ -119,7 +166,13 @@ class BitrixAPIBatchesRequest(BitrixAPIBaseRequest[BitrixAPIBatchResponse], Gene
 
 
 class BitrixAPIBatchRequest(BitrixAPIBatchesRequest[_BARQST], Generic[_BARQST]):
-    """"""
+    """
+    Lazy request object for executing one Bitrix24 batch request.
+
+    Accepts a mapping or sequence of ``BitrixAPIRequest`` objects, converts
+    them into batch-compatible request tuples, and executes them through
+    ``call_batch``.
+    """
 
     __slots__ = ("_ignore_size_limit",)
 
@@ -134,6 +187,18 @@ class BitrixAPIBatchRequest(BitrixAPIBatchesRequest[_BARQST], Generic[_BARQST]):
             ignore_size_limit: bool = False,
             **kwargs,
     ):
+        """
+        Initialize a single batch request.
+
+        Args:
+            bitrix_token: Token-like object used to execute Bitrix24 API calls.
+            bitrix_api_requests: Mapping or sequence of request objects to execute.
+            halt: Whether to stop batch execution after the first failed command.
+            ignore_size_limit: When ``False``, raise ``ValueError`` if the command
+                collection exceeds the SDK batch limit. When ``True``, truncate
+                the collection to the allowed number of commands.
+            **kwargs: Extra options forwarded to the token call.
+        """
         super().__init__(
             bitrix_token=bitrix_token,
             bitrix_api_requests=bitrix_api_requests,
@@ -152,7 +217,12 @@ class BitrixAPIBatchRequest(BitrixAPIBatchesRequest[_BARQST], Generic[_BARQST]):
         )
 
     def _call(self) -> JSONDict:
-        """"""
+        """
+        Execute wrapped requests using the single-batch caller.
+
+        Returns:
+            Raw JSON response returned by ``call_batch``.
+        """
         return self._bitrix_token.call_batch(
             methods=self._methods,
             halt=self._halt,

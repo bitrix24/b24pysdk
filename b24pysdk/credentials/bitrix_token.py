@@ -79,7 +79,7 @@ class AbstractBitrixToken:
 
     def __str__(self):
         """Return a concise token representation for logs/debug output."""
-        return f"<{('Application', 'Webhook')[self.is_webhook]} token of portal {self.domain}>"
+        return f"<{'Webhook' if self.is_webhook else 'Application'} token of portal {self.domain}>"
 
     @property
     def is_webhook(self) -> bool:

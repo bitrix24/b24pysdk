@@ -15,16 +15,29 @@ _BARPT = TypeVar("_BARPT", bound=AbstractBitrixResponse)
 
 
 class BitrixAPIBaseRequest(AbstractBitrixAPIRequest[_BARPT], ABC, Generic[_BARPT]):
-    """"""
+    """
+    Base class for Bitrix24 API request objects with standard response shape.
+
+    Extends ``AbstractBitrixAPIRequest`` for responses that expose common
+    ``result`` and ``time`` fields.
+    """
 
     __slots__ = ()
 
     @property
     def result(self):
-        """"""
+        """
+        Return result data from the response.
+
+        Accessing this property may execute the request lazily on first access.
+        """
         return self.response.result
 
     @property
     def time(self) -> "BitrixTimeResponse":
-        """"""
+        """
+        Return Bitrix24 timing metadata from the response.
+
+        Accessing this property may execute the request lazily on first access.
+        """
         return self.response.time
