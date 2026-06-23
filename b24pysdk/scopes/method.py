@@ -1,6 +1,7 @@
 from typing import Text
 
-from ..api.requests import BitrixAPIRequest
+from ..api.requests import BitrixAPIValueRequest
+from ..schemas.method import MethodGet, MethodGetData
 from ..utils.functional import type_checker
 from ..utils.types import JSONDict, Timeout
 from ._base_scope import BaseScope
@@ -19,7 +20,7 @@ class Method(BaseScope):
             name: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[MethodGetData, MethodGet]:
         """"""
 
         params: JSONDict = {
@@ -30,4 +31,6 @@ class Method(BaseScope):
             api_wrapper=self.get,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=MethodGet.from_bitrix,
         )

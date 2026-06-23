@@ -1,5 +1,6 @@
-from typing import Optional
+from typing import Generic, Optional
 
+from ...utils.type_vars import BAResultT
 from ...utils.types import JSONDict
 from ..responses import BitrixAPIResponse
 from .bitrix_api_base_request import BitrixAPIBaseRequest
@@ -10,7 +11,7 @@ __all__ = [
 ]
 
 
-class BitrixAPIRequest(BitrixAPIBaseRequest[BitrixAPIResponse]):
+class BitrixAPIRequest(BitrixAPIBaseRequest[BitrixAPIResponse[BAResultT], BAResultT], Generic[BAResultT]):
     """
     Lazy request object for a standard Bitrix24 API method call.
 
@@ -20,8 +21,7 @@ class BitrixAPIRequest(BitrixAPIBaseRequest[BitrixAPIResponse]):
 
     __slots__ = ()
 
-    @staticmethod
-    def _convert_response(json_response: JSONDict) -> BitrixAPIResponse:
+    def _convert_response(self, json_response: JSONDict) -> BitrixAPIResponse[BAResultT]:
         """
         Convert raw JSON response into ``BitrixAPIResponse``.
 

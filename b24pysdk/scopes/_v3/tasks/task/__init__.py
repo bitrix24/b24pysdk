@@ -109,6 +109,44 @@ class Task(BaseEntity):
         )
 
     @type_checker
+    def list(
+            self,
+            *,
+            select: Optional[Iterable[Text]] = None,
+            filter: Optional[Iterable] = None,
+            order: Optional[JSONDict] = None,
+            pagination: Optional[JSONDict] = None,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params = {}
+
+        if select is not None:
+            if select.__class__ is not list:
+                select = list(select)
+
+            params["select"] = select
+
+        if filter is not None:
+            if filter.__class__ is not list:
+                filter = list(filter)
+
+            params["filter"] = filter
+
+        if order is not None:
+            params["order"] = order
+
+        if pagination is not None:
+            params["pagination"] = pagination
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.list,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
     def update(
             self,
             bitrix_id: int,

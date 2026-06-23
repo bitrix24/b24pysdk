@@ -1,9 +1,16 @@
 from abc import ABC
-from typing import Iterable, Optional, Text, Union
+from typing import Callable, Iterable, Optional, Text
 
-from ....api.requests import BitrixAPIRequest
-from ....utils.types import B24BoolStrict, JSONDict, Timeout
+from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ....schemas.crm.field import CRMFieldsDict
+from ....utils.converters import bool_to_bitrix
+from ....utils.type_vars import BAResultT, BAValueT
+from ....utils.types import JSONDict, Timeout
 from .._base_crm import BaseCRM
+
+__all__ = [
+    "BaseItem",
+]
 
 
 class BaseItem(BaseCRM, ABC):
@@ -17,9 +24,10 @@ class BaseItem(BaseCRM, ABC):
             self,
             *,
             entity_type_id: Optional[int] = None,
-            use_original_uf_names: Optional[Union[bool, B24BoolStrict]] = None,
+            use_original_uf_names: Optional[bool] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+            result_adapter: Callable[[BAResultT], BAValueT] = CRMFieldsDict.from_bitrix,
+    ) -> BitrixAPIValueRequest[BAResultT, BAValueT]:
         """Get fields of CRM item.
 
         This method retrieves a list of fields and their configuration for items of type entityTypeId.
@@ -35,18 +43,20 @@ class BaseItem(BaseCRM, ABC):
             Instance of BitrixAPIRequest
         """
 
-        params = dict()
+        params: JSONDict = {}
 
         if entity_type_id is not None:
             params["entityTypeId"] = entity_type_id
 
         if use_original_uf_names is not None:
-            params["useOriginalUfNames"] = B24BoolStrict(use_original_uf_names).to_b24()
+            params["useOriginalUfNames"] = bool_to_bitrix(use_original_uf_names, is_required=True)
 
         return self._make_bitrix_api_request(
             api_wrapper=self._fields,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=result_adapter,
         )
 
     def _add(
@@ -54,8 +64,8 @@ class BaseItem(BaseCRM, ABC):
             fields: JSONDict,
             *,
             entity_type_id: Optional[int] = None,
-            use_original_uf_names: Optional[Union[bool, B24BoolStrict]] = None,
-            extra_params: Optional[JSONDict] = None,
+            use_original_uf_names: Optional[bool] = None,
+            params: Optional[JSONDict] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Create a new CRM entity.
@@ -83,7 +93,7 @@ class BaseItem(BaseCRM, ABC):
 
             use_original_uf_names: This parameter controls the format of custom field names in the responses;
 
-            extra_params: Set of additional parameters where
+            params: Set of additional parameters where
 
                 - REGISTER_SONET_EVENT - whether to register the change event in the activity stream 'Y' or not 'N',
 
@@ -95,22 +105,22 @@ class BaseItem(BaseCRM, ABC):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        _params: JSONDict = {
             "fields": fields,
         }
 
         if entity_type_id is not None:
-            params["entityTypeId"] = entity_type_id
+            _params["entityTypeId"] = entity_type_id
 
         if use_original_uf_names is not None:
-            params["useOriginalUfNames"] = B24BoolStrict(use_original_uf_names).to_b24()
+            _params["useOriginalUfNames"] = bool_to_bitrix(use_original_uf_names, is_required=True)
 
-        if extra_params is not None:
-            params["params"] = extra_params
+        if params is not None:
+            _params["params"] = params
 
         return self._make_bitrix_api_request(
             api_wrapper=self._add,
-            params=params,
+            params=_params,
             timeout=timeout,
         )
 
@@ -119,7 +129,7 @@ class BaseItem(BaseCRM, ABC):
             bitrix_id: int,
             *,
             entity_type_id: Optional[int] = None,
-            use_original_uf_names: Optional[Union[bool, B24BoolStrict]] = None,
+            use_original_uf_names: Optional[bool] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get an item by ID.
@@ -139,7 +149,7 @@ class BaseItem(BaseCRM, ABC):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 
@@ -147,7 +157,7 @@ class BaseItem(BaseCRM, ABC):
             params["entityTypeId"] = entity_type_id
 
         if use_original_uf_names is not None:
-            params["useOriginalUfNames"] = B24BoolStrict(use_original_uf_names).to_b24()
+            params["useOriginalUfNames"] = bool_to_bitrix(use_original_uf_names, is_required=True)
 
         return self._make_bitrix_api_request(
             api_wrapper=self._get,
@@ -163,7 +173,7 @@ class BaseItem(BaseCRM, ABC):
             filter: Optional[JSONDict] = None,
             order: Optional[JSONDict] = None,
             start: Optional[int] = None,
-            use_original_uf_names: Optional[Union[bool, B24BoolStrict]] = None,
+            use_original_uf_names: Optional[bool] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of CRM elements.
@@ -213,7 +223,7 @@ class BaseItem(BaseCRM, ABC):
             Instance of BitrixAPIRequest
         """
 
-        params = dict()
+        params: JSONDict = {}
 
         if entity_type_id is not None:
             params["entityTypeId"] = entity_type_id
@@ -234,7 +244,7 @@ class BaseItem(BaseCRM, ABC):
             params["start"] = start
 
         if use_original_uf_names is not None:
-            params["useOriginalUfNames"] = B24BoolStrict(use_original_uf_names).to_b24()
+            params["useOriginalUfNames"] = bool_to_bitrix(use_original_uf_names, is_required=True)
 
         return self._make_bitrix_api_request(
             api_wrapper=self._list,
@@ -248,8 +258,8 @@ class BaseItem(BaseCRM, ABC):
             fields: JSONDict,
             *,
             entity_type_id: Optional[int] = None,
-            use_original_uf_names: Optional[Union[bool, B24BoolStrict]] = None,
-            extra_params: Optional[JSONDict] = None,
+            use_original_uf_names: Optional[bool] = None,
+            params: Optional[JSONDict] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update CRM item.
@@ -275,7 +285,7 @@ class BaseItem(BaseCRM, ABC):
 
             use_original_uf_names: Parameter to control the format of custom field names in the requests and responses;
 
-            extra_params: Set of additional parameters where
+            params: Set of additional parameters where
 
                 - REGISTER_SONET_EVENT - whether to register the change event in the activity stream 'Y' or not 'N',
 
@@ -287,23 +297,23 @@ class BaseItem(BaseCRM, ABC):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        _params: JSONDict = {
             "id": bitrix_id,
             "fields": fields,
         }
 
         if entity_type_id is not None:
-            params["entityTypeId"] = entity_type_id
+            _params["entityTypeId"] = entity_type_id
 
         if use_original_uf_names is not None:
-            params["useOriginalUfNames"] = B24BoolStrict(use_original_uf_names).to_b24()
+            _params["useOriginalUfNames"] = bool_to_bitrix(use_original_uf_names, is_required=True)
 
-        if extra_params is not None:
-            params["params"] = extra_params
+        if params is not None:
+            _params["params"] = params
 
         return self._make_bitrix_api_request(
             api_wrapper=self._update,
-            params=params,
+            params=_params,
             timeout=timeout,
         )
 
@@ -329,7 +339,7 @@ class BaseItem(BaseCRM, ABC):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 

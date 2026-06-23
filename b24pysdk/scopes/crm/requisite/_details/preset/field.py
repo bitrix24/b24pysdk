@@ -1,4 +1,5 @@
-from ......api.requests import BitrixAPIRequest
+from ......api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ......schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ......utils.functional import type_checker
 from ......utils.types import JSONDict, Timeout
 from ...._base_crm import BaseCRM
@@ -19,7 +20,7 @@ class Field(BaseCRM):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[CRMFieldsData, CRMFieldsDict]:
         """Get description of custom fields for the CRM requisite template.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/presets/fields/crm-requisite-preset-field-fields.html

@@ -10,19 +10,20 @@ from b24pysdk.constants import B24BoolLit
 from b24pysdk.constants.userfield import UserTypeID
 from b24pysdk.utils.types import JSONDict
 
-from .....constants import SDK_NAME
+from .....constants import SDK_NAME, SORT
 
 pytestmark = [
     pytest.mark.integration,
+    pytest.mark.scopes,
     pytest.mark.crm,
-    pytest.mark.crm_company,
+    # pytest.mark.crm_company,
     pytest.mark.crm_company_userfield,
 ]
 
 _USER_TYPE_ID: UserTypeID = UserTypeID.STRING
 _MULTIPLE: B24BoolLit = B24BoolLit.FALSE
 _XML_ID: Text = "COMPANY_UF_XML_ID"
-_SORT: Text = "100"
+_SORT: Text = str(SORT)
 _MANDATORY: B24BoolLit = B24BoolLit.FALSE
 _SHOW_FILTER: B24BoolLit = B24BoolLit.TRUE
 _SHOW_IN_LIST: B24BoolLit = B24BoolLit.TRUE
@@ -86,7 +87,41 @@ def test_crm_company_userfield_update(bitrix_client: BaseClient, cache: Cache):
     assert is_updated is True, "Userfield update should return True"
 
 
-@pytest.mark.dependency(name="test_crm_company_userfield_list", depends=["test_crm_company_userfield_update"])
+@pytest.mark.dependency(name="test_crm_company_userfield_get", depends=["test_crm_company_userfield_update"])
+def test_crm_company_userfield_get(bitrix_client: BaseClient, cache: Cache):
+    """"""
+
+    userfield_id = cache.get("company_userfield_id", None)
+    assert isinstance(userfield_id, int), "Userfield ID should be cached"
+
+    userfield_name = cache.get("company_userfield_name", None)
+    assert isinstance(userfield_name, str), "Userfield name should be cached"
+
+    bitrix_response = bitrix_client.crm.company.userfield.get(
+        bitrix_id=userfield_id,
+    ).response
+
+    assert isinstance(bitrix_response, BitrixAPIResponse)
+    assert isinstance(bitrix_response.result, dict)
+
+    userfield = bitrix_response.result
+
+    assert userfield.get("ID") == str(userfield_id), "Userfield ID does not match"
+    assert userfield.get("FIELD_NAME") == userfield_name, "Userfield FIELD_NAME does not match"
+    assert userfield.get("USER_TYPE_ID") == _USER_TYPE_ID, "Userfield USER_TYPE_ID does not match"
+    assert userfield.get("XML_ID") == _XML_ID, "Userfield XML_ID does not match"
+    assert userfield.get("SORT") == _SORT, "Userfield SORT does not match"
+    assert userfield.get("SHOW_IN_LIST") == _SHOW_IN_LIST, "Userfield SHOW_IN_LIST does not match"
+    assert userfield.get("EDIT_IN_LIST") == _EDIT_IN_LIST, "Userfield EDIT_IN_LIST does not match"
+
+    assert isinstance(userfield.get("SETTINGS"), dict), "Userfield SETTINGS is not a dictionary"
+
+    userfield_settings = userfield["SETTINGS"]
+    assert userfield_settings.get("DEFAULT_VALUE") == _SETTINGS_DEFAULT_VALUE, "Userfield SETTINGS DEFAULT_VALUE does not match"
+    assert userfield_settings.get("ROWS") == _SETTINGS_ROWS, "Userfield SETTINGS ROWS does not match"
+
+
+@pytest.mark.dependency(name="test_crm_company_userfield_list", depends=["test_crm_company_userfield_get"])
 def test_crm_company_userfield_list(bitrix_client: BaseClient, cache: Cache):
     """"""
 
@@ -127,7 +162,7 @@ def test_crm_company_userfield_list(bitrix_client: BaseClient, cache: Cache):
     assert userfield_settings.get("ROWS") == _SETTINGS_ROWS, "Userfield SETTINGS ROWS does not match"
 
 
-@pytest.mark.dependency(name="test_crm_company_userfield_list_as_list", depends=["test_crm_company_userfield_update"])
+@pytest.mark.dependency(name="test_crm_company_userfield_list_as_list", depends=["test_crm_company_userfield_list"])
 def test_crm_company_userfield_list_as_list(bitrix_client: BaseClient):
     """"""
 
@@ -144,7 +179,7 @@ def test_crm_company_userfield_list_as_list(bitrix_client: BaseClient):
         assert isinstance(userfield, dict)
 
 
-@pytest.mark.dependency(name="test_crm_company_userfield_list_as_list_fast", depends=["test_crm_company_userfield_update"])
+@pytest.mark.dependency(name="test_crm_company_userfield_list_as_list_fast", depends=["test_crm_company_userfield_list_as_list"])
 def test_crm_company_userfield_list_as_list_fast(bitrix_client: BaseClient):
     """"""
 

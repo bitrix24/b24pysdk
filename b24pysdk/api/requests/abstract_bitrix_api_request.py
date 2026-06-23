@@ -1,17 +1,16 @@
 from abc import ABC, abstractmethod
-from typing import Generic, Optional, Text, TypeVar
+from typing import Generic, Optional, Text
 
 from ...protocols import BitrixTokenFullProtocol
+from ...utils.type_vars import ResponseT
 from ...utils.types import B24RequestTuple, JSONDict
 
 __all__ = [
     "AbstractBitrixAPIRequest",
 ]
 
-_BARPT = TypeVar("_BARPT")
 
-
-class AbstractBitrixAPIRequest(ABC, Generic[_BARPT]):
+class AbstractBitrixAPIRequest(ABC, Generic[ResponseT]):
     """
     Base class for lazy Bitrix24 API request objects.
 
@@ -26,7 +25,7 @@ class AbstractBitrixAPIRequest(ABC, Generic[_BARPT]):
     _api_method: Text
     _params: Optional[JSONDict]
     _kwargs: JSONDict
-    _response: Optional[_BARPT]
+    _response: Optional[ResponseT]
 
     def __init__(
             self,
@@ -87,7 +86,7 @@ class AbstractBitrixAPIRequest(ABC, Generic[_BARPT]):
         return self._api_method, self._params
 
     @property
-    def response(self) -> _BARPT:
+    def response(self) -> ResponseT:
         """
         Return cached response or execute the request once.
 
@@ -110,9 +109,8 @@ class AbstractBitrixAPIRequest(ABC, Generic[_BARPT]):
             **self._kwargs,
         )
 
-    @staticmethod
     @abstractmethod
-    def _convert_response(json_response: JSONDict) -> _BARPT:
+    def _convert_response(self, json_response: JSONDict) -> ResponseT:
         """
         Convert raw JSON response into a typed response object.
 
@@ -124,7 +122,7 @@ class AbstractBitrixAPIRequest(ABC, Generic[_BARPT]):
         """
         raise NotImplementedError
 
-    def _get_and_set_response(self) -> _BARPT:
+    def _get_and_set_response(self) -> ResponseT:
         """
         Execute the request, convert response, and cache it.
 
@@ -134,7 +132,7 @@ class AbstractBitrixAPIRequest(ABC, Generic[_BARPT]):
         self._response = self._convert_response(self._call())
         return self._response
 
-    def call(self) -> _BARPT:
+    def call(self) -> ResponseT:
         """
         Execute the request immediately.
 

@@ -1,9 +1,10 @@
 from functools import cached_property
 from typing import Annotated, Literal, Optional, Text
 
-from ...api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ...schemas.event import EventUnbind, EventUnbindData
 from ...utils.functional import type_checker
-from ...utils.types import Timeout
+from ...utils.types import JSONDict, Timeout
 from .._base_scope import BaseScope
 from .offline import Offline
 
@@ -31,10 +32,10 @@ class Event(BaseScope):
             auth_connector: Optional[Text] = None,
             options: Optional[Text] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
-        params = {
+        params: JSONDict = {
             "event": event,
             "handler": handler,
         }
@@ -78,10 +79,10 @@ class Event(BaseScope):
             auth_type: Optional[int] = None,
             event_type: Optional[Annotated[Text, Literal["offline", "online"]]] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[EventUnbindData, EventUnbind]:
         """"""
 
-        params = {
+        params: JSONDict = {
             "event": event,
             "handler": handler,
         }
@@ -96,4 +97,6 @@ class Event(BaseScope):
             api_wrapper=self.unbind,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=EventUnbind.from_bitrix,
         )

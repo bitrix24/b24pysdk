@@ -1,4 +1,5 @@
-from ....api.requests import BitrixAPIRequest
+from ....api.requests import BitrixAPIValueRequest
+from ....schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
 from .._base_crm import BaseCRM
@@ -19,7 +20,7 @@ class Communication(BaseCRM):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[CRMFieldsData, CRMFieldsDict]:
         """Get description of communication.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/activity-base/crm-activity-communication-fields.html

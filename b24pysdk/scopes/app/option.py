@@ -2,7 +2,7 @@ from typing import Dict, Optional, Text
 
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import Timeout
+from ...utils.types import B24APIResult, JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -23,7 +23,7 @@ class Option(BaseEntity):
             option: Optional[Text] = None,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[B24APIResult]:
         """
         Retrieve the current value of a specified option.
 
@@ -40,7 +40,7 @@ class Option(BaseEntity):
             Instance of BitrixAPIRequest representing the ongoing request.
         """
 
-        params = dict()
+        params: JSONDict = {}
 
         if option is not None:
             params["option"] = option
@@ -57,7 +57,7 @@ class Option(BaseEntity):
             options: Dict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """
         Set values for one or more options in Bitrix24.
 
@@ -74,7 +74,7 @@ class Option(BaseEntity):
             Instance of BitrixAPIRequest representing the ongoing request.
         """
 
-        params = {
+        params: JSONDict = {
             "options": options,
         }
 

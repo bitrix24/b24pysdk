@@ -16,8 +16,7 @@ class BitrixAPIRawRequest(AbstractBitrixAPIRequest[JSONDict]):
 
     __slots__ = ()
 
-    @staticmethod
-    def _convert_response(json_response: JSONDict) -> JSONDict:
+    def _convert_response(self, json_response: JSONDict) -> JSONDict:
         """
         Return raw JSON response without conversion.
 

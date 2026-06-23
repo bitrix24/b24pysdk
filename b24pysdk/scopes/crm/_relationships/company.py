@@ -1,4 +1,5 @@
-from ....api.requests import BitrixAPIRequest
+from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ....schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
 from .base_relationship import BaseRelationship
@@ -19,7 +20,7 @@ class Company(BaseRelationship):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[CRMFieldsData, CRMFieldsDict]:
         """Get fields for Contact-Company.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/contacts/company/crm-contact-company-fields.html

@@ -1,6 +1,7 @@
 from typing import Text
 
-from ..api.requests import BitrixAPIRequest
+from ..api.requests import BitrixAPIValueRequest
+from ..schemas.feature import FeatureGet, FeatureGetData
 from ..utils.functional import type_checker
 from ..utils.types import JSONDict, Timeout
 from ._base_scope import BaseScope
@@ -19,7 +20,7 @@ class Feature(BaseScope):
             code: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[FeatureGetData, FeatureGet]:
         """"""
 
         params: JSONDict = {
@@ -30,4 +31,6 @@ class Feature(BaseScope):
             api_wrapper=self.get,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=FeatureGet.from_bitrix,
         )

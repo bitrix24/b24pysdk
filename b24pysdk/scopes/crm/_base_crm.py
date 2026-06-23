@@ -1,9 +1,15 @@
 from abc import ABC
-from typing import Iterable, Optional, Text
+from typing import Callable, Iterable, Optional, Text
 
-from ...api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ...schemas.crm.field import CRMFieldsDict
+from ...utils.type_vars import BAResultT, BAValueT
 from ...utils.types import JSONDict, Timeout
 from .._base_entity import BaseEntity
+
+__all__ = [
+    "BaseCRM",
+]
 
 
 class BaseCRM(BaseEntity, ABC):
@@ -13,11 +19,14 @@ class BaseCRM(BaseEntity, ABC):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+            result_adapter: Callable[[BAResultT], BAValueT] = CRMFieldsDict.from_bitrix,
+    ) -> BitrixAPIValueRequest[BAResultT, BAValueT]:
         """"""
         return self._make_bitrix_api_request(
             api_wrapper=self._fields,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=result_adapter,
         )
 
     def _add(
@@ -28,7 +37,7 @@ class BaseCRM(BaseEntity, ABC):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {
+        params: JSONDict = {
             "fields": fields,
         }
 
@@ -46,7 +55,7 @@ class BaseCRM(BaseEntity, ABC):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 
@@ -67,7 +76,7 @@ class BaseCRM(BaseEntity, ABC):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        params: JSONDict = {}
 
         if select is not None:
             if select.__class__ is not list:
@@ -99,7 +108,7 @@ class BaseCRM(BaseEntity, ABC):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "fields": fields,
         }
@@ -118,7 +127,7 @@ class BaseCRM(BaseEntity, ABC):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 

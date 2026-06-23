@@ -1,4 +1,4 @@
-from typing import Generator, Iterable, Text
+from typing import Generator, Text, Tuple
 
 import pytest
 from _pytest.cacheprovider import Cache
@@ -9,6 +9,7 @@ from b24pysdk.api.responses import (
     BitrixAPIResponse,
 )
 from b24pysdk.client import BaseClient
+from b24pysdk.constants import B24BoolLit
 
 from .....constants import SDK_NAME
 
@@ -18,14 +19,16 @@ pytestmark = [
     pytest.mark.crm_contact,
 ]
 
-_FIELDS: Iterable[Text] = ("ID", "NAME", "SECOND_NAME", "LAST_NAME", "TYPE_ID", "SOURCE_ID", "POST", "OPENED", "ASSIGNED_BY_ID")
+_FIELDS: Tuple[Text, ...] = ("ID", "NAME", "SECOND_NAME", "LAST_NAME", "TYPE_ID", "SOURCE_ID", "POST", "OPENED", "ASSIGNED_BY_ID")
 _NAME: Text = f"{SDK_NAME} First Name"
 _SECOND_NAME: Text = f"{SDK_NAME} Middle Name"
 _LAST_NAME: Text = f"{SDK_NAME} Last Name"
 _TYPE_ID: Text = "CLIENT"
 _SOURCE_ID: Text = "WEB"
 _POST: Text = f"{SDK_NAME} Position"
-_OPENED: Text = "Y"
+_OPENED: B24BoolLit = B24BoolLit.TRUE
+_REGISTER_SONET_EVENT: B24BoolLit = B24BoolLit.TRUE
+_REGISTER_HISTORY_EVENT: B24BoolLit = B24BoolLit.TRUE
 _UPDATED_NAME: Text = f"{SDK_NAME} Updated First Name"
 
 
@@ -45,7 +48,7 @@ def test_crm_contact_fields(bitrix_client: BaseClient):
         assert isinstance(fields[field], dict), f"Field '{field}' should be a dictionary"
 
 
-@pytest.mark.dependency(name="test_crm_contact_add", depends=["test_crm_contact_fields"])
+@pytest.mark.dependency(name="test_crm_contact_add")
 def test_crm_contact_add(bitrix_client: BaseClient, cache: Cache):
     """Test creating a new contact."""
 
@@ -60,7 +63,7 @@ def test_crm_contact_add(bitrix_client: BaseClient, cache: Cache):
             "OPENED": _OPENED,
         },
         params={
-            "REGISTER_SONET_EVENT": "Y",
+            "REGISTER_SONET_EVENT": _REGISTER_SONET_EVENT,
         },
     ).response
 
@@ -98,7 +101,32 @@ def test_crm_contact_get(bitrix_client: BaseClient, cache: Cache):
     assert contact.get("OPENED") == _OPENED, "Contact opened status does not match"
 
 
-@pytest.mark.dependency(name="test_crm_contact_list", depends=["test_crm_contact_get"])
+@pytest.mark.dependency(name="test_crm_contact_update", depends=["test_crm_contact_get"])
+def test_crm_contact_update(bitrix_client: BaseClient, cache: Cache):
+    """Test updating an existing contact."""
+
+    contact_id = cache.get("contact_id", None)
+    assert isinstance(contact_id, int), "Contact ID should be cached"
+
+    bitrix_response = bitrix_client.crm.contact.update(
+        bitrix_id=contact_id,
+        fields={
+            "NAME": _UPDATED_NAME,
+        },
+        params={
+            "REGISTER_SONET_EVENT": _REGISTER_SONET_EVENT,
+            "REGISTER_HISTORY_EVENT": _REGISTER_HISTORY_EVENT,
+        },
+    ).response
+
+    assert isinstance(bitrix_response, BitrixAPIResponse)
+
+    is_updated = bitrix_response.result
+
+    assert is_updated is True, "Contact update should return True"
+
+
+@pytest.mark.dependency(name="test_crm_contact_list", depends=["test_crm_contact_update"])
 def test_crm_contact_list(bitrix_client: BaseClient, cache: Cache):
     """Test retrieving a list of contacts."""
 
@@ -120,7 +148,7 @@ def test_crm_contact_list(bitrix_client: BaseClient, cache: Cache):
         assert isinstance(contact, dict)
         if all((
             contact.get("ID") == str(contact_id),
-            contact.get("NAME") == _NAME,
+            contact.get("NAME") == _UPDATED_NAME,
             contact.get("SECOND_NAME") == _SECOND_NAME,
             contact.get("LAST_NAME") == _LAST_NAME,
             contact.get("TYPE_ID") == _TYPE_ID,
@@ -176,32 +204,7 @@ def test_crm_contact_list_as_list_fast(bitrix_client: BaseClient):
             last_contact_id = contact_id
 
 
-@pytest.mark.dependency(name="test_crm_contact_update", depends=["test_crm_contact_list_as_list_fast"])
-def test_crm_contact_update(bitrix_client: BaseClient, cache: Cache):
-    """Test updating an existing contact."""
-
-    contact_id = cache.get("contact_id", None)
-    assert isinstance(contact_id, int), "Contact ID should be cached"
-
-    bitrix_response = bitrix_client.crm.contact.update(
-        bitrix_id=contact_id,
-        fields={
-            "NAME": _UPDATED_NAME,
-        },
-        params={
-            "REGISTER_SONET_EVENT": "Y",
-            "REGISTER_HISTORY_EVENT": "Y",
-        },
-    ).response
-
-    assert isinstance(bitrix_response, BitrixAPIResponse)
-
-    is_updated = bitrix_response.result
-
-    assert is_updated is True, "Contact update should return True"
-
-
-@pytest.mark.dependency(name="test_crm_contact_delete", depends=["test_crm_contact_update"])
+@pytest.mark.dependency(name="test_crm_contact_delete", depends=["test_crm_contact_list_as_list_fast"])
 def test_crm_contact_delete(bitrix_client: BaseClient, cache: Cache):
     """Test deleting a contact."""
 

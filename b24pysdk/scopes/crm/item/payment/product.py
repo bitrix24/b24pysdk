@@ -19,10 +19,10 @@ class Product(BaseCRM):
     @type_checker
     def add(
             self,
-            *,
             payment_id: int,
             row_id: int,
             quantity: float,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Add product item to payment.
@@ -44,7 +44,7 @@ class Product(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "paymentId": payment_id,
             "rowId": row_id,
             "quantity": quantity,
@@ -59,9 +59,9 @@ class Product(BaseCRM):
     @type_checker
     def list(
             self,
-            *,
             payment_id: int,
             filter: JSONDict,
+            *,
             order: Optional[JSONDict] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
@@ -106,7 +106,7 @@ class Product(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "paymentId": payment_id,
             "filter": filter,
         }
@@ -147,8 +147,8 @@ class Product(BaseCRM):
     def set_quantity(
             self,
             bitrix_id: int,
-            *,
             quantity: float,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Change product quantity.
@@ -168,7 +168,7 @@ class Product(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "quantity": quantity,
         }

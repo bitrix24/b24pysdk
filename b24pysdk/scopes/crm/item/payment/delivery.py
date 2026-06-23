@@ -19,9 +19,9 @@ class Delivery(BaseCRM):
     @type_checker
     def add(
             self,
-            *,
             payment_id: int,
             delivery_id: int,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Add delivery item to payment.
@@ -41,7 +41,7 @@ class Delivery(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "paymentId": payment_id,
             "deliveryId": delivery_id,
         }
@@ -55,9 +55,9 @@ class Delivery(BaseCRM):
     @type_checker
     def list(
             self,
-            *,
             payment_id: int,
             filter: JSONDict,
+            *,
             order: Optional[JSONDict] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
@@ -102,7 +102,7 @@ class Delivery(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "paymentId": payment_id,
             "filter": filter,
         }
@@ -143,8 +143,8 @@ class Delivery(BaseCRM):
     def set_delivery(
             self,
             bitrix_id: int,
-            *,
             delivery_id: int,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Reassign delivery item to another document.
@@ -164,7 +164,7 @@ class Delivery(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "deliveryId": delivery_id,
         }

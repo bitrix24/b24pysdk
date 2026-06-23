@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "b24pysdk"
-version = "1.1.4"
+version = "1.2.0"
 authors = [
     { name = "Bitrix24", email = "pypi@bitrixsoft.com" }
 ]
@@ -18,15 +18,17 @@ keywords = ["bitrix24", "rest", "api"]
 classifiers = []
 
 dependencies = [
-    "psygnal>=0.14.1,<1.0",
     "requests>=2.31.0,<3",
-    "uuid6>=2021.11.29,<2026.0.0",
+    "uuid6>=2021.11.29; python_version < '3.14'",
 ]
 
 [project.urls]
 Homepage = "https://github.com/bitrix24/b24pysdk"
 
 [project.optional-dependencies]
+signals = [
+    "psygnal>=0.14.1,<1.0",
+]
 django = [
     "Django>=4.2,<7",
 ]
@@ -39,7 +41,7 @@ flask = [
 ]
 dev = [
     "pre-commit",
-    "ruff==0.15.15",
+    "ruff==0.15.18",
 ]
 test = [
     "environs>=11.0.0",
@@ -48,6 +50,7 @@ test = [
     "pytest-cov>=4",
     "pytest-dependency>=0.5.1",
     "pytest-mock>=3",
+    "psygnal>=0.14.1,<1.0",
     "python-multipart",
     "uvicorn",
 ]
@@ -160,6 +163,7 @@ markers = [
     "bitrix_api_requester",
     "bitrix_oauth_requester",
     "bitrix_time_response",
+    "bitrix_token_integration",
     "bizproc",
     "crm: mark a test as related to crm operations",
     "crm_activity",
@@ -175,10 +179,11 @@ markers = [
     "crm_calllist_items: mark a test as related to crm.calllist.items operations",
     "crm_category",
     "crm_company: mark a test as related to crm.company operations",
-    "crm_company_configuration",
     "crm_company_contact",
+    "crm_company_details_configuration",
     "crm_company_userfield",
     "crm_contact",
+    "crm_contact_company: mark a test as related to crm.contact.company operations",
     "crm_contact_configuration",
     "crm_currency: mark a test as related to crm.currency operations",
     "crm_currency_base: mark a test as related to crm.currency.base operations",
@@ -205,6 +210,7 @@ markers = [
     "documentgenerator_document",
     "entity: mark a test as related to entity operations",
     "entity_item: mark a test as related to entity item operations",
+    "entity_item_property",
     "entity_section: mark a test as related to entity section operations",
     "errors",
     "errors_oauth",

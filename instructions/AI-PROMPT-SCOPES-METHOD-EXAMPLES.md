@@ -114,6 +114,7 @@ Style requirements for all examples (mandatory):
   - If method result is expected as entity id, print/log that ID.
   - If method returns collection/object, print/log normalized result.
   - For iterator/generator results (typical for `.as_list()` / `.as_list_fast()`), consume via loop before output.
+  - If the SDK method exposes typed schema adapters, mention that `.value` or `.values` can be used to get Python-friendly objects from `b24pysdk.schemas`, while the main example must still show `.response.result`.
 - Keep snippets clean and minimal:
   - Do NOT add inline comments in code blocks.
   - Do NOT add debug/service prints (timestamps, "checking...", etc.).

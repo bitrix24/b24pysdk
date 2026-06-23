@@ -3,7 +3,6 @@ from typing import Text, Tuple
 import pytest
 from _pytest.cacheprovider import Cache
 
-from b24pysdk import Config
 from b24pysdk.api.responses import BitrixAPIResponse
 from b24pysdk.client import BaseClient
 
@@ -17,6 +16,7 @@ pytestmark = [
 ]
 
 _ROWS_FIELDS: Tuple[Text, ...] = ("PRODUCT_NAME", "PRICE", "QUANTITY")
+_DEAL_TITLE: Text = f"{SDK_NAME} Deal ProductRows"
 _ROW_PRODUCT_NAME: Text = f"{SDK_NAME} Product"
 _ROW_PRICE: Text = "100.00"
 _ROW_QUANTITY: float = 2
@@ -26,12 +26,9 @@ _ROW_QUANTITY: float = 2
 def test_crm_deal_productrows_set(bitrix_client: BaseClient, cache: Cache):
     """"""
 
-    timestamp = int(Config().get_local_datetime().timestamp() * (10 ** 6))
-    deal_title: Text = f"{SDK_NAME} Deal ProductRows {timestamp}"
-
     deal_response = bitrix_client.crm.deal.add(
         fields={
-            "TITLE": deal_title,
+            "TITLE": _DEAL_TITLE,
             "STAGE_ID": "NEW",
             "CURRENCY_ID": "USD",
             "OPPORTUNITY": 1,

@@ -1,22 +1,22 @@
 from abc import ABC
-from typing import TYPE_CHECKING, Generic, Optional, TypeVar
+from typing import TYPE_CHECKING, Generic, Optional
 
-from ...utils.types import JSONDict
-from ..responses import AbstractBitrixAPIListResponse, BitrixAPIListFastResponse, BitrixAPIListResponse
+from ...utils.type_vars import BAListResponseT, BAListResultT
+from ...utils.types import JSONDict, JSONGenerator, JSONList
+from ..responses import BitrixAPIListFastResponse, BitrixAPIListResponse
 from .bitrix_api_base_request import BitrixAPIBaseRequest
 
 if TYPE_CHECKING:
     from .bitrix_api_request import BitrixAPIRequest
 
 __all__ = [
+    "BitrixAPIBaseListRequest",
     "BitrixAPIListFastRequest",
     "BitrixAPIListRequest",
 ]
 
-_BALRPT = TypeVar("_BALRPT", bound=AbstractBitrixAPIListResponse)
 
-
-class _AbstractBitrixAPIListRequest(BitrixAPIBaseRequest[_BALRPT], ABC, Generic[_BALRPT]):
+class BitrixAPIBaseListRequest(BitrixAPIBaseRequest[BAListResponseT, BAListResultT], ABC, Generic[BAListResponseT, BAListResultT]):
     """
     Base class for lazy Bitrix24 list request objects.
 
@@ -62,7 +62,7 @@ class _AbstractBitrixAPIListRequest(BitrixAPIBaseRequest[_BALRPT], ABC, Generic[
         )
 
 
-class BitrixAPIListRequest(_AbstractBitrixAPIListRequest[BitrixAPIListResponse]):
+class BitrixAPIListRequest(BitrixAPIBaseListRequest[BitrixAPIListResponse, JSONList]):
     """
     Lazy request object for loading a paginated Bitrix24 list.
 
@@ -72,8 +72,7 @@ class BitrixAPIListRequest(_AbstractBitrixAPIListRequest[BitrixAPIListResponse])
 
     __slots__ = ()
 
-    @staticmethod
-    def _convert_response(json_response: JSONDict) -> BitrixAPIListResponse:
+    def _convert_response(self, json_response: JSONDict) -> BitrixAPIListResponse:
         """
         Convert raw JSON response into ``BitrixAPIListResponse``.
 
@@ -100,7 +99,7 @@ class BitrixAPIListRequest(_AbstractBitrixAPIListRequest[BitrixAPIListResponse])
         )
 
 
-class BitrixAPIListFastRequest(_AbstractBitrixAPIListRequest[BitrixAPIListFastResponse]):
+class BitrixAPIListFastRequest(BitrixAPIBaseListRequest[BitrixAPIListFastResponse, JSONGenerator]):
     """
     Lazy request object for loading a Bitrix24 list with fast ID pagination.
 
@@ -148,8 +147,7 @@ class BitrixAPIListFastRequest(_AbstractBitrixAPIListRequest[BitrixAPIListFastRe
             f"limit={self._limit})"
         )
 
-    @staticmethod
-    def _convert_response(json_response: JSONDict) -> BitrixAPIListFastResponse:
+    def _convert_response(self, json_response: JSONDict) -> BitrixAPIListFastResponse:
         """
         Convert raw JSON response into ``BitrixAPIListFastResponse``.
 

@@ -22,7 +22,7 @@ class Userfield(BaseEntity):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """
         Add a custom field.
 
@@ -96,7 +96,7 @@ class Userfield(BaseEntity):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """
         Update a custom field.
 
@@ -132,7 +132,7 @@ class Userfield(BaseEntity):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """
         Delete a custom field
 

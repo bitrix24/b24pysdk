@@ -1,4 +1,5 @@
-from ...api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIValueRequest
+from ...schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ...utils.functional import type_checker
 from ...utils.types import Timeout
 from ._base_crm import BaseCRM
@@ -16,7 +17,7 @@ class Multifield(BaseCRM):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[CRMFieldsData, CRMFieldsDict]:
         """Get description of multiple fields.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/auxiliary/multifield/crm-multifield-fields.html
@@ -27,6 +28,6 @@ class Multifield(BaseCRM):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValueRequest
         """
         return self._fields(timeout=timeout)

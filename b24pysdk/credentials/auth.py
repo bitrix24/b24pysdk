@@ -2,10 +2,11 @@ from dataclasses import asdict, dataclass
 from typing import TYPE_CHECKING, Any, List, Mapping, Optional, Text
 from urllib.parse import urlparse
 
-from .._constants import PYTHON_VERSION
 from ..constants import B24AppStatus
 from ..errors import BitrixValidationError
+from ..utils.dataclasses import frozen_dataclass_kwargs
 from ..utils.types import JSONDict
+from ._app_info_cache import AppInfoCacheMethods
 from .bitrix_token import BitrixToken
 from .oauth_token import OAuthToken
 
@@ -21,13 +22,8 @@ __all__ = [
     "WorkflowOAuth",
 ]
 
-_DATACLASS_KWARGS = {"eq": False, "frozen": True}
 
-if PYTHON_VERSION >= (3, 10):
-    _DATACLASS_KWARGS["slots"] = True
-
-
-@dataclass(**_DATACLASS_KWARGS)
+@dataclass(**frozen_dataclass_kwargs(eq=False))
 class Auth:
     """
     Base authentication payload returned by Bitrix24 events.
@@ -127,15 +123,17 @@ class Auth:
         return asdict(self)
 
 
-class _AuthAppInfoCache(Auth):
+class _AuthAppInfoCache(Auth, AppInfoCacheMethods):
+    """Auth base with internal ``app.info`` cache slot."""
 
     __slots__ = ("_app_info",)
 
-    if TYPE_CHECKING:
-        _app_info: "B24AppInfoResult"
+    def _make_bitrix_token(self: "OAuth", bitrix_app: "AbstractBitrixApp") -> BitrixToken:
+        """Create Bitrix token for resolving ``app.info`` from OAuth payload."""
+        return BitrixToken.from_oauth(oauth=self, bitrix_app=bitrix_app)
 
 
-@dataclass(**_DATACLASS_KWARGS)
+@dataclass(**frozen_dataclass_kwargs(eq=False))
 class OAuth(_AuthAppInfoCache):
     """
     Base OAuth payload shared by Bitrix24 auth models with user OAuth context.
@@ -199,26 +197,6 @@ class OAuth(_AuthAppInfoCache):
         except Exception as error:
             raise cls.ValidationError(f"Invalid OAuth payload: {error}") from error
 
-    def get_app_info(self, bitrix_app: "AbstractBitrixApp") -> "B24AppInfoResult":
-        """
-        Resolve and cache Bitrix24 ``app.info`` for this OAuth payload.
-
-        Args:
-            bitrix_app: SDK application object with client credentials. It is
-                required because ``app.info`` is called through the application
-                OAuth endpoint using the access token from this payload.
-
-        Returns:
-            Bitrix24 application installation information used by integrations
-            to validate incoming event, workflow, and placement payloads.
-        """
-
-        if not hasattr(self, "_app_info"):
-            bitrix_token = BitrixToken.from_oauth(oauth=self, bitrix_app=bitrix_app)
-            object.__setattr__(self, "_app_info", bitrix_token.get_app_info().result)
-
-        return self._app_info
-
     def validate_against_app_info(self, app_info: "B24AppInfoResult") -> bool:
         """
         Validate OAuth data against application info.
@@ -249,7 +227,7 @@ class OAuth(_AuthAppInfoCache):
             raise self.ValidationError("Invalid OAuth")
 
 
-@dataclass(**_DATACLASS_KWARGS)
+@dataclass(**frozen_dataclass_kwargs(eq=False))
 class EventOAuth(OAuth):
     """
     OAuth payload for Bitrix24 event handlers.
@@ -379,7 +357,7 @@ class EventOAuth(OAuth):
             raise self.ValidationError("Invalid event OAuth") from error
 
 
-@dataclass(**_DATACLASS_KWARGS)
+@dataclass(**frozen_dataclass_kwargs(eq=False))
 class RenewedOAuth(OAuth):
     """
     OAuth payload returned after token refresh.
@@ -441,7 +419,7 @@ class RenewedOAuth(OAuth):
             raise self.ValidationError("Invalid renewed OAuth")
 
 
-@dataclass(**_DATACLASS_KWARGS)
+@dataclass(**frozen_dataclass_kwargs(eq=False))
 class WorkflowOAuth(OAuth):
     """
     OAuth payload for Bitrix24 business process (workflow) events.

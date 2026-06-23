@@ -8,11 +8,12 @@ from b24pysdk.constants.crm import EntityTypeID
 
 pytestmark = [
     pytest.mark.integration,
+    pytest.mark.scopes,
     pytest.mark.crm,
     pytest.mark.crm_stagehistory,
 ]
 
-_FIELDS: Tuple[Text, ...] = ("ID", "TYPE_ID", "OWNER_ID", "CREATED_TIME")
+_FIELDS: Tuple[Text, ...] = ("ID", "TYPE_ID", "OWNER_ID", "CREATED_TIME", "STATUS_SEMANTIC_ID", "STATUS_ID")
 _ENTITY_TYPE_ID: EntityTypeID = EntityTypeID.LEAD
 
 

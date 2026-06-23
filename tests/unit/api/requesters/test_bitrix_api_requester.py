@@ -6,7 +6,7 @@ import pytest
 import requests
 
 from b24pysdk.api.requesters.bitrix_api_requester import BitrixAPIRequester
-from b24pysdk.error import BitrixRequestError, BitrixRequestTimeout
+from b24pysdk.errors import BitrixRequestError, BitrixRequestTimeout
 from tests.unit.helpers import assert_slots
 
 pytestmark = [

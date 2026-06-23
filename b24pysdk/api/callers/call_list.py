@@ -3,8 +3,10 @@ from typing import Final, Iterable, List, Mapping, Optional, Text, Tuple, Union
 from ..._constants import MAX_BATCH_SIZE
 from ...constants.version import B24APIVersion
 from ...protocols import BitrixTokenProtocol
+from ...schemas.time import TimeData
 from ...utils.types import B24APIVersionLiteral, B24RequestTuple, JSONDict, JSONList, Timeout
 from ._base_caller import BaseCaller
+from ._utils import get_empty_time
 from .call_batches import call_batches
 from .call_method import call_method
 
@@ -31,7 +33,7 @@ class _ListCaller(BaseCaller):
     __slots__ = ("_limit", "_time")
 
     _limit: Optional[int]
-    _time: Optional[JSONDict]
+    _time: Optional[TimeData]
 
     def __init__(
             self,
@@ -233,7 +235,18 @@ class _ListCaller(BaseCaller):
     def _unwrap_batch_result(self, batch_result: JSONDict) -> JSONList:
         """Flatten list payloads from all command results in a batch response."""
 
-        result_list = list()
+        result_error = batch_result.get("result_error")
+
+        if result_error:
+            self._config.logger.warning(
+                "batch result contains errors",
+                context={
+                    "api_method": self._api_method,
+                    "result_error": result_error,
+                },
+            )
+
+        result_list: JSONList = []
 
         if isinstance(batch_result["result"], dict):
             result_values = batch_result["result"].values()
@@ -245,7 +258,7 @@ class _ListCaller(BaseCaller):
 
         return result_list
 
-    def _add_time(self, time: JSONDict):
+    def _add_time(self, time: TimeData):
         """Merge timing metadata from an additional batch response into ``_time``."""
 
         self._time["finish"] = time["finish"]
@@ -272,51 +285,78 @@ class _ListCaller(BaseCaller):
         are fetched through batch requests for fewer HTTP round trips.
         """
 
-        filter_key, filter_id_key, filter_ids = self._check_filter_by_id_only()
+        self._config.logger.debug(
+            "start call_list",
+            context={
+                "limit": self._limit,
+            },
+        )
 
-        if filter_ids:
-            batch_response = self._fetch_batches_response(
-                methods=self._generate_filter_id_methods_for_batch(
-                    filter_key=filter_key,
-                    filter_id_key=filter_id_key,
-                    filter_ids=filter_ids,
-                ),
-            )
-            batch_response["result"] = self._unwrap_batch_result(batch_response["result"])[:self._limit]
-            return batch_response
+        try:
+            if self._limit is not None and self._limit <= 0:
+                return {
+                    "result": [],
+                    "time": get_empty_time(),
+                }
 
-        response = self._fetch_first_response()
+            filter_key, filter_id_key, filter_ids = self._check_filter_by_id_only()
 
-        result = self._unwrap_result(response["result"])
-        self._time = response["time"]
+            if filter_ids:
+                batch_response = self._fetch_batches_response(
+                    methods=self._generate_filter_id_methods_for_batch(
+                        filter_key=filter_key,
+                        filter_id_key=filter_id_key,
+                        filter_ids=filter_ids,
+                    ),
+                )
 
-        next_step = response.get("next")
-        total = response.get("total")
+                result = self._unwrap_batch_result(batch_response["result"])
 
-        if total is None:
-            total = len(result)
+                if self._limit is not None:
+                    del result[self._limit:]
 
-            message = (
-                f"Bitrix API method {self._api_method!r} did not return a 'total' field. "
-                "The method is likely not a list-type method and you should use call_method instead of call_list."
-            )
+                batch_response["result"] = result
+                return batch_response
 
-            self._config.logger.warning(message)
+            response = self._fetch_first_response()
 
-        if self._limit:
-            total = min(total, self._limit)
+            result = self._unwrap_result(response["result"])
+            self._time = response["time"]
 
-        if next_step and (self._limit is None or self._limit > self._STEP):
-            batch_response = self._fetch_batches_response(
-                methods=self._generate_methods_for_batch(
-                    next_step=next_step,
-                    total=total,
-                ),
-            )
-            result.extend(self._unwrap_batch_result(batch_response["result"]))
-            self._add_time(batch_response["time"])
+            next_step = response.get("next")
+            total = response.get("total")
 
-        return dict(result=result[:total], time=self._time)
+            if total is None:
+                total = len(result)
+
+                message = (
+                    f"Bitrix API method {self._api_method!r} did not return a 'total' field. "
+                    "The method is likely not a list-type method and you should use call_method instead of call_list."
+                )
+
+                self._config.logger.warning(message)
+
+            if self._limit is not None:
+                total = min(total, self._limit)
+
+            if next_step and (self._limit is None or self._limit > self._STEP):
+                batch_response = self._fetch_batches_response(
+                    methods=self._generate_methods_for_batch(
+                        next_step=next_step,
+                        total=total,
+                    ),
+                )
+                result.extend(self._unwrap_batch_result(batch_response["result"]))
+                self._add_time(batch_response["time"])
+
+            del result[total:]
+
+            return {
+                "result": result,
+                "time": self._time,
+            }
+        finally:
+            self._config.logger.debug("finish call_list")
 
 
 def call_list(

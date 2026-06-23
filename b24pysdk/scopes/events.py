@@ -1,4 +1,4 @@
-from typing import Optional, Text
+from typing import List, Optional, Text
 
 from ..api.requests import BitrixAPIRequest
 from ..utils.functional import type_checker
@@ -20,7 +20,7 @@ class Events(BaseScope):
             full: Optional[bool] = None,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[List[Text]]:
         """"""
 
         params: JSONDict = {}

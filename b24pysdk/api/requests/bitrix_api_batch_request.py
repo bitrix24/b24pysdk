@@ -1,8 +1,9 @@
-from typing import TYPE_CHECKING, Final, Generic, Mapping, Sequence, Text, TypeVar, Union, overload
+from typing import TYPE_CHECKING, Final, Generic, Mapping, Sequence, Text, overload
 
 from ...protocols import BitrixTokenFullProtocol
+from ...utils.type_vars import BABatchRequestsT
 from ...utils.types import B24Requests, B24RequestTuple, JSONDict, Key
-from ..responses import BitrixAPIBatchResponse
+from ..responses import B24APIBatchResult, BitrixAPIBatchResponse
 from .bitrix_api_base_request import BitrixAPIBaseRequest
 
 if TYPE_CHECKING:
@@ -13,16 +14,8 @@ __all__ = [
     "BitrixAPIBatchesRequest",
 ]
 
-_BARQST = TypeVar(
-    "_BARQST",
-    bound=Union[
-        Mapping[Key, "BitrixAPIRequest"],
-        Sequence["BitrixAPIRequest"],
-    ],
-)
 
-
-class BitrixAPIBatchesRequest(BitrixAPIBaseRequest[BitrixAPIBatchResponse], Generic[_BARQST]):
+class BitrixAPIBatchesRequest(BitrixAPIBaseRequest[BitrixAPIBatchResponse, B24APIBatchResult], Generic[BABatchRequestsT]):
     """
     Lazy request object for executing multiple Bitrix24 batch requests.
 
@@ -35,14 +28,14 @@ class BitrixAPIBatchesRequest(BitrixAPIBaseRequest[BitrixAPIBatchResponse], Gene
 
     __slots__ = ("_bitrix_api_requests", "_halt")
 
-    _bitrix_api_requests: _BARQST
+    _bitrix_api_requests: BABatchRequestsT
     _halt: bool
 
     def __init__(
             self,
             *,
             bitrix_token: BitrixTokenFullProtocol,
-            bitrix_api_requests: _BARQST,
+            bitrix_api_requests: BABatchRequestsT,
             halt: bool = False,
             **kwargs,
     ):
@@ -138,8 +131,7 @@ class BitrixAPIBatchesRequest(BitrixAPIBaseRequest[BitrixAPIBatchResponse], Gene
 
         return methods
 
-    @staticmethod
-    def _convert_response(json_response: JSONDict) -> BitrixAPIBatchResponse:
+    def _convert_response(self, json_response: JSONDict) -> BitrixAPIBatchResponse:
         """
         Convert raw JSON response into ``BitrixAPIBatchResponse``.
 
@@ -165,7 +157,7 @@ class BitrixAPIBatchesRequest(BitrixAPIBaseRequest[BitrixAPIBatchResponse], Gene
         )
 
 
-class BitrixAPIBatchRequest(BitrixAPIBatchesRequest[_BARQST], Generic[_BARQST]):
+class BitrixAPIBatchRequest(BitrixAPIBatchesRequest[BABatchRequestsT], Generic[BABatchRequestsT]):
     """
     Lazy request object for executing one Bitrix24 batch request.
 
@@ -182,7 +174,7 @@ class BitrixAPIBatchRequest(BitrixAPIBatchesRequest[_BARQST], Generic[_BARQST]):
             self,
             *,
             bitrix_token: BitrixTokenFullProtocol,
-            bitrix_api_requests: _BARQST,
+            bitrix_api_requests: BABatchRequestsT,
             halt: bool = False,
             ignore_size_limit: bool = False,
             **kwargs,

@@ -103,7 +103,8 @@ b24pysdk/
 │   ├── server.py              # Server related scope module
 │   ├── userfieldconfig.py     # Base class for working with userfields
 │   └── userfieldtype.py       # Base class for working with types of custom fields
-├── signals/                   # Handling different request types
+├── schemas/                   # Typed Python-friendly result schemas and adapters
+├── signals/                   # Optional internal SDK signals based on psygnal
 ├── utils/                     # Utility functions and helpers
 ├── _config.py                 # Configuration and settings management
 ├── _constants.py              # Constant values for internal use
@@ -140,6 +141,9 @@ b24pysdk/
 4. **Error Handling**:
      - Implements comprehensive error management via `BitrixAPIError` and `BitrixRequestTimeout` from `b24pysdk.errors`.
      - Provides detailed error descriptions for problematic API calls, enhancing debugging and reliability.
+5. **Typed Schemas**:
+     - Schema classes in `b24pysdk.schemas` adapt raw Bitrix24 `result` payloads to Python-friendly objects.
+     - Requests can expose `.value` for single adapted objects and `.values` for list-like adapted results while keeping `.result` available for raw API-compatible data.
 
 ### Standard API Methods
 
@@ -542,6 +546,14 @@ cfg.configure(
 ## Events subscription
 
 By using `OAuthTokenRenewedEvent` and `PortalDomainChangedEvent` you can subscribe on token refresh event and domain name change event.
+
+Signal subscription requires the optional signals extra:
+
+```bash
+pip install "b24pysdk[signals]"
+```
+
+Without this extra, regular SDK calls and token refresh still work, but direct imports from `b24pysdk.signals` raise `ImportError` with an installation hint.
 
 ```python
 from b24pysdk import BitrixToken

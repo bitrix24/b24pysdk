@@ -1,22 +1,18 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Generic, Optional
 
-from ..._constants import PYTHON_VERSION
-from ...utils.types import B24APIResult, JSONDict
+from ...utils.dataclasses import frozen_dataclass_kwargs
+from ...utils.type_vars import BAResultT
+from ...utils.types import JSONDict
 from .abstract_bitrix_response import AbstractBitrixResponse
 
 __all__ = [
     "BitrixAPIResponse",
 ]
 
-_DATACLASS_KWARGS = {"repr": False, "eq": False, "frozen": True}
 
-if PYTHON_VERSION >= (3, 10):
-    _DATACLASS_KWARGS["slots"] = True
-
-
-@dataclass(**_DATACLASS_KWARGS)
-class BitrixAPIResponse(AbstractBitrixResponse[B24APIResult]):
+@dataclass(**frozen_dataclass_kwargs(repr=False, eq=False))
+class BitrixAPIResponse(AbstractBitrixResponse[BAResultT], Generic[BAResultT]):
     """
     Standard Bitrix24 API response.
 
@@ -37,7 +33,7 @@ class BitrixAPIResponse(AbstractBitrixResponse[B24APIResult]):
         )
 
     @classmethod
-    def from_dict(cls, json_response: JSONDict, /) -> "BitrixAPIResponse":
+    def from_dict(cls, json_response: JSONDict, /) -> "BitrixAPIResponse[BAResultT]":
         """
         Create a BitrixAPIResponse instance from raw JSON response.
 

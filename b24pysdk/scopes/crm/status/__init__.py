@@ -1,7 +1,8 @@
 from functools import cached_property
 from typing import Optional
 
-from ....api.requests import BitrixAPIRequest
+from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ....schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
 from .._base_crm import BaseCRM
@@ -28,7 +29,7 @@ class Status(BaseCRM):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[CRMFieldsData, CRMFieldsDict]:
         """Get description of CRM status fields.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/status/crm-status-fields.html

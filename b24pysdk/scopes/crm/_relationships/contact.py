@@ -1,4 +1,5 @@
-from ....api.requests import BitrixAPIRequest
+from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ....schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
 from .base_relationship import BaseRelationship
@@ -22,7 +23,7 @@ class Contact(BaseRelationship):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[CRMFieldsData, CRMFieldsDict]:
         """Get fields for entity-contact connection.
 
         Documentation:
@@ -50,7 +51,7 @@ class Contact(BaseRelationship):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Add contact binding to CRM entity.
 
         Documentation:
@@ -93,7 +94,7 @@ class Contact(BaseRelationship):
             *,
             fields: JSONDict,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Remove contact from CRM entity.
 
         Documentation:

@@ -1,7 +1,8 @@
 from abc import abstractmethod
 from typing import Iterable, Optional, Text
 
-from .....api.requests import BitrixAPIRequest
+from .....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from .....schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from .....utils.types import JSONDict, Timeout
 from ..._base_crm import BaseCRM
 
@@ -18,7 +19,7 @@ class BaseDetail(BaseCRM):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[CRMFieldsData, CRMFieldsDict]:
         """Get description of the entity fields.
 
         The method returns a formal description of the fields of the requisite template or bank details.

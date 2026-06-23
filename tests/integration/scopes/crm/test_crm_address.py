@@ -10,6 +10,7 @@ from ....constants import LEAD_ID, SDK_NAME
 
 pytestmark = [
     pytest.mark.integration,
+    pytest.mark.scopes,
     pytest.mark.crm,
     pytest.mark.crm_address,
 ]

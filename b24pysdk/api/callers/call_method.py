@@ -1,5 +1,6 @@
-from typing import Optional, Text, Union
+from typing import Final, Optional, Text, Union
 
+from ..._constants import MASKED_VALUE
 from ...constants.version import B24APIVersion
 from ...protocols import BitrixTokenProtocol
 from ...utils.types import B24APIVersionLiteral, JSONDict, Timeout
@@ -13,6 +14,8 @@ __all__ = [
 
 class _MethodCaller(BaseCaller):
     """Caller for one Bitrix REST method request."""
+
+    _MASKED_AUTH: Final[Text] = MASKED_VALUE
 
     __slots__ = ()
 
@@ -87,6 +90,14 @@ class _MethodCaller(BaseCaller):
         else:
             return self._params | {"auth": self._auth_token}
 
+    def _get_params_for_log(self) -> JSONDict:
+        """Return method parameters prepared for logging."""
+
+        if not self._config.secure_log or "auth" not in self._params:
+            return self._params
+
+        return self._params | {"auth": self._MASKED_AUTH}
+
     def call(self) -> JSONDict:
         """Execute the configured method request and log request/response context."""
 
@@ -96,7 +107,8 @@ class _MethodCaller(BaseCaller):
                 "domain": self._domain,
                 "is_webhook": self._is_webhook,
                 "method": self._api_method,
-                "parameters": self._params,
+                "api_version": self._api_version,
+                "params": self._get_params_for_log(),
             },
         )
 

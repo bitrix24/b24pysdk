@@ -1,7 +1,8 @@
 from functools import cached_property
 from typing import Iterable, Optional, Text
 
-from ....api.requests import BitrixAPIRequest
+from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ....schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
 from .._userfield import Userfield
@@ -47,7 +48,7 @@ class Requisite(BaseItem):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[CRMFieldsData, CRMFieldsDict]:
         """Get requisite fields.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/universal/crm-requisite-fields.html

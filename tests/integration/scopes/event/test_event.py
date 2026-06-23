@@ -2,14 +2,16 @@ from typing import Text, Tuple
 
 import pytest
 
-from b24pysdk.api.responses import BitrixAPIListResponse, BitrixAPIResponse
+from b24pysdk.api.responses import BitrixAPIListResponse, BitrixAPIResponse, BitrixAPIValueResponse
 from b24pysdk.client import BaseClient
 from b24pysdk.constants.event import EventType
+from b24pysdk.schemas.event import EventUnbind
 
 from ....constants import BITRIX_PORTAL_OWNER_ID
 
 pytestmark = [
     pytest.mark.integration,
+    pytest.mark.scopes,
     pytest.mark.event,
 ]
 
@@ -99,14 +101,9 @@ def test_event_unbind(bitrix_client: BaseClient):
         event_type=_EVENT_TYPE,
     ).response
 
-    assert isinstance(bitrix_response, BitrixAPIResponse)
-    assert isinstance(bitrix_response.result, dict)
+    assert isinstance(bitrix_response, BitrixAPIValueResponse)
 
-    unbind_result = bitrix_response.result
+    event_unbind = bitrix_response.value
 
-    assert _UNBIND_RESULT_FIELD in unbind_result, f"Field {_UNBIND_RESULT_FIELD!r} should be present"
-
-    unbind_count = unbind_result[_UNBIND_RESULT_FIELD]
-
-    assert isinstance(unbind_count, int), f"Field '{_UNBIND_RESULT_FIELD}' should be an integer"
-    assert unbind_count > 0, "Unbind count should be positive"
+    assert isinstance(event_unbind, EventUnbind), "Event unbind value should be EventUnbind"
+    assert event_unbind.count > 0, "EventUnbind.count should be positive"

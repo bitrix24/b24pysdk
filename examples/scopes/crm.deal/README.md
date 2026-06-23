@@ -1,5 +1,8 @@
 # crm.deal
 
+## Typed Results
+Examples use `.response.result` to show the raw Bitrix24 result. For methods with schema adapters, `.value` or `.values` may also be available and return Python-friendly objects from `b24pysdk.schemas`.
+
 ## Discovered Methods
 - [crm.deal.add](crm_deal_add.md)
 - [crm.deal.get](crm_deal_get.md)

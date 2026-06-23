@@ -33,7 +33,6 @@ class BitrixOAuthRequester(BaseRequester):
     _BASE_OAUTH_URL: Final[Text] = "https://oauth.bitrix24.tech"
     _OAUTH_TOKEN_URL: Final[Text] = f"{_BASE_OAUTH_URL}/oauth/token/"
     _APP_INFO_URL: Final[Text] = f"{_BASE_OAUTH_URL}/rest/app.info/"
-    _MASKED_VALUE: Final[Text] = "********"
     _SENSITIVE_LOG_KEYS: Final[frozenset[Text]] = frozenset({
         "access_token",
         "auth",
@@ -95,7 +94,7 @@ class BitrixOAuthRequester(BaseRequester):
             "start bitrix_oauth_request",
             context={
                 "method": "GET",
-                "url": url,
+                "URL": url,
                 "timeout": self._timeout,
             },
         )
@@ -174,20 +173,37 @@ class BitrixOAuthRequester(BaseRequester):
         """Return a masked representation for non-empty sensitive values."""
         return cls._MASKED_VALUE if value else value
 
-    @classmethod
-    def _mask_sensitive_data(cls, data: Any) -> Any:
+    def _get_value_for_log(self, value: Any) -> Any:
+        """Return a value prepared for logging according to SDK privacy settings."""
+
+        if not self._config.secure_log:
+            return value
+
+        return self._mask_sensitive_value(value)
+
+    def _get_oauth_for_log(self) -> JSONDict:
+        """Return OAuth app credentials prepared for logging."""
+        return {
+            "client_id": self._get_value_for_log(self._bitrix_oauth.client_id),
+            "client_secret": self._get_value_for_log(self._bitrix_oauth.client_secret),
+        }
+
+    def _get_data_for_log(self, data: Any) -> Any:
         """Recursively mask sensitive values while preserving response shape."""
+
+        if not self._config.secure_log:
+            return data
 
         if isinstance(data, dict):
             return {
-                key: cls._mask_sensitive_value(value)
-                if str(key).lower() in cls._SENSITIVE_LOG_KEYS
-                else cls._mask_sensitive_data(value)
+                key: self._mask_sensitive_value(value)
+                if str(key).lower() in self._SENSITIVE_LOG_KEYS
+                else self._get_data_for_log(value)
                 for key, value in data.items()
             }
 
         if isinstance(data, list):
-            return [cls._mask_sensitive_data(item) for item in data]
+            return [self._get_data_for_log(item) for item in data]
 
         return data
 
@@ -212,8 +228,9 @@ class BitrixOAuthRequester(BaseRequester):
         self._config.logger.debug(
             "start get_oauth_token",
             context={
-                "bitrix_oauth": str(self._bitrix_oauth),
-                "code": self._mask_sensitive_value(code),
+                "grant_type": "authorization_code",
+                **self._get_oauth_for_log(),
+                "code": self._get_value_for_log(code),
             },
         )
 
@@ -222,7 +239,7 @@ class BitrixOAuthRequester(BaseRequester):
         self._config.logger.debug(
             "finish get_oauth_token",
             context={
-                "json_response": self._mask_sensitive_data(json_response),
+                "json_response": self._get_data_for_log(json_response),
             },
         )
 
@@ -249,8 +266,9 @@ class BitrixOAuthRequester(BaseRequester):
         self._config.logger.debug(
             "start refresh_oauth_token",
             context={
-                "bitrix_oauth": str(self._bitrix_oauth),
-                "refresh_token": self._mask_sensitive_value(refresh_token),
+                "grant_type": "refresh_token",
+                **self._get_oauth_for_log(),
+                "refresh_token": self._get_value_for_log(refresh_token),
             },
         )
 
@@ -259,7 +277,7 @@ class BitrixOAuthRequester(BaseRequester):
         self._config.logger.debug(
             "finish refresh_oauth_token",
             context={
-                "json_response": self._mask_sensitive_data(json_response),
+                "json_response": self._get_data_for_log(json_response),
             },
         )
 
@@ -283,8 +301,8 @@ class BitrixOAuthRequester(BaseRequester):
         self._config.logger.debug(
             "start get_app_info",
             context={
-                "bitrix_oauth": str(self._bitrix_oauth),
-                "auth_token": self._mask_sensitive_value(auth_token),
+                **self._get_oauth_for_log(),
+                "auth": self._get_value_for_log(auth_token),
             },
         )
 

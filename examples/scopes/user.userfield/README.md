@@ -1,5 +1,8 @@
 # user.userfield
 
+## Typed Results
+Examples use `.response.result` to show the raw Bitrix24 result. For methods with schema adapters, `.value` or `.values` may also be available and return Python-friendly objects from `b24pysdk.schemas`.
+
 ## Discovered Methods
 - [user.userfield.add](./user_userfield_add.md)
 - [user.userfield.update](./user_userfield_update.md)

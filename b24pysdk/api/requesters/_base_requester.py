@@ -5,10 +5,14 @@ from http import HTTPStatus
 from typing import Dict, Final, Optional, Text, Tuple
 
 import requests
-from uuid6 import uuid7
+
+try:
+    from uuid import uuid7
+except ImportError:
+    from uuid6 import uuid7
 
 from ..._config import Config
-from ..._constants import DEFAULT_REQUEST_ID_HEADER_NAME, SDK_USER_AGENT, TEXT_PYTHON_VERSION
+from ..._constants import DEFAULT_REQUEST_ID_HEADER_NAME, MASKED_VALUE, SDK_USER_AGENT, TEXT_PYTHON_VERSION
 from ...utils.types import DefaultTimeout, JSONDict, Number, Timeout
 from ...version import SDK_VERSION
 from ._utils import parse_response
@@ -30,6 +34,7 @@ class BaseRequester(ABC):
     _SDK_VERSION: Final[Text] = SDK_VERSION
     _SDK_USER_AGENT: Final[Text] = SDK_USER_AGENT
     _TEXT_PYTHON_VERSION: Final[Text] = TEXT_PYTHON_VERSION
+    _MASKED_VALUE: Final[Text] = MASKED_VALUE
 
     _KEY_NAME_VARIANTS: Final[Tuple[Text, ...]] = (
         "REQUEST_ID",
@@ -163,7 +168,7 @@ class BaseRequester(ABC):
                 self._config.logger.warning(
                     "Service unavailable!",
                     context={
-                        "url": response.url,
+                        "URL": self._get_url_for_log(response.url),
                         "retry_count": self._used_retries,
                         "max_retries": self._max_retries,
                         "retries_remaining": self._retries_remaining,
@@ -210,3 +215,7 @@ class BaseRequester(ABC):
             request_id = self._generate()
 
         return request_id
+
+    def _get_url_for_log(self, url: Text) -> Text:
+        """Return URL prepared for logging."""
+        return url

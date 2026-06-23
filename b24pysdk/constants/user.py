@@ -7,7 +7,7 @@ __all__ = [
 
 
 class PersonalGender(_enum.StrEnum):
-    """"""
+    """Bitrix24 personal gender value."""
     EMPTY = ""
     FEMALE = "F"
     MALE = "M"

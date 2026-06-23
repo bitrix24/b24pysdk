@@ -1,6 +1,7 @@
 from typing import Iterable, Optional, Text
 
-from .....api.requests import BitrixAPIRequest
+from .....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from .....schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from .....utils.functional import type_checker
 from .....utils.types import JSONDict, Timeout
 from .base_detail import BaseDetail
@@ -21,7 +22,7 @@ class Bankdetail(BaseDetail):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[CRMFieldsData, CRMFieldsDict]:
         """Get description of the entity fields.
 
         Documentation:

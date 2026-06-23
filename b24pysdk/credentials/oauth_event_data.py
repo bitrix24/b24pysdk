@@ -3,8 +3,8 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any, Mapping, Optional, Text
 
 from .._config import Config
-from .._constants import PYTHON_VERSION
 from ..errors import BitrixValidationError
+from ..utils.dataclasses import frozen_dataclass_kwargs
 from ..utils.types import JSONDict
 from ._utils import parse_flattened_keys
 from .auth import EventOAuth
@@ -17,13 +17,8 @@ __all__ = [
     "OAuthEventData",
 ]
 
-_DATACLASS_KWARGS = {"eq": False, "frozen": True}
 
-if PYTHON_VERSION >= (3, 10):
-    _DATACLASS_KWARGS["slots"] = True
-
-
-@dataclass(**_DATACLASS_KWARGS)
+@dataclass(**frozen_dataclass_kwargs(eq=False))
 class OAuthEventData:
     """
     Bitrix24 event callback payload with parsed auth data.

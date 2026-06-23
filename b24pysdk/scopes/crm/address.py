@@ -1,6 +1,7 @@
 from typing import Iterable, Optional, Text
 
-from ...api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ...schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
 from ._base_crm import BaseCRM
@@ -22,7 +23,7 @@ class Address(BaseCRM):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[CRMFieldsData, CRMFieldsDict]:
         """Get address fields.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/addresses/crm-address-fields.html
@@ -33,7 +34,7 @@ class Address(BaseCRM):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValueRequest
         """
         return self._fields(timeout=timeout)
 
@@ -43,7 +44,7 @@ class Address(BaseCRM):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Add address.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/addresses/crm-address-add.html
@@ -76,7 +77,7 @@ class Address(BaseCRM):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Update address.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/addresses/crm-address-update.html
@@ -104,7 +105,7 @@ class Address(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "fields": fields,
         }
 
@@ -180,7 +181,7 @@ class Address(BaseCRM):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete address.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/addresses/crm-address-delete.html
@@ -208,7 +209,7 @@ class Address(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "fields": fields,
         }
 

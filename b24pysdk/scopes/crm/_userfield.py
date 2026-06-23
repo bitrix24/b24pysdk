@@ -19,7 +19,7 @@ class Userfield(BaseCRM):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """"""
         return self._add(fields, timeout=timeout)
 
@@ -56,10 +56,10 @@ class Userfield(BaseCRM):
             *,
             list: Optional[JSONList] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "fields": fields,
         }
@@ -79,6 +79,6 @@ class Userfield(BaseCRM):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
         return self._delete(bitrix_id, timeout=timeout)

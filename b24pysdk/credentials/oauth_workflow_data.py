@@ -3,9 +3,9 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any, List, Mapping, Optional, Text
 
 from .._config import Config
-from .._constants import PYTHON_VERSION
 from ..constants import B24BoolLit
 from ..errors import BitrixValidationError
+from ..utils.dataclasses import frozen_dataclass_kwargs
 from ..utils.types import JSONDict
 from ._utils import parse_flattened_keys
 from .auth import WorkflowOAuth
@@ -18,13 +18,8 @@ __all__ = [
     "OAuthWorkflowData",
 ]
 
-_DATACLASS_KWARGS = {"eq": False, "frozen": True}
 
-if PYTHON_VERSION >= (3, 10):
-    _DATACLASS_KWARGS["slots"] = True
-
-
-@dataclass(**_DATACLASS_KWARGS)
+@dataclass(**frozen_dataclass_kwargs(eq=False))
 class OAuthWorkflowData:
     """Bitrix24 workflow robot callback payload with parsed auth data."""
 

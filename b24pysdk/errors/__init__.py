@@ -18,6 +18,7 @@ from urllib.parse import urlparse as _urlparse
 
 import requests
 
+from ..schemas import error as _error_schemas
 from ._http_responses import (
     HTTPResponse,
     HTTPResponseBadRequest,
@@ -283,9 +284,9 @@ class BitrixBaseAPIError(BitrixResponseError):
 
     __slots__ = ("json_response",)
 
-    json_response: "_types.JSONDict"
+    json_response: _error_schemas.ErrorData
 
-    def __init__(self, json_response: "_types.JSONDict", response: requests.Response):
+    def __init__(self, json_response: _error_schemas.ErrorData, response: requests.Response):
         error = json_response.get("error")
 
         if isinstance(error, dict):
@@ -388,6 +389,20 @@ class BitrixAPIError(BitrixBaseAPIError):
 
     __slots__ = ()
 
+    json_response: _error_schemas.ErrorV1Data
+
+    @property
+    def parsed_error(self) -> _error_schemas.ErrorV1:
+        """
+        Return the parsed legacy Bitrix API error payload.
+
+        Returns
+        -------
+        Error
+            Structured legacy error payload parsed from the JSON response.
+        """
+        return _error_schemas.ErrorV1.from_bitrix(self.json_response)
+
     @property
     def error(self) -> typing.Text:
         """
@@ -398,7 +413,7 @@ class BitrixAPIError(BitrixBaseAPIError):
         Text
             Value of the `error` field in the API response.
         """
-        return self.json_response.get("error") or ""
+        return self.parsed_error.error
 
     @property
     def error_description(self) -> typing.Text:
@@ -410,7 +425,7 @@ class BitrixAPIError(BitrixBaseAPIError):
         Text
             Value of the `error_description` field.
         """
-        return self.json_response.get("error_description") or ""
+        return self.parsed_error.error_description
 
 
 class BitrixAPIBadRequest(BitrixBaseAPIBadRequest, BitrixAPIError):

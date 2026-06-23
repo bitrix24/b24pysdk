@@ -1,7 +1,8 @@
 from functools import cached_property
 from typing import Iterable, Optional, Text
 
-from ....api.requests import BitrixAPIRequest
+from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ....schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
 from .._productrows import Productrows
@@ -53,7 +54,7 @@ class Deal(BaseItem):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[CRMFieldsData, CRMFieldsDict]:
         """Get deal fields.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/deals/crm-deal-fields.html
@@ -106,7 +107,7 @@ class Deal(BaseItem):
         """
         return self._add(
             fields,
-            extra_params=params,
+            params=params,
             timeout=timeout,
         )
 
@@ -237,7 +238,7 @@ class Deal(BaseItem):
         return self._update(
             bitrix_id,
             fields,
-            extra_params=params,
+            params=params,
             timeout=timeout,
         )
 

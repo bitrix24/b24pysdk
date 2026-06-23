@@ -2,8 +2,8 @@ from dataclasses import asdict, dataclass
 from datetime import datetime
 from typing import List, Text
 
-from ..._constants import PYTHON_VERSION
 from ...constants import B24AppStatus
+from ...utils.dataclasses import frozen_dataclass_kwargs
 from ...utils.types import JSONDict
 from .abstract_bitrix_response import AbstractBitrixResponse
 
@@ -13,13 +13,8 @@ __all__ = [
     "BitrixAppInfoResponse",
 ]
 
-_DATACLASS_KWARGS = {"eq": False, "frozen": True}
 
-if PYTHON_VERSION >= (3, 10):
-    _DATACLASS_KWARGS["slots"] = True
-
-
-@dataclass(**_DATACLASS_KWARGS)
+@dataclass(**frozen_dataclass_kwargs(eq=False))
 class B24AppInfoInstall:
     """
     Bitrix24 application installation metadata.
@@ -71,7 +66,7 @@ class B24AppInfoInstall:
         return asdict(self)
 
 
-@dataclass(**_DATACLASS_KWARGS)
+@dataclass(**frozen_dataclass_kwargs(eq=False))
 class B24AppInfoResult:
     """
     Parsed result of the Bitrix24 ``app.info`` method.
@@ -115,7 +110,7 @@ class B24AppInfoResult:
         return asdict(self)
 
 
-@dataclass(**_DATACLASS_KWARGS)
+@dataclass(**frozen_dataclass_kwargs(eq=False))
 class BitrixAppInfoResponse(AbstractBitrixResponse[B24AppInfoResult]):
     """
     Typed response for the Bitrix24 ``app.info`` method.

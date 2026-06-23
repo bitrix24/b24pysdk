@@ -5,7 +5,6 @@ from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
 from ..._base_entity import BaseEntity
-from .chat import Chat
 from .counters import Counters
 from .favorite import Favorite
 from .files import Files
@@ -19,11 +18,6 @@ __all__ = [
 
 class Task(BaseEntity):
     """"""
-
-    @cached_property
-    def chat(self) -> Chat:
-        """"""
-        return Chat(self)
 
     @cached_property
     def counters(self) -> Counters:
@@ -193,7 +187,7 @@ class Task(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 
@@ -231,7 +225,7 @@ class Task(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {
+        params: JSONDict = {
             "taskId": task_id,
         }
 

@@ -1,6 +1,7 @@
 from typing import Text
 
-from ....api.requests import BitrixAPIRequest
+from ....api.requests import BitrixAPIValueRequest
+from ....schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
 from .._base_crm import BaseCRM
@@ -19,7 +20,7 @@ class Settings(BaseCRM):
             *,
             type: Text,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[CRMFieldsData, CRMFieldsDict]:
         """Get the settings description.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/user-defined-fields/crm-userfield-settings-fields.html
@@ -43,4 +44,6 @@ class Settings(BaseCRM):
             api_wrapper=self.fields,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=CRMFieldsDict.from_bitrix,
         )

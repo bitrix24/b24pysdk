@@ -1,9 +1,12 @@
 from typing import TYPE_CHECKING, Type
 
-from psygnal import Signal, SignalInstance
-
 if TYPE_CHECKING:
     from ..events import BaseBitrixEvent
+
+try:
+    from psygnal import Signal, SignalInstance
+except ImportError as error:
+    raise ImportError("Signals support requires optional dependency psygnal. Install b24pysdk[signals].") from error
 
 
 class BitrixSignalInstance(SignalInstance):

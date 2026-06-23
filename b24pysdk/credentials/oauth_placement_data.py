@@ -2,10 +2,11 @@ import json
 from dataclasses import asdict, dataclass
 from typing import TYPE_CHECKING, Any, Mapping, Optional, Text
 
-from .._constants import PYTHON_VERSION
 from ..constants import B24AppStatus, Protocol
 from ..errors import BitrixValidationError
+from ..utils.dataclasses import frozen_dataclass_kwargs
 from ..utils.types import JSONDict
+from ._app_info_cache import AppInfoCacheMethods
 from .bitrix_token import BitrixToken
 from .oauth_token import OAuthToken
 
@@ -17,21 +18,18 @@ __all__ = [
     "OAuthPlacementData",
 ]
 
-_DATACLASS_KWARGS = {"eq": False, "frozen": True}
 
-if PYTHON_VERSION >= (3, 10):
-    _DATACLASS_KWARGS["slots"] = True
-
-
-class _AppInfoCacheMixin:
+class _AppInfoCacheMixin(AppInfoCacheMethods):
+    """Placement data base with internal ``app.info`` cache slot."""
 
     __slots__ = ("_app_info",)
 
-    if TYPE_CHECKING:
-        _app_info: "B24AppInfoResult"
+    def _make_bitrix_token(self: "OAuthPlacementData", bitrix_app: "AbstractBitrixApp") -> BitrixToken:
+        """Create Bitrix token for resolving ``app.info`` from placement data."""
+        return BitrixToken.from_oauth_placement_data(oauth_placement_data=self, bitrix_app=bitrix_app)
 
 
-@dataclass(**_DATACLASS_KWARGS)
+@dataclass(**frozen_dataclass_kwargs(eq=False))
 class OAuthPlacementData(_AppInfoCacheMixin):
     """
     Represents OAuth placement data received from Bitrix24.
@@ -103,26 +101,6 @@ class OAuthPlacementData(_AppInfoCacheMixin):
 
         except Exception as error:
             raise cls.ValidationError(f"Invalid placement data: {error}") from error
-
-    def get_app_info(self, bitrix_app: "AbstractBitrixApp") -> "B24AppInfoResult":
-        """
-        Resolve and cache Bitrix24 ``app.info`` for this placement launch.
-
-        Args:
-            bitrix_app: SDK application object with client credentials. It is
-                used together with the placement OAuth token to call
-                Bitrix24 ``app.info``.
-
-        Returns:
-            Bitrix24 application installation information used to validate that
-            the placement launch belongs to the expected application.
-        """
-
-        if not hasattr(self, "_app_info"):
-            bitrix_token = BitrixToken.from_oauth_placement_data(oauth_placement_data=self, bitrix_app=bitrix_app)
-            object.__setattr__(self, "_app_info", bitrix_token.get_app_info().result)
-
-        return self._app_info
 
     def validate_against_app_info(self, app_info: "B24AppInfoResult") -> bool:
         """

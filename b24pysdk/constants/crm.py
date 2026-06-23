@@ -9,8 +9,10 @@ __all__ = [
     "AddressType",
     "CRMSettingsMode",
     "CallListEntityType",
+    "ConfigurationScope",
     "ContentType",
     "DuplicateCommunicationType",
+    "EntityMergeBatchStatus",
     "EntityTypeAbbr",
     "EntityTypeID",
     "EntityTypeName",
@@ -66,16 +68,22 @@ class AddressType(_enum.IntEnum):
     DELIVERY = 11
 
 
-class CallListEntityType(_enum.StrEnum):
-    """Supported entity types for CRM call lists."""
-    CONTACT = "CONTACT"
-    COMPANY = "COMPANY"
-
-
 class CRMSettingsMode(_enum.IntEnum):
     """"""
     CLASSIC = 1
     SIMPLE = 2
+
+
+class CallListEntityType(_enum.StrEnum):
+    """Supported entity types for CRM call lists."""
+    COMPANY = "COMPANY"
+    CONTACT = "CONTACT"
+
+
+class ConfigurationScope(_enum.StrEnum):
+    """Configuration scope for CRM details cards in Bitrix24."""
+    COMMON = "C"
+    PERSONAL = "P"
 
 
 class ContentType(_enum.IntEnum):
@@ -89,6 +97,13 @@ class DuplicateCommunicationType(_enum.StrEnum):
     """Communication types used in crm.duplicate.findbycomm."""
     EMAIL = "EMAIL"
     PHONE = "PHONE"
+
+
+class EntityMergeBatchStatus(_enum.StrEnum):
+    """Statuses returned by crm.entity.mergeBatch."""
+    SUCCESS = "SUCCESS"
+    CONFLICT = "CONFLICT"
+    ERROR = "ERROR"
 
 
 class EntityTypeAbbr(_enum.StrEnum):

@@ -1,7 +1,8 @@
 from abc import abstractmethod
 from functools import cached_property
 
-from ....api.requests import BitrixAPIRequest
+from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ....schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ....utils.types import JSONDict, Timeout
 from .._base_crm import BaseCRM
 from .items import Items
@@ -21,7 +22,7 @@ class BaseRelationship(BaseCRM):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[CRMFieldsData, CRMFieldsDict]:
         """Get fields for the connection between entities.
 
         This method retrieves the fields of the connection between a Contact or Company and the specified CRM entity (Lead, Deal, Contact, or Company).
@@ -42,7 +43,7 @@ class BaseRelationship(BaseCRM):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Add a connection between CRM entities.
 
         This method adds connection between Contact or Company and the specified CRM entity (Lead, Deal, Contact, or Company).
@@ -66,7 +67,7 @@ class BaseRelationship(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "fields": fields,
         }
@@ -84,7 +85,7 @@ class BaseRelationship(BaseCRM):
             *,
             fields: JSONDict,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete connection between CRM entities.
 
         The method removes a Contact from a Lead, Deal, or Company, and removes a Company from a Contact.
@@ -103,7 +104,7 @@ class BaseRelationship(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "fields": fields,
         }

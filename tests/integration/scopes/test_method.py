@@ -2,8 +2,9 @@ from typing import Text
 
 import pytest
 
-from b24pysdk.api.responses import BitrixAPIResponse
+from b24pysdk.api.responses import BitrixAPIValueResponse
 from b24pysdk.client import BaseClient
+from b24pysdk.schemas.method import MethodGet
 
 pytestmark = [
     pytest.mark.integration,
@@ -19,10 +20,11 @@ def test_method_get(bitrix_client: BaseClient):
 
     bitrix_response = bitrix_client.method.get(name=_NAME).response
 
-    assert isinstance(bitrix_response, BitrixAPIResponse)
-    assert isinstance(bitrix_response.result, dict), "Method get result should be a dict"
+    assert isinstance(bitrix_response, BitrixAPIValueResponse)
 
-    method_data = bitrix_response.result
+    method_get = bitrix_response.value
 
-    assert method_data.get("isExisting") is True, "Method data field 'isExisting' should return True"
-    assert method_data.get("isAvailable") is True, "Method data field 'isAvailable' should return True"
+    assert isinstance(method_get, MethodGet), "Method get value should be MethodGet"
+
+    assert method_get.is_existing is True, "MethodGet.is_existing should return True"
+    assert method_get.is_available is True, "MethodGet.is_available should return True"

@@ -6,6 +6,10 @@ from ._base_context import BaseContext
 if TYPE_CHECKING:
     from ..client import BaseClient
 
+    __all__ = [
+        "BaseScope",
+    ]
+
 
 class BaseScope(BaseContext, ABC):
     """

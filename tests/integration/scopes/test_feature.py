@@ -2,9 +2,9 @@ from typing import Text
 
 import pytest
 
-from b24pysdk.api.responses import BitrixAPIResponse
+from b24pysdk.api.responses import BitrixAPIValueResponse
 from b24pysdk.client import BaseClient
-from b24pysdk.constants import B24BoolLit
+from b24pysdk.schemas.feature import FeatureGet
 
 pytestmark = [
     pytest.mark.integration,
@@ -13,8 +13,6 @@ pytestmark = [
 ]
 
 _CODE: Text = "rest_auth_connector"
-_RESULT_FIELD: Text = "value"
-_RESULT_VALUE: B24BoolLit = B24BoolLit.TRUE
 
 
 def test_feature_get(bitrix_client: BaseClient):
@@ -22,10 +20,9 @@ def test_feature_get(bitrix_client: BaseClient):
 
     bitrix_response = bitrix_client.feature.get(code=_CODE).response
 
-    assert isinstance(bitrix_response, BitrixAPIResponse)
-    assert isinstance(bitrix_response.result, dict)
+    assert isinstance(bitrix_response, BitrixAPIValueResponse)
 
-    feature_data = bitrix_response.result
+    feature_get = bitrix_response.value
 
-    assert _RESULT_FIELD in feature_data, f"Field {_RESULT_FIELD!r} should be present"
-    assert feature_data[_RESULT_FIELD] == _RESULT_VALUE, f"Value should be {_RESULT_VALUE!r}"
+    assert isinstance(feature_get, FeatureGet), "Feature get value should be FeatureGet"
+    assert feature_get.value is True, "FeatureGet.value should return True"

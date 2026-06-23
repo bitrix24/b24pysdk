@@ -1,6 +1,7 @@
 from typing import Iterable, Optional, Text
 
-from ....api.requests import BitrixAPIRequest
+from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ....schemas.crm.field import CRMFieldsDict, CRMFieldsResultData
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
 from .._base_crm import BaseCRM
@@ -21,7 +22,7 @@ class Productrow(BaseCRM):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[CRMFieldsResultData, CRMFieldsDict]:
         """Get fields for the product rows.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/product-rows/crm-item-productrow-fields.html
@@ -34,7 +35,12 @@ class Productrow(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return self._fields(timeout=timeout)
+        return self._make_bitrix_api_request(
+            api_wrapper=self.fields,
+            timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=CRMFieldsDict.from_bitrix,
+        )
 
     @type_checker
     def add(
@@ -238,7 +244,7 @@ class Productrow(BaseCRM):
         if product_rows.__class__ is not list:
             product_rows = list(product_rows)
 
-        params = {
+        params: JSONDict = {
             "ownerId": owner_id,
             "ownerType": owner_type,
             "productRows": product_rows,
@@ -275,7 +281,7 @@ class Productrow(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "ownerId": owner_id,
             "ownerType": owner_type,
         }

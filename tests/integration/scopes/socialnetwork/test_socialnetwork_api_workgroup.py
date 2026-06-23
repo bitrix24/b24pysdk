@@ -18,7 +18,9 @@ _WORKGROUP_GET_FIELDS: Tuple[Text, ...] = ("ID", "NAME")
 def test_list(bitrix_client: BaseClient):
     """"""
 
-    bitrix_response = bitrix_client.socialnetwork.api.workgroup.list().response
+    bitrix_response = bitrix_client.socialnetwork.api.workgroup.list(
+        filter={"ACTIVE": "Y"},
+    ).response
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict), "socialnetwork.api.workgroup.list result should be a dict"
@@ -40,7 +42,9 @@ def test_list(bitrix_client: BaseClient):
 def test_get(bitrix_client: BaseClient):
     """"""
 
-    list_response = bitrix_client.socialnetwork.api.workgroup.list().response
+    list_response = bitrix_client.socialnetwork.api.workgroup.list(
+        filter={"ACTIVE": "Y"},
+    ).response
 
     assert isinstance(list_response, BitrixAPIResponse)
     assert isinstance(list_response.result, dict), "socialnetwork.api.workgroup.list result should be a dict"

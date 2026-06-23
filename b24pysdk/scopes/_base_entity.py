@@ -2,6 +2,10 @@ from abc import ABC
 
 from ._base_context import BaseContext
 
+__all__ = [
+    "BaseEntity",
+]
+
 
 class BaseEntity(BaseContext, ABC):
     """

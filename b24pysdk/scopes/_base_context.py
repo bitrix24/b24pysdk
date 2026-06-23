@@ -1,16 +1,18 @@
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Callable, Optional, Text, Type, TypeVar, Union
+from typing import TYPE_CHECKING, Callable, Optional, Text, Type, Union, overload
 
-from ..api.requests import AbstractBitrixAPIRequest, BitrixAPIRequest
+from ..api.requests import BitrixAPIRequest
 from ..protocols import BitrixTokenFullProtocol
 from ..utils.functional import classproperty
+from ..utils.type_vars import BARequestT, BAResultT, BAValueT
 from ..utils.types import JSONDict, Timeout
 
 if TYPE_CHECKING:
     from ..client import BaseClient
 
-
-_BARQT = TypeVar("_BARQT", bound=AbstractBitrixAPIRequest)
+__all__ = [
+    "BaseContext",
+]
 
 
 class BaseContext(ABC):
@@ -103,7 +105,7 @@ class BaseContext(ABC):
         first, *parts = snake_str.split("_")
         return "".join((first.lower(), *(part.title() for part in parts)))
 
-    def _get_api_method(self, api_wrapper: Callable[..., _BARQT]) -> Text:
+    def _get_api_method(self, api_wrapper: Callable[..., BARequestT]) -> Text:
         """
         Build Bitrix24 REST API method name for a wrapper method.
 
@@ -116,14 +118,40 @@ class BaseContext(ABC):
         api_wrapper_name = getattr(api_wrapper, "__name__", None)
         return f"{self}.{self.__to_camel_case(api_wrapper_name.strip('_'))}" if api_wrapper_name else str(self)
 
+    @overload
     def _make_bitrix_api_request(
             self,
-            api_wrapper: Callable[..., _BARQT],
+            api_wrapper: Callable[..., BARequestT],
             params: Optional[JSONDict] = None,
             timeout: Timeout = None,
-            bitrix_api_request_type: Type[_BARQT] = BitrixAPIRequest,
+            *,
+            bitrix_api_request_type: Type[BARequestT] = BitrixAPIRequest,
+            result_adapter: None = None,
             **kwargs,
-    ) -> _BARQT:
+    ) -> BARequestT: ...
+
+    @overload
+    def _make_bitrix_api_request(
+            self,
+            api_wrapper: Callable[..., BARequestT],
+            params: Optional[JSONDict] = None,
+            timeout: Timeout = None,
+            *,
+            bitrix_api_request_type: Type[BARequestT],
+            result_adapter: Callable[[BAResultT], BAValueT],
+            **kwargs,
+    ) -> BARequestT: ...
+
+    def _make_bitrix_api_request(
+            self,
+            api_wrapper: Callable[..., BARequestT],
+            params: Optional[JSONDict] = None,
+            timeout: Timeout = None,
+            *,
+            bitrix_api_request_type: Type[BARequestT] = BitrixAPIRequest,
+            result_adapter: Optional[Callable[[BAResultT], BAValueT]] = None,
+            **kwargs,
+    ) -> BARequestT:
         """
         Create a lazy Bitrix24 API request object.
 
@@ -132,6 +160,8 @@ class BaseContext(ABC):
             params: Optional request parameters.
             timeout: Optional request timeout overriding inherited options.
             bitrix_api_request_type: Request class to instantiate.
+            result_adapter: Optional callable that converts raw ``result`` to
+                a Python-friendly value.
             **kwargs: Extra requester options overriding inherited options.
 
         Returns:
@@ -142,6 +172,9 @@ class BaseContext(ABC):
 
         if timeout:
             kwargs["timeout"] = timeout
+
+        if result_adapter:
+            kwargs["result_adapter"] = result_adapter
 
         return bitrix_api_request_type(
             bitrix_token=self._bitrix_token,

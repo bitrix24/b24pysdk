@@ -176,24 +176,29 @@ class _BatchesCaller(BaseCaller):
         ``MAX_BATCH_SIZE`` chunks and their responses are merged.
         """
 
-        total_methods = len(self._methods)
+        self._config.logger.debug("start call_batches")
 
-        if total_methods <= self._MAX_BATCH_SIZE:
-            return self._fetch_batch_response(methods=self._methods)
+        try:
+            total_methods = len(self._methods)
 
-        flat_methods: List[Tuple[Key, B24RequestTuple]] = self._get_flat_methods()
+            if total_methods <= self._MAX_BATCH_SIZE:
+                return self._fetch_batch_response(methods=self._methods)
 
-        batch_responses: JSONList = list()
+            flat_methods: List[Tuple[Key, B24RequestTuple]] = self._get_flat_methods()
 
-        for index in range(0, total_methods, self._MAX_BATCH_SIZE):
-            methods_chunk = dict(flat_methods[index:index + self._MAX_BATCH_SIZE])
-            batch_response = self._fetch_batch_response(methods=methods_chunk)
-            batch_responses.append(batch_response)
+            batch_responses: JSONList = []
 
-            if self._halt and batch_response["result"]["result_error"]:
-                break
+            for index in range(0, total_methods, self._MAX_BATCH_SIZE):
+                methods_chunk = dict(flat_methods[index:index + self._MAX_BATCH_SIZE])
+                batch_response = self._fetch_batch_response(methods=methods_chunk)
+                batch_responses.append(batch_response)
 
-        return self._combine_responses(batch_responses)
+                if self._halt and batch_response["result"]["result_error"]:
+                    break
+
+            return self._combine_responses(batch_responses)
+        finally:
+            self._config.logger.debug("finish call_batches")
 
 
 @overload

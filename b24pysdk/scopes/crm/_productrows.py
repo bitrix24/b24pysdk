@@ -36,7 +36,7 @@ class Productrows(BaseCRM):
         if rows.__class__ is not list:
             rows = list(rows)
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "rows": rows,
         }

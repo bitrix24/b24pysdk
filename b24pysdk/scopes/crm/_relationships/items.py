@@ -21,7 +21,7 @@ class Items(BaseCRM):
             items: Iterable[JSONDict],
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Add set of CRM entities to the specified one.
 
         The method adds a collection of CRM similar-type CRM entities to the specified one.
@@ -48,7 +48,7 @@ class Items(BaseCRM):
         if items.__class__ is not list:
             items = list(items)
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "items": items,
         }
@@ -80,7 +80,7 @@ class Items(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 
@@ -96,7 +96,7 @@ class Items(BaseCRM):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Clear a collection of similar-typed linked to the specified entity.
 
         The method clears the set of similar-typed CRM entities associated with the specified entity.
@@ -111,7 +111,7 @@ class Items(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 

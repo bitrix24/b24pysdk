@@ -1,6 +1,7 @@
-from typing import Optional, Text
+from typing import List, Optional, Text
 
-from ..api.requests import BitrixAPIRequest
+from ..api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ..schemas.placement import PlacementUnbind, PlacementUnbindData
 from ..utils.functional import type_checker
 from ..utils.types import JSONDict, Timeout
 from ._base_scope import BaseScope
@@ -29,7 +30,7 @@ class Placement(BaseScope):
             options: Optional[JSONDict] = None,
             user_id: Optional[int] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """
         Register a widget placement handler.
 
@@ -108,10 +109,11 @@ class Placement(BaseScope):
     @type_checker
     def list(
             self,
-            scope: Optional[Text] = None,
             *,
+            scope: Optional[Text] = None,
+            full: Optional[bool] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[List[Text]]:
         """
         Get available widget placements.
 
@@ -121,6 +123,7 @@ class Placement(BaseScope):
 
         Args:
             scope: Restrict the list to a specific app access scope;
+            full: Whether to return all available placement locations regardless of the app access scopes;
             timeout: Timeout in seconds.
 
         Returns:
@@ -132,6 +135,9 @@ class Placement(BaseScope):
         if scope is not None:
             params["SCOPE"] = scope
 
+        if full is not None:
+            params["FULL"] = full
+
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
             params=params,
@@ -142,10 +148,11 @@ class Placement(BaseScope):
     def unbind(
             self,
             placement: Text,
-            handler: Optional[Text] = None,
             *,
+            handler: Optional[Text] = None,
+            user_id: Optional[int] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[PlacementUnbindData, PlacementUnbind]:
         """
         Remove a widget placement handler.
 
@@ -156,10 +163,11 @@ class Placement(BaseScope):
         Args:
             placement: ID of the widget placement location;
             handler: URL of the widget placement handler. If not specified, all handlers of the given location registered by the app will be removed;
+            user_id: ID of the Bitrix24 user for whom the handler was registered. If specified, only handlers registered for this user will be removed;
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest.
+            Instance of BitrixAPIValueRequest.
         """
 
         params: JSONDict = {
@@ -169,8 +177,13 @@ class Placement(BaseScope):
         if handler is not None:
             params["HANDLER"] = handler
 
+        if user_id is not None:
+            params["USER_ID"] = user_id
+
         return self._make_bitrix_api_request(
             api_wrapper=self.unbind,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=PlacementUnbind.from_bitrix,
         )

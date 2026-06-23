@@ -1,4 +1,4 @@
-from typing import Optional, Text
+from typing import Dict, Optional, Text
 
 from ..api.requests import BitrixAPIRequest
 from ..utils.functional import type_checker
@@ -21,7 +21,7 @@ class Department(BaseScope):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[Dict[Text, Text]]:
         """
         Get fields of a department.
 
@@ -49,7 +49,7 @@ class Department(BaseScope):
             sort: Optional[int] = None,
             uf_head: Optional[int] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """
         Add a new department.
 
@@ -169,7 +169,7 @@ class Department(BaseScope):
             parent: Optional[int] = None,
             uf_head: Optional[int] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """
         Update an existing department.
 
@@ -222,7 +222,7 @@ class Department(BaseScope):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """
         Delete a department.
 

@@ -8,7 +8,7 @@ Both legacy Bitrix REST API error formats and the newer Bitrix REST API v3
 error format are supported.
 """
 
-from typing import Dict, Text, Type
+from typing import Dict, NoReturn, Text, Type
 
 import requests
 from requests.exceptions import HTTPError, JSONDecodeError
@@ -131,7 +131,7 @@ SDK exception class.
 """
 
 
-def _raise_http_error(response: requests.Response):
+def _raise_http_error(response: requests.Response) -> NoReturn:
     """
     Raise a `requests.HTTPError` based on the API error payload.
 

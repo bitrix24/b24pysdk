@@ -24,8 +24,8 @@ class Stagehistory(BaseCRM):
     @type_checker
     def list(
             self,
-            *,
             entity_type_id: int,
+            *,
             select: Optional[Iterable[Text]] = None,
             filter: Optional[JSONDict] = None,
             order: Optional[JSONDict] = None,
@@ -59,7 +59,7 @@ class Stagehistory(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "entityTypeId": entity_type_id,
         }
 

@@ -1,6 +1,7 @@
 from typing import Iterable, Optional, Text
 
-from ...api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ...schemas.crm.orderentity import OrderentityFieldsDict, OrderentityFieldsResultData
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
 from ._base_crm import BaseCRM
@@ -15,6 +16,29 @@ class Orderentity(BaseCRM):
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/order-entity/index.html
     """
+
+    @type_checker
+    def get_fields(
+            self,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIValueRequest[OrderentityFieldsResultData, OrderentityFieldsDict]:
+        """Get order binding fields.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/order-entity/crm-order-entity-get-fields.html
+
+        This method returns a list of available order binding fields.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+        return self._fields(
+            timeout=timeout,
+            result_adapter=OrderentityFieldsDict.from_bitrix,
+        )
 
     @type_checker
     def add(
@@ -111,7 +135,7 @@ class Orderentity(BaseCRM):
             self,
             fields: JSONDict,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Remove order bindings to CRM object.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/order-entity/crm-order-entity-delete-by-filter.html
@@ -134,35 +158,12 @@ class Orderentity(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "fields": fields,
         }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.delete_by_filter,
             params=params,
-            timeout=timeout,
-        )
-
-    @type_checker
-    def get_fields(
-            self,
-            *,
-            timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """Get order binding fields.
-
-        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/order-entity/crm-order-entity-get-fields.html
-
-        This method returns a list of available order binding fields.
-
-        Args:
-            timeout: Timeout in seconds.
-
-        Returns:
-            Instance of BitrixAPIRequest
-        """
-        return self._make_bitrix_api_request(
-            api_wrapper=self.get_fields,
             timeout=timeout,
         )

@@ -1,5 +1,6 @@
 import typing
 
+from ..utils import converters as _converters
 from ..utils import enum as _enum
 from ..utils import types as _types
 
@@ -73,7 +74,7 @@ class B24BoolLit(_enum.StrEnum):
     DEFAULT = "D"
 
     def __bool__(self):
-        return bool(_types.B24Bool(self))
+        return bool(_converters.bool_from_bitrix(self))
 
 
 class Protocol(_enum.IntEnum):

@@ -1,4 +1,5 @@
-from ....api.requests import BitrixAPIRequest
+from ....api.requests import BitrixAPIValuesRequest
+from ....schemas.crm.enum import CRMEnumItem, CRMEnumItemsData
 from ....scopes.crm._base_crm import BaseCRM
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
@@ -16,7 +17,7 @@ class Settings(BaseCRM):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValuesRequest[CRMEnumItemsData, CRMEnumItem]:
         """Get description of CRM operation modes.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/auxiliary/enum/crm-enum-settings-mode.html
@@ -27,9 +28,11 @@ class Settings(BaseCRM):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValuesRequest
         """
         return self._make_bitrix_api_request(
             api_wrapper=self.mode,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValuesRequest,
+            result_adapter=CRMEnumItem.from_bitrix_result,
         )

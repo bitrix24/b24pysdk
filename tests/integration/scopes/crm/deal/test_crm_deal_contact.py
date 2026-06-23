@@ -3,7 +3,6 @@ from typing import Text, Tuple
 import pytest
 from _pytest.cacheprovider import Cache
 
-from b24pysdk import Config
 from b24pysdk.api.responses import BitrixAPIResponse
 from b24pysdk.client import BaseClient
 from b24pysdk.constants import B24BoolLit
@@ -18,6 +17,9 @@ pytestmark = [
 ]
 
 _FIELDS: Tuple[Text, ...] = ("CONTACT_ID", "SORT", "IS_PRIMARY")
+_DEAL_TITLE: Text = f"{SDK_NAME} Deal Contact"
+_CONTACT_NAME: Text = f"{SDK_NAME} Deal Contact"
+_CONTACT_LAST_NAME: Text = "Deal"
 _CONTACT_SORT: int = 100
 _IS_PRIMARY: B24BoolLit = B24BoolLit.TRUE
 
@@ -41,14 +43,9 @@ def test_crm_deal_contact_fields(bitrix_client: BaseClient):
 def test_crm_deal_contact_add(bitrix_client: BaseClient, cache: Cache):
     """"""
 
-    timestamp = int(Config().get_local_datetime().timestamp() * (10 ** 6))
-    deal_title: Text = f"{SDK_NAME} Deal Contact {timestamp}"
-    contact_name: Text = f"{SDK_NAME} Deal Contact"
-    contact_last_name: Text = f"{timestamp}"
-
     deal_response = bitrix_client.crm.deal.add(
         fields={
-            "TITLE": deal_title,
+            "TITLE": _DEAL_TITLE,
             "STAGE_ID": "NEW",
             "CURRENCY_ID": "USD",
             "OPPORTUNITY": 1,
@@ -63,8 +60,8 @@ def test_crm_deal_contact_add(bitrix_client: BaseClient, cache: Cache):
 
     contact_response = bitrix_client.crm.contact.add(
         fields={
-            "NAME": contact_name,
-            "LAST_NAME": contact_last_name,
+            "NAME": _CONTACT_NAME,
+            "LAST_NAME": _CONTACT_LAST_NAME,
         },
     ).response
 
@@ -122,7 +119,7 @@ def test_crm_deal_contact_items_get(bitrix_client: BaseClient, cache: Cache):
         pytest.fail(f"Contact {contact_id} should be linked to deal {deal_id}")
 
 
-@pytest.mark.dependency(name="test_crm_deal_contact_delete", depends=["test_crm_deal_contact_add"])
+@pytest.mark.dependency(name="test_crm_deal_contact_delete", depends=["test_crm_deal_contact_items_get"])
 def test_crm_deal_contact_delete(bitrix_client: BaseClient, cache: Cache):
     """"""
 
@@ -146,7 +143,41 @@ def test_crm_deal_contact_delete(bitrix_client: BaseClient, cache: Cache):
     assert is_deleted is True, "Deal contact binding deletion should return True"
 
 
-@pytest.mark.dependency(name="test_crm_deal_contact_cleanup", depends=["test_crm_deal_contact_delete"])
+@pytest.mark.dependency(name="test_crm_deal_contact_items_delete", depends=["test_crm_deal_contact_delete"])
+def test_crm_deal_contact_items_delete(bitrix_client: BaseClient, cache: Cache):
+    """"""
+
+    deal_id = cache.get("deal_contact_deal_id", None)
+    assert isinstance(deal_id, int), "Deal ID should be cached"
+
+    contact_id = cache.get("deal_contact_contact_id", None)
+    assert isinstance(contact_id, int), "Contact ID should be cached"
+
+    add_response = bitrix_client.crm.deal.contact.add(
+        bitrix_id=deal_id,
+        fields={
+            "CONTACT_ID": contact_id,
+            "SORT": _CONTACT_SORT,
+            "IS_PRIMARY": _IS_PRIMARY,
+        },
+    ).response
+
+    assert isinstance(add_response, BitrixAPIResponse)
+    assert isinstance(add_response.result, bool)
+    assert add_response.result is True, "Deal contact binding should return True"
+
+    bitrix_response = bitrix_client.crm.deal.contact.items.delete(
+        bitrix_id=deal_id,
+    ).response
+
+    assert isinstance(bitrix_response, BitrixAPIResponse)
+    assert isinstance(bitrix_response.result, bool)
+
+    is_deleted = bitrix_response.result
+    assert is_deleted is True, "Deal contact items deletion should return True"
+
+
+@pytest.mark.dependency(name="test_crm_deal_contact_cleanup", depends=["test_crm_deal_contact_items_delete"])
 def test_crm_deal_contact_cleanup(bitrix_client: BaseClient, cache: Cache):
     """"""
 

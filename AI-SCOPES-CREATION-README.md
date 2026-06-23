@@ -156,7 +156,7 @@ class API(BaseEntity):
 # b24pysdk/scopes/socialnetwork/workgroup.py
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import JSONDict, Timeout, B24Bool
+from ...utils.types import JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -200,21 +200,25 @@ class Workgroup(BaseEntity):
 
 - **Decorator:** Annotate every public wrapper with `@type_checker` to enforce runtime validation. When methods delegate to other wrappers, apply the decorator only at the entry point to avoid redundant validation.
 - **Result Formation:**
-    - Assemble the `params` dictionary using native Python primitives (`int`, `float`, `bool`, `None`), standard typing hints (`Optional`, `Text`, `Iterable`), and SDK-specific helper types from `b24pysdk/utils/types` (`Timeout`, `JSONDict`, `B24Bool`, etc.) when special formatting is required. All SDK-specific helper types described in chapter 7.
+    - Assemble the `params` dictionary using native Python primitives (`int`, `float`, `bool`, `None`), standard typing hints (`Optional`, `Text`, `Iterable`), and SDK-specific helper types from `b24pysdk/utils/types` (`Timeout`, `JSONDict`, etc.) when special formatting is required. All SDK-specific helper types described in chapter 7.
+    - Do not use deprecated `B24Bool` or `B24BoolStrict` in new wrapper signatures or parameter conversion logic. Boolean REST values must be converted with `bool_to_bitrix` from `b24pysdk/utils/converters.py`.
     - Invoke `self._make_bitrix_api_request(...)`, providing:
       - `api_wrapper` — the current Python method, enabling `_get_api_method` to compute the REST method name.
       - `params` — omit when the endpoint accepts no payload.
       - `timeout` — propagate the caller-supplied timeout.
+      - `bitrix_api_request_type` and `result_adapter` — only when the method has a defined schema adapter in `b24pysdk.schemas`.
     - Return the resulting `BitrixAPIRequest` instance; do not perform immediate network I/O inside the wrapper.
+    - Keep `.result` as the raw Bitrix24 response shape. Use `.value` or `.values` only for methods whose result is intentionally adapted to Python-friendly schema objects.
 
 **Example:**
 ```python
 # b24pysdk/scopes/socialnetwork/workgroup.py
-from typing import Iterable, Optional, Text, Union
+from typing import Iterable, Optional, Text
 
 from ...api.requests import BitrixAPIRequest
+from ...utils.converters import bool_to_bitrix
 from ...utils.functional import type_checker
-from ...utils.types import B24BoolStrict, JSONDict, Timeout
+from ...utils.types import JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -250,7 +254,7 @@ class Workgroup(BaseEntity):
             *,
             filter: Optional[JSONDict] = None,
             select: Optional[Iterable[Text]] = None,
-            is_admin: Optional[Union[bool, B24BoolStrict]] = None,
+            is_admin: Optional[bool] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -267,7 +271,7 @@ class Workgroup(BaseEntity):
             params["select"] = select
 
         if is_admin is not None:
-            params["IS_ADMIN"] = B24BoolStrict(is_admin).to_b24()
+            params["IS_ADMIN"] = bool_to_bitrix(is_admin, is_required=True)
 
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
@@ -300,26 +304,22 @@ The SDK provides a set of helper types in the `b24pysdk/utils/types` module. The
 - **`B24BatchMethods`** — Collection of batch methods (`Mapping` or `Sequence` of tuples)  
 - **`UserTypeIDLiteral`** — Literal strings for CRM user field types: `"string"`, `"integer"`, `"double"`, `"date"`, `"datetime"`, `"boolean"`, `"file"`, `"enumeration"`, `"url"`, `"address"`, `"money"`, `"iblock_section"`, `"iblock_element"`, `"employee"`, `"crm"`, `"crm_status"`  
 
-#### Validation Wrapper Classes
+#### Boolean Conversion Helpers
 
-###### **`B24Bool`** — Three-state Bitrix24 Boolean
-Represents the ternary logic used by Bitrix24 (`"Y"`/`"N"`/`"D"`).
+`B24Bool` and `B24BoolStrict` are deprecated. Do not use them in new scope wrappers.
 
-**Conversion mapping:**
-- `True` → `"Y"` (Yes)
-- `False` → `"N"` (No)  
-- `None` → `"D"` (Default)
+Use helpers from `b24pysdk/utils/converters.py` instead:
 
-**Methods:**
-- `from_b24(literal: B24BoolLiteral) -> B24Bool` — Create from Bitrix24 string
-- `to_b24() -> B24BoolLiteral` — Convert to Bitrix24 API format
+- `bool_to_bitrix(value, is_required=True)` converts Python `bool` to strict Bitrix24 `"Y"` / `"N"`.
+- `bool_to_bitrix(value, is_required=False)` also allows `None` and converts it to `"D"`.
+- `bool_from_bitrix(value, is_required=True|False)` converts Bitrix24 boolean literals back to Python values for schemas and response adapters.
 
-##### **`B24BoolStrict`** — Strict Two-state Boolean (inherits `B24Bool`)
-Only allows `"Y"` or `"N"` values (excludes `"D"`). Supports mathematical operations and comparisons.
+For request parameters documented as `Y` / `N`, annotate the wrapper argument as `bool` or `Optional[bool]`, then convert it before adding to `params`:
 
-**Additional features:**
-- `value` property returns native Python `bool`
-- Use when `"D"` (Default) is not permitted by the API endpoint
+```python
+if is_admin is not None:
+    params["IS_ADMIN"] = bool_to_bitrix(is_admin, is_required=True)
+```
 
 ##### **`DocumentType`** — Immutable Document Type Tuple
 Represents a Bitrix24 document type as a 3-element tuple.
@@ -359,7 +359,8 @@ if document_type is not None:
 
 - 2\. Handle boolean parameters expected as `Y`/`N` by:
   - Annotating the parameter as `bool`.
-  - Converting the value with `B24Bool(<bool_value>).to_b24()` before transmission.
+  - Converting the value with `bool_to_bitrix(<bool_value>, is_required=True)` before transmission.
+  - Never use deprecated `B24Bool` or `B24BoolStrict` in new code.
   
 - 3\. List all mandatory parameters before the `*` separator; place optional keyword-only parameters afterwards and retrieve them with `dict.get("<param_name>")` rather than direct indexing.
   

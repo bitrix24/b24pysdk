@@ -1,6 +1,7 @@
 from typing import Optional
 
-from ...api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ...schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
 from ._base_crm import BaseCRM
@@ -21,7 +22,7 @@ class Automatedsolution(BaseCRM):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[CRMFieldsData, CRMFieldsDict]:
         """Get fields of the digital workplace.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/automated-solution/crm-automated-solution-fields.html
@@ -32,7 +33,7 @@ class Automatedsolution(BaseCRM):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValueRequest
         """
         return self._fields(timeout=timeout)
 
@@ -174,7 +175,7 @@ class Automatedsolution(BaseCRM):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[None]:
         """Delete digital workplace.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/automated-solution/crm-automated-solution-delete.html

@@ -10,6 +10,7 @@ from ....constants import SDK_NAME
 
 pytestmark = [
     pytest.mark.integration,
+    pytest.mark.scopes,
     pytest.mark.crm,
     pytest.mark.crm_automatedsolution,
 ]
@@ -201,7 +202,7 @@ def test_crm_automatedsolution_list_as_list_fast(bitrix_client: BaseClient):
             last_automated_solutions_id = automated_solution_id
 
 
-@pytest.mark.dependency(name="test_crm_automatedsolution_delete", depends=["test_crm_automatedsolution_list_as_list_fast"])
+@pytest.mark.dependency(name="test_crm_automatedsolution_delete", depends=["test_crm_automatedsolution_add"])
 def test_crm_automatedsolution_delete(bitrix_client: BaseClient, cache: Cache):
     """Test deleting a digital workplace."""
 

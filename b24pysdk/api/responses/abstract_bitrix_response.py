@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
 from dataclasses import asdict, dataclass
-from typing import Generic, TypeVar
+from typing import Generic
 
-from ..._constants import PYTHON_VERSION
+from ...schemas.time import TimeData
+from ...utils.dataclasses import frozen_dataclass_kwargs
+from ...utils.type_vars import BAResultT
 from ...utils.types import JSONDict
 from .bitrix_time_response import BitrixTimeResponse
 
@@ -10,16 +12,9 @@ __all__ = [
     "AbstractBitrixResponse",
 ]
 
-_BARST = TypeVar("_BARST")
 
-_DATACLASS_KWARGS = {"repr": False, "eq": False, "frozen": True}
-
-if PYTHON_VERSION >= (3, 10):
-    _DATACLASS_KWARGS["slots"] = True
-
-
-@dataclass(**_DATACLASS_KWARGS)
-class AbstractBitrixResponse(ABC, Generic[_BARST]):
+@dataclass(**frozen_dataclass_kwargs(repr=False, eq=False))
+class AbstractBitrixResponse(ABC, Generic[BAResultT]):
     """
     Base class for typed Bitrix24 API responses.
 
@@ -28,7 +23,7 @@ class AbstractBitrixResponse(ABC, Generic[_BARST]):
     response objects.
     """
 
-    result: _BARST
+    result: BAResultT
     time: "BitrixTimeResponse"
 
     def __repr__(self):
@@ -39,7 +34,7 @@ class AbstractBitrixResponse(ABC, Generic[_BARST]):
         )
 
     @staticmethod
-    def _convert_time(json_response: JSONDict, /) -> BitrixTimeResponse:
+    def _convert_time(json_response: TimeData, /) -> BitrixTimeResponse:
         """
         Convert raw Bitrix24 timing data into ``BitrixTimeResponse``.
 
@@ -53,7 +48,7 @@ class AbstractBitrixResponse(ABC, Generic[_BARST]):
 
     @classmethod
     @abstractmethod
-    def from_dict(cls, json_response: JSONDict, /) -> "AbstractBitrixResponse":
+    def from_dict(cls, json_response: JSONDict, /) -> "AbstractBitrixResponse[BAResultT]":
         """
         Create a response object from raw Bitrix24 JSON response.
 

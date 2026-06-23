@@ -1,7 +1,7 @@
 from abc import ABC
-from typing import TYPE_CHECKING, Generic, TypeVar
+from typing import TYPE_CHECKING, Generic
 
-from ..responses import AbstractBitrixResponse
+from ...utils.type_vars import BAResponseT, BAResultT
 from .abstract_bitrix_api_request import AbstractBitrixAPIRequest
 
 if TYPE_CHECKING:
@@ -11,10 +11,8 @@ __all__ = [
     "BitrixAPIBaseRequest",
 ]
 
-_BARPT = TypeVar("_BARPT", bound=AbstractBitrixResponse)
 
-
-class BitrixAPIBaseRequest(AbstractBitrixAPIRequest[_BARPT], ABC, Generic[_BARPT]):
+class BitrixAPIBaseRequest(AbstractBitrixAPIRequest[BAResponseT], ABC, Generic[BAResponseT, BAResultT]):
     """
     Base class for Bitrix24 API request objects with standard response shape.
 
@@ -25,7 +23,7 @@ class BitrixAPIBaseRequest(AbstractBitrixAPIRequest[_BARPT], ABC, Generic[_BARPT
     __slots__ = ()
 
     @property
-    def result(self):
+    def result(self) -> BAResultT:
         """
         Return result data from the response.
 

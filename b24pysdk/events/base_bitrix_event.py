@@ -1,18 +1,13 @@
 from dataclasses import dataclass
 
-from .._constants import PYTHON_VERSION
+from ..utils.dataclasses import frozen_dataclass_kwargs
 
 __all__ = [
     "BaseBitrixEvent",
 ]
 
-_DATACLASS_KWARGS = {"eq": False, "frozen": True}
 
-if PYTHON_VERSION >= (3, 10):
-    _DATACLASS_KWARGS["slots"] = True
-
-
-@dataclass(**_DATACLASS_KWARGS)
+@dataclass(**frozen_dataclass_kwargs(eq=False))
 class BaseBitrixEvent:
     """
     Base class for SDK events.

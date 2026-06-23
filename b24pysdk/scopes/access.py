@@ -1,6 +1,7 @@
 from typing import Iterable, Text
 
-from ..api.requests import BitrixAPIRequest
+from ..api.requests import BitrixAPIValueRequest
+from ..schemas.access import AccessNamesData, AccessNamesDict
 from ..utils.functional import type_checker
 from ..utils.types import JSONDict, Timeout
 from ._base_scope import BaseScope
@@ -19,7 +20,7 @@ class Access(BaseScope):
             access: Iterable[Text],
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[AccessNamesData, AccessNamesDict]:
         """"""
 
         if access.__class__ is not list:
@@ -33,4 +34,6 @@ class Access(BaseScope):
             api_wrapper=self.name,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=AccessNamesDict.from_bitrix,
         )

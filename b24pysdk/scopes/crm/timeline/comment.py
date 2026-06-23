@@ -1,6 +1,7 @@
 from typing import Iterable, Optional, Text
 
-from ....api.requests import BitrixAPIRequest
+from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ....schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
 from .._base_crm import BaseCRM
@@ -21,7 +22,7 @@ class Comment(BaseCRM):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[CRMFieldsData, CRMFieldsDict]:
         """Get fields of comment.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/comments/crm-timeline-comment-fields.html
@@ -219,10 +220,10 @@ class Comment(BaseCRM):
             self,
             bitrix_id: int,
             *,
-            entity_type_id: Optional[int] = None,
-            entity_id: Optional[int] = None,
+            owner_type_id: Optional[int] = None,
+            owner_id: Optional[int] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete comment.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/comments/crm-timeline-comment-delete.html
@@ -232,9 +233,9 @@ class Comment(BaseCRM):
         Args:
             bitrix_id: Integer identifier of the deal of type Comment;
 
-            entity_type_id: Optional CRM entity type identifier to narrow the comment binding context;
+            owner_type_id: Optional CRM owner type identifier to narrow the comment binding context;
 
-            entity_id: Optional CRM entity identifier to narrow the comment binding context;
+            owner_id: Optional CRM owner identifier to narrow the comment binding context;
 
             timeout: Timeout in seconds.
 
@@ -246,11 +247,11 @@ class Comment(BaseCRM):
             "id": bitrix_id,
         }
 
-        if entity_type_id is not None:
-            params["entityTypeId"] = entity_type_id
+        if owner_type_id is not None:
+            params["ownerTypeId"] = owner_type_id
 
-        if entity_id is not None:
-            params["entityId"] = entity_id
+        if owner_id is not None:
+            params["ownerId"] = owner_id
 
         return self._make_bitrix_api_request(
             api_wrapper=self.delete,

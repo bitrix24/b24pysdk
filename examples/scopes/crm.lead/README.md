@@ -1,5 +1,8 @@
 # crm.lead
 
+## Typed Results
+Examples use `.response.result` to show the raw Bitrix24 result. For methods with schema adapters, `.value` or `.values` may also be available and return Python-friendly objects from `b24pysdk.schemas`.
+
 ## Discovered Methods
 - [crm.lead.add](crm_lead_add.md)
 - [crm.lead.get](crm_lead_get.md)

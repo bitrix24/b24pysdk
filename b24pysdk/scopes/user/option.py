@@ -1,8 +1,8 @@
-from typing import Dict, Optional, Text
+from typing import Optional, Text
 
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import JSONDict, Timeout
+from ...utils.types import B24APIResult, JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -22,7 +22,7 @@ class Option(BaseEntity):
             *,
             option: Optional[Text] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[B24APIResult]:
         """
         Retrieve the current value of a specified user option.
 
@@ -53,10 +53,10 @@ class Option(BaseEntity):
     @type_checker
     def set(
             self,
-            options: Dict,
+            options: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """
         Set values for one or more user options in Bitrix24.
 

@@ -5,12 +5,14 @@ from _pytest.cacheprovider import Cache
 
 from b24pysdk.api.responses import BitrixAPIListFastResponse, BitrixAPIListResponse, BitrixAPIResponse
 from b24pysdk.client import BaseClient
+from b24pysdk.constants import B24BoolLit
 
 from .....constants import SDK_NAME
 
 pytestmark = [
-    # pytest.mark.integration,
-    # pytest.mark.crm,
+    pytest.mark.integration,
+    pytest.mark.scopes,
+    pytest.mark.crm,
     pytest.mark.crm_company,
 ]
 
@@ -26,11 +28,13 @@ _INDUSTRY: Text = "MANUFACTURING"
 _EMPLOYEES: Text = "EMPLOYEES_2"
 _CURRENCY_ID: Text = "USD"
 _REVENUE: float = 3000000.00
+_OPENED: B24BoolLit = B24BoolLit.TRUE
 _UPDATED_REVENUE: float = 500000.00
 _UPDATED_EMPLOYEES: Text = "EMPLOYEES_3"
 
 
-def test_company_fields(bitrix_client: BaseClient):
+@pytest.mark.dependency(name="test_crm_company_fields")
+def test_crm_company_fields(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.company.fields().response
@@ -45,8 +49,8 @@ def test_company_fields(bitrix_client: BaseClient):
         assert isinstance(fields[field], dict), f"Field '{field}' should be a dictionary"
 
 
-@pytest.mark.dependency(name="test_company_add")
-def test_company_add(bitrix_client: BaseClient, cache: Cache):
+@pytest.mark.dependency(name="test_crm_company_add")
+def test_crm_company_add(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     bitrix_response = bitrix_client.crm.company.add(
@@ -57,7 +61,7 @@ def test_company_add(bitrix_client: BaseClient, cache: Cache):
             "EMPLOYEES": _EMPLOYEES,
             "CURRENCY_ID": _CURRENCY_ID,
             "REVENUE": _REVENUE,
-            "OPENED": "Y",
+            "OPENED": _OPENED,
         },
     ).response
 
@@ -71,8 +75,8 @@ def test_company_add(bitrix_client: BaseClient, cache: Cache):
     cache.set("company_id", company_id)
 
 
-@pytest.mark.dependency(name="test_company_get", depends=["test_company_add"])
-def test_company_get(bitrix_client: BaseClient, cache: Cache):
+@pytest.mark.dependency(name="test_crm_company_get", depends=["test_crm_company_add"])
+def test_crm_company_get(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     company_id = cache.get("company_id", None)
@@ -92,10 +96,11 @@ def test_company_get(bitrix_client: BaseClient, cache: Cache):
     assert company.get("EMPLOYEES") == _EMPLOYEES, "Company EMPLOYEES does not match"
     assert company.get("CURRENCY_ID") == _CURRENCY_ID, "Company CURRENCY_ID does not match"
     assert float(company.get("REVENUE", 0)) == _REVENUE, "Company REVENUE does not match"
+    assert company.get("OPENED") == _OPENED, "Company OPENED does not match"
 
 
-@pytest.mark.dependency(name="test_company_update", depends=["test_company_add"])
-def test_company_update(bitrix_client: BaseClient, cache: Cache):
+@pytest.mark.dependency(name="test_crm_company_update", depends=["test_crm_company_get"])
+def test_crm_company_update(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     company_id = cache.get("company_id", None)
@@ -116,8 +121,8 @@ def test_company_update(bitrix_client: BaseClient, cache: Cache):
     assert is_updated is True, "Company update should return True"
 
 
-@pytest.mark.dependency(name="test_company_list", depends=["test_company_update"])
-def test_company_list(bitrix_client: BaseClient, cache: Cache):
+@pytest.mark.dependency(name="test_crm_company_list", depends=["test_crm_company_update"])
+def test_crm_company_list(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     company_id = cache.get("company_id", None)
@@ -143,8 +148,8 @@ def test_company_list(bitrix_client: BaseClient, cache: Cache):
     assert company.get("EMPLOYEES") == _UPDATED_EMPLOYEES, "Company EMPLOYEES does not match after update"
 
 
-@pytest.mark.dependency(name="test_company_list_as_list", depends=["test_company_add"])
-def test_company_list_as_list(bitrix_client: BaseClient):
+@pytest.mark.dependency(name="test_crm_company_list_as_list", depends=["test_crm_company_update"])
+def test_crm_company_list_as_list(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.company.list().as_list().response
@@ -160,8 +165,8 @@ def test_company_list_as_list(bitrix_client: BaseClient):
         assert isinstance(company, dict)
 
 
-@pytest.mark.dependency(name="test_company_list_as_list_fast", depends=["test_company_add"])
-def test_company_list_as_list_fast(bitrix_client: BaseClient):
+@pytest.mark.dependency(name="test_crm_company_list_as_list_fast", depends=["test_crm_company_update"])
+def test_crm_company_list_as_list_fast(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.company.list().as_list_fast(descending=True).response
@@ -186,8 +191,8 @@ def test_company_list_as_list_fast(bitrix_client: BaseClient):
             last_company_id = company_id
 
 
-@pytest.mark.dependency(name="test_company_delete", depends=["test_company_list"])
-def test_company_delete(bitrix_client: BaseClient, cache: Cache):
+@pytest.mark.dependency(name="test_crm_company_delete", depends=["test_crm_company_list_as_list_fast"])
+def test_crm_company_delete(bitrix_client: BaseClient, cache: Cache):
     """"""
 
     company_id = cache.get("company_id", None)
@@ -196,5 +201,7 @@ def test_company_delete(bitrix_client: BaseClient, cache: Cache):
     bitrix_response = bitrix_client.crm.company.delete(bitrix_id=company_id).response
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
+
     is_deleted = bitrix_response.result
+
     assert is_deleted is True, "Company deletion should return True"

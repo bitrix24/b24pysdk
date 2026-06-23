@@ -28,7 +28,7 @@ class Offline(BaseEntity):
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        params: JSONDict = {}
 
         if filter is not None:
             params["filter"] = filter
@@ -64,11 +64,12 @@ class Offline(BaseEntity):
             filter: Optional[JSONDict] = None,
             order: Optional[JSONDict] = None,
             start: Optional[int] = None,
+            auth_connector: Optional[Text] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        params: JSONDict = {}
 
         if filter is not None:
             params["filter"] = filter
@@ -78,6 +79,9 @@ class Offline(BaseEntity):
 
         if start is not None:
             params["start"] = start
+
+        if auth_connector is not None:
+            params["auth_connector"] = auth_connector
 
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
@@ -93,10 +97,10 @@ class Offline(BaseEntity):
             bitrix_id: Optional[Iterable[int]] = None,
             message_id: Optional[Iterable[int]] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
-        params = {
+        params: JSONDict = {
             "process_id": process_id,
         }
 
@@ -125,10 +129,10 @@ class Offline(BaseEntity):
             *,
             message_id: Optional[Iterable[int]] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
-        params = {
+        params: JSONDict = {
             "process_id": process_id,
         }
 

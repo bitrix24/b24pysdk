@@ -1,6 +1,7 @@
 from functools import cached_property
 
-from ...api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIValueRequest
+from ...schemas.app import AppInfo, AppInfoBase, AppInfoData
 from ...utils.functional import type_checker
 from ...utils.types import Timeout
 from .._base_scope import BaseScope
@@ -24,9 +25,11 @@ class App(BaseScope):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[AppInfoData, AppInfo]:
         """"""
         return self._make_bitrix_api_request(
             api_wrapper=self.info,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=AppInfoBase.from_bitrix,
         )

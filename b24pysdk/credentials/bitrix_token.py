@@ -8,10 +8,14 @@ from ..client import Client
 from ..constants.version import B24APIVersion
 from ..errors import BitrixAPIExpiredToken, BitrixResponse302JSONDecodeError
 from ..events import OAuthTokenRenewedEvent, PortalDomainChangedEvent
-from ..signals import BitrixSignalInstance
 from ..utils.functional import classproperty
 from ..utils.types import B24APIVersionLiteral, B24Requests, B24RequestTuple, JSONDict, Key, Timeout
 from .oauth_token import OAuthToken
+
+try:
+    from ..signals import BitrixSignalInstance as _BitrixSignalInstance
+except ImportError:
+    _BitrixSignalInstance = NotImplemented
 
 if TYPE_CHECKING:
     from ..api.responses import BitrixAppInfoResponse
@@ -71,11 +75,12 @@ class AbstractBitrixToken:
     bitrix_app: Optional["AbstractBitrixApp"] = NotImplemented
     """Bitrix application object used for OAuth flows."""
 
-    oauth_token_renewed_signal: BitrixSignalInstance = BitrixSignalInstance.create_signal(OAuthTokenRenewedEvent)
-    """Signal emitted after successful OAuth token refresh."""
+    if _BitrixSignalInstance is not NotImplemented:
+        oauth_token_renewed_signal: _BitrixSignalInstance = _BitrixSignalInstance.create_signal(OAuthTokenRenewedEvent)
+        """Signal emitted after successful OAuth token refresh."""
 
-    portal_domain_changed_signal: BitrixSignalInstance = BitrixSignalInstance.create_signal(PortalDomainChangedEvent)
-    """Signal emitted after automatic portal domain change."""
+        portal_domain_changed_signal: _BitrixSignalInstance = _BitrixSignalInstance.create_signal(PortalDomainChangedEvent)
+        """Signal emitted after automatic portal domain change."""
 
     def __str__(self):
         """Return a concise token representation for logs/debug output."""
@@ -258,9 +263,10 @@ class AbstractBitrixToken:
 
         self.oauth_token = renewed_oauth.oauth_token
 
-        self.oauth_token_renewed_signal.emit(OAuthTokenRenewedEvent(
-            renewed_oauth_token=renewed_oauth,
-        ))
+        if _BitrixSignalInstance is not NotImplemented:
+            self.oauth_token_renewed_signal.emit(OAuthTokenRenewedEvent(
+                renewed_oauth_token=renewed_oauth,
+            ))
 
     def __expired_token_handler(self) -> bool:
         """
@@ -331,10 +337,11 @@ class AbstractBitrixToken:
         old_domain = self.domain
         self.domain = new_domain
 
-        self.portal_domain_changed_signal.emit(PortalDomainChangedEvent(
-            old_domain=old_domain,
-            new_domain=new_domain,
-        ))
+        if _BitrixSignalInstance is not NotImplemented:
+            self.portal_domain_changed_signal.emit(PortalDomainChangedEvent(
+                old_domain=old_domain,
+                new_domain=new_domain,
+            ))
 
         return True
 

@@ -13,6 +13,8 @@ Build integrations faster with a clean, Pythonic interface to Bitrix24: strong t
 - Authentication via OAuth tokens or incoming webhooks
 - Native Python types for arguments and responses
 - Helpful type hints for available method parameters and their types
+- Typed response adapters via `.value` and `.values`
+- Schema classes for Python-friendly Bitrix24 result objects
 - Runtime validation of argument types
 - Efficient pagination helpers and batch operations
 
@@ -29,6 +31,14 @@ Install from PyPI:
 ```bash
 pip install b24pysdk
 ```
+
+Optional SDK signals support:
+
+```bash
+pip install "b24pysdk[signals]"
+```
+
+The `signals` extra is required only when you subscribe to SDK internal signals, for example OAuth token renewal or portal-domain change notifications. Regular REST calls and automatic OAuth token refresh work without this extra.
 
 ### Test environment (Docker-only, no local installs)
 
@@ -95,6 +105,7 @@ CI note:
   - BitrixToken - OAuth 2.0 token auth (paired with BitrixApp)
   - BitrixApp - your Bitrix24 app credentials (client_id, client_secret)
 - Responses expose `result` and `time` (including execution duration)
+- Typed requests may also expose `.value` or `.values`, adapted through schema classes from `b24pysdk.schemas`
 
 ## Quickstart
 
@@ -252,6 +263,26 @@ Updated successfully: True
 Call took 0.40396690368652344 seconds
 ```
 
+### Typed values and schemas
+
+Some SDK methods provide typed adapters for Bitrix24 results:
+
+- `.result` returns the raw Bitrix24 `result` value.
+- `.value` returns one Python-friendly schema object for single-result methods.
+- `.values` returns adapted values for list-like methods.
+
+Schema classes live in `b24pysdk.schemas`. They convert Bitrix24 field names and values to Python-friendly objects while keeping `.result` available for raw API-compatible data.
+
+```python
+request = client.profile()
+
+raw_profile = request.result
+profile = request.value
+
+print(raw_profile["ID"])
+print(profile.bitrix_id)
+```
+
 ### Retrieving records with list methods
 
 For list methods, you can use `.as_list()` and `.as_list_fast()` to explicitly retrieve all records.
@@ -372,7 +403,7 @@ Common exceptions you may want to handle:
 - `BitrixAPIExpiredToken`: access token expired; for `BitrixToken` B24PySDK can auto-refresh
 
 ```python
-from b24pysdk.error import BitrixAPIError, BitrixRequestTimeout
+from b24pysdk.errors import BitrixAPIError, BitrixRequestTimeout
 
 try:
     request = client.crm.deal.get(bitrix_id=2)
@@ -402,6 +433,14 @@ Examples of the available abstract classes are `AbstractBitrixApp`, `AbstractBit
 Sometimes, when working with Bitrix24 through the SDK, it is necessary to react to internal changes within the client — for example, when an OAuth token expires and the SDK automatically obtains a new one, or when the Bitrix24 portal domain changes (which may happen if the portal is moved to another subdomain).
 
 To handle such situations, the SDK provides an **event mechanism** that allows you to subscribe to and process specific events.
+
+Event subscription requires the optional `signals` extra:
+
+```bash
+pip install "b24pysdk[signals]"
+```
+
+If the extra is not installed, direct imports from `b24pysdk.signals` raise `ImportError` with an installation hint. Token refresh and regular SDK calls continue to work without signal subscriptions.
 
 There are two key events you can listen to:
 

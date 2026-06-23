@@ -10,6 +10,7 @@ from typing import Final, Text, Tuple
 
 __all__ = [
     "DEFAULT_REQUEST_ID_HEADER_NAME",
+    "MASKED_VALUE",
     "MAX_BATCH_SIZE",
     "PYTHON_VERSION",
     "SDK_USER_AGENT",
@@ -22,6 +23,11 @@ HTTP header name used to propagate request identifiers.
 
 This header may be used for request tracing and debugging across
 services interacting with the Bitrix API.
+"""
+
+MASKED_VALUE: Final[Text] = "*" * 5
+"""
+Default masked value used in secure SDK logs.
 """
 
 MAX_BATCH_SIZE: Final[int] = 50

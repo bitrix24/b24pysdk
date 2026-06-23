@@ -410,7 +410,7 @@ from b24pysdk import Config
 from b24pysdk.client import BaseClient
 from b24pysdk.api.responses import BitrixAPIListFastResponse, BitrixAPIListResponse, BitrixAPIResponse
 from b24pysdk.constants.user import PersonalGender
-from b24pysdk.utils.types import JSONDictGenerator
+from b24pysdk.utils.types import JSONGenerator
 
 from ....constants import HEAD_DEPARTMENT_ID, SDK_NAME
 

@@ -4,8 +4,10 @@ from typing import Callable, Dict, Final, Iterable, Literal, Optional, Text, Tup
 from ..._constants import MAX_BATCH_SIZE
 from ...constants.version import B24APIVersion
 from ...protocols import BitrixTokenProtocol
-from ...utils.types import B24APIVersionLiteral, B24RequestTuple, JSONDict, JSONDictGenerator, JSONList, Timeout
+from ...schemas.time import TimeData
+from ...utils.types import B24APIVersionLiteral, B24RequestTuple, JSONDict, JSONGenerator, JSONList, Timeout
 from ._base_caller import BaseCaller
+from ._utils import get_empty_time
 from .call_batch import call_batch
 from .call_method import call_method
 
@@ -60,7 +62,7 @@ class _ListFastCaller(BaseCaller):
     _descending: bool
     _limit: Optional[int]
     _now_datetime: datetime
-    _time: JSONDict
+    _time: TimeData
     _counter: int
     _last_id: int
     _request_id_field: Optional[Text]
@@ -115,14 +117,7 @@ class _ListFastCaller(BaseCaller):
         self._descending = descending
         self._limit = limit
         self._now_datetime = self._config.get_local_datetime()
-        self._time = {
-            "start": self._timestamp,
-            "finish": self._timestamp,
-            "duration": 0,
-            "processing": 0,
-            "date_start": self._now_datetime.isoformat(timespec="seconds"),
-            "date_finish": self._now_datetime.isoformat(timespec="seconds"),
-        }
+        self._time = get_empty_time(self._now_datetime)
         self._counter = 0
         self._last_id = 0
         self._request_id_field = self._get_initial_request_id_field()
@@ -197,11 +192,6 @@ class _ListFastCaller(BaseCaller):
         """Return ordering parameters for the current ID field and direction."""
         return self._order_pattern(self._dynamic_request_id_field, self._sorting)
 
-    @property
-    def _timestamp(self) -> float:
-        """Return the fixed timestamp used for synthetic aggregated time fields."""
-        return self._now_datetime.timestamp()
-
     @staticmethod
     def _force_values(collection: Union[JSONDict, JSONList]) -> Iterable[Union[JSONDict, JSONList]]:
         """Return iterable values for either dict-shaped or list-shaped results."""
@@ -241,7 +231,7 @@ class _ListFastCaller(BaseCaller):
 
         return result_dict
 
-    def _add_time(self, time: JSONDict):
+    def _add_time(self, time: TimeData):
         """Accumulate Bitrix timing metadata from one method or batch response."""
 
         self._time["finish"] = time["finish"]
@@ -333,6 +323,24 @@ class _ListFastCaller(BaseCaller):
             {"start": self._START},
         )
 
+    def _get_batch_methods_count(self) -> int:
+        """Return how many batch commands are needed for the remaining limit."""
+
+        if self._limit is None:
+            return self._MAX_BATCH_SIZE
+
+        remaining_limit = self._limit - self._counter
+
+        if remaining_limit <= 0:
+            return 0
+
+        methods_count = remaining_limit // self._MAX_BATCH_SIZE
+
+        if remaining_limit % self._MAX_BATCH_SIZE:
+            methods_count += 1
+
+        return min(self._MAX_BATCH_SIZE, methods_count)
+
     def _generate_batch_methods(self) -> Dict[Text, B24RequestTuple]:
         """
         Generate one chain of fast-list batch commands.
@@ -340,6 +348,8 @@ class _ListFastCaller(BaseCaller):
         Every command uses the same API method with generated order, filter, and
         ``start=-1`` parameters. Commands are named ``req_0``, ``req_1``, ...
         because later filters reference earlier command results by these names.
+        The number of generated commands is limited by the remaining requested
+        item count when ``limit`` is set.
 
         Returns:
             Dictionary of request names to ``(api_method, params)`` tuples ready
@@ -348,7 +358,7 @@ class _ListFastCaller(BaseCaller):
 
         methods: Dict[Text, B24RequestTuple] = {}
 
-        for index in range(self._MAX_BATCH_SIZE):
+        for index in range(self._get_batch_methods_count()):
             method_params = self._generate_method_params(index=index)
             methods[f"req_{index}"] = (self._api_method, method_params)
 
@@ -389,6 +399,20 @@ class _ListFastCaller(BaseCaller):
             **self._kwargs,
         )
 
+    def _warn_batch_result_errors(self, batch_result: JSONDict):
+        """Log warning when a batch response contains command errors."""
+
+        result_error = batch_result.get("result_error")
+
+        if result_error:
+            self._config.logger.warning(
+                "batch result contains errors",
+                context={
+                    "api_method": self._api_method,
+                    "result_error": result_error,
+                },
+            )
+
     def _extract_response_id_field(self, result_value: JSONDict) -> Text:
         """
         Detect the actual ID key returned by Bitrix in a result item.
@@ -419,7 +443,7 @@ class _ListFastCaller(BaseCaller):
                 "This can lead to an infinite generation loop!",
             )
 
-    def _generate_result(self) -> JSONDictGenerator:
+    def _generate_result(self) -> JSONGenerator:
         """
         Yield items one by one while fetching additional pages as needed.
 
@@ -427,40 +451,50 @@ class _ListFastCaller(BaseCaller):
         chained batch pages until a short page is returned or ``limit`` is
         reached.
         """
+        try:
+            if self._limit is not None and self._limit <= 0:
+                return
 
-        response = self._fetch_first_response()
+            response = self._fetch_first_response()
 
-        self._add_time(response["time"])
-        self._wrapper, unwrapped_result_values = self._unwrap_result(response["result"])
+            self._add_time(response["time"])
+            self._wrapper, unwrapped_result_values = self._unwrap_result(response["result"])
 
-        if unwrapped_result_values:
-            self._results = [response["result"]]
-        else:
-            return
+            if unwrapped_result_values:
+                self._results = [response["result"]]
+            else:
+                return
 
-        self._response_id_field = self._extract_response_id_field(unwrapped_result_values[0])
+            self._response_id_field = self._extract_response_id_field(unwrapped_result_values[0])
 
-        while self._results:
-            for result_values in self._results_values:
-                unwrapped_result_values = result_values[self._wrapper] if self._wrapper else result_values
+            while self._results:
+                for result_values in self._results_values:
+                    unwrapped_result_values = result_values[self._wrapper] if self._wrapper else result_values
 
-                for result_value in unwrapped_result_values:
-                    yield result_value
-                    self._counter += 1
+                    for result_value in unwrapped_result_values:
+                        yield result_value
+                        self._counter += 1
 
-                    if self._limit is not None and self._counter >= self._limit:
+                        if self._limit is not None and self._counter >= self._limit:
+                            return
+
+                    if len(unwrapped_result_values) < self._MAX_BATCH_SIZE:
                         return
 
-                if len(unwrapped_result_values) < self._MAX_BATCH_SIZE:
+                if self._limit is not None and self._counter >= self._limit:
                     return
 
-            new_last_id = int(unwrapped_result_values[-1][self._response_id_field])
-            self._update_last_id(new_last_id)
+                new_last_id = int(unwrapped_result_values[-1][self._response_id_field])
+                self._update_last_id(new_last_id)
 
-            batch_response = self._fetch_next_batch_response()
+                batch_response = self._fetch_next_batch_response()
+                batch_result = batch_response["result"]
 
-            self._add_time(batch_response["time"])
-            self._results = batch_response["result"]["result"]
+                self._warn_batch_result_errors(batch_result)
+                self._add_time(batch_response["time"])
+                self._results = batch_result["result"]
+        finally:
+            self._config.logger.debug("finish call_list_fast")
 
     def call(self) -> JSONDict:
         """
@@ -471,6 +505,14 @@ class _ListFastCaller(BaseCaller):
         Final timing values are available only after the generator has been fully
         consumed.
         """
+
+        self._config.logger.debug(
+            "start call_list_fast",
+            context={
+                "descending": self._descending,
+            },
+        )
+
         return {
             "result": self._generate_result(),
             "time": self._time,

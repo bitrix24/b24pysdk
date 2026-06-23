@@ -1,7 +1,7 @@
 import pytest
 
 from b24pysdk.api.responses import BitrixAPIListFastResponse
-from b24pysdk.utils.types import JSONDict, JSONDictGenerator, JSONList
+from b24pysdk.utils.types import JSONDict, JSONGenerator, JSONList
 from tests.unit.examples import EXAMPLE_TIME_1, EXAMPLE_TIME_2, EXAMPLE_TIME_3
 from tests.unit.helpers import assert_equality_disabled, assert_frozen_instance, assert_is_dataclass, assert_slots, verify_time
 
@@ -13,22 +13,22 @@ pytestmark = [
 ]
 
 
-def _simple_generator() -> JSONDictGenerator:
+def _simple_generator() -> JSONGenerator:
     yield from [{"id": 1}, {"id": 2}, {"id": 3}]
 
 
-def _empty_generator() -> JSONDictGenerator:
+def _empty_generator() -> JSONGenerator:
     yield from []
 
 
-def _nested_generator() -> JSONDictGenerator:
+def _nested_generator() -> JSONGenerator:
     yield from [
         {"user": {"id": 1, "name": "John"}},
         {"user": {"id": 2, "name": "Jane"}},
     ]
 
 
-def _mixed_generator() -> JSONDictGenerator:
+def _mixed_generator() -> JSONGenerator:
     yield from [
         {"id": 1, "active": True},
         {"name": "test", "tags": ["tag1"]},

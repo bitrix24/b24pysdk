@@ -1,15 +1,10 @@
 from dataclasses import asdict, dataclass
 from typing import Dict, List, Text, Union
 
-from ..._constants import PYTHON_VERSION
+from ...utils.dataclasses import frozen_dataclass_kwargs
 from ...utils.types import B24APIResult, JSONDict, JSONList
 from .abstract_bitrix_response import AbstractBitrixResponse
 from .bitrix_time_response import BitrixTimeResponse
-
-_DATACLASS_KWARGS = {"repr": False, "eq": False, "frozen": True}
-
-if PYTHON_VERSION >= (3, 10):
-    _DATACLASS_KWARGS["slots"] = True
 
 __all__ = [
     "B24APIBatchResult",
@@ -17,7 +12,7 @@ __all__ = [
 ]
 
 
-@dataclass(**_DATACLASS_KWARGS)
+@dataclass(**frozen_dataclass_kwargs(repr=False, eq=False))
 class B24APIBatchResult:
     """
     Result payload of a Bitrix24 batch response.
@@ -88,7 +83,7 @@ class B24APIBatchResult:
         return asdict(self)
 
 
-@dataclass(**_DATACLASS_KWARGS)
+@dataclass(**frozen_dataclass_kwargs(repr=False, eq=False))
 class BitrixAPIBatchResponse(AbstractBitrixResponse[B24APIBatchResult]):
     """
     Typed Bitrix24 batch response.

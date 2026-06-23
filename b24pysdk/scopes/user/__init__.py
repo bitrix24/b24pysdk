@@ -1,5 +1,5 @@
 from functools import cached_property
-from typing import Iterable, Optional, Text
+from typing import Dict, Iterable, Optional, Text
 
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
@@ -31,7 +31,7 @@ class User(BaseScope):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[Dict[Text, Text]]:
         """"""
         return self._make_bitrix_api_request(
             api_wrapper=self.fields,
@@ -44,7 +44,7 @@ class User(BaseScope):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """"""
         return self._make_bitrix_api_request(
             api_wrapper=self.add,
@@ -94,7 +94,7 @@ class User(BaseScope):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
         return self._make_bitrix_api_request(
             api_wrapper=self.update,
@@ -155,7 +155,7 @@ class User(BaseScope):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
         return self._make_bitrix_api_request(
             api_wrapper=self.admin,
@@ -168,7 +168,7 @@ class User(BaseScope):
             access: Iterable[Text],
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         if access.__class__ is not list:

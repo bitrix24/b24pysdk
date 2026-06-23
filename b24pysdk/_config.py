@@ -7,6 +7,7 @@ the behavior of the Bitrix SDK. Configuration options include:
 - retry strategy
 - request timeouts
 - logging
+- sensitive data masking
 - timezone handling
 - API version detection
 
@@ -47,6 +48,7 @@ class _LocalConfig:
         "default_read_timeout",
         "default_retry_delay_increment",
         "logger",
+        "secure_log",
         "tz",
     )
 
@@ -57,6 +59,7 @@ class _LocalConfig:
     default_max_retries: int
     default_retry_delay_increment: Number
     logger: AbstractLogger
+    secure_log: bool
     tz: tzinfo
 
     def __init__(self):
@@ -67,6 +70,7 @@ class _LocalConfig:
         self.default_max_retries = DEFAULT_MAX_RETRIES
         self.default_retry_delay_increment = DEFAULT_RETRY_DELAY_INCREMENT
         self.logger = NullLogger()
+        self.secure_log = True
         self.tz = self.__get_default_tz()
 
     def __get_default_tz(self) -> tzinfo:
@@ -137,6 +141,7 @@ class Config:
             default_timeout: Timeout = None,
             logger: typing.Optional[AbstractLogger] = None,
             log_level: typing.Optional[int] = None,
+            secure_log: typing.Optional[bool] = None,
             tz: typing.Optional[tzinfo] = None,
     ):
         """
@@ -175,6 +180,9 @@ class Config:
         log_level : int, optional
             Logging level to apply to the current logger.
 
+        secure_log : bool, optional
+            Whether SDK logs should hide credentials and other sensitive values.
+
         tz : tzinfo, optional
             Default timezone used by SDK date/time helpers.
         """
@@ -205,6 +213,9 @@ class Config:
 
         if log_level is not None:
             self.log_level = log_level
+
+        if secure_log is not None:
+            self.secure_log = secure_log
 
         if tz is not None:
             self.tz = tz
@@ -399,6 +410,20 @@ class Config:
             )
 
         self._config.logger.set_level(value)
+
+    @property
+    def secure_log(self) -> bool:
+        """Whether SDK logs should hide credentials and other sensitive values."""
+        return self._config.secure_log
+
+    @secure_log.setter
+    def secure_log(self, value: bool):
+        """Set secure logging mode for SDK logs."""
+
+        if not isinstance(value, bool):
+            raise TypeError("secure_log must be a boolean")
+
+        self._config.secure_log = value
 
     @property
     def tz(self) -> tzinfo:

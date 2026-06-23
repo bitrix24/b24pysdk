@@ -3,20 +3,16 @@ from datetime import datetime
 from typing import Optional
 
 from ..._config import Config
-from ..._constants import PYTHON_VERSION
+from ...schemas.time import TimeData
+from ...utils.dataclasses import frozen_dataclass_kwargs
 from ...utils.types import JSONDict
 
 __all__ = [
     "BitrixTimeResponse",
 ]
 
-_DATACLASS_KWARGS = {"eq": False, "frozen": True}
 
-if PYTHON_VERSION >= (3, 10):
-    _DATACLASS_KWARGS["slots"] = True
-
-
-@dataclass(**_DATACLASS_KWARGS)
+@dataclass(**frozen_dataclass_kwargs(eq=False))
 class BitrixTimeResponse:
     """
     Timing metadata returned by Bitrix24 API responses.
@@ -35,7 +31,7 @@ class BitrixTimeResponse:
     operating: Optional[float] = None
 
     @classmethod
-    def from_dict(cls, json_response: JSONDict, /) -> "BitrixTimeResponse":
+    def from_dict(cls, json_response: TimeData, /) -> "BitrixTimeResponse":
         """
         Create a BitrixTimeResponse instance from raw timing data.
 

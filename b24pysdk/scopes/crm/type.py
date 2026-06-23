@@ -1,6 +1,7 @@
-from typing import Optional
+from typing import List, NoReturn, Optional
 
-from ...api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ...schemas.crm.field import CRMFieldsDict, CRMFieldsResultData
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
 from ._base_crm import BaseCRM
@@ -21,7 +22,7 @@ class Type(BaseCRM):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[CRMFieldsResultData, CRMFieldsDict]:
         """Get custom fields.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/user-defined-object-types/crm-type-fields.html
@@ -32,9 +33,14 @@ class Type(BaseCRM):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValueRequest
         """
-        return self._fields(timeout=timeout)
+        return self._make_bitrix_api_request(
+            api_wrapper=self.fields,
+            timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=CRMFieldsDict.from_bitrix,
+        )
 
     @type_checker
     def add(
@@ -104,7 +110,7 @@ class Type(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "entityTypeId": entity_type_id,
         }
 
@@ -206,7 +212,7 @@ class Type(BaseCRM):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[List[NoReturn]]:
         """Delete custom type.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/user-defined-object-types/crm-type-delete.html

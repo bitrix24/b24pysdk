@@ -1,6 +1,7 @@
 from typing import Iterable, Optional, Text
 
-from ...api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ...schemas.crm.vat import VatFieldsData, VatFieldsDict
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
 from ._base_crm import BaseCRM
@@ -15,6 +16,29 @@ class Vat(BaseCRM):
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/auxiliary/vat/index.html
     """
+
+    @type_checker
+    def fields(
+            self,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIValueRequest[VatFieldsData, VatFieldsDict]:
+        """Get VAT rate fields.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/auxiliary/vat/crm-vat-fields.html
+
+        The method returns the description of VAT rate fields.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+        return self._fields(
+            timeout=timeout,
+            result_adapter=VatFieldsDict.from_bitrix,
+        )
 
     @type_checker
     def add(
@@ -46,29 +70,6 @@ class Vat(BaseCRM):
         return self._add(fields, timeout=timeout)
 
     @type_checker
-    def delete(
-            self,
-            bitrix_id: int,
-            *,
-            timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """Delete VAT rate.
-
-        Documentation: https://apidocs.bitrix24.com/api-reference/crm/auxiliary/vat/crm-vat-delete.html
-
-        The method removes a VAT rate by its identifier.
-
-        Args:
-            bitrix_id: Identifier of the VAT rate to be deleted;
-
-            timeout: Timeout in seconds.
-
-        Returns:
-            Instance of BitrixAPIRequest
-        """
-        return self._delete(bitrix_id, timeout=timeout)
-
-    @type_checker
     def get(
             self,
             bitrix_id: int,
@@ -90,26 +91,6 @@ class Vat(BaseCRM):
             Instance of BitrixAPIRequest
         """
         return self._get(bitrix_id, timeout=timeout)
-
-    @type_checker
-    def fields(
-            self,
-            *,
-            timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """Get VAT rate fields.
-
-        Documentation: https://apidocs.bitrix24.com/api-reference/crm/auxiliary/vat/crm-vat-fields.html
-
-        The method returns the description of VAT rate fields.
-
-        Args:
-            timeout: Timeout in seconds.
-
-        Returns:
-            Instance of BitrixAPIRequest
-        """
-        return self._fields(timeout=timeout)
 
     @type_checker
     def list(
@@ -192,3 +173,26 @@ class Vat(BaseCRM):
             fields=fields,
             timeout=timeout,
         )
+
+    @type_checker
+    def delete(
+            self,
+            bitrix_id: int,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """Delete VAT rate.
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/auxiliary/vat/crm-vat-delete.html
+
+        The method removes a VAT rate by its identifier.
+
+        Args:
+            bitrix_id: Identifier of the VAT rate to be deleted;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+        return self._delete(bitrix_id, timeout=timeout)

@@ -1,4 +1,5 @@
-from ...api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIValueRequest
+from ...schemas.crm.entity import CRMEntityMergeBatch, CRMEntityMergeBatchData
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
 from ._base_crm import BaseCRM
@@ -20,7 +21,7 @@ class Entity(BaseCRM):
             *,
             params: JSONDict,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[CRMEntityMergeBatchData, CRMEntityMergeBatch]:
         """Merge duplicates
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/duplicates/crm-entity-merge-batch.html
@@ -37,10 +38,10 @@ class Entity(BaseCRM):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValueRequest
         """
 
-        params = {
+        params: JSONDict = {
             "params": params,
         }
 

@@ -1,19 +1,9 @@
-import dataclasses as _dc
-import functools as _ft
 import typing as _tp
 
-from .. import _constants
+from ..schemas import error as _error_schemas
 from . import BitrixBaseAPIBadRequest as _BitrixBaseAPIBadRequest
 from . import BitrixBaseAPIError as _BaseBitrixAPIError
 from . import BitrixBaseAPIUnauthorized as _BitrixBaseAPIUnauthorized
-
-if _tp.TYPE_CHECKING:
-    from ..utils import types as _types
-
-_DATACLASS_KWARGS = {"eq": False, "frozen": True}
-
-if _constants.PYTHON_VERSION >= (3, 10):
-    _DATACLASS_KWARGS["slots"] = True
 
 __all__ = [
     "BitrixAPIAccessDeniedException",
@@ -27,60 +17,6 @@ __all__ = [
     "BitrixAPIValidationDTOValidationException",
     "BitrixAPIValidationRequestValidationException",
 ]
-
-
-@_dc.dataclass(**_DATACLASS_KWARGS)
-class Validation:
-    """
-    Validation issue returned by Bitrix REST API v3.
-
-    Represents a single field-level validation error with the field
-    name and corresponding error message.
-    """
-
-    field: _tp.Text
-    message: _tp.Text
-
-    @classmethod
-    def from_dict(cls, json_response: "_types.JSONDict") -> "Validation":
-        return cls(
-            field=json_response["field"],
-            message=json_response["message"],
-        )
-
-    def to_dict(self) -> "_types.JSONDict":
-        return _dc.asdict(self)
-
-
-@_dc.dataclass(**_DATACLASS_KWARGS)
-class Error:
-    """
-    Structured API v3 error payload.
-
-    Contains the machine-readable error code, a human-readable message,
-    and optional validation details.
-    """
-
-    code: _tp.Text
-    message: _tp.Text
-    validation: _tp.Optional[_tp.List[Validation]]
-
-    @classmethod
-    def from_dict(cls, json_response: "_types.JSONDict") -> "Error":
-        validation = json_response.get("validation")
-
-        if isinstance(validation, list):
-            validation = [Validation.from_dict(item) for item in validation]
-
-        return cls(
-            code=json_response["code"],
-            message=json_response["message"],
-            validation=validation,
-        )
-
-    def to_dict(self) -> "_types.JSONDict":
-        return _dc.asdict(self)
-
 
 # ------------------------ Exceptions for API v3 ------------------------
 
@@ -110,18 +46,20 @@ class BitrixAPIError(_BaseBitrixAPIError):
 
     __slots__ = ()
 
-    @_ft.cached_property
-    def error(self) -> Error:
+    json_response: _error_schemas.ErrorV3Data
+
+    @property
+    def error(self) -> "_error_schemas.ErrorV3":
         """
         Parsed error object returned by the API.
 
         Returns
         -------
-        Error
+        ErrorV3
             Structured representation of the API error parsed from the
             JSON response.
         """
-        return Error.from_dict(self.json_response["error"])
+        return _error_schemas.ErrorV3.from_bitrix(self.json_response)
 
     @property
     def code(self) -> _tp.Text:
@@ -136,7 +74,7 @@ class BitrixAPIError(_BaseBitrixAPIError):
         return self.error.code
 
     @property
-    def validation(self) -> _tp.Optional[_tp.List[Validation]]:
+    def validation(self) -> _tp.Optional[_tp.List["_error_schemas.ValidationItem"]]:
         """
         Validation errors returned by the API.
 

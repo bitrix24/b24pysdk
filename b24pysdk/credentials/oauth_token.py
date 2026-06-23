@@ -3,21 +3,16 @@ from datetime import datetime, timedelta
 from typing import Any, Mapping, Optional, Text
 
 from .._config import Config
-from .._constants import PYTHON_VERSION
 from ..errors import BitrixValidationError
+from ..utils.dataclasses import frozen_dataclass_kwargs
 from ..utils.types import JSONDict
 
 __all__ = [
     "OAuthToken",
 ]
 
-_DATACLASS_KWARGS = {"eq": False, "frozen": True}
 
-if PYTHON_VERSION >= (3, 10):
-    _DATACLASS_KWARGS["slots"] = True
-
-
-@dataclass(**_DATACLASS_KWARGS)
+@dataclass(**frozen_dataclass_kwargs(eq=False))
 class OAuthToken:
     """
     Represents an OAuth token used for authenticating requests to Bitrix24 API.

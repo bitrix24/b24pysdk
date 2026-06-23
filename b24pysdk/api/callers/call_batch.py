@@ -124,7 +124,10 @@ class _BatchCaller(BaseCaller):
     @property
     def _dynamic_params(self) -> JSONDict:
         """Return the payload expected by the classic Bitrix ``batch`` method."""
-        return dict(cmd=self._cmd, halt=self._halt)
+        return {
+            "cmd": self._cmd,
+            "halt": self._halt,
+        }
 
     def _fetch_response(self) -> JSONDict:
         """
@@ -152,7 +155,18 @@ class _BatchCaller(BaseCaller):
 
     def call(self) -> JSONDict:
         """Execute the configured batch request and return the parsed response."""
-        return self._fetch_response()
+
+        self._config.logger.debug(
+            "start call_batch",
+            context={
+                "ignore_size_limit": self._ignore_size_limit,
+            },
+        )
+
+        try:
+            return self._fetch_response()
+        finally:
+            self._config.logger.debug("finish call_batch")
 
 
 @overload

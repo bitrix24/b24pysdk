@@ -1,3 +1,4 @@
+import re
 from typing import IO, Dict, Final, Optional, Text, Tuple
 
 import requests
@@ -21,6 +22,7 @@ class BitrixAPIRequester(BaseRequester):
 
     _ALLOW_REDIRECTS: Final[bool] = False
     _HEADERS: Final[Dict] = {"Content-Type": "application/json"}
+    _REST_WEBHOOK_URL_RE: Final[re.Pattern] = re.compile(r"(?P<prefix>/rest/(?:api/)?)[^/?#]+/[^/?#]+/")
 
     __slots__ = ("_files", "_params", "_url")
 
@@ -66,6 +68,18 @@ class BitrixAPIRequester(BaseRequester):
         """Return default SDK headers extended with JSON content type."""
         return self._get_default_headers() | self._HEADERS
 
+    def _get_url_for_log(self, url: Text) -> Text:
+        """Return Bitrix24 REST URL prepared for logging."""
+
+        if not self._config.secure_log:
+            return url
+
+        return self._REST_WEBHOOK_URL_RE.sub(
+            rf"\g<prefix>{self._MASKED_VALUE}/{self._MASKED_VALUE}/",
+            url,
+            count=1,
+        )
+
     def _request(self) -> requests.Response:
         """
         Execute one raw Bitrix24 REST API POST request.
@@ -78,7 +92,7 @@ class BitrixAPIRequester(BaseRequester):
             "start bitrix_api_request",
             context={
                 "method": "POST",
-                "url": self._url,
+                "URL": self._get_url_for_log(self._url),
                 "timeout": self._timeout,
             },
         )

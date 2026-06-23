@@ -90,7 +90,7 @@ class Delivery(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "entityTypeId": entity_type_id,
             "entityId": entity_id,
         }

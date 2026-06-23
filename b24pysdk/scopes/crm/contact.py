@@ -1,7 +1,8 @@
 from functools import cached_property
 from typing import Iterable, Optional, Text
 
-from ...api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ...schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
 from ._relationships import Company
@@ -41,7 +42,7 @@ class Contact(BaseItem):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[CRMFieldsData, CRMFieldsDict]:
         """Get contact fields.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/contacts/crm-contact-fields.html
@@ -52,7 +53,7 @@ class Contact(BaseItem):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValueRequest
         """
         return self._fields(timeout=timeout)
 
@@ -63,7 +64,7 @@ class Contact(BaseItem):
             *,
             params: Optional[JSONDict] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """Create a new contact.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/contacts/crm-contact-add.html
@@ -96,7 +97,7 @@ class Contact(BaseItem):
         """
         return super()._add(
             fields,
-            extra_params=params,
+            params=params,
             timeout=timeout,
         )
 
@@ -191,7 +192,7 @@ class Contact(BaseItem):
             *,
             params: Optional[JSONDict] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Update contact.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/contacts/crm-contact-update.html
@@ -227,7 +228,7 @@ class Contact(BaseItem):
         return self._update(
             bitrix_id,
             fields,
-            extra_params=params,
+            params=params,
             timeout=timeout,
         )
 
@@ -237,7 +238,7 @@ class Contact(BaseItem):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete contact.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/contacts/crm-contact-delete.html

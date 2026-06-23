@@ -14,6 +14,7 @@ Each client exposes Bitrix API scopes as attributes (e.g. ``crm``, ``user``,
 
 import inspect
 from abc import ABC
+from functools import cached_property
 from typing import TYPE_CHECKING, ClassVar, List, Literal, Mapping, Optional, Sequence, Text, Union, overload
 
 from . import scopes
@@ -44,7 +45,7 @@ class BaseClient(ABC):
 
     Provides common functionality shared by all API client versions:
 
-    - scope initialization
+    - lazy scope access
     - lazy batch request creation
     - API method discovery
     - forwarding request configuration to API request objects
@@ -55,106 +56,10 @@ class BaseClient(ABC):
 
     VERSION: ClassVar[Union[B24APIVersion, B24APIVersionLiteral]] = NotImplemented
 
-    __slots__ = (
-        "_bitrix_token",
-        "_kwargs",
-        "access",
-        "ai",
-        "app",
-        "biconnector",
-        "bizproc",
-        "booking",
-        "calendar",
-        "catalog",
-        "crm",
-        "department",
-        "disk",
-        "documentgenerator",
-        "entity",
-        "event",
-        "events",
-        "feature",
-        "im",
-        "imbot",
-        "imconnector",
-        "imopenlines",
-        "landing",
-        "lists",
-        "mailservice",
-        "messageservice",
-        "method",
-        "placement",
-        "profile",
-        "pull",
-        "rpa",
-        "sale",
-        "salescenter",
-        "scope",
-        "server",
-        "sign",
-        "socialnetwork",
-        "sonet_group",
-        "task",
-        "telephony",
-        "timeman",
-        "user",
-        "userconsent",
-        "userfieldconfig",
-        "userfieldtype",
-        "vote",
-        "voximplant",
-    )
-
     _bitrix_token: BitrixTokenFullProtocol
     _kwargs: JSONDict
 
-    access: scopes.Access
-    ai: scopes.Ai
-    app: scopes.App
-    booking: scopes.Booking
-    biconnector: scopes.Biconnector
-    bizproc: scopes.Bizproc
-    calendar: scopes.Calendar
-    catalog: scopes.Catalog
-    crm: scopes.CRM
-    department: scopes.Department
-    disk: scopes.Disk
-    documentgenerator: scopes.Documentgenerator
-    entity: scopes.Entity
-    event: scopes.Event
-    events: scopes.Events
-    feature: scopes.Feature
-    im: scopes.Im
-    imbot: scopes.Imbot
-    imconnector: scopes.Imconnector
-    imopenlines: scopes.Imopenlines
-    landing: scopes.Landing
-    lists: scopes.Lists
-    mailservice: scopes.Mailservice
-    messageservice: scopes.Messageservice
-    method: scopes.Method
-    placement: scopes.Placement
-    profile: scopes.Profile
-    pull: scopes.Pull
-    rpa: scopes.Rpa
-    salescenter: scopes.Salescenter
-    sale: scopes.Sale
-    scope: scopes.Scope
-    server: scopes.Server
-    sign: scopes.Sign
-    socialnetwork: scopes.Socialnetwork
-    sonet_group: scopes.SonetGroup
-    task: scopes.Task
-    telephony: scopes.Telephony
-    timeman: scopes.Timeman
-    user: scopes.User
-    userfieldconfig: scopes.Userfieldconfig
-    userfieldtype: scopes.Userfieldtype
-    userconsent: scopes.Userconsent
-    vote: scopes.Vote
-    voximplant: scopes.Voximplant
-
-    def __init__(  # noqa: PLR0915
+    def __init__(
             self,
             bitrix_token: BitrixTokenFullProtocol,
             *,
@@ -178,52 +83,6 @@ class BaseClient(ABC):
 
         self._bitrix_token = bitrix_token
 
-        self.access = scopes.Access(self)
-        self.ai = scopes.Ai(self)
-        self.app = scopes.App(self)
-        self.booking = scopes.Booking(self)
-        self.biconnector = scopes.Biconnector(self)
-        self.bizproc = scopes.Bizproc(self)
-        self.calendar = scopes.Calendar(self)
-        self.catalog = scopes.Catalog(self)
-        self.crm = scopes.CRM(self)
-        self.department = scopes.Department(self)
-        self.disk = scopes.Disk(self)
-        self.documentgenerator = scopes.Documentgenerator(self)
-        self.entity = scopes.Entity(self)
-        self.event = scopes.Event(self)
-        self.events = scopes.Events(self)
-        self.feature = scopes.Feature(self)
-        self.im = scopes.Im(self)
-        self.imbot = scopes.Imbot(self)
-        self.imconnector = scopes.Imconnector(self)
-        self.imopenlines = scopes.Imopenlines(self)
-        self.landing = scopes.Landing(self)
-        self.lists = scopes.Lists(self)
-        self.mailservice = scopes.Mailservice(self)
-        self.messageservice = scopes.Messageservice(self)
-        self.method = scopes.Method(self)
-        self.placement = scopes.Placement(self)
-        self.profile = scopes.Profile(self)
-        self.pull = scopes.Pull(self)
-        self.rpa = scopes.Rpa(self)
-        self.salescenter = scopes.Salescenter(self)
-        self.sale = scopes.Sale(self)
-        self.scope = scopes.Scope(self)
-        self.server = scopes.Server(self)
-        self.sign = scopes.Sign(self)
-        self.socialnetwork = scopes.Socialnetwork(self)
-        self.sonet_group = scopes.SonetGroup(self)
-        self.task = scopes.Task(self)
-        self.telephony = scopes.Telephony(self)
-        self.timeman = scopes.Timeman(self)
-        self.user = scopes.User(self)
-        self.userfieldconfig = scopes.Userfieldconfig(self)
-        self.userfieldtype = scopes.Userfieldtype(self)
-        self.userconsent = scopes.Userconsent(self)
-        self.vote = scopes.Vote(self)
-        self.voximplant = scopes.Voximplant(self)
-
         self._kwargs = kwargs | {"prefer_version": self.VERSION}
 
         if timeout is not None:
@@ -237,6 +96,186 @@ class BaseClient(ABC):
 
         if retry_delay_increment is not None:
             self._kwargs["retry_delay_increment"] = retry_delay_increment
+
+    @cached_property
+    def access(self) -> scopes.Access:
+        return scopes.Access(self)
+
+    @cached_property
+    def ai(self) -> scopes.Ai:
+        return scopes.Ai(self)
+
+    @cached_property
+    def app(self) -> scopes.App:
+        return scopes.App(self)
+
+    @cached_property
+    def booking(self) -> scopes.Booking:
+        return scopes.Booking(self)
+
+    @cached_property
+    def biconnector(self) -> scopes.Biconnector:
+        return scopes.Biconnector(self)
+
+    @cached_property
+    def bizproc(self) -> scopes.Bizproc:
+        return scopes.Bizproc(self)
+
+    @cached_property
+    def calendar(self) -> scopes.Calendar:
+        return scopes.Calendar(self)
+
+    @cached_property
+    def catalog(self) -> scopes.Catalog:
+        return scopes.Catalog(self)
+
+    @cached_property
+    def crm(self) -> scopes.CRM:
+        return scopes.CRM(self)
+
+    @cached_property
+    def department(self) -> scopes.Department:
+        return scopes.Department(self)
+
+    @cached_property
+    def disk(self) -> scopes.Disk:
+        return scopes.Disk(self)
+
+    @cached_property
+    def documentgenerator(self) -> scopes.Documentgenerator:
+        return scopes.Documentgenerator(self)
+
+    @cached_property
+    def entity(self) -> scopes.Entity:
+        return scopes.Entity(self)
+
+    @cached_property
+    def event(self) -> scopes.Event:
+        return scopes.Event(self)
+
+    @cached_property
+    def events(self) -> scopes.Events:
+        return scopes.Events(self)
+
+    @cached_property
+    def feature(self) -> scopes.Feature:
+        return scopes.Feature(self)
+
+    @cached_property
+    def im(self) -> scopes.Im:
+        return scopes.Im(self)
+
+    @cached_property
+    def imbot(self) -> scopes.Imbot:
+        return scopes.Imbot(self)
+
+    @cached_property
+    def imconnector(self) -> scopes.Imconnector:
+        return scopes.Imconnector(self)
+
+    @cached_property
+    def imopenlines(self) -> scopes.Imopenlines:
+        return scopes.Imopenlines(self)
+
+    @cached_property
+    def landing(self) -> scopes.Landing:
+        return scopes.Landing(self)
+
+    @cached_property
+    def lists(self) -> scopes.Lists:
+        return scopes.Lists(self)
+
+    @cached_property
+    def mailservice(self) -> scopes.Mailservice:
+        return scopes.Mailservice(self)
+
+    @cached_property
+    def messageservice(self) -> scopes.Messageservice:
+        return scopes.Messageservice(self)
+
+    @cached_property
+    def method(self) -> scopes.Method:
+        return scopes.Method(self)
+
+    @cached_property
+    def placement(self) -> scopes.Placement:
+        return scopes.Placement(self)
+
+    @cached_property
+    def profile(self) -> scopes.Profile:
+        return scopes.Profile(self)
+
+    @cached_property
+    def pull(self) -> scopes.Pull:
+        return scopes.Pull(self)
+
+    @cached_property
+    def rpa(self) -> scopes.Rpa:
+        return scopes.Rpa(self)
+
+    @cached_property
+    def salescenter(self) -> scopes.Salescenter:
+        return scopes.Salescenter(self)
+
+    @cached_property
+    def sale(self) -> scopes.Sale:
+        return scopes.Sale(self)
+
+    @cached_property
+    def scope(self) -> scopes.Scope:
+        return scopes.Scope(self)
+
+    @cached_property
+    def server(self) -> scopes.Server:
+        return scopes.Server(self)
+
+    @cached_property
+    def sign(self) -> scopes.Sign:
+        return scopes.Sign(self)
+
+    @cached_property
+    def socialnetwork(self) -> scopes.Socialnetwork:
+        return scopes.Socialnetwork(self)
+
+    @cached_property
+    def sonet_group(self) -> scopes.SonetGroup:
+        return scopes.SonetGroup(self)
+
+    @cached_property
+    def task(self) -> scopes.Task:
+        return scopes.Task(self)
+
+    @cached_property
+    def telephony(self) -> scopes.Telephony:
+        return scopes.Telephony(self)
+
+    @cached_property
+    def timeman(self) -> scopes.Timeman:
+        return scopes.Timeman(self)
+
+    @cached_property
+    def user(self) -> scopes.User:
+        return scopes.User(self)
+
+    @cached_property
+    def userfieldconfig(self) -> scopes.Userfieldconfig:
+        return scopes.Userfieldconfig(self)
+
+    @cached_property
+    def userfieldtype(self) -> scopes.Userfieldtype:
+        return scopes.Userfieldtype(self)
+
+    @cached_property
+    def userconsent(self) -> scopes.Userconsent:
+        return scopes.Userconsent(self)
+
+    @cached_property
+    def vote(self) -> scopes.Vote:
+        return scopes.Vote(self)
+
+    @cached_property
+    def voximplant(self) -> scopes.Voximplant:
+        return scopes.Voximplant(self)
 
     def __str__(self):
         if hasattr(self._bitrix_token, "domain"):
@@ -494,42 +533,9 @@ class ClientV1(BaseClient):
 
     VERSION = B24APIVersion.V1
 
-    __slots__ = (
-        "tasks",
-    )
-
-    tasks: scopes.Tasks
-
-    def __init__(
-            self,
-            bitrix_token: BitrixTokenFullProtocol,
-            *,
-            timeout: Timeout = None,
-            max_retries: Optional[int] = None,
-            initial_retry_delay: Optional[Number] = None,
-            retry_delay_increment: Optional[Number] = None,
-            **kwargs,
-    ):
-        """
-        Initialize Bitrix REST API v1 client.
-
-        Args:
-            bitrix_token: Authentication token used for API access.
-            timeout: Default request timeout.
-            max_retries: Maximum number of request attempts.
-            initial_retry_delay: Delay before the first retry attempt.
-            retry_delay_increment: Increment added to retry delay after each attempt.
-            **kwargs: Additional options passed to API request objects.
-        """
-        super().__init__(
-            bitrix_token,
-            timeout=timeout,
-            max_retries=max_retries,
-            initial_retry_delay=initial_retry_delay,
-            retry_delay_increment=retry_delay_increment,
-            **kwargs,
-        )
-        self.tasks = scopes.Tasks(self)
+    @cached_property
+    def tasks(self) -> scopes.Tasks:
+        return scopes.Tasks(self)
 
 
 class ClientV2(ClientV1):
@@ -542,8 +548,6 @@ class ClientV2(ClientV1):
 
     VERSION = B24APIVersion.V2
 
-    __slots__ = ()
-
 
 class ClientV3(BaseClient):
     """
@@ -554,51 +558,29 @@ class ClientV3(BaseClient):
 
     VERSION = B24APIVersion.V3
 
-    __slots__ = (
-        "documentation",
-        "main",
-        "rest",
-        "tasks",
-    )
+    @cached_property
+    def documentation(self) -> scopes_v3.Documentation:
+        return scopes_v3.Documentation(self)
 
-    documentation: scopes_v3.Documentation
-    main: scopes_v3.Main
-    rest: scopes_v3.Rest
-    tasks: scopes_v3.Tasks
+    @cached_property
+    def humanresources(self) -> scopes_v3.Humanresources:
+        return scopes_v3.Humanresources(self)
 
-    def __init__(
-            self,
-            bitrix_token: BitrixTokenFullProtocol,
-            *,
-            timeout: Timeout = None,
-            max_retries: Optional[int] = None,
-            initial_retry_delay: Optional[Number] = None,
-            retry_delay_increment: Optional[Number] = None,
-            **kwargs,
-    ):
-        """
-        Initialize Bitrix REST API v3 client.
+    @cached_property
+    def mail(self) -> scopes_v3.Mail:
+        return scopes_v3.Mail(self)
 
-        Args:
-            bitrix_token: Authentication token used for API access.
-            timeout: Default request timeout.
-            max_retries: Maximum number of request attempts.
-            initial_retry_delay: Delay before the first retry attempt.
-            retry_delay_increment: Increment added to retry delay after each attempt.
-            **kwargs: Additional options passed to API request objects.
-        """
-        super().__init__(
-            bitrix_token,
-            timeout=timeout,
-            max_retries=max_retries,
-            initial_retry_delay=initial_retry_delay,
-            retry_delay_increment=retry_delay_increment,
-            **kwargs,
-        )
-        self.documentation = scopes_v3.Documentation(self)
-        self.main = scopes_v3.Main(self)
-        self.rest = scopes_v3.Rest(self)
-        self.tasks = scopes_v3.Tasks(self)
+    @cached_property
+    def main(self) -> scopes_v3.Main:
+        return scopes_v3.Main(self)
+
+    @cached_property
+    def rest(self) -> scopes_v3.Rest:
+        return scopes_v3.Rest(self)
+
+    @cached_property
+    def tasks(self) -> scopes_v3.Tasks:
+        return scopes_v3.Tasks(self)
 
 
 # noinspection PyPep8Naming

@@ -12,6 +12,7 @@ from ....constants import SDK_NAME, SORT
 
 pytestmark = [
     pytest.mark.integration,
+    pytest.mark.scopes,
     pytest.mark.crm,
     pytest.mark.crm_category,
 ]

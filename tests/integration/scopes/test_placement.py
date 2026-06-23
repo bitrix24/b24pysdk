@@ -2,11 +2,12 @@ from typing import Text
 
 import pytest
 
-from b24pysdk.api.responses import BitrixAPIListResponse, BitrixAPIResponse
+from b24pysdk.api.responses import BitrixAPIListResponse, BitrixAPIResponse, BitrixAPIValueResponse
 from b24pysdk.client import BaseClient
+from b24pysdk.schemas.placement import PlacementUnbind
 from b24pysdk.utils.types import JSONDict
 
-from ...constants import SDK_NAME
+from ...constants import BITRIX_PORTAL_OWNER_ID, SDK_NAME
 
 pytestmark = [
     pytest.mark.integration,
@@ -14,7 +15,7 @@ pytestmark = [
     pytest.mark.placement,
 ]
 
-_PLACEMENT: Text = "TASK_VIEW_TAB"
+_PLACEMENT: Text = "PAGE_BACKGROUND_WORKER"
 _HANDLER: Text = "https://example.com/handler/"
 _LANG_ALL: JSONDict = {
     "en": {
@@ -23,7 +24,10 @@ _LANG_ALL: JSONDict = {
         "GROUP_NAME": "",
     },
 }
-_UNBIND_RESULT_FIELD: Text = "count"
+_OPTIONS: JSONDict = {
+    "errorHandlerUrl": _HANDLER,
+}
+_USER_ID: int = BITRIX_PORTAL_OWNER_ID
 _SCOPE: Text = "task"
 
 
@@ -36,6 +40,8 @@ def test_placement_bind(bitrix_client: BaseClient):
         placement=_PLACEMENT,
         handler=_HANDLER,
         lang_all=_LANG_ALL,
+        options=_OPTIONS,
+        user_id=_USER_ID,
     ).response
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
@@ -66,6 +72,8 @@ def test_placement_get(bitrix_client: BaseClient):
             bound_placement.get("placement") == _PLACEMENT,
             bound_placement.get("handler") == _HANDLER,
             bound_placement.get("langAll") == _LANG_ALL,
+            bound_placement.get("options") == _OPTIONS,
+            bound_placement.get("userId") == _USER_ID,
         )):
             break
     else:
@@ -135,16 +143,12 @@ def test_placement_unbind(bitrix_client: BaseClient):
     bitrix_response = bitrix_client.placement.unbind(
         placement=_PLACEMENT,
         handler=_HANDLER,
+        user_id=_USER_ID,
     ).response
 
-    assert isinstance(bitrix_response, BitrixAPIResponse)
-    assert isinstance(bitrix_response.result, dict)
+    assert isinstance(bitrix_response, BitrixAPIValueResponse)
 
-    unbind_result = bitrix_response.result
+    unbind_result = bitrix_response.value
 
-    assert _UNBIND_RESULT_FIELD in unbind_result, f"Field {_UNBIND_RESULT_FIELD!r} should be present"
-
-    unbind_count = unbind_result[_UNBIND_RESULT_FIELD]
-
-    assert isinstance(unbind_count, int), f"Field '{_UNBIND_RESULT_FIELD}' should be an integer"
-    assert unbind_count > 0, "Unbind count should be positive"
+    assert isinstance(unbind_result, PlacementUnbind), "Placement unbind result should be PlacementUnbind"
+    assert unbind_result.count > 0, "Placement unbind count should be positive"
