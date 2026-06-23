@@ -28,4 +28,4 @@ def test_server_time(bitrix_client: BaseClient):
     server_time = bitrix_response.value
 
     assert isinstance(server_time, datetime), "Server time result should be a datetime object"
-    assert start_dt <= server_time <= end_dt, "Server time result should be between start and end"
+    assert start_dt.replace(microsecond=0) <= server_time <= end_dt.replace(microsecond=0), "Server time result should be between start and end"
