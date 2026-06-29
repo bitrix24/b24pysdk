@@ -38,7 +38,7 @@ class BaseDetail(BaseCRM):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """Create a new entity.
 
         This method creates a new requisites template or bank details.
@@ -135,7 +135,7 @@ class BaseDetail(BaseCRM):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Update entity.
 
         This method updates the requisite template or bank details.
@@ -162,7 +162,7 @@ class BaseDetail(BaseCRM):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete entity.
 
         This method deletes requisite template or bank entity.

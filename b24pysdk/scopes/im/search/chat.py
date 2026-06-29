@@ -2,7 +2,7 @@ from typing import Optional, Text
 
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import Timeout
+from ....utils.types import JSONList, Timeout
 from ..._base_entity import BaseEntity
 
 __all__ = [
@@ -21,7 +21,7 @@ class Chat(BaseEntity):
             offset: Optional[int] = None,
             limit: Optional[int] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONList]:
         """"""
 
         params = dict(

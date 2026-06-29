@@ -26,7 +26,7 @@ class Message(BaseEntity):
             keyboard: Optional[Union[JSONDict, Text]] = None,
             menu: Optional[Union[JSONDict, Text]] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """"""
 
         params = dict(
@@ -69,7 +69,7 @@ class Message(BaseEntity):
             *,
             command_params: Optional[Text] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = dict(
@@ -93,7 +93,7 @@ class Message(BaseEntity):
             message_id: Union[int, Text],
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = dict(
@@ -113,7 +113,7 @@ class Message(BaseEntity):
             *,
             action: Optional[Text] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = dict(
@@ -137,7 +137,7 @@ class Message(BaseEntity):
             type: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = dict(
@@ -163,7 +163,7 @@ class Message(BaseEntity):
             keyboard: Optional[JSONDict] = None,
             menu: Optional[JSONDict] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = dict(

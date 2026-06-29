@@ -72,7 +72,6 @@ class Item(BaseItem):
             entity_type_id=entity_type_id,
             use_original_uf_names=use_original_uf_names,
             timeout=timeout,
-            result_adapter=CRMFieldsDict.from_bitrix,
         )
 
     @type_checker

@@ -1,7 +1,8 @@
 from functools import cached_property
 from typing import Annotated, Iterable, Literal, Optional, Text
 
-from ....api.requests import BitrixAPIRequest
+from ....api.requests import BitrixAPIRequest, BitrixAPIValuesRequest
+from ....schemas.crm.calllist import CalllistStatus, CalllistStatusesData
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
 from .._base_crm import BaseCRM
@@ -31,7 +32,7 @@ class Calllist(BaseCRM):
             entities: Iterable[int],
             webform_id: Optional[int] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """Create a new call list.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/call-list/crm-calllist-add.html
@@ -153,7 +154,7 @@ class Calllist(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        params = dict()
+        params = {}
 
         if select is not None:
             if select.__class__ is not list:
@@ -178,7 +179,7 @@ class Calllist(BaseCRM):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValuesRequest[CalllistStatusesData, CalllistStatus]:
         """Get the list of call statuses.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/call-list/crm-calllist-statuslist.html
@@ -194,6 +195,8 @@ class Calllist(BaseCRM):
         return self._make_bitrix_api_request(
             api_wrapper=self.statuslist,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValuesRequest,
+            result_adapter=CalllistStatus.from_bitrix_result,
         )
 
     @type_checker
@@ -205,7 +208,7 @@ class Calllist(BaseCRM):
             entities: Iterable[int],
             webform_id: Optional[int] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Update call list composition.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/call-list/crm-calllist-update.html

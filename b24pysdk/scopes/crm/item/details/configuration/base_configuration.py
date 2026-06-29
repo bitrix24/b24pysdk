@@ -49,7 +49,7 @@ class BaseConfiguration(BaseCRM, ABC):
             Instance of BitrixAPIRequest
         """
 
-        params = dict()
+        params = {}
 
         if entity_type_id is not None:
             params["entityTypeId"] = entity_type_id
@@ -78,7 +78,7 @@ class BaseConfiguration(BaseCRM, ABC):
             scope: Optional[str] = None,
             extras: Optional[JSONDict] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Set parameters for CRM item detail card configuration.
 
         The method sets the settings for the detail card of a specific CRM object.
@@ -135,7 +135,7 @@ class BaseConfiguration(BaseCRM, ABC):
             scope: Optional[str] = None,
             extras: Optional[JSONDict] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Reset item card parameters.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/item-details-configuration/crm-item-details-configuration-reset.html
@@ -162,7 +162,7 @@ class BaseConfiguration(BaseCRM, ABC):
             Instance of BitrixAPIRequest
         """
 
-        params = dict()
+        params = {}
 
         if entity_type_id is not None:
             params["entityTypeId"] = entity_type_id
@@ -188,7 +188,7 @@ class BaseConfiguration(BaseCRM, ABC):
             entity_type_id: Optional[int] = None,
             extras: Optional[JSONDict] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Set common detail for all users.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/item-details-configuration/crm-item-details-configuration-forceCommonScopeForAll.html
@@ -206,7 +206,7 @@ class BaseConfiguration(BaseCRM, ABC):
             Instance of BitrixAPIRequest
         """
 
-        params = dict()
+        params = {}
 
         if entity_type_id is not None:
             params["entityTypeId"] = entity_type_id

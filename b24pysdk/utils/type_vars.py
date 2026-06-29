@@ -3,15 +3,13 @@ import typing
 if typing.TYPE_CHECKING:
     from ..api import requests as _requests
     from ..api import responses as _responses
-
-    # noinspection PyProtectedMember
     from ..schemas._base_listable_schema import BaseListableSchema
-
-    # noinspection PyProtectedMember
     from ..schemas._base_schema import BaseSchema
+    from ..schemas._base_schema_dict import BaseSchemaDict
     from . import types as _types
 
 __all__ = [
+    "BSDT",
     "BSLT",
     "BST",
     "BABatchRequestsT",
@@ -33,37 +31,40 @@ BABatchRequestsT = typing.TypeVar(
         typing.Sequence["_requests.BitrixAPIRequest"],
     ],
 )
-"""Bitrix API batch requests collection type."""
+"""Type variable for a Bitrix API batch request collection."""
 
 BAListResponseT = typing.TypeVar("BAListResponseT", bound="_responses.AbstractBitrixAPIListResponse")
-"""Bitrix API list response type."""
+"""Type variable for SDK responses that load list-like API results."""
 
 BAListResultT = typing.TypeVar("BAListResultT", bound=typing.Iterable["_types.JSONDict"])
-"""Bitrix API list result type, represented as an iterable of JSON objects."""
+"""Type variable for raw list results represented as iterable JSON objects."""
 
 BARequestT = typing.TypeVar("BARequestT", bound="_requests.AbstractBitrixAPIRequest")
-"""Bitrix API request type."""
+"""Type variable for SDK request wrapper classes."""
 
 BAResponseT = typing.TypeVar("BAResponseT", bound="_responses.AbstractBitrixResponse")
-"""Bitrix API response type."""
+"""Type variable for SDK response wrapper classes."""
 
 BAResultT = typing.TypeVar("BAResultT")
-"""Bitrix API raw result type."""
+"""Type variable for an unadapted ``result`` payload returned by Bitrix24."""
 
 BAValueResponseT = typing.TypeVar("BAValueResponseT", bound="_responses.AbstractBitrixAPIValueResponse")
-"""Bitrix API value response type."""
+"""Type variable for SDK responses that expose an adapted ``value`` or ``values`` property."""
 
 BAValueT = typing.TypeVar("BAValueT")
-"""Bitrix API adapted value type."""
+"""Type variable for a value produced by a result adapter."""
 
 BSDataT = typing.TypeVar("BSDataT")
-"""Bitrix schema data type."""
+"""Type variable for raw data used to build SDK schema objects."""
 
-BSLT = typing.TypeVar("BSLT", bound="BaseListableSchema")
-"""Bitrix listable schema type."""
+BSDT = typing.TypeVar("BSDT", bound="BaseSchemaDict")
+"""Type variable for dictionary-like SDK schema classes."""
 
 BST = typing.TypeVar("BST", bound="BaseSchema")
-"""Bitrix schema type."""
+"""Type variable for SDK schema classes."""
+
+BSLT = typing.TypeVar("BSLT", bound="BaseListableSchema")
+"""Type variable for SDK schema classes that can be used in list results."""
 
 ResponseT = typing.TypeVar("ResponseT")
-"""Generic response type used by abstract request classes."""
+"""Type variable that preserves concrete return types across generic helper methods."""

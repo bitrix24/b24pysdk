@@ -2,7 +2,7 @@ from typing import Optional, Text, Union
 
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import B24BoolStrict, Timeout
+from ....utils.types import B24BoolStrict, JSONDict, Timeout
 from ..._base_entity import BaseEntity
 
 __all__ = [
@@ -23,7 +23,7 @@ class File(BaseEntity):
             message: Optional[Text] = None,
             silent_mode: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """"""
 
         params = dict(
@@ -51,7 +51,7 @@ class File(BaseEntity):
             disk_id: Union[int, Text],
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = dict(
@@ -71,7 +71,7 @@ class File(BaseEntity):
             disk_id: Union[int, Text],
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """"""
 
         params = dict(

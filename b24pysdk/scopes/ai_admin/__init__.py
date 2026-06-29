@@ -5,11 +5,11 @@ from .engine import Engine
 from .prompt import Prompt
 
 __all__ = [
-    "Ai",
+    "AI",
 ]
 
 
-class Ai(BaseScope):
+class AI(BaseScope):
     """"""
 
     @cached_property

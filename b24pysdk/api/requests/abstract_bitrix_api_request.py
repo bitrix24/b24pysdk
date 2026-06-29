@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Generic, Optional, Text
+from typing import Any, Generic, Optional, Text
 
 from ...protocols import BitrixTokenFullProtocol
 from ...utils.type_vars import ResponseT
@@ -96,7 +96,7 @@ class AbstractBitrixAPIRequest(ABC, Generic[ResponseT]):
             return self._get_and_set_response()
         return self._response
 
-    def _call(self) -> JSONDict:
+    def _call(self) -> Any:
         """
         Execute the raw Bitrix24 API call.
 
@@ -110,7 +110,7 @@ class AbstractBitrixAPIRequest(ABC, Generic[ResponseT]):
         )
 
     @abstractmethod
-    def _convert_response(self, json_response: JSONDict) -> ResponseT:
+    def _convert_response(self, json_response: Any) -> ResponseT:
         """
         Convert raw JSON response into a typed response object.
 

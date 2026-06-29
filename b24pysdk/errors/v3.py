@@ -1,5 +1,6 @@
 import typing as _tp
 
+from .._constants import MISSING
 from ..schemas import error as _error_schemas
 from . import BitrixBaseAPIBadRequest as _BitrixBaseAPIBadRequest
 from . import BitrixBaseAPIError as _BaseBitrixAPIError
@@ -42,7 +43,7 @@ class BitrixAPIError(_BaseBitrixAPIError):
     The parsed error object is available via the `error` property.
     """
 
-    CODE: _tp.ClassVar[_tp.Text] = NotImplemented
+    CODE: _tp.ClassVar[_tp.Text] = MISSING
 
     __slots__ = ()
 

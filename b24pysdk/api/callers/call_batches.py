@@ -1,14 +1,24 @@
-from typing import Dict, Final, List, Mapping, Optional, Sequence, Text, Tuple, Union, overload
+from typing import Dict, Final, List, Literal, Mapping, Optional, Sequence, Text, Tuple, Union, overload
 
 from ..._constants import MAX_BATCH_SIZE
 from ...constants.version import B24APIVersion
 from ...protocols import BitrixTokenProtocol
-from ...utils.types import B24APIVersionLiteral, B24Requests, B24RequestTuple, JSONDict, JSONList, Key, Timeout
+from ...schemas.api import BatchResponseData, BatchResultData, TimeResponseData
+from ...utils.type_vars import BAResultT
+from ...utils.types import B24APIVersionLiteral, B24Requests, B24RequestTuple, Key, Timeout
 from ._base_caller import BaseCaller
 from .call_batch import call_batch
 
 __all__ = [
     "call_batches",
+]
+
+_BatchResultFieldLiteral = Literal[
+    "result",
+    "result_error",
+    "result_total",
+    "result_next",
+    "result_time",
 ]
 
 
@@ -23,7 +33,7 @@ class _BatchesCaller(BaseCaller):
     """
 
     _API_METHOD: Final[Text] = "batch"
-    _BATCH_RESULT_FIELDS: Final[Tuple] = ("result", "result_error", "result_total", "result_next", "result_time")
+    _BATCH_RESULT_FIELDS: Final[Tuple[_BatchResultFieldLiteral, ...]] = ("result", "result_error", "result_total", "result_next", "result_time")
     _MAX_BATCH_SIZE: Final[int] = MAX_BATCH_SIZE
 
     __slots__ = ("_halt", "_methods")
@@ -71,7 +81,7 @@ class _BatchesCaller(BaseCaller):
         self._methods = methods
         self._halt = halt
 
-    def _fetch_batch_response(self, methods: B24Requests) -> JSONDict:
+    def _fetch_batch_response(self, methods: B24Requests) -> BatchResponseData:
         """Execute one classic batch chunk using the current auth context."""
         return call_batch(
             domain=self._domain,
@@ -96,7 +106,7 @@ class _BatchesCaller(BaseCaller):
             return list(enumerate(self._methods))
 
     @staticmethod
-    def _force_dict(collection: Union[Dict, List]) -> JSONDict:
+    def _force_dict(collection: Union[Dict[Text, BAResultT], List[BAResultT]]) -> Dict[Text, BAResultT]:
         """
         Normalize a batch result section to a dictionary.
 
@@ -108,9 +118,12 @@ class _BatchesCaller(BaseCaller):
         if isinstance(collection, dict):
             return collection
         else:
-            return {str(index): element for index, element in enumerate(collection)}
+            return {
+                str(index): element
+                for index, element in enumerate(collection)
+            }
 
-    def _combine_responses(self, responses: JSONList) -> JSONDict:
+    def _combine_responses(self, responses: List[BatchResponseData]) -> BatchResponseData:
         """
         Merge several classic batch responses into a single batch-like response.
 
@@ -121,7 +134,7 @@ class _BatchesCaller(BaseCaller):
 
         first_response, last_response = responses[0], responses[-1]
 
-        combined_response: JSONDict = {
+        combined_response: BatchResponseData = {
             "result": {
                 "result": {},
                 "result_error": {},
@@ -139,8 +152,8 @@ class _BatchesCaller(BaseCaller):
             },
         }
 
-        combined_result: JSONDict = combined_response["result"]
-        combined_time: JSONDict = combined_response["time"]
+        combined_result: BatchResultData = combined_response["result"]
+        combined_time: TimeResponseData = combined_response["time"]
 
         operating_reset_at = last_response["time"].get("operating_reset_at")
 
@@ -152,7 +165,7 @@ class _BatchesCaller(BaseCaller):
             time = response["time"]
 
             for key in self._BATCH_RESULT_FIELDS:
-                value = result.get(key)
+                value = result[key]
 
                 if value:
                     combined_result[key].update(self._force_dict(value))
@@ -167,7 +180,8 @@ class _BatchesCaller(BaseCaller):
 
         return combined_response
 
-    def call(self) -> JSONDict:
+
+    def call(self) -> BatchResponseData:
         """
         Execute all configured methods, splitting them into batch-size chunks.
 
@@ -186,7 +200,7 @@ class _BatchesCaller(BaseCaller):
 
             flat_methods: List[Tuple[Key, B24RequestTuple]] = self._get_flat_methods()
 
-            batch_responses: JSONList = []
+            batch_responses: List[BatchResponseData] = []
 
             for index in range(0, total_methods, self._MAX_BATCH_SIZE):
                 methods_chunk = dict(flat_methods[index:index + self._MAX_BATCH_SIZE])
@@ -213,7 +227,7 @@ def call_batches(
         timeout: Timeout = None,
         bitrix_token: Optional[BitrixTokenProtocol] = None,
         **kwargs,
-) -> JSONDict: ...
+) -> BatchResponseData: ...
 
 
 @overload
@@ -228,7 +242,7 @@ def call_batches(
         timeout: Timeout = None,
         bitrix_token: Optional[BitrixTokenProtocol] = None,
         **kwargs,
-) -> JSONDict: ...
+) -> BatchResponseData: ...
 
 
 def call_batches(
@@ -242,7 +256,7 @@ def call_batches(
         prefer_version: Union[B24APIVersion, B24APIVersionLiteral] = B24APIVersion.V2,
         bitrix_token: Optional[BitrixTokenProtocol] = None,
         **kwargs,
-) -> JSONDict:
+) -> BatchResponseData:
     """
     Execute any number of Bitrix REST methods through classic batch requests.
 

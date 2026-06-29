@@ -1,7 +1,7 @@
 from typing import Generic, Optional
 
+from ...schemas.api import ResponseData
 from ...utils.type_vars import BAResultT
-from ...utils.types import JSONDict
 from ..responses import BitrixAPIResponse
 from .bitrix_api_base_request import BitrixAPIBaseRequest
 from .bitrix_api_list_request import BitrixAPIListFastRequest, BitrixAPIListRequest
@@ -21,7 +21,7 @@ class BitrixAPIRequest(BitrixAPIBaseRequest[BitrixAPIResponse[BAResultT], BAResu
 
     __slots__ = ()
 
-    def _convert_response(self, json_response: JSONDict) -> BitrixAPIResponse[BAResultT]:
+    def _convert_response(self, json_response: ResponseData) -> BitrixAPIResponse[BAResultT]:
         """
         Convert raw JSON response into ``BitrixAPIResponse``.
 

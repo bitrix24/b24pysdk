@@ -37,7 +37,7 @@ class Orderentity(BaseCRM):
         """
         return self._fields(
             timeout=timeout,
-            result_adapter=OrderentityFieldsDict.from_bitrix,
+            value_type=OrderentityFieldsDict,
         )
 
     @type_checker

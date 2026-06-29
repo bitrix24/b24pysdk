@@ -56,7 +56,7 @@ class Currency(BaseCRM):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[Text]:
         """Add currency
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/currency/crm-currency-add.html
@@ -161,7 +161,7 @@ class Currency(BaseCRM):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Update currency.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/currency/crm-currency-update.html
@@ -210,7 +210,7 @@ class Currency(BaseCRM):
             bitrix_id: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete currency.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/currency/crm-currency-delete.html

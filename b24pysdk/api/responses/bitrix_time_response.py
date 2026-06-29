@@ -1,11 +1,11 @@
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
 from ..._config import Config
-from ...schemas.time import TimeData
+from ...schemas.api import TimeResponseData
+from ...utils.converters import datetime_from_bitrix, datetime_to_bitrix
 from ...utils.dataclasses import frozen_dataclass_kwargs
-from ...utils.types import JSONDict
 
 __all__ = [
     "BitrixTimeResponse",
@@ -31,7 +31,7 @@ class BitrixTimeResponse:
     operating: Optional[float] = None
 
     @classmethod
-    def from_dict(cls, json_response: TimeData, /) -> "BitrixTimeResponse":
+    def from_dict(cls, json_response: TimeResponseData, /) -> "BitrixTimeResponse":
         """
         Create a BitrixTimeResponse instance from raw timing data.
 
@@ -46,17 +46,33 @@ class BitrixTimeResponse:
             finish=json_response["finish"],
             duration=json_response["duration"],
             processing=json_response["processing"],
-            date_start=datetime.fromisoformat(json_response["date_start"]),
-            date_finish=datetime.fromisoformat(json_response["date_finish"]),
+            date_start=datetime_from_bitrix(json_response["date_start"], is_required=True),
+            date_finish=datetime_from_bitrix(json_response["date_finish"], is_required=True),
             operating_reset_at=json_response.get("operating_reset_at") and datetime.fromtimestamp(json_response["operating_reset_at"], tz=Config().tz),
             operating=json_response.get("operating"),
         )
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self) -> TimeResponseData:
         """
-        Convert timing metadata to dictionary.
+        Convert timing metadata to raw Bitrix24 time payload shape.
 
         Returns:
             Dictionary representation of the timing metadata.
         """
-        return asdict(self)
+
+        time_response_data: TimeResponseData = {
+            "start": self.start,
+            "finish": self.finish,
+            "duration": self.duration,
+            "processing": self.processing,
+            "date_start": datetime_to_bitrix(self.date_start, is_required=True),
+            "date_finish": datetime_to_bitrix(self.date_finish, is_required=True),
+        }
+
+        if self.operating_reset_at is not None:
+            time_response_data["operating_reset_at"] = self.operating_reset_at.timestamp()
+
+        if self.operating is not None:
+            time_response_data["operating"] = self.operating
+
+        return time_response_data

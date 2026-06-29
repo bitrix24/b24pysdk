@@ -1,4 +1,5 @@
 from ....api.requests import BitrixAPIRequest
+from ....schemas.crm.activity import ConfigurableActivityResultData
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
 from .._base_crm import BaseCRM
@@ -23,7 +24,7 @@ class Configurable(BaseCRM):
             fields: JSONDict,
             layout: JSONDict,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[ConfigurableActivityResultData]:
         """Add configurable activity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/configurable/crm-activity-configurable-add.html

@@ -3,8 +3,9 @@ from typing import Dict, Final, Mapping, Optional, Sequence, Text, Union, overlo
 from ..._constants import MAX_BATCH_SIZE
 from ...constants.version import B24APIVersion
 from ...protocols import BitrixTokenProtocol
+from ...schemas.api import BatchResponseData
 from ...utils.encoding import encode_params
-from ...utils.types import B24APIVersionLiteral, B24Requests, B24RequestTuple, JSONDict, Key, Timeout
+from ...utils.types import B24APIVersionLiteral, B24Requests, B24RequestTuple, JSONDict, Key, Timeout, cast
 from ._base_caller import BaseCaller
 from .call_method import call_method
 
@@ -153,7 +154,7 @@ class _BatchCaller(BaseCaller):
                 **self._kwargs,
             )
 
-    def call(self) -> JSONDict:
+    def call(self) -> BatchResponseData:
         """Execute the configured batch request and return the parsed response."""
 
         self._config.logger.debug(
@@ -164,7 +165,7 @@ class _BatchCaller(BaseCaller):
         )
 
         try:
-            return self._fetch_response()
+            return cast(BatchResponseData, self._fetch_response())
         finally:
             self._config.logger.debug("finish call_batch")
 
@@ -182,7 +183,7 @@ def call_batch(
         prefer_version: Union[B24APIVersion, B24APIVersionLiteral] = B24APIVersion.V2,
         bitrix_token: Optional[BitrixTokenProtocol] = None,
         **kwargs,
-) -> JSONDict: ...
+) -> BatchResponseData: ...
 
 
 @overload
@@ -198,7 +199,7 @@ def call_batch(
         prefer_version: Union[B24APIVersion, B24APIVersionLiteral] = B24APIVersion.V2,
         bitrix_token: Optional[BitrixTokenProtocol] = None,
         **kwargs,
-) -> JSONDict: ...
+) -> BatchResponseData: ...
 
 
 def call_batch(
@@ -213,7 +214,7 @@ def call_batch(
         prefer_version: Union[B24APIVersion, B24APIVersionLiteral] = B24APIVersion.V2,
         bitrix_token: Optional[BitrixTokenProtocol] = None,
         **kwargs,
-) -> JSONDict:
+) -> BatchResponseData:
     """
     Execute multiple Bitrix REST methods in one classic ``batch`` request.
 

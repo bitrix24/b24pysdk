@@ -37,7 +37,7 @@ class Vat(BaseCRM):
         """
         return self._fields(
             timeout=timeout,
-            result_adapter=VatFieldsDict.from_bitrix,
+            value_type=VatFieldsDict,
         )
 
     @type_checker
@@ -46,7 +46,7 @@ class Vat(BaseCRM):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """Create VAT rate.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/auxiliary/vat/crm-vat-add.html
@@ -151,7 +151,7 @@ class Vat(BaseCRM):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """Update existing VAT rate.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/auxiliary/vat/crm-vat-update.html
@@ -180,7 +180,7 @@ class Vat(BaseCRM):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete VAT rate.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/auxiliary/vat/crm-vat-delete.html

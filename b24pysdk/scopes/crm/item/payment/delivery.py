@@ -23,7 +23,7 @@ class Delivery(BaseCRM):
             delivery_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """Add delivery item to payment.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/payment/delivery-in-payment/crm-item-payment-delivery-add.html
@@ -122,7 +122,7 @@ class Delivery(BaseCRM):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Remove delivery item from payment.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/payment/delivery-in-payment/crm-item-payment-delivery-delete.html
@@ -146,7 +146,7 @@ class Delivery(BaseCRM):
             delivery_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Reassign delivery item to another document.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/payment/delivery-in-payment/crm-item-payment-delivery-set-delivery.html

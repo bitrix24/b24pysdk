@@ -35,12 +35,7 @@ class Productrow(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return self._make_bitrix_api_request(
-            api_wrapper=self.fields,
-            timeout=timeout,
-            bitrix_api_request_type=BitrixAPIValueRequest,
-            result_adapter=CRMFieldsDict.from_bitrix,
-        )
+        return self._fields(timeout=timeout)
 
     @type_checker
     def add(
@@ -196,7 +191,7 @@ class Productrow(BaseCRM):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[None]:
         """Delete product row.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/product-rows/crm-item-productrow-delete.html

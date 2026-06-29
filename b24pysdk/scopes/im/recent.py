@@ -2,7 +2,7 @@ from typing import Optional, Text, Union
 
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import B24BoolStrict, Timeout
+from ...utils.types import B24BoolStrict, JSONDict, JSONList, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -24,7 +24,7 @@ class Recent(BaseEntity):
             only_openlines: Optional[Union[bool, B24BoolStrict]] = None,
             last_sync_date: Optional[Text] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONList]:
         """"""
 
         params = dict()
@@ -62,7 +62,7 @@ class Recent(BaseEntity):
             skip_chat: Optional[Union[bool, B24BoolStrict]] = None,
             last_message_date: Optional[Text] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """"""
 
         params = dict()
@@ -91,7 +91,7 @@ class Recent(BaseEntity):
             dialog_id: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = dict(
@@ -111,7 +111,7 @@ class Recent(BaseEntity):
             pin: Union[bool, B24BoolStrict],
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = dict(
@@ -132,7 +132,7 @@ class Recent(BaseEntity):
             action: Union[bool, B24BoolStrict],
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = dict(

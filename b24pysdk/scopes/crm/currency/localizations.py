@@ -76,7 +76,7 @@ class Localizations(BaseCRM):
             *,
             localizations: JSONDict,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Set localization for currency.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/currency/localizations/crm-currency-localizations-set.html
@@ -112,7 +112,7 @@ class Localizations(BaseCRM):
             *,
             lids: Iterable[Text],
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete currency localization.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/currency/localizations/crm-currency-localizations-delete.html

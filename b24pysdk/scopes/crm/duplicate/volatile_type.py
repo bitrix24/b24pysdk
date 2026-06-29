@@ -1,8 +1,15 @@
 from typing import Annotated, Literal, Optional, Text
 
-from ....api.requests import BitrixAPIRequest
+from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest, BitrixAPIValuesRequest
+from ....schemas.crm.duplicate.volatile_type import (
+    CRMDuplicateVolatileType,
+    CRMDuplicateVolatileTypeField,
+    CRMDuplicateVolatileTypeFieldsData,
+    CRMDuplicateVolatileTypesData,
+)
+from ....schemas.results import IDResultData
 from ....utils.functional import type_checker
-from ....utils.types import Timeout
+from ....utils.types import JSONDict, Timeout
 from .._base_crm import BaseCRM
 
 __all__ = [
@@ -20,9 +27,9 @@ class VolatileType(BaseCRM):
     def fields(
             self,
             *,
-            entity_type_id: Optional[Annotated[Text, Literal[1, 3, 4]]] = None,
+            entity_type_id: Optional[Annotated[int, Literal[1, 3, 4]]] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValuesRequest[CRMDuplicateVolatileTypeFieldsData, CRMDuplicateVolatileTypeField]:
         """Get a list of fields for duplicate search
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/duplicates/volatile-type/crm-duplicate-volatile-type-fields.html
@@ -41,10 +48,10 @@ class VolatileType(BaseCRM):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValuesRequest
         """
 
-        params = dict()
+        params: JSONDict = {}
 
         if entity_type_id is not None:
             params["entityTypeId"] = entity_type_id
@@ -53,6 +60,8 @@ class VolatileType(BaseCRM):
             api_wrapper=self.fields,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValuesRequest,
+            result_adapter=CRMDuplicateVolatileTypeField.from_bitrix_result,
         )
 
     @type_checker
@@ -60,7 +69,7 @@ class VolatileType(BaseCRM):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValuesRequest[CRMDuplicateVolatileTypesData, CRMDuplicateVolatileType]:
         """Get a list of custom fields involved in duplicate search
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/duplicates/volatile-type/crm-duplicate-volatile-type-list.html
@@ -71,21 +80,23 @@ class VolatileType(BaseCRM):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValuesRequest
         """
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValuesRequest,
+            result_adapter=CRMDuplicateVolatileType.from_bitrix_result,
         )
 
     @type_checker
     def register(
             self,
             *,
-            entity_type_id: Annotated[Text, Literal[1, 3, 4]],
+            entity_type_id: Annotated[int, Literal[1, 3, 4]],
             field_code: Text,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[IDResultData, int]:
         """Add a field to the duplicate search
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/duplicates/volatile-type/crm-duplicate-volatile-type-register.html
@@ -106,10 +117,10 @@ class VolatileType(BaseCRM):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValueRequest
         """
 
-        params = {
+        params: JSONDict = {
             "entityTypeId": entity_type_id,
             "fieldCode": field_code,
         }
@@ -118,6 +129,8 @@ class VolatileType(BaseCRM):
             api_wrapper=self.register,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=lambda result: result["id"],
         )
 
     @type_checker
@@ -126,7 +139,7 @@ class VolatileType(BaseCRM):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Remove field from duplicate search
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/duplicates/volatile-type/crm-duplicate-volatile-type-unregister.html
@@ -142,7 +155,7 @@ class VolatileType(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 

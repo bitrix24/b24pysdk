@@ -3,7 +3,7 @@ from typing import Iterable, Optional, Union
 
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import B24BoolStrict, Timeout
+from ....utils.types import B24BoolStrict, JSONList, Timeout
 from ..._base_entity import BaseEntity
 from .colleagues import Colleagues
 from .employees import Employees
@@ -39,7 +39,7 @@ class Department(BaseEntity):
             *,
             user_data: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONList]:
         """"""
 
         if bitrix_id.__class__ is not list:

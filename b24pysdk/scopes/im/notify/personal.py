@@ -24,7 +24,7 @@ class Personal(BaseEntity):
             sub_tag: Optional[Text] = None,
             attach: Optional[Union[JSONDict, Text]] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[Union[int, bool]]:
         """"""
 
         params = {

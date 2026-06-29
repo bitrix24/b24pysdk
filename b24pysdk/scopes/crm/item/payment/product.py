@@ -24,7 +24,7 @@ class Product(BaseCRM):
             quantity: float,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """Add product item to payment.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/payment/products-in-payment/crm-item-payment-product-add.html
@@ -126,7 +126,7 @@ class Product(BaseCRM):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Remove product item from payment.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/payment/products-in-payment/crm-item-payment-product-delete.html
@@ -150,7 +150,7 @@ class Product(BaseCRM):
             quantity: float,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Change product quantity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/payment/products-in-payment/crm-item-payment-product-set-quantity.html

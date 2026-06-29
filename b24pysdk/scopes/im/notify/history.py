@@ -29,7 +29,7 @@ class History(BaseEntity):
             convert_text: Optional[Text] = None,
             group_tag: Optional[Text] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """"""
 
         params: JSONDict = dict()

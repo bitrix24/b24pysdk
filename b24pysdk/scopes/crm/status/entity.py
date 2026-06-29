@@ -1,6 +1,9 @@
-from ....api.requests import BitrixAPIRequest
+from typing import Text
+
+from ....api.requests import BitrixAPIValuesRequest
+from ....schemas.crm.status_entity import CRMStatusEntityItem, CRMStatusEntityItemsData, CRMStatusEntityType, CRMStatusEntityTypesData
 from ....utils.functional import type_checker
-from ....utils.types import Timeout
+from ....utils.types import JSONDict, Timeout
 from .._base_crm import BaseCRM
 
 __all__ = [
@@ -14,10 +17,10 @@ class Entity(BaseCRM):
     @type_checker
     def items(
             self,
-            entity_id: str,
+            entity_id: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValuesRequest[CRMStatusEntityItemsData, CRMStatusEntityItem]:
         """Get the directory item by its symbolic identifier.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/status/crm-status-entity-items.html
@@ -30,10 +33,10 @@ class Entity(BaseCRM):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValuesRequest
         """
 
-        params = {
+        params: JSONDict = {
             "entityId": entity_id,
         }
 
@@ -41,6 +44,8 @@ class Entity(BaseCRM):
             api_wrapper=self.items,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValuesRequest,
+            result_adapter=CRMStatusEntityItem.from_bitrix_result,
         )
 
     @type_checker
@@ -48,7 +53,7 @@ class Entity(BaseCRM):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValuesRequest[CRMStatusEntityTypesData, CRMStatusEntityType]:
         """Get CRM status entity types.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/status/crm-status-entity-types.html
@@ -59,9 +64,11 @@ class Entity(BaseCRM):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValuesRequest
         """
         return self._make_bitrix_api_request(
             api_wrapper=self.types,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValuesRequest,
+            result_adapter=CRMStatusEntityType.from_bitrix_result,
         )

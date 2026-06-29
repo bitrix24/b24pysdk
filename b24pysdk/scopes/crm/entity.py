@@ -49,4 +49,6 @@ class Entity(BaseCRM):
             api_wrapper=self.merge_batch,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=CRMEntityMergeBatch.from_bitrix,
         )

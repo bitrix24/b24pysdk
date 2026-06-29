@@ -1,3 +1,5 @@
+from typing import List, Text
+
 from ......api.requests import BitrixAPIRequest, BitrixAPIValueRequest
 from ......schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ......utils.functional import type_checker
@@ -42,7 +44,7 @@ class Field(BaseCRM):
             preset: JSONDict,
             fields: JSONDict,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """Add a custom field to the CRM requisite template
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/presets/fields/crm-requisite-preset-field-add.html
@@ -158,7 +160,7 @@ class Field(BaseCRM):
             preset: JSONDict,
             fields: JSONDict,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Update custom fields of a given CRM requisite template.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/presets/fields/crm-requisite-preset-field-update.html
@@ -211,7 +213,7 @@ class Field(BaseCRM):
             *,
             preset: JSONDict,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete custom field from CRM requisite template.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/presets/fields/crm-requisite-preset-field-delete.html
@@ -246,7 +248,7 @@ class Field(BaseCRM):
             *,
             preset: JSONDict,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[List[Text]]:
         """Get fields available for addition to the CRM requisite template.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/presets/fields/crm-requisite-preset-field-available-to-add.html

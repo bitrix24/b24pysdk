@@ -2,7 +2,7 @@ from typing import Text
 
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import JSONDict, Timeout
+from ....utils.types import JSONDict, JSONList, Timeout
 from .._base_crm import BaseCRM
 
 __all__ = [
@@ -22,7 +22,7 @@ class Type(BaseCRM):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Add custom CRM activity type.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/types/crm-activity-type-add.html
@@ -54,7 +54,7 @@ class Type(BaseCRM):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONList]:
         """Get a list of custom activity types.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/types/crm-activity-type-list.html
@@ -75,7 +75,7 @@ class Type(BaseCRM):
             type_id: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete custom activity type.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/types/crm-activity-type-delete.html

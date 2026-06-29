@@ -43,7 +43,7 @@ class Comment(BaseCRM):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """Add a new comment.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/comments/crm-timeline-comment-add.html
@@ -167,7 +167,7 @@ class Comment(BaseCRM):
             entity_type_id: Optional[int] = None,
             entity_id: Optional[int] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """Update comment.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/comments/crm-timeline-comment-update.html

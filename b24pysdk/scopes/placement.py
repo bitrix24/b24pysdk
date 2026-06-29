@@ -1,7 +1,7 @@
 from typing import List, Optional, Text
 
 from ..api.requests import BitrixAPIRequest, BitrixAPIValueRequest
-from ..schemas.placement import PlacementUnbind, PlacementUnbindData
+from ..schemas.results import CountResultData
 from ..utils.functional import type_checker
 from ..utils.types import JSONDict, Timeout
 from ._base_scope import BaseScope
@@ -152,7 +152,7 @@ class Placement(BaseScope):
             handler: Optional[Text] = None,
             user_id: Optional[int] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIValueRequest[PlacementUnbindData, PlacementUnbind]:
+    ) -> BitrixAPIValueRequest[CountResultData, int]:
         """
         Remove a widget placement handler.
 
@@ -185,5 +185,5 @@ class Placement(BaseScope):
             params=params,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValueRequest,
-            result_adapter=PlacementUnbind.from_bitrix,
+            result_adapter=lambda result: result["count"],
         )

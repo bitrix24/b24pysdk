@@ -70,7 +70,7 @@ class Lead(BaseItem):
             *,
             params: Optional[JSONDict] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """Create a new lead.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/leads/crm-lead-add.html
@@ -196,7 +196,7 @@ class Lead(BaseItem):
             *,
             params: Optional[JSONDict] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Update lead.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/leads/crm-lead-update.html
@@ -240,7 +240,7 @@ class Lead(BaseItem):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete lead.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/leads/crm-lead-delete.html

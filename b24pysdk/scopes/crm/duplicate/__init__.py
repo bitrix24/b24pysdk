@@ -1,9 +1,10 @@
 from functools import cached_property
 from typing import Annotated, Iterable, Literal, Optional, Text
 
-from ....api.requests import BitrixAPIRequest
+from ....api.requests import BitrixAPIValueRequest
+from ....schemas.crm.duplicate import CRMDuplicateFindByComm, CRMDuplicateFindByCommData
 from ....utils.functional import type_checker
-from ....utils.types import Timeout
+from ....utils.types import JSONDict, Timeout
 from .._base_crm import BaseCRM
 from .volatile_type import VolatileType
 
@@ -29,9 +30,9 @@ class Duplicate(BaseCRM):
             type: Annotated[Text, Literal["EMAIL", "PHONE"]],
             values: Iterable[Text],
             *,
-            entity_type: Optional[Annotated[Text, Literal["LEAD", "CONTACT", "COMPANY"]]] = None,
+            entity_type: Optional[Annotated[Text, Literal["LEAD", "COMPANY", "CONTACT"]]] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[CRMDuplicateFindByCommData, CRMDuplicateFindByComm]:
         """Get leads, contacts, and companies with matching data
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/duplicates/crm-duplicate-find-by-comm.html
@@ -51,21 +52,21 @@ class Duplicate(BaseCRM):
 
                 - LEAD,
 
-                - CONTACT,
-
                 - COMPANY;
+
+                - CONTACT,
 
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValueRequest
 
         """
 
         if values.__class__ is not list:
             values = list(values)
 
-        params = {
+        params: JSONDict = {
             "type": type,
             "values": values,
         }
@@ -77,4 +78,6 @@ class Duplicate(BaseCRM):
             api_wrapper=self.findbycomm,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=CRMDuplicateFindByComm.from_bitrix,
         )

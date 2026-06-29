@@ -18,6 +18,7 @@ from urllib.parse import urlparse as _urlparse
 
 import requests
 
+from .._constants import MISSING
 from ..schemas import error as _error_schemas
 from ._http_responses import (
     HTTPResponse,
@@ -385,7 +386,7 @@ class BitrixAPIError(BitrixBaseAPIError):
     associated with particular HTTP status codes.
     """
 
-    ERROR: typing.ClassVar[typing.Text] = NotImplemented
+    ERROR: typing.ClassVar[typing.Text] = MISSING
 
     __slots__ = ()
 

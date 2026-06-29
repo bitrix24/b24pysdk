@@ -2,7 +2,7 @@ from functools import cached_property
 from typing import Annotated, Literal, Optional, Text
 
 from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest
-from ...schemas.event import EventUnbind, EventUnbindData
+from ...schemas.results import CountResultData
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
 from .._base_scope import BaseScope
@@ -79,7 +79,7 @@ class Event(BaseScope):
             auth_type: Optional[int] = None,
             event_type: Optional[Annotated[Text, Literal["offline", "online"]]] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIValueRequest[EventUnbindData, EventUnbind]:
+    ) -> BitrixAPIValueRequest[CountResultData, int]:
         """"""
 
         params: JSONDict = {
@@ -98,5 +98,5 @@ class Event(BaseScope):
             params=params,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValueRequest,
-            result_adapter=EventUnbind.from_bitrix,
+            result_adapter=lambda result: result["count"],
         )

@@ -2,7 +2,7 @@ from typing import Iterable, Optional, Text
 
 from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
-from .....utils.types import JSONDict, Timeout
+from .....utils.types import JSONDict, JSONList, Timeout
 from ...._base_entity import BaseEntity
 
 __all__ = [
@@ -19,7 +19,7 @@ class Result(BaseEntity):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """"""
 
         params = {
@@ -38,7 +38,7 @@ class Result(BaseEntity):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """"""
 
         params = {
@@ -58,7 +58,7 @@ class Result(BaseEntity):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """"""
 
         params = {
@@ -81,7 +81,7 @@ class Result(BaseEntity):
             select: Optional[Iterable[Text]] = None,
             pagination: Optional[JSONDict] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONList]:
         """"""
 
         if filter.__class__ is not list:
@@ -115,7 +115,7 @@ class Result(BaseEntity):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """"""
 
         params = {

@@ -1,6 +1,7 @@
 from typing import Mapping, Optional, Protocol, Sequence, Text, Union, overload
 
 from ..constants.version import B24APIVersion
+from ..schemas.api import BatchResponseData, ListFastResponseData, ListResponseData
 from ..utils.types import B24APIVersionLiteral, B24Requests, B24RequestTuple, JSONDict, Key, Timeout
 
 
@@ -48,7 +49,7 @@ class BitrixTokenFullProtocol(BitrixTokenProtocol, Protocol):
         ignore_size_limit: bool = False,
         timeout: Timeout = None,
         prefer_version: Union[B24APIVersion, B24APIVersionLiteral] = B24APIVersion.V2,
-    ) -> JSONDict: ...
+    ) -> BatchResponseData: ...
 
     @overload
     def call_batch(
@@ -58,7 +59,7 @@ class BitrixTokenFullProtocol(BitrixTokenProtocol, Protocol):
         ignore_size_limit: bool = False,
         timeout: Timeout = None,
         prefer_version: Union[B24APIVersion, B24APIVersionLiteral] = B24APIVersion.V2,
-    ) -> JSONDict: ...
+    ) -> BatchResponseData: ...
 
     def call_batch(
         self,
@@ -67,7 +68,7 @@ class BitrixTokenFullProtocol(BitrixTokenProtocol, Protocol):
         ignore_size_limit: bool = False,
         timeout: Timeout = None,
         prefer_version: Union[B24APIVersion, B24APIVersionLiteral] = B24APIVersion.V2,
-    ) -> JSONDict:
+    ) -> BatchResponseData:
         """
         Execute a Bitrix24 batch request.
 
@@ -89,7 +90,7 @@ class BitrixTokenFullProtocol(BitrixTokenProtocol, Protocol):
         halt: bool = False,
         timeout: Timeout = None,
         prefer_version: Union[B24APIVersion, B24APIVersionLiteral] = B24APIVersion.V2,
-    ) -> JSONDict: ...
+    ) -> BatchResponseData: ...
 
     @overload
     def call_batches(
@@ -98,7 +99,7 @@ class BitrixTokenFullProtocol(BitrixTokenProtocol, Protocol):
         halt: bool = False,
         timeout: Timeout = None,
         prefer_version: Union[B24APIVersion, B24APIVersionLiteral] = B24APIVersion.V2,
-    ) -> JSONDict: ...
+    ) -> BatchResponseData: ...
 
     def call_batches(
         self,
@@ -106,7 +107,7 @@ class BitrixTokenFullProtocol(BitrixTokenProtocol, Protocol):
         halt: bool = False,
         timeout: Timeout = None,
         prefer_version: Union[B24APIVersion, B24APIVersionLiteral] = B24APIVersion.V2,
-    ) -> JSONDict:
+    ) -> BatchResponseData:
         """
         Execute multiple Bitrix24 batch requests.
 
@@ -127,7 +128,7 @@ class BitrixTokenFullProtocol(BitrixTokenProtocol, Protocol):
         limit: Optional[int] = None,
         timeout: Timeout = None,
         prefer_version: Union[B24APIVersion, B24APIVersionLiteral] = B24APIVersion.V2,
-    ) -> JSONDict:
+    ) -> ListResponseData:
         """
         Load a paginated Bitrix24 REST API list.
 
@@ -150,7 +151,7 @@ class BitrixTokenFullProtocol(BitrixTokenProtocol, Protocol):
         limit: Optional[int] = None,
         timeout: Timeout = None,
         prefer_version: Union[B24APIVersion, B24APIVersionLiteral] = B24APIVersion.V2,
-    ) -> JSONDict:
+    ) -> ListFastResponseData:
         """
         Load a Bitrix24 REST API list using optimized pagination.
 

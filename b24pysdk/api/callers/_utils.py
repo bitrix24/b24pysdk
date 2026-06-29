@@ -2,14 +2,14 @@ from datetime import datetime
 from typing import Optional
 
 from ..._config import Config
-from ...schemas.time import TimeData
+from ...schemas.api import TimeResponseData
 
 __all__ = [
     "get_empty_time",
 ]
 
 
-def get_empty_time(date_time: Optional[datetime] = None) -> TimeData:
+def get_empty_time(date_time: Optional[datetime] = None) -> TimeResponseData:
     """Build synthetic zero-duration timing metadata for responses without API calls."""
 
     if date_time is None:

@@ -3,19 +3,19 @@
 ### Preparation
 1. Install dev dependencies:
 ```bash
-pip install -r requirements-dev.txt
+python -m pip install -e ".[dev,test,signals,django,fastapi,flask]"
 ```
 2. Create a .env.local file with the following data(example values):
 ```txt
-B24_DOMAIN=b24-e4f2d1.bitrix24.com
-B24_WEBHOOK=13/dd5w3aldjdu4twfk
-B24_CLIENT_ID=local.672f30763b63d4.04393872
-B24_CLIENT_SECRET=rdsfdcc6RtwHlkFng5145gGdhebdh8mXl12QjaD112frtBSL16
+B24_DOMAIN=portal.bitrix24.com
+B24_WEBHOOK=xxxxx/xxxxx
+B24_CLIENT_ID=your_app_code
+B24_CLIENT_SECRET=your_app_secret
 B24_PREFER_AUTH_TYPE=webhook
 
 # Only if you're running the integration tests directly, without first running tests/application_bridge/index.py
-B24_ACCESS_TOKEN=b0872d69007e1212107f3e254fb7f1gdsgdv11297667cf03e675caa
-B24_REFRESH_TOKEN=a00655dgghd5tfd25df256fd52e5f1f5d60d44b7bd193be0a98869
+B24_ACCESS_TOKEN=your_access_token
+B24_REFRESH_TOKEN=your_access_token
 B24_EXPIRES=2025-11-28 21:09:16+03:00
 B24_EXPIRES_IN=3600
 B24_EXPIRED_TOKEN=expired_token_value
@@ -43,9 +43,9 @@ EVENT_HANDLER_URL = "http://localhost:8000"
 6. Launch the application. A file named `oauth_data.json` should appear in your `tests/` directory, containing:
 ```txt
 {
-    "access_token": "",
-    "refresh_token": "",
-    "expires": "",
+    "access_token": "your_access_token",
+    "refresh_token": "your_access_token",
+    "expires": "2025-11-28 21:09:16+03:00",
     "expires_in": 3600
 }
 ```

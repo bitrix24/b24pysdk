@@ -3,7 +3,7 @@ from typing import Iterable, Optional, Text, Union
 
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import B24BoolStrict, Timeout
+from ....utils.types import B24BoolStrict, JSONDict, Timeout
 from ..._base_entity import BaseEntity
 from .user import User
 
@@ -35,7 +35,7 @@ class Chat(BaseEntity):
             entity_id: Optional[Union[int, Text]] = None,
             owner_id: Optional[Union[int, Text]] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """"""
 
         if users.__class__ is not list:
@@ -85,7 +85,7 @@ class Chat(BaseEntity):
             entity_id: Union[int, Text],
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[Optional[JSONDict]]:
         """"""
 
         params = dict(
@@ -106,7 +106,7 @@ class Chat(BaseEntity):
             mute: Union[bool, B24BoolStrict],
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = dict(
@@ -126,7 +126,7 @@ class Chat(BaseEntity):
             chat_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = dict(
@@ -146,7 +146,7 @@ class Chat(BaseEntity):
             user_id: Union[int, Text],
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = dict(
@@ -167,7 +167,7 @@ class Chat(BaseEntity):
             avatar: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = dict(
@@ -188,7 +188,7 @@ class Chat(BaseEntity):
             color: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = dict(
@@ -209,7 +209,7 @@ class Chat(BaseEntity):
             title: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = dict(

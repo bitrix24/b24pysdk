@@ -20,7 +20,7 @@ class Trace(BaseCRM):
             *,
             entities: Optional[Iterable[JSONDict]] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """"""
 
         params: JSONDict = {
@@ -45,6 +45,6 @@ class Trace(BaseCRM):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[None]:
         """"""
         return self._delete(bitrix_id, timeout=timeout)

@@ -23,7 +23,7 @@ class Userfieldtype(BaseScope):
             description: Optional[Text] = None,
             options: Optional[JSONDict] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params: JSONDict = {
@@ -52,7 +52,7 @@ class Userfieldtype(BaseScope):
             user_type_id: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params: JSONDict = {
@@ -70,7 +70,7 @@ class Userfieldtype(BaseScope):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """"""
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
@@ -87,7 +87,7 @@ class Userfieldtype(BaseScope):
             description: Optional[Text] = None,
             options: Optional[JSONDict] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params: JSONDict = {

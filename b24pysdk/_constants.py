@@ -6,16 +6,30 @@ including API limits and runtime environment information.
 """
 
 import sys
-from typing import Final, Text, Tuple
+from typing import Any, Final, Text, Tuple
 
 __all__ = [
     "DEFAULT_REQUEST_ID_HEADER_NAME",
     "MASKED_VALUE",
     "MAX_BATCH_SIZE",
+    "MISSING",
     "PYTHON_VERSION",
     "SDK_USER_AGENT",
     "TEXT_PYTHON_VERSION",
 ]
+
+
+class _MissingType:
+    """Sentinel type for values that are intentionally not provided."""
+
+    __slots__ = ()
+
+    def __repr__(self):
+        return "MISSING"
+
+
+MISSING: Final[Any] = _MissingType()
+"""Sentinel object used to mark intentionally missing SDK values."""
 
 DEFAULT_REQUEST_ID_HEADER_NAME: Final[Text] = "X-Request-ID"
 """

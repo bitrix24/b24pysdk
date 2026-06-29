@@ -76,7 +76,7 @@ class Deal(BaseItem):
             *,
             params: Optional[JSONDict] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """Create a new deal.
 
         The method crm.deal.add creates a new deal.
@@ -202,7 +202,7 @@ class Deal(BaseItem):
             *,
             params: Optional[JSONDict] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Update deal.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/deals/crm-deal-update.html
@@ -248,7 +248,7 @@ class Deal(BaseItem):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete deal.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/deals/crm-deal-delete.html

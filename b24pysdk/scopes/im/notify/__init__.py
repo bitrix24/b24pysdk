@@ -56,7 +56,7 @@ class Notify(BaseEntity):
             sub_tag: Optional[Text] = None,
             attach: Optional[Union[JSONDict, Text]] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[Union[int, bool]]:
         """"""
 
         params = {
@@ -92,7 +92,7 @@ class Notify(BaseEntity):
             answer_text: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """"""
 
         params = {
@@ -113,7 +113,7 @@ class Notify(BaseEntity):
             notify_value: Union[bool, B24BoolStrict],
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """"""
 
         params = {
@@ -136,7 +136,7 @@ class Notify(BaseEntity):
             sub_tag: Optional[Text] = None,
             client_id: Optional[Text] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params: JSONDict = dict()
@@ -168,7 +168,7 @@ class Notify(BaseEntity):
             limit: Optional[int] = None,
             convert_text: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """"""
 
         params: JSONDict = dict()

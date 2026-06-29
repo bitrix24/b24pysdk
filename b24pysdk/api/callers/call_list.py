@@ -3,8 +3,8 @@ from typing import Final, Iterable, List, Mapping, Optional, Text, Tuple, Union
 from ..._constants import MAX_BATCH_SIZE
 from ...constants.version import B24APIVersion
 from ...protocols import BitrixTokenProtocol
-from ...schemas.time import TimeData
-from ...utils.types import B24APIVersionLiteral, B24RequestTuple, JSONDict, JSONList, Timeout
+from ...schemas.api import BatchResponseData, BatchResultData, ListResponseData, ResponseData, TimeResponseData
+from ...utils.types import B24APIVersionLiteral, B24RequestTuple, JSONDict, JSONList, Timeout, cast
 from ._base_caller import BaseCaller
 from ._utils import get_empty_time
 from .call_batches import call_batches
@@ -33,7 +33,7 @@ class _ListCaller(BaseCaller):
     __slots__ = ("_limit", "_time")
 
     _limit: Optional[int]
-    _time: Optional[TimeData]
+    _time: TimeResponseData
 
     def __init__(
             self,
@@ -78,7 +78,6 @@ class _ListCaller(BaseCaller):
         if self._api_version == B24APIVersion.V3:
             raise TypeError("Bitrix API v3 methods are not supported by call_list yet.")
         self._limit = limit
-        self._time = None
 
     def _check_filter_by_id_only(self) -> Tuple[Text, Text, List[int]]:
         """
@@ -180,7 +179,7 @@ class _ListCaller(BaseCaller):
 
         return methods
 
-    def _fetch_first_response(self) -> JSONDict:
+    def _fetch_first_response(self) -> ResponseData:
         """
         Fetch the first page using the original method parameters.
 
@@ -188,13 +187,13 @@ class _ListCaller(BaseCaller):
         expose ``total`` and ``next`` only in the normal list response.
         """
         if self._bitrix_token:
-            return self._bitrix_token.call_method(
+            response = self._bitrix_token.call_method(
                 api_method=self._api_method,
                 params=self._params,
                 **self._kwargs,
             )
         else:
-            return call_method(
+            response = call_method(
                 domain=self._domain,
                 auth_token=self._auth_token,
                 is_webhook=self._is_webhook,
@@ -203,7 +202,9 @@ class _ListCaller(BaseCaller):
                 **self._kwargs,
             )
 
-    def _fetch_batches_response(self, methods: List[B24RequestTuple]) -> JSONDict:
+        return cast(ResponseData, response)
+
+    def _fetch_batches_response(self, methods: List[B24RequestTuple]) -> BatchResponseData:
         """Execute generated pagination or ID-filter requests through batches."""
         return call_batches(
             domain=self._domain,
@@ -215,7 +216,7 @@ class _ListCaller(BaseCaller):
             **self._kwargs,
         )
 
-    def _unwrap_result(self, result: JSONDict) -> JSONList:
+    def _unwrap_result(self, result: Union[JSONDict, JSONList]) -> JSONList:
         """
         Extract the list payload from a Bitrix list response.
 
@@ -232,7 +233,7 @@ class _ListCaller(BaseCaller):
         else:
             raise TypeError(f"Bitrix API method {self._api_method!r} is not a list-type method!")
 
-    def _unwrap_batch_result(self, batch_result: JSONDict) -> JSONList:
+    def _unwrap_batch_result(self, batch_result: BatchResultData) -> JSONList:
         """Flatten list payloads from all command results in a batch response."""
 
         result_error = batch_result.get("result_error")
@@ -258,7 +259,7 @@ class _ListCaller(BaseCaller):
 
         return result_list
 
-    def _add_time(self, time: TimeData):
+    def _add_time(self, time: TimeResponseData):
         """Merge timing metadata from an additional batch response into ``_time``."""
 
         self._time["finish"] = time["finish"]
@@ -276,7 +277,7 @@ class _ListCaller(BaseCaller):
         if operating is not None:
             self._time["operating"] = self._time.get("operating", 0) + operating
 
-    def call(self) -> JSONDict:
+    def call(self) -> ListResponseData:
         """
         Fetch list items with classic Bitrix pagination and return a normalized response.
 
@@ -315,8 +316,10 @@ class _ListCaller(BaseCaller):
                 if self._limit is not None:
                     del result[self._limit:]
 
-                batch_response["result"] = result
-                return batch_response
+                return {
+                    "result": result,
+                    "time": batch_response["time"],
+                }
 
             response = self._fetch_first_response()
 
@@ -355,6 +358,7 @@ class _ListCaller(BaseCaller):
                 "result": result,
                 "time": self._time,
             }
+
         finally:
             self._config.logger.debug("finish call_list")
 
@@ -371,7 +375,7 @@ def call_list(
         prefer_version: Union[B24APIVersion, B24APIVersionLiteral] = B24APIVersion.V2,
         bitrix_token: Optional[BitrixTokenProtocol] = None,
         **kwargs,
-) -> JSONDict:
+) -> ListResponseData:
     """
     Retrieve items from a classic Bitrix list method using batch pagination.
 

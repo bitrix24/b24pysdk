@@ -43,7 +43,7 @@ class Recurring(BaseCRM):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """Create a new recurring deal
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/deals/recurring-deals/crm-deal-recurring-add.html
@@ -157,7 +157,7 @@ class Recurring(BaseCRM):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Update existing settings for the recurring deal template
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/deals/recurring-deals/crm-deal-recurring-update.html
@@ -188,7 +188,7 @@ class Recurring(BaseCRM):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete existing configuration for recurring deal template
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/deals/recurring-deals/crm-deal-recurring-delete.html
@@ -227,7 +227,7 @@ class Recurring(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 

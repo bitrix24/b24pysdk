@@ -1,4 +1,4 @@
-from typing import Optional, Text, Union
+from typing import List, Optional, Text, Union
 
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
@@ -23,7 +23,7 @@ class Sender(BaseEntity):
             *,
             description: Optional[Union[Text, JSONDict]] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = {
@@ -48,7 +48,7 @@ class Sender(BaseEntity):
             code: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = {
@@ -66,7 +66,7 @@ class Sender(BaseEntity):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[List[Text]]:
         """"""
 
         return self._make_bitrix_api_request(
@@ -83,7 +83,7 @@ class Sender(BaseEntity):
             name: Optional[Union[Text, JSONDict]] = None,
             description: Optional[Union[Text, JSONDict]] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = {

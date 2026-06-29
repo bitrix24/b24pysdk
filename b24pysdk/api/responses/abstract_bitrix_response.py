@@ -1,11 +1,10 @@
 from abc import ABC, abstractmethod
-from dataclasses import asdict, dataclass
-from typing import Generic
+from dataclasses import dataclass
+from typing import Generic, Type
 
-from ...schemas.time import TimeData
+from ...schemas.api import ResponseData, TimeResponseData
 from ...utils.dataclasses import frozen_dataclass_kwargs
-from ...utils.type_vars import BAResultT
-from ...utils.types import JSONDict
+from ...utils.type_vars import BAResponseT, BAResultT
 from .bitrix_time_response import BitrixTimeResponse
 
 __all__ = [
@@ -34,7 +33,7 @@ class AbstractBitrixResponse(ABC, Generic[BAResultT]):
         )
 
     @staticmethod
-    def _convert_time(json_response: TimeData, /) -> BitrixTimeResponse:
+    def _convert_time(json_response: TimeResponseData, /) -> BitrixTimeResponse:
         """
         Convert raw Bitrix24 timing data into ``BitrixTimeResponse``.
 
@@ -48,7 +47,7 @@ class AbstractBitrixResponse(ABC, Generic[BAResultT]):
 
     @classmethod
     @abstractmethod
-    def from_dict(cls, json_response: JSONDict, /) -> "AbstractBitrixResponse[BAResultT]":
+    def from_dict(cls: Type[BAResponseT], json_response: ResponseData, /) -> BAResponseT:
         """
         Create a response object from raw Bitrix24 JSON response.
 
@@ -60,11 +59,14 @@ class AbstractBitrixResponse(ABC, Generic[BAResultT]):
         """
         raise NotImplementedError
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self) -> ResponseData:
         """
         Convert response object to dictionary.
 
         Returns:
             Dictionary representation of the response.
         """
-        return asdict(self)
+        return {
+            "result": self.result,
+            "time": self.time.to_dict(),
+        }

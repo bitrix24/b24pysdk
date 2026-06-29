@@ -18,7 +18,7 @@ class Idle(BaseEntity):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         return self._make_bitrix_api_request(
@@ -32,7 +32,7 @@ class Idle(BaseEntity):
             *,
             ago: Optional[int] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = dict()

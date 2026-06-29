@@ -2,7 +2,7 @@ from typing import Iterable
 
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import JSONDict
+from ....utils.types import JSONDict, JSONList
 from .._base_crm import BaseCRM, Timeout
 
 __all__ = [
@@ -65,7 +65,7 @@ class Items(BaseCRM):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONList]:
         """Get a collection associated with CRM entity.
 
         This method retrieves a similar-typed collection associated with specified CRM entity.

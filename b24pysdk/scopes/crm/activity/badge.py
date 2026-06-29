@@ -1,4 +1,4 @@
-from typing import Text, Union
+from typing import Optional, Text, Union
 
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
@@ -97,7 +97,7 @@ class Badge(BaseCRM):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """Get the list of badges.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/configurable/badges/crm-activity-badge-list.html
@@ -111,7 +111,10 @@ class Badge(BaseCRM):
               Instance of BitrixAPIRequest
         """
 
-        return self._list(timeout=timeout)
+        return self._make_bitrix_api_request(
+            api_wrapper=self.list,
+            timeout=timeout,
+        )
 
     @type_checker
     def delete(
@@ -119,7 +122,7 @@ class Badge(BaseCRM):
             code: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[Optional[bool]]:
         """Delete badge by code.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/configurable/badges/crm-activity-badge-delete.html

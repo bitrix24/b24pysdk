@@ -42,7 +42,7 @@ class Company(BaseRelationship):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Add a Company to the specified Contact.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/contacts/company/crm-contact-company-add.html
@@ -78,7 +78,7 @@ class Company(BaseRelationship):
             *,
             fields: JSONDict,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/contacts/company/crm-contact-company-delete.html

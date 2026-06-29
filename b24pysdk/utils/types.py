@@ -23,7 +23,16 @@ __all__ = [
     "Number",
     "Timeout",
     "UserTypeIDLiteral",
+    "cast",
 ]
+
+_T = typing.TypeVar("_T")
+
+
+def cast(_: typing.Type[_T], value: typing.Any, /) -> _T:
+    """Cast value to the requested target type when it cannot be inferred statically."""
+    return typing.cast("_T", value)
+
 
 JSONDict = typing.Dict[typing.Text, typing.Any]
 """A JSON object represented as a dictionary with string keys."""

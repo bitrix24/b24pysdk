@@ -44,7 +44,7 @@ class Bankdetail(BaseDetail):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """Create a new entity.
 
         Documentation:
@@ -150,7 +150,7 @@ class Bankdetail(BaseDetail):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Update entity.
 
         Documentation:
@@ -180,7 +180,7 @@ class Bankdetail(BaseDetail):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete entity.
 
         Documentation:

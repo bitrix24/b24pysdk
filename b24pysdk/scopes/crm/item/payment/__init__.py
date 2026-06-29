@@ -36,7 +36,7 @@ class Payment(BaseCRM):
             entity_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """Add payment.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/payment/crm-item-payment-add.html
@@ -163,7 +163,7 @@ class Payment(BaseCRM):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Update payment fields.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/payment/crm-item-payment-update.html
@@ -193,7 +193,7 @@ class Payment(BaseCRM):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete payment.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/payment/crm-item-payment-delete.html
@@ -216,7 +216,7 @@ class Payment(BaseCRM):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Change payment status to "Paid".
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/payment/crm-item-payment-pay.html
@@ -248,7 +248,7 @@ class Payment(BaseCRM):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Change payment status to "Unpaid".
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/payment/crm-item-payment-unpay.html

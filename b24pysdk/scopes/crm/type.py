@@ -35,12 +35,7 @@ class Type(BaseCRM):
         Returns:
             Instance of BitrixAPIValueRequest
         """
-        return self._make_bitrix_api_request(
-            api_wrapper=self.fields,
-            timeout=timeout,
-            bitrix_api_request_type=BitrixAPIValueRequest,
-            result_adapter=CRMFieldsDict.from_bitrix,
-        )
+        return self._fields(timeout=timeout)
 
     @type_checker
     def add(
@@ -212,7 +207,7 @@ class Type(BaseCRM):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest[List[NoReturn]]:
+    ) -> BitrixAPIRequest[Optional[List[NoReturn]]]:
         """Delete custom type.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/user-defined-object-types/crm-type-delete.html

@@ -29,7 +29,6 @@ class BaseContext(ABC):
     def __str__(self):
         return self._path
 
-    # noinspection PyMethodParameters
     @classproperty
     def _name(cls) -> Text:
         """
@@ -89,7 +88,7 @@ class BaseContext(ABC):
         return f"{base_path}.{self._name}" if base_path else self._name
 
     @staticmethod
-    def __to_camel_case(snake_str: Text) -> Text:
+    def _snake_to_camel(snake_str: Text) -> Text:
         """
         Convert snake_case name to lowerCamelCase.
 
@@ -102,7 +101,7 @@ class BaseContext(ABC):
         Returns:
             lowerCamelCase representation.
         """
-        first, *parts = snake_str.split("_")
+        first, *parts = snake_str.strip("_").split("_")
         return "".join((first.lower(), *(part.title() for part in parts)))
 
     def _get_api_method(self, api_wrapper: Callable[..., BARequestT]) -> Text:
@@ -116,7 +115,7 @@ class BaseContext(ABC):
             Full Bitrix24 REST API method name.
         """
         api_wrapper_name = getattr(api_wrapper, "__name__", None)
-        return f"{self}.{self.__to_camel_case(api_wrapper_name.strip('_'))}" if api_wrapper_name else str(self)
+        return f"{self}.{self._snake_to_camel(api_wrapper_name)}" if api_wrapper_name else str(self)
 
     @overload
     def _make_bitrix_api_request(

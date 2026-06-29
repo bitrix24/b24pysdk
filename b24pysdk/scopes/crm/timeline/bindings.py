@@ -1,7 +1,7 @@
 from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
 from ....schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ....utils.functional import type_checker
-from ....utils.types import JSONDict, Timeout
+from ....utils.types import JSONDict, JSONList, Timeout
 from .._base_crm import BaseCRM
 
 __all__ = [
@@ -41,7 +41,7 @@ class Bindings(BaseCRM):
             *,
             filter: JSONDict,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONList]:
         """Get the list of bindings for a record in the timeline.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/bindings/crm-timeline-bindings-list.html
@@ -83,7 +83,7 @@ class Bindings(BaseCRM):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ):
+    ) -> BitrixAPIRequest[bool]:
         """Add timeline record binding to CRM entity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/bindings/crm-timeline-bindings-bind.html
@@ -122,7 +122,7 @@ class Bindings(BaseCRM):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ):
+    ) -> BitrixAPIRequest[bool]:
         """Unbind timeline record from CRM entity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/bindings/crm-timeline-bindings-unbind.html

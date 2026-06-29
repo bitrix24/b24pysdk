@@ -6,7 +6,6 @@ from typing import Dict, Optional, Text, Type
 import pytest
 import requests
 
-# noinspection PyProtectedMember
 from b24pysdk.api.requesters._utils.parse_response import parse_response
 from b24pysdk.api.requests import BitrixAPIRequest
 from b24pysdk.client import BaseClient, Client

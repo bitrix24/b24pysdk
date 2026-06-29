@@ -1,8 +1,9 @@
 from typing import TYPE_CHECKING, Final, Generic, Mapping, Sequence, Text, overload
 
 from ...protocols import BitrixTokenFullProtocol
+from ...schemas.api import BatchResponseData
 from ...utils.type_vars import BABatchRequestsT
-from ...utils.types import B24Requests, B24RequestTuple, JSONDict, Key
+from ...utils.types import B24Requests, B24RequestTuple, Key
 from ..responses import B24APIBatchResult, BitrixAPIBatchResponse
 from .bitrix_api_base_request import BitrixAPIBaseRequest
 
@@ -131,7 +132,7 @@ class BitrixAPIBatchesRequest(BitrixAPIBaseRequest[BitrixAPIBatchResponse, B24AP
 
         return methods
 
-    def _convert_response(self, json_response: JSONDict) -> BitrixAPIBatchResponse:
+    def _convert_response(self, json_response: BatchResponseData) -> BitrixAPIBatchResponse:
         """
         Convert raw JSON response into ``BitrixAPIBatchResponse``.
 
@@ -143,7 +144,7 @@ class BitrixAPIBatchesRequest(BitrixAPIBaseRequest[BitrixAPIBatchResponse, B24AP
         """
         return BitrixAPIBatchResponse.from_dict(json_response)
 
-    def _call(self) -> JSONDict:
+    def _call(self) -> BatchResponseData:
         """
         Execute wrapped requests using the multi-batch caller.
 
@@ -208,7 +209,7 @@ class BitrixAPIBatchRequest(BitrixAPIBatchesRequest[BABatchRequestsT], Generic[B
             f"ignore_size_limit={self._ignore_size_limit})"
         )
 
-    def _call(self) -> JSONDict:
+    def _call(self) -> BatchResponseData:
         """
         Execute wrapped requests using the single-batch caller.
 

@@ -4,7 +4,6 @@ import pytest
 
 from b24pysdk.api.responses import BitrixAPIListResponse, BitrixAPIResponse, BitrixAPIValueResponse
 from b24pysdk.client import BaseClient
-from b24pysdk.schemas.placement import PlacementUnbind
 from b24pysdk.utils.types import JSONDict
 
 from ...constants import BITRIX_PORTAL_OWNER_ID, SDK_NAME
@@ -148,7 +147,7 @@ def test_placement_unbind(bitrix_client: BaseClient):
 
     assert isinstance(bitrix_response, BitrixAPIValueResponse)
 
-    unbind_result = bitrix_response.value
+    unbind_count = bitrix_response.value
 
-    assert isinstance(unbind_result, PlacementUnbind), "Placement unbind result should be PlacementUnbind"
-    assert unbind_result.count > 0, "Placement unbind count should be positive"
+    assert isinstance(unbind_count, int), "Placement unbind count should be int"
+    assert unbind_count > 0, "Placement unbind count should be positive"

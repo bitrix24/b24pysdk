@@ -20,7 +20,7 @@ class Settings(BaseEntity):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """
         Retrieve the user calendar settings.
 
@@ -46,7 +46,7 @@ class Settings(BaseEntity):
             settings: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """
         Set the user calendar settings.
 

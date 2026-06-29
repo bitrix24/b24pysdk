@@ -2,9 +2,10 @@ from abc import ABC
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Callable, Generator, Generic, List, NoReturn, Type, Union
 
+from ...schemas.api import ListFastResponseData, ListResponseData, ResponseData
 from ...utils.dataclasses import frozen_dataclass_kwargs
 from ...utils.type_vars import BAResultT, BAValueResponseT, BAValueT
-from ...utils.types import JSONDict, JSONGenerator, JSONList
+from ...utils.types import JSONGenerator, JSONList
 from .abstract_bitrix_response import AbstractBitrixResponse
 from .bitrix_api_list_response import BitrixAPIListFastResponse, BitrixAPIListResponse
 from .bitrix_api_response import BitrixAPIResponse
@@ -51,7 +52,7 @@ class BitrixAPIBaseValueResponse(BitrixAPIResponse[BAResultT], AbstractBitrixAPI
     @classmethod
     def from_dict(
             cls: Type[BAValueResponseT],
-            json_response: JSONDict,
+            json_response: ResponseData,
             /,
             *,
             result_adapter: Callable[[BAResultT], Union[BAValueT, List[BAValueT]]] = _missing_result_adapter,
@@ -73,21 +74,6 @@ class BitrixAPIBaseValueResponse(BitrixAPIResponse[BAResultT], AbstractBitrixAPI
             total=json_response.get("total"),
             _result_adapter=result_adapter,
         )
-
-    def to_dict(self) -> JSONDict:
-        """
-        Convert response to a JSON-compatible dictionary.
-
-        Internal adapter field is intentionally excluded from the serialized
-        representation.
-        """
-        return {
-            "result": self.result,
-            "time": self.time.to_dict(),
-            "next": self.next,
-            "total": self.total,
-        }
-
 
 @dataclass(**frozen_dataclass_kwargs(repr=False, eq=False))
 class BitrixAPIValueResponse(BitrixAPIBaseValueResponse[BAResultT, BAValueT], Generic[BAResultT, BAValueT]):
@@ -157,7 +143,7 @@ class BitrixAPIValuesListResponse(BitrixAPIListResponse, AbstractBitrixAPIValueR
     @classmethod
     def from_dict(
             cls,
-            json_response: JSONDict,
+            json_response: ListResponseData,
             /,
             *,
             result_adapter: Callable[[JSONList], List[BAValueT]] = _missing_result_adapter,
@@ -179,7 +165,7 @@ class BitrixAPIValuesListResponse(BitrixAPIListResponse, AbstractBitrixAPIValueR
             _result_adapter=result_adapter,
         )
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self) -> ListResponseData:
         """
         Convert list response to a JSON-compatible dictionary.
 
@@ -217,7 +203,7 @@ class BitrixAPIValuesListFastResponse(BitrixAPIListFastResponse, AbstractBitrixA
     @classmethod
     def from_dict(
             cls,
-            json_response: JSONDict,
+            json_response: ListFastResponseData,
             /,
             *,
             result_adapter: Callable[[JSONGenerator], Generator[BAValueT, None, None]] = _missing_result_adapter,

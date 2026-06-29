@@ -140,7 +140,7 @@ class Logmessage(BaseCRM):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[Optional[bool]]:
         """Delete log entry.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/logmessage/crm-timeline-logmessage-delete.html

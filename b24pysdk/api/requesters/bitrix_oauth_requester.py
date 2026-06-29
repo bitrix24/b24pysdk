@@ -2,18 +2,11 @@ from typing import Any, Dict, Final, Optional, Text
 
 import requests
 
-from ...errors import (
-    BitrixAPIInsufficientScope,
-    BitrixAPIInvalidRequest,
-)
-from ...errors.oauth import (
-    BitrixOAuthInsufficientScope,
-    BitrixOAuthInvalidRequest,
-    BitrixOAuthRequestError,
-    BitrixOAuthRequestTimeout,
-)
+from ...errors import BitrixAPIInsufficientScope, BitrixAPIInvalidRequest
+from ...errors.oauth import BitrixOAuthInsufficientScope, BitrixOAuthInvalidRequest, BitrixOAuthRequestError, BitrixOAuthRequestTimeout
 from ...protocols import BitrixOAuthProtocol
-from ...utils.types import JSONDict, Number, Timeout
+from ...schemas.api import BitrixAppInfoResponseData
+from ...utils.types import JSONDict, Number, Timeout, cast
 from ._base_requester import BaseRequester
 
 __all__ = [
@@ -283,7 +276,7 @@ class BitrixOAuthRequester(BaseRequester):
 
         return json_response
 
-    def get_app_info(self, auth_token: Text) -> JSONDict:
+    def get_app_info(self, auth_token: Text) -> BitrixAppInfoResponseData:
         """
         Retrieve Bitrix24 application installation information.
 
@@ -316,4 +309,4 @@ class BitrixOAuthRequester(BaseRequester):
             },
         )
 
-        return json_response
+        return cast(BitrixAppInfoResponseData, json_response)

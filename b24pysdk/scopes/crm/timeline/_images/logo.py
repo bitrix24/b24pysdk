@@ -1,4 +1,4 @@
-from typing import Text
+from typing import Optional, Text
 
 from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
@@ -101,7 +101,7 @@ class Logo(BaseImage):
             *,
             code: Text,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[Optional[bool]]:
         """Delete logo
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/logmessage/logo/crm-timeline-logo-delete.html

@@ -56,7 +56,7 @@ class Quote(BaseItem):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """Create a new estimate.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/quote/crm-quote-add.html
@@ -173,7 +173,7 @@ class Quote(BaseItem):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Update the estimate.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/quote/crm-quote-update.html
@@ -212,7 +212,7 @@ class Quote(BaseItem):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete estimate.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/quote/crm-quote-delete.html

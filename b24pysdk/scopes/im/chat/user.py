@@ -1,4 +1,4 @@
-from typing import Iterable, Optional, Text, Union
+from typing import Iterable, List, Optional, Text, Union
 
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
@@ -21,7 +21,7 @@ class User(BaseEntity):
             *,
             hide_history: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         if users.__class__ is not list:
@@ -48,7 +48,7 @@ class User(BaseEntity):
             user_id: Union[int, Text],
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = dict(
@@ -68,7 +68,7 @@ class User(BaseEntity):
             chat_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[List[int]]:
         """"""
 
         params = dict(

@@ -1,10 +1,10 @@
 from abc import ABC
-from typing import Callable, Iterable, Optional, Text
+from typing import Iterable, Optional, Text, Type
 
 from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
 from ....schemas.crm.field import CRMFieldsDict
 from ....utils.converters import bool_to_bitrix
-from ....utils.type_vars import BAResultT, BAValueT
+from ....utils.type_vars import BSDT, BAResultT
 from ....utils.types import JSONDict, Timeout
 from .._base_crm import BaseCRM
 
@@ -26,8 +26,8 @@ class BaseItem(BaseCRM, ABC):
             entity_type_id: Optional[int] = None,
             use_original_uf_names: Optional[bool] = None,
             timeout: Timeout = None,
-            result_adapter: Callable[[BAResultT], BAValueT] = CRMFieldsDict.from_bitrix,
-    ) -> BitrixAPIValueRequest[BAResultT, BAValueT]:
+            value_type: Type[BSDT] = CRMFieldsDict,
+    ) -> BitrixAPIValueRequest[BAResultT, BSDT]:
         """Get fields of CRM item.
 
         This method retrieves a list of fields and their configuration for items of type entityTypeId.
@@ -40,7 +40,7 @@ class BaseItem(BaseCRM, ABC):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValueRequest
         """
 
         params: JSONDict = {}
@@ -56,7 +56,7 @@ class BaseItem(BaseCRM, ABC):
             params=params,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValueRequest,
-            result_adapter=result_adapter,
+            result_adapter=value_type.from_bitrix,
         )
 
     def _add(

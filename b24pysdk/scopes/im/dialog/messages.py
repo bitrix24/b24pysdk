@@ -22,7 +22,7 @@ class Messages(BaseEntity):
             first_id: Optional[Union[int, Text]] = None,
             limit: Optional[int] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """"""
 
         params = dict(
@@ -57,7 +57,7 @@ class Messages(BaseEntity):
             limit: Optional[int] = None,
             last_id: Optional[int] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """"""
 
         params: JSONDict = {

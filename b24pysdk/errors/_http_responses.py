@@ -4,6 +4,8 @@ from typing import ClassVar
 
 import requests
 
+from .._constants import MISSING
+
 __all__ = [
     "HTTPResponse",
     "HTTPResponseBadRequest",
@@ -29,7 +31,7 @@ class HTTPResponse(ABC):
     through subclasses.
     """
 
-    STATUS_CODE: ClassVar[HTTPStatus] = NotImplemented
+    STATUS_CODE: ClassVar[HTTPStatus] = MISSING
     """HTTP status code represented by the response class."""
 
     response: requests.Response

@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List, Optional, Text
 
 from ....api.requests import BitrixAPIRequest
+from ....schemas.results import IDResultData
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
 from .._base_crm import BaseCRM
@@ -31,7 +32,7 @@ class Todo(BaseCRM):
             ping_offsets: Optional[List[int]] = None,
             color_id: Optional[Text] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[Optional[IDResultData]]:
         """Add a new universal activity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/todo/crm-activity-todo-add.html
@@ -108,7 +109,7 @@ class Todo(BaseCRM):
             ping_offsets: Optional[List[int]] = None,
             color_id: Optional[Text] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[Optional[IDResultData]]:
         """Update universal activity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/todo/crm-activity-todo-update.html
@@ -182,7 +183,7 @@ class Todo(BaseCRM):
             color_id: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[Optional[IDResultData]]:
         """Update the color of the universal activity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/todo/crm-activity-todo-update-color.html
@@ -226,7 +227,7 @@ class Todo(BaseCRM):
             value: datetime,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[Optional[IDResultData]]:
         """Update the deadline of the universal activity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/todo/crm-activity-todo-update-deadline.html
@@ -270,7 +271,7 @@ class Todo(BaseCRM):
             value: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[Optional[IDResultData]]:
         """Update the description of the universal activity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/todo/crm-activity-todo-update-description.html
@@ -314,7 +315,7 @@ class Todo(BaseCRM):
             responsible_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[Optional[IDResultData]]:
         """Update the responsible user for the universal activity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/todo/crm-activity-todo-update-responsible-user.html

@@ -1,8 +1,9 @@
 from abc import ABC
 from typing import TYPE_CHECKING, Generic, Optional
 
+from ...schemas.api import ListFastResponseData, ListResponseData
 from ...utils.type_vars import BAListResponseT, BAListResultT
-from ...utils.types import JSONDict, JSONGenerator, JSONList
+from ...utils.types import JSONGenerator, JSONList
 from ..responses import BitrixAPIListFastResponse, BitrixAPIListResponse
 from .bitrix_api_base_request import BitrixAPIBaseRequest
 
@@ -72,7 +73,7 @@ class BitrixAPIListRequest(BitrixAPIBaseListRequest[BitrixAPIListResponse, JSONL
 
     __slots__ = ()
 
-    def _convert_response(self, json_response: JSONDict) -> BitrixAPIListResponse:
+    def _convert_response(self, json_response: ListResponseData) -> BitrixAPIListResponse:
         """
         Convert raw JSON response into ``BitrixAPIListResponse``.
 
@@ -84,7 +85,7 @@ class BitrixAPIListRequest(BitrixAPIBaseListRequest[BitrixAPIListResponse, JSONL
         """
         return BitrixAPIListResponse.from_dict(json_response)
 
-    def _call(self) -> JSONDict:
+    def _call(self) -> ListResponseData:
         """
         Execute the request using standard list pagination.
 
@@ -147,7 +148,7 @@ class BitrixAPIListFastRequest(BitrixAPIBaseListRequest[BitrixAPIListFastRespons
             f"limit={self._limit})"
         )
 
-    def _convert_response(self, json_response: JSONDict) -> BitrixAPIListFastResponse:
+    def _convert_response(self, json_response: ListFastResponseData) -> BitrixAPIListFastResponse:
         """
         Convert raw JSON response into ``BitrixAPIListFastResponse``.
 
@@ -159,7 +160,7 @@ class BitrixAPIListFastRequest(BitrixAPIBaseListRequest[BitrixAPIListFastRespons
         """
         return BitrixAPIListFastResponse.from_dict(json_response)
 
-    def _call(self) -> JSONDict:
+    def _call(self) -> ListFastResponseData:
         """
         Execute the request using fast ID-window pagination.
 

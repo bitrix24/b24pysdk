@@ -72,7 +72,7 @@ class Note(BaseCRM):
             item_type: int,
             item_id: int,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete note.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/note/crm-timeline-note-delete.html
@@ -118,7 +118,7 @@ class Note(BaseCRM):
             item_id: int,
             text: Text,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Save note.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/note/crm-timeline-note-save.html

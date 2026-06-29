@@ -8,7 +8,7 @@ __all__ = [
     "StrEnum",
 ]
 
-_MIN_STR_WITH_ENCODING_ARGS: typing.Final[int] = 2
+_MIN_STR_ENCODING_ARGS: typing.Final[int] = 2
 _MAX_STR_CONSTRUCTOR_ARGS: typing.Final[int] = 3
 
 
@@ -35,7 +35,7 @@ else:
             if len(values) == 1 and not isinstance(values[0], str):
                 raise TypeError("%r is not a string" % (values[0],))
 
-            if len(values) >= _MIN_STR_WITH_ENCODING_ARGS and not isinstance(values[1], str):
+            if len(values) >= _MIN_STR_ENCODING_ARGS and not isinstance(values[1], str):
                 raise TypeError("encoding must be a string, not %r" % (values[1],))
 
             if len(values) == _MAX_STR_CONSTRUCTOR_ARGS and not isinstance(values[2], str):

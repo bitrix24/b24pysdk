@@ -69,7 +69,7 @@ class Configuration(BaseConfiguration):
             scope: Optional[str] = None,
             extras: Optional[JSONDict] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Set parameters for CRM item detail card configuration.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/item-details-configuration/crm-item-details-configuration-set.html
@@ -115,7 +115,7 @@ class Configuration(BaseConfiguration):
             scope: Optional[str] = None,
             extras: Optional[JSONDict] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Reset item card parameters.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/item-details-configuration/crm-item-details-configuration-reset.html
@@ -156,7 +156,7 @@ class Configuration(BaseConfiguration):
             entity_type_id: int,
             extras: Optional[JSONDict] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Set common detail for all users.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/item-details-configuration/crm-item-details-configuration-forceCommonScopeForAll.html

@@ -50,7 +50,7 @@ class Status(BaseCRM):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """Create a new CRM directory element.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/status/crm-status-add.html
@@ -98,7 +98,15 @@ class Status(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return self._get(bitrix_id=bitrix_id, timeout=timeout)
+        params: JSONDict = {
+            "id": bitrix_id,
+        }
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.get,
+            params=params,
+            timeout=timeout,
+        )
 
     @type_checker
     def list(
@@ -147,7 +155,7 @@ class Status(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = dict()
+        params: JSONDict = {}
 
         if filter is not None:
             params["filter"] = filter
@@ -168,7 +176,7 @@ class Status(BaseCRM):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Update an existing CRM directory item.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/status/crm-status-update.html
@@ -208,7 +216,7 @@ class Status(BaseCRM):
             *,
             params: Optional[JSONDict] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete CRM status element.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/status/crm-status-delete.html
@@ -226,7 +234,7 @@ class Status(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        _params = {
+        _params: JSONDict = {
             "id": bitrix_id,
         }
 

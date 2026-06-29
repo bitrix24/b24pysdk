@@ -70,5 +70,4 @@ class AccessNamesDict(BaseSchemaDict[AccessName, AccessNameData]):
     The method returns access permission descriptions indexed by access
     identifier, for example ``G2`` or ``AU``.
     """
-
     _ITEM_SCHEMA = AccessName

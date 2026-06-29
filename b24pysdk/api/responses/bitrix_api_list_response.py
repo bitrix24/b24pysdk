@@ -2,10 +2,10 @@ from abc import ABC
 from dataclasses import InitVar, dataclass, field
 from typing import TYPE_CHECKING, Generic
 
-from ...schemas.time import TimeData
+from ...schemas.api import ListFastResponseData, ListResponseData, TimeResponseData
 from ...utils.dataclasses import frozen_dataclass_kwargs
 from ...utils.type_vars import BAListResultT
-from ...utils.types import JSONDict, JSONGenerator, JSONList
+from ...utils.types import JSONGenerator, JSONList
 from .abstract_bitrix_response import AbstractBitrixResponse
 
 if TYPE_CHECKING:
@@ -44,7 +44,7 @@ class BitrixAPIListResponse(AbstractBitrixAPIListResponse[JSONList]):
         )
 
     @classmethod
-    def from_dict(cls, json_response: JSONDict, /) -> "BitrixAPIListResponse":
+    def from_dict(cls, json_response: ListResponseData, /) -> "BitrixAPIListResponse":
         """
         Create a BitrixAPIListResponse instance from raw JSON response.
 
@@ -58,6 +58,18 @@ class BitrixAPIListResponse(AbstractBitrixAPIListResponse[JSONList]):
             result=json_response["result"],
             time=cls._convert_time(json_response["time"]),
         )
+
+    def to_dict(self) -> ListResponseData:
+        """
+        Convert list response to a dictionary.
+
+        Returns:
+            Dictionary representation of the list response.
+        """
+        return {
+            "result": self.result,
+            "time": self.time.to_dict(),
+        }
 
 
 @dataclass(**frozen_dataclass_kwargs(repr=False, eq=False))
@@ -73,8 +85,8 @@ class BitrixAPIListFastResponse(AbstractBitrixAPIListResponse[JSONGenerator]):
     available only after the result generator has been fully consumed.
     """
 
-    time: InitVar[TimeData]
-    _time: TimeData = field(init=False)
+    time: InitVar[TimeResponseData]
+    _time: TimeResponseData = field(init=False)
 
     def __repr__(self):
         return (
@@ -83,7 +95,7 @@ class BitrixAPIListFastResponse(AbstractBitrixAPIListResponse[JSONGenerator]):
             f"time={self.time})"
         )
 
-    def __post_init__(self, time: TimeData):
+    def __post_init__(self, time: TimeResponseData):
         """
         Store mutable raw timing metadata.
 
@@ -103,7 +115,7 @@ class BitrixAPIListFastResponse(AbstractBitrixAPIListResponse[JSONGenerator]):
         return self._convert_time(self._time)
 
     @classmethod
-    def from_dict(cls, json_response: JSONDict, /) -> "BitrixAPIListFastResponse":
+    def from_dict(cls, json_response: ListFastResponseData, /) -> "BitrixAPIListFastResponse":
         """
         Create a BitrixAPIListFastResponse instance from raw JSON response.
 
@@ -118,19 +130,16 @@ class BitrixAPIListFastResponse(AbstractBitrixAPIListResponse[JSONGenerator]):
             time=json_response["time"],
         )
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self) -> ListFastResponseData:
         """
-        Convert fast list response to dictionary.
+        Convert fast list response to a dictionary.
 
-        Warning:
-            This method consumes the one-time ``result`` generator by converting
-            it to a list. After calling this method, the generator should be
-            treated as exhausted.
+        The returned ``result`` keeps the original one-time generator.
 
         Returns:
-            Dictionary representation of the response.
+            Dictionary representation of the fast list response.
         """
         return {
-            "result": list(self.result),
+            "result": self.result,
             "time": self.time.to_dict(),
         }

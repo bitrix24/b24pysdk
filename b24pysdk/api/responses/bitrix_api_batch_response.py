@@ -1,6 +1,7 @@
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from typing import Dict, List, Text, Union
 
+from ...schemas.api import BatchResponseData, BatchResultData
 from ...utils.dataclasses import frozen_dataclass_kwargs
 from ...utils.types import B24APIResult, JSONDict, JSONList
 from .abstract_bitrix_response import AbstractBitrixResponse
@@ -40,7 +41,7 @@ class B24APIBatchResult:
         )
 
     @classmethod
-    def from_dict(cls, json_response: JSONDict, /) -> "B24APIBatchResult":
+    def from_dict(cls, json_response: BatchResultData, /) -> "B24APIBatchResult":
         """
         Create a B24APIBatchResult instance from raw batch result data.
 
@@ -73,14 +74,32 @@ class B24APIBatchResult:
             result_time=result_time,
         )
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self) -> BatchResultData:
         """
         Convert batch result payload to dictionary.
 
         Returns:
             Dictionary representation of the batch result.
         """
-        return asdict(self)
+
+        if isinstance(self.result_time, dict):
+            result_time = {
+                key: time_value.to_dict()
+                for key, time_value in self.result_time.items()
+            }
+        else:
+            result_time = [
+                time_value.to_dict()
+                for time_value in self.result_time
+            ]
+
+        return {
+            "result": self.result,
+            "result_error": self.result_error,
+            "result_total": self.result_total,
+            "result_next": self.result_next,
+            "result_time": result_time,
+        }
 
 
 @dataclass(**frozen_dataclass_kwargs(repr=False, eq=False))
@@ -93,7 +112,7 @@ class BitrixAPIBatchResponse(AbstractBitrixResponse[B24APIBatchResult]):
     """
 
     @classmethod
-    def from_dict(cls, json_response: JSONDict, /) -> "BitrixAPIBatchResponse":
+    def from_dict(cls, json_response: BatchResponseData, /) -> "BitrixAPIBatchResponse":
         """
         Create a BitrixAPIBatchResponse instance from raw JSON response.
 
@@ -107,3 +126,15 @@ class BitrixAPIBatchResponse(AbstractBitrixResponse[B24APIBatchResult]):
             result=B24APIBatchResult.from_dict(json_response["result"]),
             time=cls._convert_time(json_response["time"]),
         )
+
+    def to_dict(self) -> BatchResponseData:
+        """
+        Convert response to a JSON-compatible dictionary.
+
+        Internal adapter field is intentionally excluded from the serialized
+        representation.
+        """
+        return {
+            "result": self.result.to_dict(),
+            "time": self.time.to_dict(),
+        }

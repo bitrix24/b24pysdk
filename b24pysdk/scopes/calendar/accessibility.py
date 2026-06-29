@@ -2,7 +2,7 @@ from typing import Iterable, Text
 
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import Timeout
+from ...utils.types import JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -25,7 +25,7 @@ class Accessibility(BaseEntity):
             to: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """
         Retrieve the accessibility of specified users within a date range.
 

@@ -69,7 +69,7 @@ class Requisite(BaseItem):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """Add Requisite.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/universal/crm-requisite-add.html
@@ -186,7 +186,7 @@ class Requisite(BaseItem):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Update Requisite.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/universal/crm-requisite-update.html
@@ -225,7 +225,7 @@ class Requisite(BaseItem):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete requisite.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/universal/crm-requisite-delete.html

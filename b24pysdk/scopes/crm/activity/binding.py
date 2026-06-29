@@ -1,3 +1,5 @@
+from typing import Dict, List, Text
+
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
@@ -22,7 +24,7 @@ class Binding(BaseCRM):
             entity_type_id: int,
             entity_id: int,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Add a deal binding to a CRM entity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/binding/crm-activity-binding-add.html
@@ -64,7 +66,7 @@ class Binding(BaseCRM):
             target_entity_type_id: int,
             target_entity_id: int,
             timeout: Timeout = None,
-    ):
+    ) -> BitrixAPIRequest[bool]:
         """Update the deal's connection with the CRM entity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/binding/crm-activity-binding-move.html
@@ -108,7 +110,7 @@ class Binding(BaseCRM):
             activity_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[List[Dict[Text, int]]]:
         """Get a list of all bindings for the activity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/binding/crm-activity-binding-list.html
@@ -143,7 +145,7 @@ class Binding(BaseCRM):
             entity_type_id: int,
             entity_id: int,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete the connection of the activity with the CRM entity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/binding/crm-activity-binding-delete.html

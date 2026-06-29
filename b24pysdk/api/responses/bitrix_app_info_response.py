@@ -1,10 +1,10 @@
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Text
 
 from ...constants import B24AppStatus
+from ...schemas.api import B24AppInfoInstallData, B24AppInfoResultData, BitrixAppInfoResponseData
 from ...utils.dataclasses import frozen_dataclass_kwargs
-from ...utils.types import JSONDict
 from .abstract_bitrix_response import AbstractBitrixResponse
 
 __all__ = [
@@ -34,7 +34,7 @@ class B24AppInfoInstall:
     member_type: Text
 
     @classmethod
-    def from_dict(cls, json_response: JSONDict, /) -> "B24AppInfoInstall":
+    def from_dict(cls, json_response: B24AppInfoInstallData, /) -> "B24AppInfoInstall":
         """
         Create a B24AppInfoInstall instance from raw install data.
 
@@ -56,14 +56,24 @@ class B24AppInfoInstall:
             member_type=json_response["member_type"],
         )
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self) -> B24AppInfoInstallData:
         """
         Convert installation metadata to dictionary.
 
         Returns:
             Dictionary representation of the installation metadata.
         """
-        return asdict(self)
+        return {
+            "installed": self.installed,
+            "version": self.version,
+            "status": self.status.value,
+            "scope": ",".join(self.scope),
+            "domain": self.domain,
+            "uri": self.uri,
+            "client_endpoint": self.client_endpoint,
+            "member_id": self.member_id,
+            "member_type": self.member_type,
+        }
 
 
 @dataclass(**frozen_dataclass_kwargs(eq=False))
@@ -82,7 +92,7 @@ class B24AppInfoResult:
     user_id: int
 
     @classmethod
-    def from_dict(cls, json_response: JSONDict, /) -> "B24AppInfoResult":
+    def from_dict(cls, json_response: B24AppInfoResultData, /) -> "B24AppInfoResult":
         """
         Create a B24AppInfoResult instance from raw ``app.info`` result data.
 
@@ -100,17 +110,23 @@ class B24AppInfoResult:
             user_id=int(json_response["user_id"]),
         )
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self) -> B24AppInfoResultData:
         """
         Convert application info result to dictionary.
 
         Returns:
             Dictionary representation of the application info result.
         """
-        return asdict(self)
+        return {
+            "client_id": self.client_id,
+            "scope": ",".join(self.scope),
+            "expires": self.expires.isoformat(),
+            "install": self.install.to_dict(),
+            "user_id": self.user_id,
+        }
 
 
-@dataclass(**frozen_dataclass_kwargs(eq=False))
+@dataclass(**frozen_dataclass_kwargs(repr=False, eq=False))
 class BitrixAppInfoResponse(AbstractBitrixResponse[B24AppInfoResult]):
     """
     Typed response for the Bitrix24 ``app.info`` method.
@@ -120,7 +136,7 @@ class BitrixAppInfoResponse(AbstractBitrixResponse[B24AppInfoResult]):
     """
 
     @classmethod
-    def from_dict(cls, json_response: JSONDict, /) -> "BitrixAppInfoResponse":
+    def from_dict(cls, json_response: BitrixAppInfoResponseData, /) -> "BitrixAppInfoResponse":
         """
         Create a BitrixAppInfoResponse instance from raw JSON response.
 
@@ -134,3 +150,15 @@ class BitrixAppInfoResponse(AbstractBitrixResponse[B24AppInfoResult]):
             result=B24AppInfoResult.from_dict(json_response["result"]),
             time=cls._convert_time(json_response["time"]),
         )
+
+    def to_dict(self) -> BitrixAppInfoResponseData:
+        """
+        Convert response to a JSON-compatible dictionary.
+
+        Returns:
+            Dictionary representation of the ``app.info`` response.
+        """
+        return {
+            "result": self.result.to_dict(),
+            "time": self.time.to_dict(),
+        }

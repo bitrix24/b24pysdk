@@ -21,7 +21,7 @@ class Member(BaseEntity):
             role: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """"""
 
         if user_ids.__class__ is not list:
@@ -47,7 +47,7 @@ class Member(BaseEntity):
             *,
             role: Optional[Text] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """"""
 
         if user_ids.__class__ is not list:
@@ -74,7 +74,7 @@ class Member(BaseEntity):
             user_ids: Iterable[int],
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """"""
 
         if user_ids.__class__ is not list:
@@ -98,7 +98,7 @@ class Member(BaseEntity):
             user_ids: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """"""
 
         params = {

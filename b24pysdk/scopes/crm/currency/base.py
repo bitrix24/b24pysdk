@@ -21,7 +21,7 @@ class Base(BaseCRM):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[Text]:
         """Get the symbolic identifier of the base currency.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/currency/crm-currency-base-get.html
@@ -45,7 +45,7 @@ class Base(BaseCRM):
             bitrix_id: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Set currency as base.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/currency/crm-currency-base-set.html

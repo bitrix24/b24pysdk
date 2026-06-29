@@ -2,7 +2,7 @@ from typing import Optional
 
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import JSONDict, Timeout
+from ....utils.types import JSONDict, JSONList, Timeout
 from .._base_crm import BaseCRM
 
 __all__ = [
@@ -23,7 +23,7 @@ class Items(BaseCRM):
             list_id: int,
             filter: Optional[JSONDict] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONList]:
         """Get the list of participants for the call.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/call-list/crm-calllist-items-get.html

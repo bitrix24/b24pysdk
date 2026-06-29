@@ -2,7 +2,7 @@ from typing import Text, Union
 
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import Timeout
+from ....utils.types import JSONDict, Timeout
 from ..._base_entity import BaseEntity
 
 __all__ = [
@@ -20,7 +20,7 @@ class Read(BaseEntity):
             message_id: Union[int, Text],
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[Union[JSONDict, bool]]:
         """"""
 
         params = dict(
@@ -39,7 +39,7 @@ class Read(BaseEntity):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         return self._make_bitrix_api_request(

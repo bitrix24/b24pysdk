@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Text, Union
+from typing import Any, Optional, Text, Union
 
 from ..._config import Config
 from ...constants.version import B24APIVersion
@@ -100,6 +100,6 @@ class BaseCaller(ABC):
             return B24APIVersion.V2
 
     @abstractmethod
-    def call(self) -> JSONDict:
-        """Execute the configured API operation and return the parsed JSON response."""
+    def call(self) -> Any:
+        """Execute the configured API operation and return the parsed response."""
         raise NotImplementedError

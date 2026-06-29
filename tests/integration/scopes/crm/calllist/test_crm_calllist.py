@@ -3,8 +3,9 @@ from typing import Generator, Text, Tuple
 import pytest
 from _pytest.cacheprovider import Cache
 
-from b24pysdk.api.responses import BitrixAPIListFastResponse, BitrixAPIListResponse, BitrixAPIResponse
+from b24pysdk.api.responses import BitrixAPIListFastResponse, BitrixAPIListResponse, BitrixAPIResponse, BitrixAPIValuesResponse
 from b24pysdk.client import BaseClient
+from b24pysdk.schemas.crm.calllist import CalllistStatus
 
 pytestmark = [
     # pytest.mark.integration,
@@ -16,7 +17,6 @@ _ENTITY_TYPE: Text = "CONTACT"
 _ENTITY_TYPE_ID: int = 3
 _ENTITIES: Tuple[int] = (1,)
 _UPDATED_ENTITIES: Tuple[int, ...] = (1, 3)
-_STATUS_LIST_FIELDS: Tuple = ("ID", "NAME", "SORT", "STATUS_ID")
 
 
 def test_calllist_statuslist(bitrix_client: BaseClient):
@@ -24,17 +24,19 @@ def test_calllist_statuslist(bitrix_client: BaseClient):
 
     bitrix_response = bitrix_client.crm.calllist.statuslist().response
 
-    assert isinstance(bitrix_response, BitrixAPIResponse)
+    assert isinstance(bitrix_response, BitrixAPIValuesResponse)
     assert isinstance(bitrix_response.result, list)
 
-    statuses = bitrix_response.result
+    statuses = bitrix_response.values
 
     assert len(statuses) >= 1, "Expected at least one call status to be returned"
 
     for status in statuses:
-        assert isinstance(status, dict)
-        for field in _STATUS_LIST_FIELDS:
-            assert field in status, f"Field {field} should be present"
+        assert isinstance(status, CalllistStatus)
+        assert isinstance(status.bitrix_id, int)
+        assert isinstance(status.name, str)
+        assert isinstance(status.sort, int)
+        assert isinstance(status.status_id, str)
 
 
 @pytest.mark.dependency(name="test_calllist_add")

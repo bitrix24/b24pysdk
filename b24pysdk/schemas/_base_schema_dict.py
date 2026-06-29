@@ -1,13 +1,11 @@
 from abc import ABC
-from typing import Dict, Generic, Optional, Text, Type, TypeVar, Union
+from typing import Dict, Generic, Optional, Text, Type, Union
 
-from ..utils.type_vars import BST, BSDataT
+from ..utils.type_vars import BSDT, BST, BSDataT
 
 __all__ = [
     "BaseSchemaDict",
 ]
-
-_BSDT = TypeVar("_BSDT", bound="BaseSchemaDict")
 
 
 class BaseSchemaDict(dict[Text, BST], ABC, Generic[BST, BSDataT]):
@@ -23,10 +21,10 @@ class BaseSchemaDict(dict[Text, BST], ABC, Generic[BST, BSDataT]):
 
     @classmethod
     def from_bitrix(
-            cls: Type[_BSDT],
+            cls: Type[BSDT],
             bitrix_data: Union[Dict[Text, BSDataT], Dict[Text, Dict[Text, BSDataT]]],
             /,
-    ) -> _BSDT:
+    ) -> BSDT:
         """
         Create a schema dictionary from Bitrix24 mapping data.
 

@@ -18,12 +18,10 @@ from functools import cached_property
 from typing import TYPE_CHECKING, ClassVar, List, Literal, Mapping, Optional, Sequence, Text, Union, overload
 
 from . import scopes
+from ._constants import MISSING
 from .api.requests import BitrixAPIBatchesRequest, BitrixAPIBatchRequest
 from .constants.version import B24APIVersion
 from .protocols import BitrixTokenFullProtocol
-from .scopes import v3 as scopes_v3
-
-# noinspection PyProtectedMember
 from .scopes._base_context import BaseContext
 from .utils.types import B24APIVersionLiteral, JSONDict, Key, Number, Timeout
 
@@ -54,7 +52,7 @@ class BaseClient(ABC):
     for requests.
     """
 
-    VERSION: ClassVar[Union[B24APIVersion, B24APIVersionLiteral]] = NotImplemented
+    VERSION: ClassVar[Union[B24APIVersion, B24APIVersionLiteral]] = MISSING
 
     _bitrix_token: BitrixTokenFullProtocol
     _kwargs: JSONDict
@@ -98,183 +96,183 @@ class BaseClient(ABC):
             self._kwargs["retry_delay_increment"] = retry_delay_increment
 
     @cached_property
-    def access(self) -> scopes.Access:
+    def access(self) -> "scopes.Access":
         return scopes.Access(self)
 
     @cached_property
-    def ai(self) -> scopes.Ai:
-        return scopes.Ai(self)
+    def ai(self) -> "scopes.AI":
+        return scopes.AI(self)
 
     @cached_property
-    def app(self) -> scopes.App:
+    def app(self) -> "scopes.App":
         return scopes.App(self)
 
     @cached_property
-    def booking(self) -> scopes.Booking:
+    def booking(self) -> "scopes.Booking":
         return scopes.Booking(self)
 
     @cached_property
-    def biconnector(self) -> scopes.Biconnector:
+    def biconnector(self) -> "scopes.Biconnector":
         return scopes.Biconnector(self)
 
     @cached_property
-    def bizproc(self) -> scopes.Bizproc:
+    def bizproc(self) -> "scopes.Bizproc":
         return scopes.Bizproc(self)
 
     @cached_property
-    def calendar(self) -> scopes.Calendar:
+    def calendar(self) -> "scopes.Calendar":
         return scopes.Calendar(self)
 
     @cached_property
-    def catalog(self) -> scopes.Catalog:
+    def catalog(self) -> "scopes.Catalog":
         return scopes.Catalog(self)
 
     @cached_property
-    def crm(self) -> scopes.CRM:
+    def crm(self) -> "scopes.CRM":
         return scopes.CRM(self)
 
     @cached_property
-    def department(self) -> scopes.Department:
+    def department(self) -> "scopes.Department":
         return scopes.Department(self)
 
     @cached_property
-    def disk(self) -> scopes.Disk:
+    def disk(self) -> "scopes.Disk":
         return scopes.Disk(self)
 
     @cached_property
-    def documentgenerator(self) -> scopes.Documentgenerator:
+    def documentgenerator(self) -> "scopes.Documentgenerator":
         return scopes.Documentgenerator(self)
 
     @cached_property
-    def entity(self) -> scopes.Entity:
+    def entity(self) -> "scopes.Entity":
         return scopes.Entity(self)
 
     @cached_property
-    def event(self) -> scopes.Event:
+    def event(self) -> "scopes.Event":
         return scopes.Event(self)
 
     @cached_property
-    def events(self) -> scopes.Events:
+    def events(self) -> "scopes.Events":
         return scopes.Events(self)
 
     @cached_property
-    def feature(self) -> scopes.Feature:
+    def feature(self) -> "scopes.Feature":
         return scopes.Feature(self)
 
     @cached_property
-    def im(self) -> scopes.Im:
+    def im(self) -> "scopes.Im":
         return scopes.Im(self)
 
     @cached_property
-    def imbot(self) -> scopes.Imbot:
+    def imbot(self) -> "scopes.Imbot":
         return scopes.Imbot(self)
 
     @cached_property
-    def imconnector(self) -> scopes.Imconnector:
+    def imconnector(self) -> "scopes.Imconnector":
         return scopes.Imconnector(self)
 
     @cached_property
-    def imopenlines(self) -> scopes.Imopenlines:
+    def imopenlines(self) -> "scopes.Imopenlines":
         return scopes.Imopenlines(self)
 
     @cached_property
-    def landing(self) -> scopes.Landing:
+    def landing(self) -> "scopes.Landing":
         return scopes.Landing(self)
 
     @cached_property
-    def lists(self) -> scopes.Lists:
+    def lists(self) -> "scopes.Lists":
         return scopes.Lists(self)
 
     @cached_property
-    def mailservice(self) -> scopes.Mailservice:
+    def mailservice(self) -> "scopes.Mailservice":
         return scopes.Mailservice(self)
 
     @cached_property
-    def messageservice(self) -> scopes.Messageservice:
+    def messageservice(self) -> "scopes.Messageservice":
         return scopes.Messageservice(self)
 
     @cached_property
-    def method(self) -> scopes.Method:
+    def method(self) -> "scopes.Method":
         return scopes.Method(self)
 
     @cached_property
-    def placement(self) -> scopes.Placement:
+    def placement(self) -> "scopes.Placement":
         return scopes.Placement(self)
 
     @cached_property
-    def profile(self) -> scopes.Profile:
+    def profile(self) -> "scopes.Profile":
         return scopes.Profile(self)
 
     @cached_property
-    def pull(self) -> scopes.Pull:
+    def pull(self) -> "scopes.Pull":
         return scopes.Pull(self)
 
     @cached_property
-    def rpa(self) -> scopes.Rpa:
+    def rpa(self) -> "scopes.Rpa":
         return scopes.Rpa(self)
 
     @cached_property
-    def salescenter(self) -> scopes.Salescenter:
+    def salescenter(self) -> "scopes.Salescenter":
         return scopes.Salescenter(self)
 
     @cached_property
-    def sale(self) -> scopes.Sale:
+    def sale(self) -> "scopes.Sale":
         return scopes.Sale(self)
 
     @cached_property
-    def scope(self) -> scopes.Scope:
+    def scope(self) -> "scopes.Scope":
         return scopes.Scope(self)
 
     @cached_property
-    def server(self) -> scopes.Server:
+    def server(self) -> "scopes.Server":
         return scopes.Server(self)
 
     @cached_property
-    def sign(self) -> scopes.Sign:
+    def sign(self) -> "scopes.Sign":
         return scopes.Sign(self)
 
     @cached_property
-    def socialnetwork(self) -> scopes.Socialnetwork:
+    def socialnetwork(self) -> "scopes.Socialnetwork":
         return scopes.Socialnetwork(self)
 
     @cached_property
-    def sonet_group(self) -> scopes.SonetGroup:
+    def sonet_group(self) -> "scopes.SonetGroup":
         return scopes.SonetGroup(self)
 
     @cached_property
-    def task(self) -> scopes.Task:
+    def task(self) -> "scopes.Task":
         return scopes.Task(self)
 
     @cached_property
-    def telephony(self) -> scopes.Telephony:
+    def telephony(self) -> "scopes.Telephony":
         return scopes.Telephony(self)
 
     @cached_property
-    def timeman(self) -> scopes.Timeman:
+    def timeman(self) -> "scopes.Timeman":
         return scopes.Timeman(self)
 
     @cached_property
-    def user(self) -> scopes.User:
+    def user(self) -> "scopes.User":
         return scopes.User(self)
 
     @cached_property
-    def userfieldconfig(self) -> scopes.Userfieldconfig:
+    def userfieldconfig(self) -> "scopes.Userfieldconfig":
         return scopes.Userfieldconfig(self)
 
     @cached_property
-    def userfieldtype(self) -> scopes.Userfieldtype:
+    def userfieldtype(self) -> "scopes.Userfieldtype":
         return scopes.Userfieldtype(self)
 
     @cached_property
-    def userconsent(self) -> scopes.Userconsent:
+    def userconsent(self) -> "scopes.Userconsent":
         return scopes.Userconsent(self)
 
     @cached_property
-    def vote(self) -> scopes.Vote:
+    def vote(self) -> "scopes.Vote":
         return scopes.Vote(self)
 
     @cached_property
-    def voximplant(self) -> scopes.Voximplant:
+    def voximplant(self) -> "scopes.Voximplant":
         return scopes.Voximplant(self)
 
     def __str__(self):
@@ -407,7 +405,7 @@ class BaseClient(ABC):
             **kwargs,
         )
 
-    def __get_context_by_path(self, path: Text) -> BaseContext:
+    def __get_context_by_path(self, path: Text) -> "BaseContext":
         """
         Resolve a context object by dot-separated path.
 
@@ -444,7 +442,7 @@ class BaseClient(ABC):
 
             return context
 
-    def __collect_api_methods(self, context: Union[BaseContext, "BaseClient"]) -> List[Text]:
+    def __collect_api_methods(self, context: Union["BaseContext", "BaseClient"]) -> List[Text]:
         """
         Recursively collect supported API method names from a context.
 
@@ -468,11 +466,11 @@ class BaseClient(ABC):
                 api_methods.extend(self.__collect_api_methods(value))
 
             elif not isinstance(context, self.__class__):
-                api_methods.append(f"{context}.{attr_name}")
+                api_methods.append(f"{context}.{BaseContext._snake_to_camel(attr_name)}")
 
         return api_methods
 
-    def get_supported_api_methods(self, context: Optional[Union[BaseContext, Text]] = None) -> List[Text]:
+    def get_supported_api_methods(self, context: Optional[Union["BaseContext", Text]] = None) -> List[Text]:
         """
         Return supported API method names.
 
@@ -505,7 +503,7 @@ class BaseClient(ABC):
 
         return self.__collect_api_methods(context_object)
 
-    def print_supported_api_methods(self, context: Optional[Union[BaseContext, Text]] = None):
+    def print_supported_api_methods(self, context: Optional[Union["BaseContext", Text]] = None):
         """
         Print supported API method names.
 
@@ -534,7 +532,7 @@ class ClientV1(BaseClient):
     VERSION = B24APIVersion.V1
 
     @cached_property
-    def tasks(self) -> scopes.Tasks:
+    def tasks(self) -> "scopes.Tasks":
         return scopes.Tasks(self)
 
 
@@ -559,31 +557,30 @@ class ClientV3(BaseClient):
     VERSION = B24APIVersion.V3
 
     @cached_property
-    def documentation(self) -> scopes_v3.Documentation:
-        return scopes_v3.Documentation(self)
+    def documentation(self) -> "scopes.v3.Documentation":
+        return scopes.v3.Documentation(self)
 
     @cached_property
-    def humanresources(self) -> scopes_v3.Humanresources:
-        return scopes_v3.Humanresources(self)
+    def humanresources(self) -> "scopes.v3.Humanresources":
+        return scopes.v3.Humanresources(self)
 
     @cached_property
-    def mail(self) -> scopes_v3.Mail:
-        return scopes_v3.Mail(self)
+    def mail(self) -> "scopes.v3.Mail":
+        return scopes.v3.Mail(self)
 
     @cached_property
-    def main(self) -> scopes_v3.Main:
-        return scopes_v3.Main(self)
+    def main(self) -> "scopes.v3.Main":
+        return scopes.v3.Main(self)
 
     @cached_property
-    def rest(self) -> scopes_v3.Rest:
-        return scopes_v3.Rest(self)
+    def rest(self) -> "scopes.v3.Rest":
+        return scopes.v3.Rest(self)
 
     @cached_property
-    def tasks(self) -> scopes_v3.Tasks:
-        return scopes_v3.Tasks(self)
+    def tasks(self) -> "scopes.v3.Tasks":
+        return scopes.v3.Tasks(self)
 
 
-# noinspection PyPep8Naming
 @overload
 def Client(
         bitrix_token: BitrixTokenFullProtocol,
@@ -597,7 +594,6 @@ def Client(
 ) -> ClientV2: ...
 
 
-# noinspection PyPep8Naming
 @overload
 def Client(
         bitrix_token: BitrixTokenFullProtocol,
@@ -611,7 +607,6 @@ def Client(
 ) -> ClientV1: ...
 
 
-# noinspection PyPep8Naming
 @overload
 def Client(
         bitrix_token: BitrixTokenFullProtocol,

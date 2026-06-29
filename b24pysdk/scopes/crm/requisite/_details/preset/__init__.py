@@ -1,8 +1,9 @@
 from functools import cached_property
 from typing import Iterable, Optional, Text
 
-from ......api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ......api.requests import BitrixAPIRequest, BitrixAPIValueRequest, BitrixAPIValuesRequest
 from ......schemas.crm.field import CRMFieldsData, CRMFieldsDict
+from ......schemas.crm.requisite import RequisitePresetCountriesData, RequisitePresetCountry
 from ......utils.functional import type_checker
 from ......utils.types import JSONDict, Timeout
 from ..base_detail import BaseDetail
@@ -51,7 +52,7 @@ class Preset(BaseDetail):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """Create a new entity.
 
         Documentation:
@@ -157,7 +158,7 @@ class Preset(BaseDetail):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Update entity.
 
         Documentation:
@@ -187,7 +188,7 @@ class Preset(BaseDetail):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete entity.
 
         Documentation:
@@ -210,7 +211,7 @@ class Preset(BaseDetail):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValuesRequest[RequisitePresetCountriesData, RequisitePresetCountry]:
         """Get a list of countries for the template.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/presets/crm-requisite-preset-countries.html
@@ -226,4 +227,6 @@ class Preset(BaseDetail):
         return self._make_bitrix_api_request(
             api_wrapper=self.countries,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValuesRequest,
+            result_adapter=RequisitePresetCountry.from_bitrix_result,
         )

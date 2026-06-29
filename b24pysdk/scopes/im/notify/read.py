@@ -2,7 +2,7 @@ from typing import Iterable, Optional, Union
 
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import B24BoolStrict, Timeout
+from ....utils.types import B24BoolStrict, JSONDict, Timeout
 from ..._base_entity import BaseEntity
 
 __all__ = [
@@ -20,7 +20,7 @@ class Read(BaseEntity):
             *,
             only_current: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = {
@@ -43,7 +43,7 @@ class Read(BaseEntity):
             *,
             action: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         if ids.__class__ is not list:
@@ -67,7 +67,7 @@ class Read(BaseEntity):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """"""
 
         return self._make_bitrix_api_request(

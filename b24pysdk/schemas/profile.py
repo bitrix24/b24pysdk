@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional, Text, TypedDict
+from typing import Annotated, Literal, Optional, Text, TypedDict
 from zoneinfo import ZoneInfo
 
 from ..constants.user import PersonalGender
@@ -18,7 +18,7 @@ class ProfileData(TypedDict):
     ADMIN: bool
     NAME: Text
     LAST_NAME: Text
-    PERSONAL_GENDER: Text
+    PERSONAL_GENDER: Annotated[Text, Literal["", "F", "M"]]
     TIME_ZONE: Text
 
 

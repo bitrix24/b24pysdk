@@ -1,17 +1,31 @@
+from abc import ABC
 from dataclasses import dataclass
-from typing import List, Optional, Text, TypedDict
+from typing import Generic, List, Optional, Text, TypedDict
 
 from ...utils.dataclasses import frozen_dataclass_kwargs
+from ...utils.type_vars import BSDataT
 from .._base_listable_schema import BaseListableSchema
 
 __all__ = [
     "CRMEnumItem",
+    "CRMEnumItemBase",
     "CRMEnumItemData",
     "CRMEnumItemsData",
     "OrderOwnerType",
     "OrderOwnerTypeData",
     "OrderOwnerTypesData",
 ]
+
+
+@dataclass(**frozen_dataclass_kwargs())
+class CRMEnumItemBase(BaseListableSchema[BSDataT], ABC, Generic[BSDataT]):
+    """
+    Base class for CRM enum-like items.
+
+    It stores common Python-friendly fields shared by CRM enum schemas.
+    """
+    bitrix_id: int
+    name: Text
 
 
 class CRMEnumItemData(TypedDict):
@@ -25,7 +39,7 @@ CRMEnumItemsData = List[CRMEnumItemData]
 
 
 @dataclass(**frozen_dataclass_kwargs())
-class CRMEnumItem(BaseListableSchema[CRMEnumItemData]):
+class CRMEnumItem(CRMEnumItemBase[CRMEnumItemData]):
     """
     Single CRM enum item returned by most ``crm.enum.*`` methods.
 
@@ -39,8 +53,6 @@ class CRMEnumItem(BaseListableSchema[CRMEnumItemData]):
         }
     """
 
-    bitrix_id: int
-    name: Text
     symbol_code: Optional[Text]
     symbol_code_short: Optional[Text]
 
@@ -88,7 +100,7 @@ OrderOwnerTypesData = List[OrderOwnerTypeData]
 
 
 @dataclass(**frozen_dataclass_kwargs())
-class OrderOwnerType(BaseListableSchema[OrderOwnerTypeData]):
+class OrderOwnerType(CRMEnumItemBase[OrderOwnerTypeData]):
     """
     Single order owner type returned by ``crm.enum.getorderownertypes``.
 
@@ -98,25 +110,23 @@ class OrderOwnerType(BaseListableSchema[OrderOwnerTypeData]):
 
     attribute: Text
     code: Text
-    bitrix_id: int
-    name: Text
 
     @classmethod
     def from_bitrix(cls, bitrix_data: OrderOwnerTypeData, /) -> "OrderOwnerType":
         """
-        Create a CRMOrderOwnerType schema from Bitrix24 order owner type data.
+        Create an OrderOwnerType schema from Bitrix24 order owner type data.
 
         Args:
             bitrix_data: Raw order owner type data.
 
         Returns:
-            CRMOrderOwnerType schema with Python-friendly field names.
+            OrderOwnerType schema with Python-friendly field names.
         """
         return cls(
-            attribute=bitrix_data["attribute"],
-            code=bitrix_data["code"],
             bitrix_id=int(bitrix_data["id"]),
             name=bitrix_data["name"],
+            attribute=bitrix_data["attribute"],
+            code=bitrix_data["code"],
         )
 
     def to_bitrix(self) -> OrderOwnerTypeData:

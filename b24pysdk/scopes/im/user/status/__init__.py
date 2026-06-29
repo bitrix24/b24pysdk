@@ -1,5 +1,5 @@
 from functools import cached_property
-from typing import Text
+from typing import Text, Union
 
 from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
@@ -25,7 +25,7 @@ class Status(BaseEntity):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[Union[Text, bool]]:
         """"""
 
         return self._make_bitrix_api_request(
@@ -39,7 +39,7 @@ class Status(BaseEntity):
             status: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = dict(

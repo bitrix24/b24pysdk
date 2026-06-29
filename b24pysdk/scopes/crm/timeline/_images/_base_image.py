@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Text
+from typing import Optional, Text
 
 from .....api.requests import BitrixAPIRequest
 from .....utils.types import Timeout
@@ -96,7 +96,7 @@ class BaseImage(BaseCRM):
             *,
             code: Text,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[Optional[bool]]:
         """Delete image.
 
         This method deletes an image.

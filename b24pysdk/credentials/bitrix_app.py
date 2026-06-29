@@ -1,5 +1,6 @@
 from typing import Text
 
+from .._constants import MISSING
 from ..api.requesters import BitrixOAuthRequester
 from ..api.responses import BitrixAppInfoResponse
 from .auth import RenewedOAuth
@@ -19,10 +20,10 @@ class AbstractBitrixApp:
     Provides common OAuth-related methods for both market and local apps.
     """
 
-    client_id: Text = NotImplemented
+    client_id: Text = MISSING
     """OAuth client ID issued by Bitrix24."""
 
-    client_secret: Text = NotImplemented
+    client_secret: Text = MISSING
     """OAuth client secret issued by Bitrix24."""
 
     def __str__(self):
@@ -85,7 +86,7 @@ class AbstractBitrixAppLocal(AbstractBitrixApp):
     Extends AbstractBitrixApp with required domain attribute.
     """
 
-    domain: Text = NotImplemented
+    domain: Text = MISSING
     """Bitrix24 portal domain (e.g., 'example.bitrix24.com')."""
 
 

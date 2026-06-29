@@ -149,7 +149,7 @@ class Link(BaseCRM):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Register requisite link.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/links/crm-requisite-link-register.html
@@ -192,7 +192,7 @@ class Link(BaseCRM):
             entity_type_id: int,
             entity_id: int,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Unlink requisite from object.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/requisites/links/crm-requisite-link-unregister.html

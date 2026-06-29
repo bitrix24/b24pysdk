@@ -4,8 +4,8 @@ from typing import Callable, Dict, Final, Iterable, Literal, Optional, Text, Tup
 from ..._constants import MAX_BATCH_SIZE
 from ...constants.version import B24APIVersion
 from ...protocols import BitrixTokenProtocol
-from ...schemas.time import TimeData
-from ...utils.types import B24APIVersionLiteral, B24RequestTuple, JSONDict, JSONGenerator, JSONList, Timeout
+from ...schemas.api import BatchResponseData, BatchResultData, ListFastResponseData, ResponseData, TimeResponseData
+from ...utils.types import B24APIVersionLiteral, B24RequestTuple, JSONDict, JSONGenerator, JSONList, Timeout, cast
 from ._base_caller import BaseCaller
 from ._utils import get_empty_time
 from .call_batch import call_batch
@@ -62,7 +62,7 @@ class _ListFastCaller(BaseCaller):
     _descending: bool
     _limit: Optional[int]
     _now_datetime: datetime
-    _time: TimeData
+    _time: TimeResponseData
     _counter: int
     _last_id: int
     _request_id_field: Optional[Text]
@@ -178,7 +178,7 @@ class _ListFastCaller(BaseCaller):
         return self._request_id_field or self._response_id_field or self._DEFAULT_ID_FIELD
 
     @property
-    def _prop(self) -> Text:
+    def _filter_key(self) -> Text:
         """Return the Bitrix filter key for the moving ID boundary."""
         return f"{self._cmp}{self._dynamic_request_id_field}"
 
@@ -231,7 +231,7 @@ class _ListFastCaller(BaseCaller):
 
         return result_dict
 
-    def _add_time(self, time: TimeData):
+    def _add_time(self, time: TimeResponseData):
         """Accumulate Bitrix timing metadata from one method or batch response."""
 
         self._time["finish"] = time["finish"]
@@ -249,7 +249,7 @@ class _ListFastCaller(BaseCaller):
         if operating is not None:
             self._time["operating"] = self._time.get("operating", 0) + operating
 
-    def _unwrap_result(self, result: JSONDict) -> Tuple[Optional[Text], JSONList]:
+    def _unwrap_result(self, result: Union[JSONDict, JSONList]) -> Tuple[Optional[Text], JSONList]:
         """
         Extract the list payload and remember its wrapper key.
 
@@ -297,7 +297,7 @@ class _ListFastCaller(BaseCaller):
             if self._last_id:
                 return {
                     "filter": {
-                        self._prop: self._last_id,
+                        self._filter_key: self._last_id,
                     },
                 }
             else:
@@ -305,7 +305,7 @@ class _ListFastCaller(BaseCaller):
 
         return {
             "filter": {
-                self._prop: f"{self._get_path(index)}[{self._MAX_BATCH_SIZE - 1}][{self._response_id_field}]",
+                self._filter_key: f"{self._get_path(index)}[{self._MAX_BATCH_SIZE - 1}][{self._response_id_field}]",
             },
         }
 
@@ -364,7 +364,7 @@ class _ListFastCaller(BaseCaller):
 
         return methods
 
-    def _fetch_first_response(self) -> JSONDict:
+    def _fetch_first_response(self) -> ResponseData:
         """
         Fetch the first page outside batch to discover wrapper and ID field names.
 
@@ -372,13 +372,13 @@ class _ListFastCaller(BaseCaller):
         in this initial response.
         """
         if self._bitrix_token:
-            return self._bitrix_token.call_method(
+            response = self._bitrix_token.call_method(
                 api_method=self._api_method,
                 params=self._generate_method_params(),
                 **self._kwargs,
             )
         else:
-            return call_method(
+            response = call_method(
                 domain=self._domain,
                 auth_token=self._auth_token,
                 is_webhook=self._is_webhook,
@@ -387,7 +387,9 @@ class _ListFastCaller(BaseCaller):
                 **self._kwargs,
             )
 
-    def _fetch_next_batch_response(self) -> JSONDict:
+        return cast(ResponseData, response)
+
+    def _fetch_next_batch_response(self) -> BatchResponseData:
         """Fetch the next chain of pages through one classic batch request."""
         return call_batch(
             domain=self._domain,
@@ -399,7 +401,7 @@ class _ListFastCaller(BaseCaller):
             **self._kwargs,
         )
 
-    def _warn_batch_result_errors(self, batch_result: JSONDict):
+    def _warn_batch_result_errors(self, batch_result: BatchResultData):
         """Log warning when a batch response contains command errors."""
 
         result_error = batch_result.get("result_error")
@@ -427,21 +429,31 @@ class _ListFastCaller(BaseCaller):
 
         raise ValueError("ID key is not found in Bitrix responses!")
 
-    def _update_last_id(self, new_last_id: int):
+    def _update_last_id(self, new_last_id: int) -> bool:
         """
         Store the last emitted ID and guard against infinite pagination loops.
 
-        If Bitrix returns the same boundary ID twice, the moving filter would
-        keep requesting the same page forever, so the method raises ``ValueError``.
+        Returns:
+            ``True`` if the moving ID boundary was updated. ``False`` if Bitrix
+            returned the same boundary ID again, which usually means that the
+            method does not support the generated ID-window filter.
         """
+
         if new_last_id != self._last_id:
             self._last_id = new_last_id
-        else:
-            raise ValueError(
-                "Bitrix API returned the same ID sequence: "
-                f"last_id={self._last_id}, new_last_id={new_last_id}. "
-                "This can lead to an infinite generation loop!",
-            )
+            return True
+
+        self._config.logger.info(
+            "stop call_list_fast because Bitrix returned the same ID sequence",
+            context={
+                "api_method": self._api_method,
+                "filter_key": self._filter_key,
+                "last_id": self._last_id,
+                "new_last_id": new_last_id,
+            },
+        )
+
+        return False
 
     def _generate_result(self) -> JSONGenerator:
         """
@@ -471,6 +483,14 @@ class _ListFastCaller(BaseCaller):
                 for result_values in self._results_values:
                     unwrapped_result_values = result_values[self._wrapper] if self._wrapper else result_values
 
+                    if not unwrapped_result_values:
+                        return
+
+                    new_last_id = int(unwrapped_result_values[-1][self._response_id_field])
+
+                    if not self._update_last_id(new_last_id):
+                        return
+
                     for result_value in unwrapped_result_values:
                         yield result_value
                         self._counter += 1
@@ -481,12 +501,6 @@ class _ListFastCaller(BaseCaller):
                     if len(unwrapped_result_values) < self._MAX_BATCH_SIZE:
                         return
 
-                if self._limit is not None and self._counter >= self._limit:
-                    return
-
-                new_last_id = int(unwrapped_result_values[-1][self._response_id_field])
-                self._update_last_id(new_last_id)
-
                 batch_response = self._fetch_next_batch_response()
                 batch_result = batch_response["result"]
 
@@ -496,7 +510,7 @@ class _ListFastCaller(BaseCaller):
         finally:
             self._config.logger.debug("finish call_list_fast")
 
-    def call(self) -> JSONDict:
+    def call(self) -> ListFastResponseData:
         """
         Return a lazy result generator and accumulated timing metadata.
 
@@ -532,7 +546,7 @@ def call_list_fast(
         prefer_version: Union[B24APIVersion, B24APIVersionLiteral] = B24APIVersion.V2,
         bitrix_token: Optional[BitrixTokenProtocol] = None,
         **kwargs,
-) -> JSONDict:
+) -> ListFastResponseData:
     """
     Retrieve a large classic list result using ID-window pagination.
 

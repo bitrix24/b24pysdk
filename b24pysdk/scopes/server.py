@@ -26,5 +26,5 @@ class Server(BaseScope):
             api_wrapper=self.time,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValueRequest,
-            result_adapter=lambda value: datetime_from_bitrix(value, is_required=True),
+            result_adapter=lambda result: datetime_from_bitrix(result, is_required=True),
         )

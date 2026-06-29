@@ -1,3 +1,5 @@
+from typing import Optional
+
 from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
 from .....utils.types import JSONDict, Timeout
@@ -22,7 +24,7 @@ class Blocks(BaseCRM):
             entity_id: int,
             activity_id: int,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """Get a set of additional content blocks in the activity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/layout-blocks/crm-activity-layout-blocks-get.html
@@ -64,7 +66,7 @@ class Blocks(BaseCRM):
             activity_id: int,
             layout: JSONDict,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Set a set of additional content blocks in the activity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/layout-blocks/crm-activity-layout-blocks-set.html
@@ -107,7 +109,7 @@ class Blocks(BaseCRM):
             entity_id: int,
             activity_id: int,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[Optional[bool]]:
         """Delete a set of additional content blocks in CRM activity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/layout-blocks/crm-activity-layout-blocks-delete.html

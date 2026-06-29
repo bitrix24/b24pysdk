@@ -2,7 +2,7 @@ from typing import Optional, Text, Union
 
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import B24BoolStrict, Timeout
+from ....utils.types import B24BoolStrict, JSONList, Timeout
 from ..._base_entity import BaseEntity
 
 __all__ = [
@@ -19,7 +19,7 @@ class Last(BaseEntity):
             dialog_id: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = dict(
@@ -38,7 +38,7 @@ class Last(BaseEntity):
             dialog_id: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params = dict(
@@ -59,7 +59,7 @@ class Last(BaseEntity):
             skip_chat: Optional[Union[bool, B24BoolStrict]] = None,
             skip_dialog: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONList]:
         """"""
 
         params = dict()

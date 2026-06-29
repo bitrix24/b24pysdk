@@ -3,7 +3,7 @@ from typing import Optional, Text, Union
 
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import B24BoolStrict, Timeout
+from ....utils.types import B24BoolStrict, JSONDict, Timeout
 from ..._base_entity import BaseEntity
 from .list import List
 from .status import Status
@@ -33,7 +33,7 @@ class User(BaseEntity):
             bitrix_id: Optional[Union[int, Text]] = None,
             avatar_hr: Optional[Union[bool, B24BoolStrict]] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """"""
 
         params = dict()

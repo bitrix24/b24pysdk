@@ -1,9 +1,9 @@
 from abc import ABC
-from typing import Callable, Iterable, Optional, Text
+from typing import Iterable, Optional, Text, Type
 
 from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest
 from ...schemas.crm.field import CRMFieldsDict
-from ...utils.type_vars import BAResultT, BAValueT
+from ...utils.type_vars import BSDT, BAResultT
 from ...utils.types import JSONDict, Timeout
 from .._base_entity import BaseEntity
 
@@ -19,14 +19,14 @@ class BaseCRM(BaseEntity, ABC):
             self,
             *,
             timeout: Timeout = None,
-            result_adapter: Callable[[BAResultT], BAValueT] = CRMFieldsDict.from_bitrix,
-    ) -> BitrixAPIValueRequest[BAResultT, BAValueT]:
+            value_type: Type[BSDT] = CRMFieldsDict,
+    ) -> BitrixAPIValueRequest[BAResultT, BSDT]:
         """"""
         return self._make_bitrix_api_request(
             api_wrapper=self._fields,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValueRequest,
-            result_adapter=result_adapter,
+            result_adapter=value_type.from_bitrix,
         )
 
     def _add(

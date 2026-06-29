@@ -1,9 +1,9 @@
 from dataclasses import dataclass
-from typing import Generic, Optional
+from typing import Generic, Optional, Type
 
+from ...schemas.api import ResponseData
 from ...utils.dataclasses import frozen_dataclass_kwargs
-from ...utils.type_vars import BAResultT
-from ...utils.types import JSONDict
+from ...utils.type_vars import BAResponseT, BAResultT
 from .abstract_bitrix_response import AbstractBitrixResponse
 
 __all__ = [
@@ -33,7 +33,7 @@ class BitrixAPIResponse(AbstractBitrixResponse[BAResultT], Generic[BAResultT]):
         )
 
     @classmethod
-    def from_dict(cls, json_response: JSONDict, /) -> "BitrixAPIResponse[BAResultT]":
+    def from_dict(cls: Type[BAResponseT], json_response: ResponseData, /) -> BAResponseT:
         """
         Create a BitrixAPIResponse instance from raw JSON response.
 
@@ -49,3 +49,24 @@ class BitrixAPIResponse(AbstractBitrixResponse[BAResultT], Generic[BAResultT]):
             next=json_response.get("next"),
             total=json_response.get("total"),
         )
+
+    def to_dict(self) -> ResponseData:
+        """
+        Convert response to a JSON-compatible dictionary.
+
+        Internal adapter field is intentionally excluded from the serialized
+        representation.
+        """
+
+        response_data: ResponseData = {
+            "result": self.result,
+            "time": self.time.to_dict(),
+        }
+
+        if self.next is not None:
+            response_data["next"] = self.next
+
+        if self.total is not None:
+            response_data["total"] = self.total
+
+        return response_data

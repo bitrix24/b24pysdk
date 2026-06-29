@@ -1,21 +1,24 @@
 from datetime import datetime
 from functools import wraps
-from typing import TYPE_CHECKING, Any, Callable, Final, Literal, Mapping, Optional, Sequence, Text, Union, overload
+from typing import TYPE_CHECKING, Callable, Final, Literal, Mapping, Optional, Sequence, Text, Union, overload
 
 from .._config import Config
+from .._constants import MISSING
 from ..api.callers import call_batch, call_batches, call_list, call_list_fast, call_method
 from ..client import Client
 from ..constants.version import B24APIVersion
 from ..errors import BitrixAPIExpiredToken, BitrixResponse302JSONDecodeError
 from ..events import OAuthTokenRenewedEvent, PortalDomainChangedEvent
+from ..schemas.api import BatchResponseData, ListFastResponseData, ListResponseData
 from ..utils.functional import classproperty
+from ..utils.type_vars import ResponseT
 from ..utils.types import B24APIVersionLiteral, B24Requests, B24RequestTuple, JSONDict, Key, Timeout
 from .oauth_token import OAuthToken
 
 try:
     from ..signals import BitrixSignalInstance as _BitrixSignalInstance
 except ImportError:
-    _BitrixSignalInstance = NotImplemented
+    _BitrixSignalInstance = MISSING
 
 if TYPE_CHECKING:
     from ..api.responses import BitrixAppInfoResponse
@@ -35,13 +38,13 @@ __all__ = [
 ]
 
 
-def _bitrix_app_required(func: Callable) -> Callable:
+def _bitrix_app_required(func: Callable[..., ResponseT]) -> Callable[..., ResponseT]:
     """Require a token to be bound to a Bitrix app before calling an OAuth-only method."""
 
     @wraps(func)
     def wrapper(self: "AbstractBitrixToken", *args, **kwargs):
         """Validate that ``self.bitrix_app`` is available, then call the wrapped method."""
-        if self.bitrix_app is NotImplemented or self.bitrix_app is None:
+        if self.bitrix_app is MISSING or self.bitrix_app is None:
             raise AttributeError(f"'bitrix_app' is not implemented for {self}")
         return func(self, *args, **kwargs)
 
@@ -57,25 +60,25 @@ class AbstractBitrixToken:
     _AUTO_REFRESH_EXPIRED_TOKEN: bool = True
     """Automatically refresh expired OAuth tokens when possible."""
 
-    domain: Text = NotImplemented
+    domain: Text = MISSING
     """Bitrix portal domain used for API requests."""
 
-    auth_token: Text = NotImplemented
+    auth_token: Text = MISSING
     """Current access token (OAuth token or webhook token)."""
 
-    refresh_token: Optional[Text] = NotImplemented
+    refresh_token: Optional[Text] = MISSING
     """OAuth refresh token, if available."""
 
-    expires: Optional[datetime] = NotImplemented
+    expires: Optional[datetime] = MISSING
     """OAuth access token expiration datetime."""
 
-    expires_in: Optional[int] = NotImplemented
+    expires_in: Optional[int] = MISSING
     """OAuth access token lifetime in seconds."""
 
-    bitrix_app: Optional["AbstractBitrixApp"] = NotImplemented
+    bitrix_app: Optional["AbstractBitrixApp"] = MISSING
     """Bitrix application object used for OAuth flows."""
 
-    if _BitrixSignalInstance is not NotImplemented:
+    if _BitrixSignalInstance is not MISSING:
         oauth_token_renewed_signal: _BitrixSignalInstance = _BitrixSignalInstance.create_signal(OAuthTokenRenewedEvent)
         """Signal emitted after successful OAuth token refresh."""
 
@@ -101,7 +104,6 @@ class AbstractBitrixToken:
             bitrix_token=self,
         )
 
-    # noinspection PyMethodParameters
     @classproperty
     def _config(cls) -> Config:
         """Return the global SDK configuration used by token helpers and API callers."""
@@ -263,7 +265,7 @@ class AbstractBitrixToken:
 
         self.oauth_token = renewed_oauth.oauth_token
 
-        if _BitrixSignalInstance is not NotImplemented:
+        if _BitrixSignalInstance is not MISSING:
             self.oauth_token_renewed_signal.emit(OAuthTokenRenewedEvent(
                 renewed_oauth_token=renewed_oauth,
             ))
@@ -337,7 +339,7 @@ class AbstractBitrixToken:
         old_domain = self.domain
         self.domain = new_domain
 
-        if _BitrixSignalInstance is not NotImplemented:
+        if _BitrixSignalInstance is not MISSING:
             self.portal_domain_changed_signal.emit(PortalDomainChangedEvent(
                 old_domain=old_domain,
                 new_domain=new_domain,
@@ -345,7 +347,7 @@ class AbstractBitrixToken:
 
         return True
 
-    def _execute_with_retries(self, func: Callable[[], Any]):
+    def _execute_with_retries(self, func: Callable[[], ResponseT]) -> ResponseT:
         """
         Execute ``func`` with SDK-level recovery for expired tokens and domain redirects.
 
@@ -402,7 +404,7 @@ class AbstractBitrixToken:
                 return func()
             raise
 
-    def _call_with_retries(self, call_func: Callable[..., JSONDict], parameters: JSONDict) -> JSONDict:
+    def _call_with_retries(self, call_func: Callable[..., ResponseT], parameters: JSONDict) -> ResponseT:
         """Call a low-level API function with token auth data and retry handling."""
         return self._execute_with_retries(lambda: call_func(**self._auth_data, **parameters))
 
@@ -446,7 +448,7 @@ class AbstractBitrixToken:
             timeout: Timeout = None,
             prefer_version: Union[B24APIVersion, B24APIVersionLiteral] = B24APIVersion.V2,
             **kwargs,
-    ) -> JSONDict: ...
+    ) -> BatchResponseData: ...
 
     @overload
     def call_batch(
@@ -457,7 +459,7 @@ class AbstractBitrixToken:
             timeout: Timeout = None,
             prefer_version: Union[B24APIVersion, B24APIVersionLiteral] = B24APIVersion.V2,
             **kwargs,
-    ) -> JSONDict: ...
+    ) -> BatchResponseData: ...
 
     def call_batch(
             self,
@@ -467,7 +469,7 @@ class AbstractBitrixToken:
             timeout: Timeout = None,
             prefer_version: Union[B24APIVersion, B24APIVersionLiteral] = B24APIVersion.V2,
             **kwargs,
-    ) -> JSONDict:
+    ) -> BatchResponseData:
         """
         Call multiple API methods in a single batch request with retries.
 
@@ -501,7 +503,7 @@ class AbstractBitrixToken:
             timeout: Timeout = None,
             prefer_version: Union[B24APIVersion, B24APIVersionLiteral] = B24APIVersion.V2,
             **kwargs,
-    ) -> JSONDict: ...
+    ) -> BatchResponseData: ...
 
     @overload
     def call_batches(
@@ -511,7 +513,7 @@ class AbstractBitrixToken:
             timeout: Timeout = None,
             prefer_version: Union[B24APIVersion, B24APIVersionLiteral] = B24APIVersion.V2,
             **kwargs,
-    ) -> JSONDict: ...
+    ) -> BatchResponseData: ...
 
     def call_batches(
             self,
@@ -520,7 +522,7 @@ class AbstractBitrixToken:
             timeout: Timeout = None,
             prefer_version: Union[B24APIVersion, B24APIVersionLiteral] = B24APIVersion.V2,
             **kwargs,
-    ) -> JSONDict:
+    ) -> BatchResponseData:
         """
         Call multiple API methods using parallel batch requests with retries.
 
@@ -552,7 +554,7 @@ class AbstractBitrixToken:
             timeout: Timeout = None,
             prefer_version: Union[B24APIVersion, B24APIVersionLiteral] = B24APIVersion.V2,
             **kwargs,
-    ) -> JSONDict:
+    ) -> ListResponseData:
         """
         Call list-like API methods with pagination and retries.
 
@@ -587,7 +589,7 @@ class AbstractBitrixToken:
             timeout: Timeout = None,
             prefer_version: Union[B24APIVersion, B24APIVersionLiteral] = B24APIVersion.V2,
             **kwargs,
-    ) -> JSONDict:
+    ) -> ListFastResponseData:
         """
         Call list-like API methods with optimized pagination and retries.
 
@@ -619,7 +621,7 @@ class AbstractBitrixToken:
 class AbstractBitrixTokenLocal(AbstractBitrixToken):
     """Token wrapper bound to a local Bitrix app."""
 
-    bitrix_app: "AbstractBitrixAppLocal" = NotImplemented
+    bitrix_app: "AbstractBitrixAppLocal" = MISSING
     """Local Bitrix application that supplies the current portal domain."""
 
     @property

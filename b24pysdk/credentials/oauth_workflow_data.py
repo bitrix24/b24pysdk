@@ -38,7 +38,7 @@ class OAuthWorkflowData:
     properties: Optional[JSONDict] = None
 
     @classmethod
-    def from_dict(cls, workflow_data: Mapping[Text, Any]) -> "OAuthWorkflowData":
+    def from_dict(cls, workflow_data: Mapping[Text, Any], /) -> "OAuthWorkflowData":
         """
         Create a workflow payload model from raw Bitrix24 request parameters.
 

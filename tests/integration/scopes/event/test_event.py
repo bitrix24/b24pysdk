@@ -5,7 +5,6 @@ import pytest
 from b24pysdk.api.responses import BitrixAPIListResponse, BitrixAPIResponse, BitrixAPIValueResponse
 from b24pysdk.client import BaseClient
 from b24pysdk.constants.event import EventType
-from b24pysdk.schemas.event import EventUnbind
 
 from ....constants import BITRIX_PORTAL_OWNER_ID
 
@@ -103,7 +102,7 @@ def test_event_unbind(bitrix_client: BaseClient):
 
     assert isinstance(bitrix_response, BitrixAPIValueResponse)
 
-    event_unbind = bitrix_response.value
+    unbind_count = bitrix_response.value
 
-    assert isinstance(event_unbind, EventUnbind), "Event unbind value should be EventUnbind"
-    assert event_unbind.count > 0, "EventUnbind.count should be positive"
+    assert isinstance(unbind_count, int), "Event unbind count should be int"
+    assert unbind_count > 0, "Event unbind count should be positive"

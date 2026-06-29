@@ -9,6 +9,12 @@ __all__ = [
     "bool_to_bitrix",
     "datetime_from_bitrix",
     "datetime_to_bitrix",
+    "float_from_bitrix",
+    "float_to_bitrix",
+    "int_from_bitrix",
+    "int_to_bitrix",
+    "text_from_bitrix",
+    "text_to_bitrix",
     "timezone_from_bitrix",
     "timezone_to_bitrix",
 ]
@@ -155,6 +161,238 @@ def datetime_to_bitrix(value: typing.Optional[datetime.datetime], /, *, is_requi
         return value.isoformat(timespec="seconds")
 
     raise ValueError(f"Cannot convert Python value to Bitrix24 datetime: {value!r}")
+
+@typing.overload
+def float_from_bitrix(value: typing.Union[float, typing.Text], /, *, is_required: typing.Literal[True]) -> float: ...
+
+@typing.overload
+def float_from_bitrix(value: typing.Optional[typing.Union[int, float, typing.Text]], /, *, is_required: typing.Literal[False] = False) -> typing.Optional[float]: ...
+
+def float_from_bitrix(value: typing.Optional[typing.Union[int, float, typing.Text]], /, *, is_required: bool = False) -> typing.Optional[float]:
+    """
+    Convert a Bitrix24 float value to Python ``float``.
+
+    Args:
+        value: Bitrix24 float value.
+        is_required: Whether empty values should be treated as an error.
+
+    Returns:
+        Python ``float`` instance, or ``None`` when ``is_required`` is False
+        and the input value is empty.
+
+    Raises:
+        ValueError: If the value is required but empty, or cannot be converted
+            to ``float``.
+    """
+
+    if value is None or value == "":
+        if not is_required:
+            return None
+
+        raise ValueError(f"Cannot convert empty Bitrix24 value to float: {value!r}")
+
+    if isinstance(value, bool):
+        raise TypeError(f"Cannot convert Bitrix24 value to float: {value!r}")
+
+    if isinstance(value, float):
+        return value
+
+    if isinstance(value, (int, str)):
+        try:
+            return float(value)
+        except ValueError as error:
+            raise ValueError(f"Cannot convert Bitrix24 value to float: {value!r}") from error
+
+    raise ValueError(f"Cannot convert Bitrix24 value to float: {value!r}")
+
+@typing.overload
+def float_to_bitrix(value: float, /, *, is_required: typing.Literal[True]) -> float: ...
+
+@typing.overload
+def float_to_bitrix(value: typing.Optional[typing.Union[int, float]], /, *, is_required: typing.Literal[False] = False) -> typing.Optional[float]: ...
+
+def float_to_bitrix(value: typing.Optional[typing.Union[int, float]], /, *, is_required: bool = False) -> typing.Optional[float]:
+    """
+    Convert a Python ``float`` value to Bitrix24 float value.
+
+    Args:
+        value: Python float value.
+        is_required: Whether ``None`` should be treated as an error.
+
+    Returns:
+        Bitrix24 float value. Returns ``None`` when ``is_required`` is False
+        and the input value is ``None``.
+
+    Raises:
+        ValueError: If the value is required but ``None``, or cannot be
+            converted to Bitrix24 float.
+    """
+
+    if value is None:
+        if not is_required:
+            return None
+
+        raise ValueError(f"Cannot convert empty Python value to Bitrix24 float: {value!r}")
+
+    if isinstance(value, bool):
+        raise TypeError(f"Cannot convert Python value to Bitrix24 float: {value!r}")
+
+    if isinstance(value, float):
+        return value
+
+    if isinstance(value, int):
+        return float(value)
+
+    raise ValueError(f"Cannot convert Python value to Bitrix24 float: {value!r}")
+
+@typing.overload
+def int_from_bitrix(value: typing.Union[int, typing.Text], /, *, is_required: typing.Literal[True]) -> int: ...
+
+@typing.overload
+def int_from_bitrix(value: typing.Optional[typing.Union[int, typing.Text]], /, *, is_required: typing.Literal[False] = False) -> typing.Optional[int]: ...
+
+def int_from_bitrix(value: typing.Optional[typing.Union[int, typing.Text]], /, *, is_required: bool = False) -> typing.Optional[int]:
+    """
+    Convert a Bitrix24 integer value to Python ``int``.
+
+    Args:
+        value: Bitrix24 integer value.
+        is_required: Whether empty values should be treated as an error.
+
+    Returns:
+        Python ``int`` instance, or ``None`` when ``is_required`` is False
+        and the input value is empty.
+
+    Raises:
+        ValueError: If the value is required but empty, or cannot be converted
+            to ``int``.
+    """
+
+    if value is None or value == "":
+        if not is_required:
+            return None
+
+        raise ValueError(f"Cannot convert empty Bitrix24 value to int: {value!r}")
+
+    if isinstance(value, bool):
+        raise TypeError(f"Cannot convert Bitrix24 value to int: {value!r}")
+
+    if isinstance(value, int):
+        return value
+
+    if isinstance(value, str):
+        try:
+            return int(value)
+        except ValueError as error:
+            raise ValueError(f"Cannot convert Bitrix24 value to int: {value!r}") from error
+
+    raise ValueError(f"Cannot convert Bitrix24 value to int: {value!r}")
+
+@typing.overload
+def int_to_bitrix(value: int, /, *, is_required: typing.Literal[True]) -> int: ...
+
+@typing.overload
+def int_to_bitrix(value: typing.Optional[int], /, *, is_required: typing.Literal[False] = False) -> typing.Optional[int]: ...
+
+def int_to_bitrix(value: typing.Optional[int], /, *, is_required: bool = False) -> typing.Optional[int]:
+    """
+    Convert a Python ``int`` value to Bitrix24 integer value.
+
+    Args:
+        value: Python integer value.
+        is_required: Whether ``None`` should be treated as an error.
+
+    Returns:
+        Bitrix24 integer value. Returns ``None`` when ``is_required`` is False
+        and the input value is ``None``.
+
+    Raises:
+        ValueError: If the value is required but ``None``, or cannot be
+            converted to Bitrix24 integer.
+    """
+
+    if value is None:
+        if not is_required:
+            return None
+
+        raise ValueError(f"Cannot convert empty Python value to Bitrix24 int: {value!r}")
+
+    if isinstance(value, bool):
+        raise TypeError(f"Cannot convert Python value to Bitrix24 int: {value!r}")
+
+    if isinstance(value, int):
+        return value
+
+    raise ValueError(f"Cannot convert Python value to Bitrix24 int: {value!r}")
+
+@typing.overload
+def text_from_bitrix(value: typing.Text, /, *, is_required: typing.Literal[True]) -> typing.Text: ...
+
+@typing.overload
+def text_from_bitrix(value: typing.Optional[typing.Text], /, *, is_required: typing.Literal[False] = False) -> typing.Optional[typing.Text]: ...
+
+def text_from_bitrix(value: typing.Optional[typing.Text], /, *, is_required: bool = False) -> typing.Optional[typing.Text]:
+    """
+    Convert a Bitrix24 text value to Python ``str``.
+
+    Args:
+        value: Bitrix24 text value.
+        is_required: Whether empty values should be treated as an error.
+
+    Returns:
+        Python ``str`` instance, or ``None`` when ``is_required`` is False
+        and the input value is empty.
+
+    Raises:
+        ValueError: If the value is required but empty, or cannot be converted
+            to ``str``.
+    """
+
+    if value is None:
+        if not is_required:
+            return None
+
+        raise ValueError(f"Cannot convert empty Bitrix24 value to text: {value!r}")
+
+    if isinstance(value, str):
+        return value
+
+    raise ValueError(f"Cannot convert Bitrix24 value to text: {value!r}")
+
+@typing.overload
+def text_to_bitrix(value: typing.Text, /, *, is_required: typing.Literal[True]) -> typing.Text: ...
+
+@typing.overload
+def text_to_bitrix(value: typing.Optional[typing.Text], /, *, is_required: typing.Literal[False] = False) -> typing.Optional[typing.Text]: ...
+
+def text_to_bitrix(value: typing.Optional[typing.Text], /, *, is_required: bool = False) -> typing.Optional[typing.Text]:
+    """
+    Convert a Python ``str`` value to Bitrix24 text value.
+
+    Args:
+        value: Python text value.
+        is_required: Whether ``None`` or an empty string should be treated as an
+            error.
+
+    Returns:
+        Bitrix24 text value. Returns ``None`` when ``is_required`` is False
+        and the input value is empty.
+
+    Raises:
+        ValueError: If the value is required but empty, or cannot be converted
+            to Bitrix24 text.
+    """
+
+    if value is None:
+        if not is_required:
+            return None
+
+        raise ValueError(f"Cannot convert empty Python value to Bitrix24 text: {value!r}")
+
+    if isinstance(value, str):
+        return value
+
+    raise ValueError(f"Cannot convert Python value to Bitrix24 text: {value!r}")
 
 @typing.overload
 def timezone_from_bitrix(value: typing.Text, /, *, is_required: typing.Literal[True]) -> zoneinfo.ZoneInfo: ...

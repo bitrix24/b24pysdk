@@ -1,4 +1,4 @@
-from typing import Optional, Text
+from typing import Dict, List, Optional, Text
 
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
@@ -23,7 +23,7 @@ class Trigger(BaseCRM):
             target: Text,
             code: Optional[Text] = None,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Activate trigger.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/automation/crm-automation-trigger.html
@@ -61,7 +61,7 @@ class Trigger(BaseCRM):
             code: Text,
             name: Text,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Add trigger.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/automation/triggers/crm-automation-trigger-add.html
@@ -98,7 +98,7 @@ class Trigger(BaseCRM):
             owner_type_id: int,
             owner_id: int,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Executes the trigger.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/automation/triggers/crm-automation-trigger-execute.html
@@ -135,7 +135,7 @@ class Trigger(BaseCRM):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[List[Dict[Text, Text]]]:
         """Get a list of triggers.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/automation/triggers/crm-automation-trigger-list.html
@@ -148,7 +148,10 @@ class Trigger(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return self._list(timeout=timeout)
+        return self._make_bitrix_api_request(
+            api_wrapper=self.list,
+            timeout=timeout,
+        )
 
     @type_checker
     def delete(
@@ -156,7 +159,7 @@ class Trigger(BaseCRM):
             *,
             code: Text,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """Delete triggers.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/automation/triggers/crm-automation-trigger-delete.html
