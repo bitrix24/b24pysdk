@@ -1,5 +1,6 @@
 from typing import Optional, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
@@ -46,6 +47,7 @@ class Handler(BaseEntity):
     def list(
             self,
             *,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -61,8 +63,14 @@ class Handler(BaseEntity):
             Instance of BitrixAPIRequest.
         """
 
+        params: JSONDict = {}
+
+        if start is not MISSING:
+            params["start"] = start
+
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
+            params=params,
             timeout=timeout,
         )
 
@@ -73,7 +81,7 @@ class Handler(BaseEntity):
             code: Text,
             settings: JSONDict,
             *,
-            sort: Optional[int] = None,
+            sort: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -102,7 +110,7 @@ class Handler(BaseEntity):
             "SETTINGS": settings,
         }
 
-        if sort is not None:
+        if sort is not MISSING:
             params["SORT"] = sort
 
         return self._make_bitrix_api_request(

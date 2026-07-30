@@ -1,5 +1,6 @@
 from typing import Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -23,10 +24,10 @@ class Section(BaseEntity):
             owner_id: int,
             name: Text,
             *,
-            description: Optional[Text] = None,
-            color: Optional[Text] = None,
-            text_color: Optional[Text] = None,
-            export: Optional[JSONDict] = None,
+            description: Optional[Text] = MISSING,
+            color: Optional[Text] = MISSING,
+            text_color: Optional[Text] = MISSING,
+            export: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -58,16 +59,16 @@ class Section(BaseEntity):
             "name": name,
         }
 
-        if description is not None:
+        if description is not MISSING:
             params["description"] = description
 
-        if color is not None:
+        if color is not MISSING:
             params["color"] = color
 
-        if text_color is not None:
+        if text_color is not MISSING:
             params["text_color"] = text_color
 
-        if export is not None:
+        if export is not MISSING:
             params["export"] = export
 
         return self._make_bitrix_api_request(
@@ -156,11 +157,11 @@ class Section(BaseEntity):
             owner_id: int,
             bitrix_id: Text,
             *,
-            name: Optional[Text] = None,
-            description: Optional[Text] = None,
-            color: Optional[Text] = None,
-            text_color: Optional[Text] = None,
-            export: Optional[JSONDict] = None,
+            name: Optional[Text] = MISSING,
+            description: Optional[Text] = MISSING,
+            color: Optional[Text] = MISSING,
+            text_color: Optional[Text] = MISSING,
+            export: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -191,19 +192,19 @@ class Section(BaseEntity):
             "id": bitrix_id,
         }
 
-        if name is not None:
+        if name is not MISSING:
             params["name"] = name
 
-        if description is not None:
+        if description is not MISSING:
             params["description"] = description
 
-        if color is not None:
+        if color is not MISSING:
             params["color"] = color
 
-        if text_color is not None:
+        if text_color is not MISSING:
             params["text_color"] = text_color
 
-        if export is not None:
+        if export is not MISSING:
             params["export"] = export
 
         return self._make_bitrix_api_request(

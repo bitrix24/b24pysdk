@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Optional, Text, Union
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import B24BoolStrict, JSONDict, Timeout
@@ -25,9 +26,9 @@ class Item(BaseEntity):
             self,
             entity: Text,
             *,
-            sort: Optional[JSONDict] = None,
-            filter: Optional[JSONDict] = None,
-            start: Optional[int] = None,
+            sort: Optional[JSONDict] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -36,13 +37,13 @@ class Item(BaseEntity):
             "ENTITY": entity,
         }
 
-        if sort is not None:
+        if sort is not MISSING:
             params["SORT"] = sort
 
-        if filter is not None:
+        if filter is not MISSING:
             params["FILTER"] = filter
 
-        if start is not None:
+        if start is not MISSING:
             params["start"] = start
 
         return self._make_bitrix_api_request(
@@ -57,17 +58,17 @@ class Item(BaseEntity):
             entity: Text,
             name: Text,
             *,
-            active: Optional[Union[bool, B24BoolStrict]] = None,
-            date_active_from: Optional[Text] = None,
-            date_active_to: Optional[Text] = None,
-            sort: Optional[int] = None,
-            preview_picture: Optional[JSONDict] = None,
-            preview_text: Optional[Text] = None,
-            detail_picture: Optional[JSONDict] = None,
-            detail_text: Optional[Text] = None,
-            code: Optional[Text] = None,
-            section: Optional[int] = None,
-            property_values: Optional[JSONDict] = None,
+            active: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            date_active_from: Optional[Text] = MISSING,
+            date_active_to: Optional[Text] = MISSING,
+            sort: Optional[int] = MISSING,
+            preview_picture: Optional[JSONDict] = MISSING,
+            preview_text: Optional[Text] = MISSING,
+            detail_picture: Optional[JSONDict] = MISSING,
+            detail_text: Optional[Text] = MISSING,
+            code: Optional[Text] = MISSING,
+            section: Optional[int] = MISSING,
+            property_values: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -77,37 +78,37 @@ class Item(BaseEntity):
             "NAME": name,
         }
 
-        if active is not None:
+        if active is not MISSING:
             params["ACTIVE"] = B24BoolStrict(active).to_b24()
 
-        if date_active_from is not None:
+        if date_active_from is not MISSING:
             params["DATE_ACTIVE_FROM"] = date_active_from
 
-        if date_active_to is not None:
+        if date_active_to is not MISSING:
             params["DATE_ACTIVE_TO"] = date_active_to
 
-        if sort is not None:
+        if sort is not MISSING:
             params["SORT"] = sort
 
-        if preview_picture is not None:
+        if preview_picture is not MISSING:
             params["PREVIEW_PICTURE"] = preview_picture
 
-        if preview_text is not None:
+        if preview_text is not MISSING:
             params["PREVIEW_TEXT"] = preview_text
 
-        if detail_picture is not None:
+        if detail_picture is not MISSING:
             params["DETAIL_PICTURE"] = detail_picture
 
-        if detail_text is not None:
+        if detail_text is not MISSING:
             params["DETAIL_TEXT"] = detail_text
 
-        if code is not None:
+        if code is not MISSING:
             params["CODE"] = code
 
-        if section is not None:
+        if section is not MISSING:
             params["SECTION"] = section
 
-        if property_values is not None:
+        if property_values is not MISSING:
             params["PROPERTY_VALUES"] = property_values
 
         return self._make_bitrix_api_request(
@@ -123,17 +124,17 @@ class Item(BaseEntity):
             bitrix_id: int,
             property_values: JSONDict,
             *,
-            name: Optional[Text] = None,
-            active: Optional[Union[bool, B24BoolStrict]] = None,
-            date_active_from: Optional[Text] = None,
-            date_active_to: Optional[Text] = None,
-            sort: Optional[int] = None,
-            preview_picture: Optional[JSONDict] = None,
-            preview_text: Optional[Text] = None,
-            detail_picture: Optional[JSONDict] = None,
-            detail_text: Optional[Text] = None,
-            code: Optional[Text] = None,
-            section: Optional[int] = None,
+            name: Optional[Text] = MISSING,
+            active: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            date_active_from: Optional[Text] = MISSING,
+            date_active_to: Optional[Text] = MISSING,
+            sort: Optional[int] = MISSING,
+            preview_picture: Optional[JSONDict] = MISSING,
+            preview_text: Optional[Text] = MISSING,
+            detail_picture: Optional[JSONDict] = MISSING,
+            detail_text: Optional[Text] = MISSING,
+            code: Optional[Text] = MISSING,
+            section: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -144,37 +145,37 @@ class Item(BaseEntity):
             "PROPERTY_VALUES": property_values,
         }
 
-        if name is not None:
+        if name is not MISSING:
             params["NAME"] = name
 
-        if active is not None:
+        if active is not MISSING:
             params["ACTIVE"] = B24BoolStrict(active).to_b24()
 
-        if date_active_from is not None:
+        if date_active_from is not MISSING:
             params["DATE_ACTIVE_FROM"] = date_active_from
 
-        if date_active_to is not None:
+        if date_active_to is not MISSING:
             params["DATE_ACTIVE_TO"] = date_active_to
 
-        if sort is not None:
+        if sort is not MISSING:
             params["SORT"] = sort
 
-        if preview_picture is not None:
+        if preview_picture is not MISSING:
             params["PREVIEW_PICTURE"] = preview_picture
 
-        if preview_text is not None:
+        if preview_text is not MISSING:
             params["PREVIEW_TEXT"] = preview_text
 
-        if detail_picture is not None:
+        if detail_picture is not MISSING:
             params["DETAIL_PICTURE"] = detail_picture
 
-        if detail_text is not None:
+        if detail_text is not MISSING:
             params["DETAIL_TEXT"] = detail_text
 
-        if code is not None:
+        if code is not MISSING:
             params["CODE"] = code
 
-        if section is not None:
+        if section is not MISSING:
             params["SECTION"] = section
 
         return self._make_bitrix_api_request(

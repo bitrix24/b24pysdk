@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -32,7 +33,7 @@ class Entity(BaseScope):
             entity: Text,
             name: Text,
             *,
-            access: Optional[JSONDict] = None,
+            access: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -42,7 +43,7 @@ class Entity(BaseScope):
             "NAME": name,
         }
 
-        if access is not None:
+        if access is not MISSING:
             params["ACCESS"] = access
 
         return self._make_bitrix_api_request(
@@ -56,9 +57,9 @@ class Entity(BaseScope):
             self,
             entity: Text,
             *,
-            name: Optional[Text] = None,
-            access: Optional[JSONDict] = None,
-            entity_new: Optional[Text] = None,
+            name: Optional[Text] = MISSING,
+            access: Optional[JSONDict] = MISSING,
+            entity_new: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -67,13 +68,13 @@ class Entity(BaseScope):
             "ENTITY": entity,
         }
 
-        if name is not None:
+        if name is not MISSING:
             params["NAME"] = name
 
-        if access is not None:
+        if access is not MISSING:
             params["ACCESS"] = access
 
-        if entity_new is not None:
+        if entity_new is not MISSING:
             params["ENTITY_NEW"] = entity_new
 
         return self._make_bitrix_api_request(
@@ -87,7 +88,7 @@ class Entity(BaseScope):
             self,
             entity: Text,
             *,
-            access: Optional[JSONDict] = None,
+            access: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -96,7 +97,7 @@ class Entity(BaseScope):
             "ENTITY": entity,
         }
 
-        if access is not None:
+        if access is not MISSING:
             params["ACCESS"] = access
 
         return self._make_bitrix_api_request(
@@ -109,14 +110,14 @@ class Entity(BaseScope):
     def get(
             self,
             *,
-            entity: Optional[Text] = None,
+            entity: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        params: JSONDict = {}
 
-        if entity is not None:
+        if entity is not MISSING:
             params["ENTITY"] = entity
 
         return self._make_bitrix_api_request(

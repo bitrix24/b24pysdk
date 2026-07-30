@@ -3,16 +3,18 @@ from typing import Text, Tuple
 import pytest
 from _pytest.cacheprovider import Cache
 
-from b24pysdk.api.responses import BitrixAPIResponse
+from b24pysdk.api.responses import BitrixAPIResponse, BitrixAPIValueResponse, BitrixAPIValuesResponse
 from b24pysdk.client import BaseClient
 from b24pysdk.constants import B24BoolLit
+from b24pysdk.schemas.crm.field import CRMField, CRMFieldsDict
+from b24pysdk.schemas.crm.links import ContactLink
 
 from .....constants import SDK_NAME, SORT
 
 pytestmark = [
     pytest.mark.integration,
     pytest.mark.crm,
-    # pytest.mark.crm_company,
+    pytest.mark.crm_company,
     pytest.mark.crm_company_contact,
 ]
 
@@ -30,13 +32,15 @@ def test_crm_company_contact_fields(bitrix_client: BaseClient):
 
     bitrix_response = bitrix_client.crm.company.contact.fields().response
 
-    assert isinstance(bitrix_response, BitrixAPIResponse)
-    assert isinstance(bitrix_response.result, dict)
+    assert isinstance(bitrix_response, BitrixAPIValueResponse)
 
-    fields = bitrix_response.result
+    fields = bitrix_response.value
+
+    assert isinstance(fields, CRMFieldsDict)
 
     for field in _FIELDS:
-        assert field in fields, f"Field '{field}' should be present"
+        assert field in fields, f"Field {field!r} should be present"
+        assert isinstance(fields[field], CRMField), f"Field {field!r} should be CRMField"
 
 
 @pytest.mark.dependency(name="test_crm_company_contact_add")
@@ -101,16 +105,19 @@ def test_crm_company_contact_items_get(bitrix_client: BaseClient, cache: Cache):
         bitrix_id=company_id,
     ).response
 
-    assert isinstance(bitrix_response, BitrixAPIResponse)
+    assert isinstance(bitrix_response, BitrixAPIValuesResponse)
     assert isinstance(bitrix_response.result, list)
+    assert isinstance(bitrix_response.values, list)
 
-    items = bitrix_response.result
+    items = bitrix_response.values
 
     assert len(items) >= 1, "Expected at least one contact binding to be returned"
 
     for item in items:
-        assert isinstance(item, dict)
-        if item.get("CONTACT_ID") in (contact_id, str(contact_id)):
+        assert isinstance(item, ContactLink)
+        if item.contact_id == contact_id:
+            assert item.sort == _SORT
+            assert item.is_primary is True
             break
     else:
         pytest.fail(f"Contact {contact_id} should be linked to company {company_id}")

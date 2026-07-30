@@ -1,11 +1,13 @@
 from functools import cached_property
 from typing import Iterable, Optional, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
 from ....schemas.crm.field import CRMFieldsDict, CRMFieldsResultData
 from ....utils.converters import bool_to_bitrix
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
+from ..._adapters import BitrixSchemaDictAdapter
 from .base_item import BaseItem
 from .delivery import Delivery
 from .details import Details
@@ -49,7 +51,7 @@ class Item(BaseItem):
             self,
             entity_type_id: int,
             *,
-            use_original_uf_names: Optional[bool] = None,
+            use_original_uf_names: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIValueRequest[CRMFieldsResultData, CRMFieldsDict]:
         """Get fields of CRM item.
@@ -72,6 +74,7 @@ class Item(BaseItem):
             entity_type_id=entity_type_id,
             use_original_uf_names=use_original_uf_names,
             timeout=timeout,
+            result_adapter=BitrixSchemaDictAdapter(CRMFieldsDict, wrapper="fields"),
         )
 
     @type_checker
@@ -80,7 +83,7 @@ class Item(BaseItem):
             entity_type_id: int,
             fields: JSONDict,
             *,
-            use_original_uf_names: Optional[bool] = None,
+            use_original_uf_names: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Create a new CRM entity.
@@ -128,7 +131,7 @@ class Item(BaseItem):
             entity_type_id: int,
             bitrix_id: int,
             *,
-            use_original_uf_names: Optional[bool] = None,
+            use_original_uf_names: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get an item by ID.
@@ -161,11 +164,11 @@ class Item(BaseItem):
             self,
             entity_type_id: int,
             *,
-            select: Optional[Iterable[Text]] = None,
-            filter: Optional[JSONDict] = None,
-            order: Optional[JSONDict] = None,
-            start: Optional[int] = None,
-            use_original_uf_names: Optional[bool] = None,
+            select: Optional[Iterable[Text]] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            order: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
+            use_original_uf_names: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of CRM elements.
@@ -233,7 +236,7 @@ class Item(BaseItem):
             bitrix_id: int,
             fields: JSONDict,
             *,
-            use_original_uf_names: Optional[bool] = None,
+            use_original_uf_names: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update CRM item.
@@ -310,7 +313,7 @@ class Item(BaseItem):
             entity_type_id: int,
             fields: JSONDict,
             *,
-            use_original_uf_names: Optional[bool] = None,
+            use_original_uf_names: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Import a single record
@@ -353,7 +356,7 @@ class Item(BaseItem):
             "fields": fields,
         }
 
-        if use_original_uf_names is not None:
+        if use_original_uf_names is not MISSING:
             params["useOriginalUfNames"] = bool_to_bitrix(use_original_uf_names, is_required=True)
 
         return self._make_bitrix_api_request(
@@ -368,7 +371,7 @@ class Item(BaseItem):
             entity_type_id: int,
             data: Iterable[JSONDict],
             *,
-            use_original_uf_names: Optional[bool] = None,
+            use_original_uf_names: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Import a batch of CRM records.
@@ -398,7 +401,7 @@ class Item(BaseItem):
             "data": data,
         }
 
-        if use_original_uf_names is not None:
+        if use_original_uf_names is not MISSING:
             params["useOriginalUfNames"] = bool_to_bitrix(use_original_uf_names, is_required=True)
 
         return self._make_bitrix_api_request(

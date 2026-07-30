@@ -1,5 +1,6 @@
 from typing import Optional
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, JSONList, Timeout
@@ -21,7 +22,7 @@ class Items(BaseCRM):
             self,
             *,
             list_id: int,
-            filter: Optional[JSONDict] = None,
+            filter: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONList]:
         """Get the list of participants for the call.
@@ -45,7 +46,7 @@ class Items(BaseCRM):
             "LIST_ID": list_id,
         }
 
-        if filter is not None:
+        if filter is not MISSING:
             params["FILTER"] = filter
 
         return self._make_bitrix_api_request(

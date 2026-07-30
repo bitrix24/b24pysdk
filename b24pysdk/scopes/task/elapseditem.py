@@ -1,5 +1,6 @@
 from typing import Iterable, Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -80,33 +81,33 @@ class Elapseditem(BaseEntity):
     def getlist(
             self,
             *,
-            task_id: Optional[int] = None,
-            order: Optional[JSONDict] = None,
-            filter: Optional[JSONDict] = None,
-            select: Optional[Iterable[Text]] = None,
-            params: Optional[JSONDict] = None,
+            task_id: Optional[int] = MISSING,
+            order: Optional[JSONDict] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            select: Optional[Iterable[Text]] = MISSING,
+            params: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
         payload = dict()
 
-        if task_id is not None:
+        if task_id is not MISSING:
             payload["TASKID"] = task_id
 
-        if order is not None:
+        if order is not MISSING:
             payload["ORDER"] = order
 
-        if filter is not None:
+        if filter is not MISSING:
             payload["FILTER"] = filter
 
-        if select is not None:
+        if select is not MISSING:
             if select.__class__ is not list:
                 select = list(select)
 
             payload["SELECT"] = select
 
-        if params is not None:
+        if params is not MISSING:
             payload["PARAMS"] = params
 
         return self._make_bitrix_api_request(

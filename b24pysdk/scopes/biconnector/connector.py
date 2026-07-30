@@ -1,5 +1,6 @@
 from typing import Iterable, Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -97,10 +98,10 @@ class Connector(BaseBiconnector):
     def list(
             self,
             *,
-            select: Optional[Iterable[Text]] = None,
-            filter: Optional[JSONDict] = None,
-            order: Optional[JSONDict] = None,
-            page: Optional[int] = None,
+            select: Optional[Iterable[Text]] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            order: Optional[JSONDict] = MISSING,
+            page: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """

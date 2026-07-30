@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Iterable, Optional, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
 from ....schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ....utils.functional import type_checker
@@ -123,10 +124,10 @@ class Requisite(BaseItem):
     def list(
             self,
             *,
-            select: Optional[Iterable[Text]] = None,
-            filter: Optional[JSONDict] = None,
-            order: Optional[JSONDict] = None,
-            start: Optional[int] = None,
+            select: Optional[Iterable[Text]] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            order: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of requisites.

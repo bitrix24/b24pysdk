@@ -1,5 +1,6 @@
 from typing import Dict, Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import B24APIResult, JSONDict, Timeout
@@ -20,7 +21,7 @@ class Option(BaseEntity):
     @type_checker
     def get(
             self,
-            option: Optional[Text] = None,
+            option: Optional[Text] = MISSING,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[B24APIResult]:
@@ -42,7 +43,7 @@ class Option(BaseEntity):
 
         params: JSONDict = {}
 
-        if option is not None:
+        if option is not MISSING:
             params["option"] = option
 
         return self._make_bitrix_api_request(

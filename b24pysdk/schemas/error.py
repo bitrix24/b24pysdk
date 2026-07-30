@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Optional, Text, TypedDict, Union
 
+from ..utils.converters import text_from_bitrix, text_to_bitrix
 from ..utils.dataclasses import frozen_dataclass_kwargs
 from ._base_schema import BaseSchema
 
@@ -48,8 +49,8 @@ class ErrorV1(BaseSchema[ErrorV1Data]):
             ErrorV1 schema with Python-friendly fields.
         """
         return cls(
-            error=bitrix_data.get("error") or "",
-            error_description=bitrix_data.get("error_description") or "",
+            error=text_from_bitrix(bitrix_data.get("error")) or "",
+            error_description=text_from_bitrix(bitrix_data.get("error_description")) or "",
         )
 
     def to_bitrix(self) -> ErrorV1Data:
@@ -60,8 +61,8 @@ class ErrorV1(BaseSchema[ErrorV1Data]):
             Dictionary with legacy Bitrix24 error field names.
         """
         return {
-            "error": self.error,
-            "error_description": self.error_description,
+            "error": text_to_bitrix(self.error, is_required=True),
+            "error_description": text_to_bitrix(self.error_description, is_required=True),
         }
 
 
@@ -94,8 +95,8 @@ class ValidationItem(BaseSchema[ValidationItemData]):
             Validation schema with field and message.
         """
         return cls(
-            field=bitrix_data["field"],
-            message=bitrix_data["message"],
+            field=text_from_bitrix(bitrix_data["field"], is_required=True),
+            message=text_from_bitrix(bitrix_data["message"], is_required=True),
         )
 
     def to_bitrix(self) -> ValidationItemData:
@@ -106,8 +107,8 @@ class ValidationItem(BaseSchema[ValidationItemData]):
             Dictionary with v3 validation field names.
         """
         return {
-            "field": self.field,
-            "message": self.message,
+            "field": text_to_bitrix(self.field, is_required=True),
+            "message": text_to_bitrix(self.message, is_required=True),
         }
 
 
@@ -152,9 +153,13 @@ class ErrorV3(BaseSchema[ErrorV3Data]):
         error_data = bitrix_data["error"]
 
         return cls(
-            code=error_data["code"],
-            message=error_data["message"],
-            validation=[ValidationItem.from_bitrix(validation_item) for validation_item in error_data["validation"]] if "validation" in error_data else None,
+            code=text_from_bitrix(error_data["code"], is_required=True),
+            message=text_from_bitrix(error_data["message"], is_required=True),
+            validation=(
+                [ValidationItem.from_bitrix(validation_item) for validation_item in error_data["validation"]]
+                if "validation" in error_data
+                else None
+            ),
         )
 
     def to_bitrix(self) -> ErrorV3Data:
@@ -166,8 +171,8 @@ class ErrorV3(BaseSchema[ErrorV3Data]):
         """
 
         error_data: ErrorV3ErrorData = {
-            "code": self.code,
-            "message": self.message,
+            "code": text_to_bitrix(self.code, is_required=True),
+            "message": text_to_bitrix(self.message, is_required=True),
         }
 
         if self.validation is not None:

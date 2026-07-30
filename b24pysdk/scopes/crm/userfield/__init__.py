@@ -1,10 +1,10 @@
 from functools import cached_property
 
 from ....api.requests import BitrixAPIValueRequest, BitrixAPIValuesRequest
-from ....schemas.crm.field import CRMFieldsData, CRMFieldsDict
-from ....schemas.crm.userfield import CRMUserfieldType, CRMUserfieldTypesData
+from ....schemas.crm.userfield import CRMUserfieldFieldsData, CRMUserfieldFieldsDict, CRMUserfieldType, CRMUserfieldTypesData
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
+from ..._adapters import BitrixSchemaDictAdapter, BitrixSchemasAdapter
 from .._base_crm import BaseCRM
 from .enumeration import Enumeration
 from .settings import Settings
@@ -35,7 +35,7 @@ class Userfield(BaseCRM):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIValueRequest[CRMFieldsData, CRMFieldsDict]:
+    ) -> BitrixAPIValueRequest[CRMUserfieldFieldsData, CRMUserfieldFieldsDict]:
         """Get description for custom fields.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/user-defined-fields/crm-userfield-fields.html
@@ -46,9 +46,9 @@ class Userfield(BaseCRM):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValueRequest
         """
-        return self._fields(timeout=timeout)
+        return self._fields(timeout=timeout, result_adapter=BitrixSchemaDictAdapter(CRMUserfieldFieldsDict))
 
     @type_checker
     def types(
@@ -72,5 +72,5 @@ class Userfield(BaseCRM):
             api_wrapper=self.types,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValuesRequest,
-            result_adapter=CRMUserfieldType.from_bitrix_result,
+            result_adapter=BitrixSchemasAdapter(CRMUserfieldType),
         )

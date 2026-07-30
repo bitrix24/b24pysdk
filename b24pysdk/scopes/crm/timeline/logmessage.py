@@ -1,5 +1,6 @@
 from typing import Optional
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
@@ -80,8 +81,8 @@ class Logmessage(BaseCRM):
             entity_type_id: int,
             entity_id: int,
             *,
-            order: Optional[JSONDict] = None,
-            start: Optional[int] = None,
+            order: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of log entries.
@@ -122,10 +123,10 @@ class Logmessage(BaseCRM):
             "entityId": entity_id,
         }
 
-        if order is not None:
+        if order is not MISSING:
             params["order"] = order
 
-        if start is not None:
+        if start is not MISSING:
             params["start"] = start
 
         return self._make_bitrix_api_request(

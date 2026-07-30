@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Optional, Text, Union
 
+from ....._constants import MISSING
 from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
 from .....utils.types import B24BoolStrict, Timeout
@@ -64,16 +65,16 @@ class Session(BaseEntity):
             chat_id: Union[int, Text],
             leave: Union[bool, B24BoolStrict],
             *,
-            user_id: Optional[Union[int, Text]] = None,
-            queue_id: Optional[Union[int, Text]] = None,
+            user_id: Optional[Union[int, Text]] = MISSING,
+            queue_id: Optional[Union[int, Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        if user_id is None and queue_id is None:
+        if user_id is MISSING and queue_id is MISSING:
             raise ValueError("Either user_id or queue_id must be provided.")
 
-        if user_id is not None and queue_id is not None:
+        if user_id is not MISSING and queue_id is not MISSING:
             raise ValueError("Provide only one of user_id or queue_id.")
 
         params = dict(
@@ -81,10 +82,10 @@ class Session(BaseEntity):
             LEAVE=B24BoolStrict(leave).to_b24(),
         )
 
-        if user_id is not None:
+        if user_id is not MISSING:
             params["USER_ID"] = user_id
 
-        if queue_id is not None:
+        if queue_id is not MISSING:
             params["QUEUE_ID"] = queue_id
 
         return self._make_bitrix_api_request(

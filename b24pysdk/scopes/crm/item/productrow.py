@@ -1,9 +1,11 @@
 from typing import Iterable, Optional, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
 from ....schemas.crm.field import CRMFieldsDict, CRMFieldsResultData
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
+from ..._adapters import BitrixSchemaDictAdapter
 from .._base_crm import BaseCRM
 
 __all__ = [
@@ -35,7 +37,10 @@ class Productrow(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return self._fields(timeout=timeout)
+        return self._fields(
+            timeout=timeout,
+            result_adapter=BitrixSchemaDictAdapter(CRMFieldsDict, wrapper="fields"),
+        )
 
     @type_checker
     def add(
@@ -97,9 +102,9 @@ class Productrow(BaseCRM):
     def list(
             self,
             *,
-            filter: Optional[JSONDict] = None,
-            order: Optional[JSONDict] = None,
-            start: Optional[int] = None,
+            filter: Optional[JSONDict] = MISSING,
+            order: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of product rows.

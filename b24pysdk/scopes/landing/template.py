@@ -1,5 +1,6 @@
 from typing import Optional
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -17,15 +18,19 @@ class Template(BaseEntity):
     def getlist(
             self,
             *,
-            params: Optional[JSONDict] = None,
+            params: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        api_params = dict()
+        api_params: JSONDict = {}
 
-        if params is not None:
+        if params is not MISSING:
             api_params["params"] = params
+
+        if start is not MISSING:
+            api_params["start"] = start
 
         return self._make_bitrix_api_request(
             api_wrapper=self.getlist,
@@ -74,7 +79,7 @@ class Template(BaseEntity):
             self,
             bitrix_id: int,
             *,
-            data: Optional[JSONDict] = None,
+            data: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -83,7 +88,7 @@ class Template(BaseEntity):
             "id": bitrix_id,
         }
 
-        if data is not None:
+        if data is not MISSING:
             params["data"] = data
 
         return self._make_bitrix_api_request(
@@ -97,7 +102,7 @@ class Template(BaseEntity):
             self,
             bitrix_id: int,
             *,
-            data: Optional[JSONDict] = None,
+            data: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -106,7 +111,7 @@ class Template(BaseEntity):
             "id": bitrix_id,
         }
 
-        if data is not None:
+        if data is not MISSING:
             params["data"] = data
 
         return self._make_bitrix_api_request(

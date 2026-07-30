@@ -1,5 +1,6 @@
 from typing import Optional, Sequence, Text, Union
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import B24BoolStrict, DocumentType, JSONDict, Timeout
@@ -23,15 +24,15 @@ class Activity(BaseEntity):
             handler: Text,
             name: Union[Text, JSONDict],
             *,
-            auth_user_id: Optional[int] = None,
-            use_subscription: Optional[Union[bool, B24BoolStrict]] = None,
-            description: Optional[Union[Text, JSONDict]] = None,
-            properties: Optional[JSONDict] = None,
-            return_properties: Optional[JSONDict] = None,
-            document_type: Optional[Sequence[Text]] = None,
-            filter: Optional[JSONDict] = None,
-            use_placement: Optional[Union[bool, B24BoolStrict]] = None,
-            placement_handler: Optional[Text] = None,
+            auth_user_id: Optional[int] = MISSING,
+            use_subscription: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            description: Optional[Union[Text, JSONDict]] = MISSING,
+            properties: Optional[JSONDict] = MISSING,
+            return_properties: Optional[JSONDict] = MISSING,
+            document_type: Optional[Sequence[Text]] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            use_placement: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            placement_handler: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Add a new custom action for use in Bitrix24 business processes.
@@ -96,31 +97,31 @@ class Activity(BaseEntity):
             "NAME": name,
         }
 
-        if auth_user_id is not None:
+        if auth_user_id is not MISSING:
             params["AUTH_USER_ID"] = auth_user_id
 
-        if use_subscription is not None:
+        if use_subscription is not MISSING:
             params["USE_SUBSCRIPTION"] = B24BoolStrict(use_subscription).to_b24()
 
-        if description is not None:
+        if description is not MISSING:
             params["DESCRIPTION"] = description
 
-        if properties is not None:
+        if properties is not MISSING:
             params["PROPERTIES"] = properties
 
-        if return_properties is not None:
+        if return_properties is not MISSING:
             params["RETURN_PROPERTIES"] = return_properties
 
-        if document_type is not None:
+        if document_type is not MISSING:
             params["DOCUMENT_TYPE"] = DocumentType(document_type).to_b24()
 
-        if filter is not None:
+        if filter is not MISSING:
             params["FILTER"] = filter
 
-        if use_placement is not None:
+        if use_placement is not MISSING:
             params["USE_PLACEMENT"] = B24BoolStrict(use_placement).to_b24()
 
-        if placement_handler is not None:
+        if placement_handler is not MISSING:
             params["PLACEMENT_HANDLER"] = placement_handler
 
         return self._make_bitrix_api_request(

@@ -1,5 +1,6 @@
 from typing import Iterable, Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -74,29 +75,29 @@ class Type(BaseEntity):
     def list(
             self,
             *,
-            select: Optional[Iterable[Text]] = None,
-            order: Optional[JSONDict] = None,
-            filter: Optional[JSONDict] = None,
-            start: Optional[int] = None,
+            select: Optional[Iterable[Text]] = MISSING,
+            order: Optional[JSONDict] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
         params: JSONDict = {}
 
-        if select is not None:
+        if select is not MISSING:
             if select.__class__ is not list:
                 select = list(select)
 
             params["select"] = select
 
-        if order is not None:
+        if order is not MISSING:
             params["order"] = order
 
-        if filter is not None:
+        if filter is not MISSING:
             params["filter"] = filter
 
-        if start is not None:
+        if start is not MISSING:
             params["start"] = start
 
         return self._make_bitrix_api_request(

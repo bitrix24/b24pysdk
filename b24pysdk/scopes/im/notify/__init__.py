@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Annotated, Literal, Optional, Text, Union
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import B24BoolStrict, JSONDict, Timeout
@@ -50,11 +51,11 @@ class Notify(BaseEntity):
             user_id: int,
             message: Text,
             *,
-            type: Optional[Annotated[Text, Literal["USER", "SYSTEM"]]] = None,
-            message_out: Optional[Text] = None,
-            tag: Optional[Text] = None,
-            sub_tag: Optional[Text] = None,
-            attach: Optional[Union[JSONDict, Text]] = None,
+            type: Optional[Annotated[Text, Literal["USER", "SYSTEM"]]] = MISSING,
+            message_out: Optional[Text] = MISSING,
+            tag: Optional[Text] = MISSING,
+            sub_tag: Optional[Text] = MISSING,
+            attach: Optional[Union[JSONDict, Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[Union[int, bool]]:
         """"""
@@ -64,19 +65,19 @@ class Notify(BaseEntity):
             "MESSAGE": message,
         }
 
-        if type is not None:
+        if type is not MISSING:
             params["TYPE"] = type
 
-        if message_out is not None:
+        if message_out is not MISSING:
             params["MESSAGE_OUT"] = message_out
 
-        if tag is not None:
+        if tag is not MISSING:
             params["TAG"] = tag
 
-        if sub_tag is not None:
+        if sub_tag is not MISSING:
             params["SUB_TAG"] = sub_tag
 
-        if attach is not None:
+        if attach is not MISSING:
             params["ATTACH"] = attach
 
         return self._make_bitrix_api_request(
@@ -131,26 +132,26 @@ class Notify(BaseEntity):
     def delete(
             self,
             *,
-            bitrix_id: Optional[int] = None,
-            tag: Optional[Text] = None,
-            sub_tag: Optional[Text] = None,
-            client_id: Optional[Text] = None,
+            bitrix_id: Optional[int] = MISSING,
+            tag: Optional[Text] = MISSING,
+            sub_tag: Optional[Text] = MISSING,
+            client_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """"""
 
-        params: JSONDict = dict()
+        params: JSONDict = {}
 
-        if bitrix_id is not None:
+        if bitrix_id is not MISSING:
             params["ID"] = bitrix_id
 
-        if tag is not None:
+        if tag is not MISSING:
             params["TAG"] = tag
 
-        if sub_tag is not None:
+        if sub_tag is not MISSING:
             params["SUB_TAG"] = sub_tag
 
-        if client_id is not None:
+        if client_id is not MISSING:
             params["CLIENT_ID"] = client_id
 
         return self._make_bitrix_api_request(
@@ -163,26 +164,26 @@ class Notify(BaseEntity):
     def get(
             self,
             *,
-            last_id: Optional[int] = None,
-            last_type: Optional[Literal[1, 3]] = None,
-            limit: Optional[int] = None,
-            convert_text: Optional[Union[bool, B24BoolStrict]] = None,
+            last_id: Optional[int] = MISSING,
+            last_type: Optional[Literal[1, 3]] = MISSING,
+            limit: Optional[int] = MISSING,
+            convert_text: Optional[Union[bool, B24BoolStrict]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
         """"""
 
-        params: JSONDict = dict()
+        params: JSONDict = {}
 
-        if last_id is not None:
+        if last_id is not MISSING:
             params["LAST_ID"] = last_id
 
-        if last_type is not None:
+        if last_type is not MISSING:
             params["LAST_TYPE"] = last_type
 
-        if limit is not None:
+        if limit is not MISSING:
             params["LIMIT"] = limit
 
-        if convert_text is not None:
+        if convert_text is not MISSING:
             params["CONVERT_TEXT"] = B24BoolStrict(convert_text).to_b24()
 
         return self._make_bitrix_api_request(

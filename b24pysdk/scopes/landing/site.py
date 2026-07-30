@@ -1,5 +1,6 @@
 from typing import Iterable, Optional, Text, Union
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -18,6 +19,7 @@ class Site(BaseEntity):
             self,
             fields: JSONDict,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -25,6 +27,9 @@ class Site(BaseEntity):
         params: JSONDict = {
             "fields": fields,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.add,
@@ -38,6 +43,7 @@ class Site(BaseEntity):
             bitrix_id: int,
             fields: JSONDict,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -46,6 +52,9 @@ class Site(BaseEntity):
             "id": bitrix_id,
             "fields": fields,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,
@@ -58,6 +67,7 @@ class Site(BaseEntity):
             self,
             bitrix_id: int,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -65,6 +75,9 @@ class Site(BaseEntity):
         params: JSONDict = {
             "id": bitrix_id,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.delete,
@@ -76,15 +89,23 @@ class Site(BaseEntity):
     def get_list(
             self,
             *,
-            params: Optional[JSONDict] = None,
+            scope: Optional[Text] = MISSING,
+            params: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        api_params = dict()
+        api_params: JSONDict = {}
 
-        if params is not None:
+        if scope is not MISSING:
+            api_params["scope"] = scope
+
+        if params is not MISSING:
             api_params["params"] = params
+
+        if start is not MISSING:
+            api_params["start"] = start
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get_list,
@@ -97,6 +118,7 @@ class Site(BaseEntity):
             self,
             bitrix_id: int,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -104,6 +126,9 @@ class Site(BaseEntity):
         params: JSONDict = {
             "id": bitrix_id,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get_preview,
@@ -116,6 +141,7 @@ class Site(BaseEntity):
             self,
             bitrix_id: Union[int, Iterable[int]],
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -126,6 +152,9 @@ class Site(BaseEntity):
         params: JSONDict = {
             "id": bitrix_id,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get_public_url,
@@ -138,6 +167,7 @@ class Site(BaseEntity):
             self,
             bitrix_id: int,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -145,6 +175,9 @@ class Site(BaseEntity):
         params: JSONDict = {
             "id": bitrix_id,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.mark_delete,
@@ -157,6 +190,7 @@ class Site(BaseEntity):
             self,
             bitrix_id: int,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -164,6 +198,9 @@ class Site(BaseEntity):
         params: JSONDict = {
             "id": bitrix_id,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.mark_un_delete,
@@ -176,6 +213,7 @@ class Site(BaseEntity):
             self,
             bitrix_id: int,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -183,6 +221,9 @@ class Site(BaseEntity):
         params: JSONDict = {
             "id": bitrix_id,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.publication,
@@ -195,6 +236,7 @@ class Site(BaseEntity):
             self,
             bitrix_id: int,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -202,6 +244,9 @@ class Site(BaseEntity):
         params: JSONDict = {
             "id": bitrix_id,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.unpublic,
@@ -213,7 +258,7 @@ class Site(BaseEntity):
     def set_rights(
             self,
             bitrix_id: int,
-            rights: JSONDict,
+            rights: Optional[JSONDict] = MISSING,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
@@ -221,8 +266,10 @@ class Site(BaseEntity):
 
         params: JSONDict = {
             "id": bitrix_id,
-            "rights": rights,
         }
+
+        if rights is not MISSING:
+            params["rights"] = rights
 
         return self._make_bitrix_api_request(
             api_wrapper=self.set_rights,
@@ -254,6 +301,7 @@ class Site(BaseEntity):
             self,
             bitrix_id: int,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -261,6 +309,9 @@ class Site(BaseEntity):
         params: JSONDict = {
             "id": bitrix_id,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.getadditionalfields,
@@ -274,6 +325,7 @@ class Site(BaseEntity):
             site_id: int,
             fields: JSONDict,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -283,8 +335,38 @@ class Site(BaseEntity):
             "fields": fields,
         }
 
+        if scope is not MISSING:
+            params["scope"] = scope
+
         return self._make_bitrix_api_request(
             api_wrapper=self.add_folder,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def update_folder(
+            self,
+            site_id: int,
+            folder_id: int,
+            fields: JSONDict,
+            *,
+            scope: Optional[Text] = MISSING,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params: JSONDict = {
+            "siteId": site_id,
+            "folderId": folder_id,
+            "fields": fields,
+        }
+
+        if scope is not MISSING:
+            params["scope"] = scope
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.update_folder,
             params=params,
             timeout=timeout,
         )
@@ -294,7 +376,9 @@ class Site(BaseEntity):
             self,
             site_id: int,
             *,
-            filter: Optional[JSONDict] = None,
+            scope: Optional[Text] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -303,8 +387,14 @@ class Site(BaseEntity):
             "siteId": site_id,
         }
 
-        if filter is not None:
+        if scope is not MISSING:
+            params["scope"] = scope
+
+        if filter is not MISSING:
             params["filter"] = filter
+
+        if start is not MISSING:
+            params["start"] = start
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get_folders,
@@ -317,6 +407,8 @@ class Site(BaseEntity):
             self,
             folder_id: int,
             *,
+            scope: Optional[Text] = MISSING,
+            mark: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -324,6 +416,12 @@ class Site(BaseEntity):
         params: JSONDict = {
             "folderId": folder_id,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
+
+        if mark is not MISSING:
+            params["mark"] = mark
 
         return self._make_bitrix_api_request(
             api_wrapper=self.publication_folder,
@@ -336,6 +434,7 @@ class Site(BaseEntity):
             self,
             folder_id: int,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -343,6 +442,9 @@ class Site(BaseEntity):
         params: JSONDict = {
             "folderId": folder_id,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.un_public_folder,
@@ -355,6 +457,7 @@ class Site(BaseEntity):
             self,
             bitrix_id: int,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -362,6 +465,9 @@ class Site(BaseEntity):
         params: JSONDict = {
             "id": bitrix_id,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.mark_folder_delete,
@@ -374,6 +480,7 @@ class Site(BaseEntity):
             self,
             bitrix_id: int,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -381,6 +488,9 @@ class Site(BaseEntity):
         params: JSONDict = {
             "id": bitrix_id,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.mark_folder_un_delete,
@@ -476,14 +586,14 @@ class Site(BaseEntity):
     def get_menu_bindings(
             self,
             *,
-            menu_code: Optional[Text] = None,
+            menu_code: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        params: JSONDict = {}
 
-        if menu_code is not None:
+        if menu_code is not MISSING:
             params["menuCode"] = menu_code
 
         return self._make_bitrix_api_request(
@@ -496,14 +606,14 @@ class Site(BaseEntity):
     def get_group_bindings(
             self,
             *,
-            group_id: Optional[int] = None,
+            group_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        params: JSONDict = {}
 
-        if group_id is not None:
+        if group_id is not MISSING:
             params["groupId"] = group_id
 
         return self._make_bitrix_api_request(
@@ -517,7 +627,7 @@ class Site(BaseEntity):
             self,
             bitrix_id: int,
             *,
-            params: Optional[JSONDict] = None,
+            params: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -526,7 +636,7 @@ class Site(BaseEntity):
             "id": bitrix_id,
         }
 
-        if params is not None:
+        if params is not MISSING:
             api_params["params"] = params
 
         return self._make_bitrix_api_request(

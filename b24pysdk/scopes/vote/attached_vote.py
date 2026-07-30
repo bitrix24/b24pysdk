@@ -1,5 +1,6 @@
 from typing import Annotated, Iterable, Literal, Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import classproperty, type_checker
 from ...utils.types import JSONDict, Timeout
@@ -21,33 +22,33 @@ class AttachedVote(BaseEntity):
     def download(
             self,
             *,
-            attach_id: Optional[int] = None,
-            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = None,
+            attach_id: Optional[int] = MISSING,
+            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = MISSING,
             entity_type: Optional[Annotated[
                 Text,
                 Literal["Bitrix\\Vote\\Attachment\\ImMessageConnector", "Bitrix\\Vote\\Attachment\\BlogPostConnector"],
-            ]] = None,
-            entity_id: Optional[int] = None,
-            signed_attach_id: Optional[Text] = None,
+            ]] = MISSING,
+            entity_id: Optional[int] = MISSING,
+            signed_attach_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        params: JSONDict = {}
 
-        if attach_id is not None:
+        if attach_id is not MISSING:
             params["attachId"] = attach_id
 
-        if module_id is not None:
+        if module_id is not MISSING:
             params["moduleId"] = module_id
 
-        if entity_type is not None:
+        if entity_type is not MISSING:
             params["entityType"] = entity_type
 
-        if entity_id is not None:
+        if entity_id is not MISSING:
             params["entityId"] = entity_id
 
-        if signed_attach_id is not None:
+        if signed_attach_id is not MISSING:
             params["signedAttachId"] = signed_attach_id
 
         return self._make_bitrix_api_request(
@@ -60,33 +61,33 @@ class AttachedVote(BaseEntity):
     def get(
             self,
             *,
-            attach_id: Optional[int] = None,
-            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = None,
+            attach_id: Optional[int] = MISSING,
+            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = MISSING,
             entity_type: Optional[Annotated[
                 Text,
                 Literal["Bitrix\\Vote\\Attachment\\ImMessageConnector", "Bitrix\\Vote\\Attachment\\BlogPostConnector"],
-            ]] = None,
-            entity_id: Optional[int] = None,
-            signed_attach_id: Optional[Text] = None,
+            ]] = MISSING,
+            entity_id: Optional[int] = MISSING,
+            signed_attach_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {}
+        params: JSONDict = {}
 
-        if attach_id is not None:
+        if attach_id is not MISSING:
             params["attachId"] = attach_id
 
-        if module_id is not None:
+        if module_id is not MISSING:
             params["moduleId"] = module_id
 
-        if entity_type is not None:
+        if entity_type is not MISSING:
             params["entityType"] = entity_type
 
-        if entity_id is not None:
+        if entity_id is not MISSING:
             params["entityId"] = entity_id
 
-        if signed_attach_id is not None:
+        if signed_attach_id is not MISSING:
             params["signedAttachId"] = signed_attach_id
 
         return self._make_bitrix_api_request(
@@ -100,16 +101,16 @@ class AttachedVote(BaseEntity):
             self,
             answer_id: int,
             *,
-            attach_id: Optional[int] = None,
-            page_navigation: Optional[JSONDict] = None,
-            user_for_mobile_format: Optional[bool] = None,
-            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = None,
+            attach_id: Optional[int] = MISSING,
+            page_navigation: Optional[JSONDict] = MISSING,
+            user_for_mobile_format: Optional[bool] = MISSING,
+            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = MISSING,
             entity_type: Optional[Annotated[
                 Text,
                 Literal["Bitrix\\Vote\\Attachment\\ImMessageConnector", "Bitrix\\Vote\\Attachment\\BlogPostConnector"],
-            ]] = None,
-            entity_id: Optional[int] = None,
-            signed_attach_id: Optional[Text] = None,
+            ]] = MISSING,
+            entity_id: Optional[int] = MISSING,
+            signed_attach_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -118,25 +119,25 @@ class AttachedVote(BaseEntity):
             "answerId": answer_id,
         }
 
-        if attach_id is not None:
+        if attach_id is not MISSING:
             params["attachId"] = attach_id
 
-        if page_navigation is not None:
+        if page_navigation is not MISSING:
             params["pageNavigation"] = page_navigation
 
-        if user_for_mobile_format is not None:
+        if user_for_mobile_format is not MISSING:
             params["userForMobileFormat"] = user_for_mobile_format
 
-        if module_id is not None:
+        if module_id is not MISSING:
             params["moduleId"] = module_id
 
-        if entity_type is not None:
+        if entity_type is not MISSING:
             params["entityType"] = entity_type
 
-        if entity_id is not None:
+        if entity_id is not MISSING:
             params["entityId"] = entity_id
 
-        if signed_attach_id is not None:
+        if signed_attach_id is not MISSING:
             params["signedAttachId"] = signed_attach_id
 
         return self._make_bitrix_api_request(
@@ -178,41 +179,41 @@ class AttachedVote(BaseEntity):
     def get_with_voted(
             self,
             *,
-            attach_id: Optional[int] = None,
-            page_size: Optional[int] = None,
-            user_for_mobile_format: Optional[bool] = None,
-            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = None,
+            attach_id: Optional[int] = MISSING,
+            page_size: Optional[int] = MISSING,
+            user_for_mobile_format: Optional[bool] = MISSING,
+            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = MISSING,
             entity_type: Optional[Annotated[
                 Text,
                 Literal["Bitrix\\Vote\\Attachment\\ImMessageConnector", "Bitrix\\Vote\\Attachment\\BlogPostConnector"],
-            ]] = None,
-            entity_id: Optional[int] = None,
-            signed_attach_id: Optional[Text] = None,
+            ]] = MISSING,
+            entity_id: Optional[int] = MISSING,
+            signed_attach_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {}
+        params: JSONDict = {}
 
-        if attach_id is not None:
+        if attach_id is not MISSING:
             params["attachId"] = attach_id
 
-        if page_size is not None:
+        if page_size is not MISSING:
             params["pageSize"] = page_size
 
-        if user_for_mobile_format is not None:
+        if user_for_mobile_format is not MISSING:
             params["userForMobileFormat"] = user_for_mobile_format
 
-        if module_id is not None:
+        if module_id is not MISSING:
             params["moduleId"] = module_id
 
-        if entity_type is not None:
+        if entity_type is not MISSING:
             params["entityType"] = entity_type
 
-        if entity_id is not None:
+        if entity_id is not MISSING:
             params["entityId"] = entity_id
 
-        if signed_attach_id is not None:
+        if signed_attach_id is not MISSING:
             params["signedAttachId"] = signed_attach_id
 
         return self._make_bitrix_api_request(
@@ -225,33 +226,33 @@ class AttachedVote(BaseEntity):
     def recall(
             self,
             *,
-            attach_id: Optional[int] = None,
-            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = None,
+            attach_id: Optional[int] = MISSING,
+            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = MISSING,
             entity_type: Optional[Annotated[
                 Text,
                 Literal["Bitrix\\Vote\\Attachment\\ImMessageConnector", "Bitrix\\Vote\\Attachment\\BlogPostConnector"],
-            ]] = None,
-            entity_id: Optional[int] = None,
-            signed_attach_id: Optional[Text] = None,
+            ]] = MISSING,
+            entity_id: Optional[int] = MISSING,
+            signed_attach_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {}
+        params: JSONDict = {}
 
-        if attach_id is not None:
+        if attach_id is not MISSING:
             params["attachId"] = attach_id
 
-        if module_id is not None:
+        if module_id is not MISSING:
             params["moduleId"] = module_id
 
-        if entity_type is not None:
+        if entity_type is not MISSING:
             params["entityType"] = entity_type
 
-        if entity_id is not None:
+        if entity_id is not MISSING:
             params["entityId"] = entity_id
 
-        if signed_attach_id is not None:
+        if signed_attach_id is not MISSING:
             params["signedAttachId"] = signed_attach_id
 
         return self._make_bitrix_api_request(
@@ -264,33 +265,33 @@ class AttachedVote(BaseEntity):
     def resume(
             self,
             *,
-            attach_id: Optional[int] = None,
-            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = None,
+            attach_id: Optional[int] = MISSING,
+            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = MISSING,
             entity_type: Optional[Annotated[
                 Text,
                 Literal["Bitrix\\Vote\\Attachment\\ImMessageConnector", "Bitrix\\Vote\\Attachment\\BlogPostConnector"],
-            ]] = None,
-            entity_id: Optional[int] = None,
-            signed_attach_id: Optional[Text] = None,
+            ]] = MISSING,
+            entity_id: Optional[int] = MISSING,
+            signed_attach_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {}
+        params: JSONDict = {}
 
-        if attach_id is not None:
+        if attach_id is not MISSING:
             params["attachId"] = attach_id
 
-        if module_id is not None:
+        if module_id is not MISSING:
             params["moduleId"] = module_id
 
-        if entity_type is not None:
+        if entity_type is not MISSING:
             params["entityType"] = entity_type
 
-        if entity_id is not None:
+        if entity_id is not MISSING:
             params["entityId"] = entity_id
 
-        if signed_attach_id is not None:
+        if signed_attach_id is not MISSING:
             params["signedAttachId"] = signed_attach_id
 
         return self._make_bitrix_api_request(
@@ -303,33 +304,33 @@ class AttachedVote(BaseEntity):
     def stop(
             self,
             *,
-            attach_id: Optional[int] = None,
-            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = None,
+            attach_id: Optional[int] = MISSING,
+            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = MISSING,
             entity_type: Optional[Annotated[
                 Text,
                 Literal["Bitrix\\Vote\\Attachment\\ImMessageConnector", "Bitrix\\Vote\\Attachment\\BlogPostConnector"],
-            ]] = None,
-            entity_id: Optional[int] = None,
-            signed_attach_id: Optional[Text] = None,
+            ]] = MISSING,
+            entity_id: Optional[int] = MISSING,
+            signed_attach_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {}
+        params: JSONDict = {}
 
-        if attach_id is not None:
+        if attach_id is not MISSING:
             params["attachId"] = attach_id
 
-        if module_id is not None:
+        if module_id is not MISSING:
             params["moduleId"] = module_id
 
-        if entity_type is not None:
+        if entity_type is not MISSING:
             params["entityType"] = entity_type
 
-        if entity_id is not None:
+        if entity_id is not MISSING:
             params["entityId"] = entity_id
 
-        if signed_attach_id is not None:
+        if signed_attach_id is not MISSING:
             params["signedAttachId"] = signed_attach_id
 
         return self._make_bitrix_api_request(
@@ -343,14 +344,14 @@ class AttachedVote(BaseEntity):
             self,
             ballot: JSONDict,
             *,
-            attach_id: Optional[int] = None,
-            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = None,
+            attach_id: Optional[int] = MISSING,
+            module_id: Optional[Annotated[Text, Literal["Im", "blog"]]] = MISSING,
             entity_type: Optional[Annotated[
                 Text,
                 Literal["Bitrix\\Vote\\Attachment\\ImMessageConnector", "Bitrix\\Vote\\Attachment\\BlogPostConnector"],
-            ]] = None,
-            entity_id: Optional[int] = None,
-            signed_attach_id: Optional[Text] = None,
+            ]] = MISSING,
+            entity_id: Optional[int] = MISSING,
+            signed_attach_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -359,19 +360,19 @@ class AttachedVote(BaseEntity):
             "ballot": ballot,
         }
 
-        if attach_id is not None:
+        if attach_id is not MISSING:
             params["attachId"] = attach_id
 
-        if module_id is not None:
+        if module_id is not MISSING:
             params["moduleId"] = module_id
 
-        if entity_type is not None:
+        if entity_type is not MISSING:
             params["entityType"] = entity_type
 
-        if entity_id is not None:
+        if entity_id is not MISSING:
             params["entityId"] = entity_id
 
-        if signed_attach_id is not None:
+        if signed_attach_id is not MISSING:
             params["signedAttachId"] = signed_attach_id
 
         return self._make_bitrix_api_request(

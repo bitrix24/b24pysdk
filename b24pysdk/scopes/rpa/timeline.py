@@ -1,5 +1,6 @@
 from typing import Optional, Union
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import B24BoolStrict, JSONDict, Timeout
@@ -61,7 +62,7 @@ class Timeline(BaseEntity):
             type_id: int,
             item_id: int,
             *,
-            start: Optional[int] = None,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -71,7 +72,7 @@ class Timeline(BaseEntity):
             "itemId": item_id,
         }
 
-        if start is not None:
+        if start is not MISSING:
             params["start"] = start
 
         return self._make_bitrix_api_request(

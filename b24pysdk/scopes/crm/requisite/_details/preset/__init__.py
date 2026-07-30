@@ -1,11 +1,13 @@
 from functools import cached_property
 from typing import Iterable, Optional, Text
 
+from ......_constants import MISSING
 from ......api.requests import BitrixAPIRequest, BitrixAPIValueRequest, BitrixAPIValuesRequest
 from ......schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ......schemas.crm.requisite import RequisitePresetCountriesData, RequisitePresetCountry
 from ......utils.functional import type_checker
 from ......utils.types import JSONDict, Timeout
+from ....._adapters import BitrixSchemasAdapter
 from ..base_detail import BaseDetail
 from .field import Field
 
@@ -98,10 +100,10 @@ class Preset(BaseDetail):
     def list(
             self,
             *,
-            select: Optional[Iterable[Text]] = None,
-            filter: Optional[JSONDict] = None,
-            order: Optional[JSONDict] = None,
-            start: Optional[int] = None,
+            select: Optional[Iterable[Text]] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            order: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of entities.
@@ -228,5 +230,5 @@ class Preset(BaseDetail):
             api_wrapper=self.countries,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValuesRequest,
-            result_adapter=RequisitePresetCountry.from_bitrix_result,
+            result_adapter=BitrixSchemasAdapter(RequisitePresetCountry),
         )

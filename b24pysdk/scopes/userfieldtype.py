@@ -1,5 +1,6 @@
 from typing import Optional, Text
 
+from .._constants import MISSING
 from ..api.requests import BitrixAPIRequest
 from ..utils.functional import type_checker
 from ..utils.types import JSONDict, Timeout
@@ -19,9 +20,9 @@ class Userfieldtype(BaseScope):
             user_type_id: Text,
             handler: Text,
             *,
-            title: Optional[Text] = None,
-            description: Optional[Text] = None,
-            options: Optional[JSONDict] = None,
+            title: Optional[Text] = MISSING,
+            description: Optional[Text] = MISSING,
+            options: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """"""
@@ -31,13 +32,13 @@ class Userfieldtype(BaseScope):
             "HANDLER": handler,
         }
 
-        if title is not None:
+        if title is not MISSING:
             params["TITLE"] = title
 
-        if description is not None:
+        if description is not MISSING:
             params["DESCRIPTION"] = description
 
-        if options is not None:
+        if options is not MISSING:
             params["OPTIONS"] = options
 
         return self._make_bitrix_api_request(
@@ -69,11 +70,18 @@ class Userfieldtype(BaseScope):
     def list(
             self,
             *,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
         """"""
+        params: JSONDict = {}
+
+        if start is not MISSING:
+            params["start"] = start
+
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
+            params=params,
             timeout=timeout,
         )
 
@@ -84,8 +92,8 @@ class Userfieldtype(BaseScope):
             handler: Text,
             title: Text,
             *,
-            description: Optional[Text] = None,
-            options: Optional[JSONDict] = None,
+            description: Optional[Text] = MISSING,
+            options: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """"""
@@ -96,10 +104,10 @@ class Userfieldtype(BaseScope):
             "TITLE": title,
         }
 
-        if description is not None:
+        if description is not MISSING:
             params["DESCRIPTION"] = description
 
-        if options is not None:
+        if options is not MISSING:
             params["OPTIONS"] = options
 
         return self._make_bitrix_api_request(

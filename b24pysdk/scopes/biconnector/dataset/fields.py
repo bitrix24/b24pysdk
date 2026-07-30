@@ -1,5 +1,6 @@
 from typing import Iterable, Optional
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
@@ -39,9 +40,9 @@ class Fields(BaseEntity):
     def update(
             self,
             bitrix_id: int,
-            add: Optional[Iterable[JSONDict]] = None,
-            update: Optional[Iterable[JSONDict]] = None,
-            delete: Optional[Iterable[int]] = None,
+            add: Optional[Iterable[JSONDict]] = MISSING,
+            update: Optional[Iterable[JSONDict]] = MISSING,
+            delete: Optional[Iterable[int]] = MISSING,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
@@ -75,13 +76,13 @@ class Fields(BaseEntity):
 
         params = {"id": bitrix_id}
 
-        if add is not None:
+        if add is not MISSING:
             params["add"] = list(add)
 
-        if update is not None:
+        if update is not MISSING:
             params["update"] = list(update)
 
-        if delete is not None:
+        if delete is not MISSING:
             params["delete"] = list(delete)
 
         return self._make_bitrix_api_request(

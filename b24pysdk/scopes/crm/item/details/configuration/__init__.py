@@ -1,8 +1,10 @@
 from typing import Optional, Text
 
-from ......api.requests import BitrixAPIRequest
+from ......_constants import MISSING
+from ......api.requests import BitrixAPIRequest, BitrixAPIValuesRequest
+from ......schemas.crm.details_configuration import CRMDetailsConfigurationSection, CRMDetailsConfigurationSectionsData
 from ......utils.functional import type_checker
-from ......utils.types import JSONDict, JSONList, Timeout
+from ......utils.types import JSONDict, Timeout
 from .base_configuration import BaseConfiguration
 
 __all__ = [
@@ -21,11 +23,11 @@ class Configuration(BaseConfiguration):
             self,
             *,
             entity_type_id: int,
-            user_id: Optional[int] = None,
-            scope: Optional[Text] = None,
-            extras: Optional[JSONDict] = None,
+            user_id: Optional[int] = MISSING,
+            scope: Optional[Text] = MISSING,
+            extras: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValuesRequest[Optional[CRMDetailsConfigurationSectionsData], CRMDetailsConfigurationSection]:
         """Get parameters of CRM item detail configuration.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/item-details-configuration/crm-item-details-configuration-get.html
@@ -49,7 +51,7 @@ class Configuration(BaseConfiguration):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValuesRequest
         """
         return self._get(
             entity_type_id=entity_type_id,
@@ -64,10 +66,10 @@ class Configuration(BaseConfiguration):
             self,
             *,
             entity_type_id: int,
-            data: JSONList,
-            user_id: Optional[int] = None,
-            scope: Optional[str] = None,
-            extras: Optional[JSONDict] = None,
+            data: CRMDetailsConfigurationSectionsData,
+            user_id: Optional[int] = MISSING,
+            scope: Optional[str] = MISSING,
+            extras: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Set parameters for CRM item detail card configuration.
@@ -112,8 +114,8 @@ class Configuration(BaseConfiguration):
             *,
             entity_type_id: int,
             user_id: Optional[int],
-            scope: Optional[str] = None,
-            extras: Optional[JSONDict] = None,
+            scope: Optional[str] = MISSING,
+            extras: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Reset item card parameters.
@@ -154,7 +156,7 @@ class Configuration(BaseConfiguration):
             self,
             *,
             entity_type_id: int,
-            extras: Optional[JSONDict] = None,
+            extras: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Set common detail for all users.

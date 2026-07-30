@@ -1,5 +1,6 @@
 from typing import Optional
 
+from ....._constants import MISSING
 from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
 from .....utils.types import JSONDict, Timeout
@@ -17,14 +18,14 @@ class Users(BaseEntity):
     def get(
             self,
             *,
-            department_id: Optional[int] = None,
+            department_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
         params: JSONDict = {}
 
-        if department_id is not None:
+        if department_id is not MISSING:
             params["DEPARTMENT_ID"] = department_id
 
         return self._make_bitrix_api_request(

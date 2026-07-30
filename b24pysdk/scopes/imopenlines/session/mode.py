@@ -1,5 +1,6 @@
 from typing import Optional, Text, Union
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import B24BoolStrict, Timeout
@@ -18,7 +19,7 @@ class Mode(BaseEntity):
             self,
             chat_id: Union[int, Text],
             *,
-            activate: Optional[Union[bool, B24BoolStrict]] = None,
+            activate: Optional[Union[bool, B24BoolStrict]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -27,7 +28,7 @@ class Mode(BaseEntity):
             CHAT_ID=chat_id,
         )
 
-        if activate is not None:
+        if activate is not MISSING:
             params["ACTIVATE"] = B24BoolStrict(activate).to_b24()
 
         return self._make_bitrix_api_request(
@@ -54,7 +55,7 @@ class Mode(BaseEntity):
             self,
             chat_id: Union[int, Text],
             *,
-            activate: Optional[Union[bool, B24BoolStrict]] = None,
+            activate: Optional[Union[bool, B24BoolStrict]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -63,7 +64,7 @@ class Mode(BaseEntity):
             CHAT_ID=chat_id,
         )
 
-        if activate is not None:
+        if activate is not MISSING:
             params["ACTIVATE"] = B24BoolStrict(activate).to_b24()
 
         return self._make_bitrix_api_request(

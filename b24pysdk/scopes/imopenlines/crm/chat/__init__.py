@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Optional, Text, Union
 
+from ....._constants import MISSING
 from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
 from .....utils.types import B24BoolStrict, Timeout
@@ -26,7 +27,7 @@ class Chat(BaseEntity):
             crm_entity_type: Text,
             crm_entity: Union[int, Text],
             *,
-            active_only: Optional[Union[bool, B24BoolStrict]] = None,
+            active_only: Optional[Union[bool, B24BoolStrict]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -36,7 +37,7 @@ class Chat(BaseEntity):
             CRM_ENTITY=crm_entity,
         )
 
-        if active_only is not None:
+        if active_only is not MISSING:
             params["ACTIVE_ONLY"] = B24BoolStrict(active_only).to_b24()
 
         return self._make_bitrix_api_request(

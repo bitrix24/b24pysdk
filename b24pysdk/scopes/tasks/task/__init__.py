@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Iterable, Optional, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
@@ -182,16 +183,16 @@ class Task(BaseEntity):
             self,
             bitrix_id: int,
             *,
-            select: Optional[Iterable[Text]] = None,
+            select: Optional[Iterable[Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
         params: JSONDict = {
-            "id": bitrix_id,
+            "taskId": bitrix_id,
         }
 
-        if select is not None:
+        if select is not MISSING:
             if select.__class__ is not list:
                 select = list(select)
 
@@ -220,7 +221,7 @@ class Task(BaseEntity):
             self,
             task_id: int,
             *,
-            users: Optional[Iterable[int]] = None,
+            users: Optional[Iterable[int]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -229,7 +230,7 @@ class Task(BaseEntity):
             "taskId": task_id,
         }
 
-        if users is not None:
+        if users is not MISSING:
             if users.__class__ is not list:
                 users = list(users)
 
@@ -245,33 +246,33 @@ class Task(BaseEntity):
     def list(
             self,
             *,
-            order: Optional[JSONDict] = None,
-            filter: Optional[JSONDict] = None,
-            select: Optional[Iterable[Text]] = None,
-            params: Optional[JSONDict] = None,
-            start: Optional[int] = None,
+            order: Optional[JSONDict] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            select: Optional[Iterable[Text]] = MISSING,
+            params: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        _params = dict()
+        _params: JSONDict = {}
 
-        if order is not None:
+        if order is not MISSING:
             _params["order"] = order
 
-        if filter is not None:
+        if filter is not MISSING:
             _params["filter"] = filter
 
-        if select is not None:
+        if select is not MISSING:
             if select.__class__ is not list:
                 select = list(select)
 
             _params["select"] = select
 
-        if params is not None:
+        if params is not MISSING:
             _params["params"] = params
 
-        if start is not None:
+        if start is not MISSING:
             _params["start"] = start
 
         return self._make_bitrix_api_request(
@@ -314,6 +315,25 @@ class Task(BaseEntity):
 
         return self._make_bitrix_api_request(
             api_wrapper=self.pause,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def pin(
+            self,
+            bitrix_id: int,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params = {
+            "id": bitrix_id,
+        }
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.pin,
             params=params,
             timeout=timeout,
         )
@@ -389,6 +409,25 @@ class Task(BaseEntity):
 
         return self._make_bitrix_api_request(
             api_wrapper=self.stopwatch,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def unpin(
+            self,
+            bitrix_id: int,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params = {
+            "id": bitrix_id,
+        }
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.unpin,
             params=params,
             timeout=timeout,
         )

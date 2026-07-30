@@ -11,6 +11,7 @@ __all__ = [
     "CallListEntityType",
     "ConfigurationScope",
     "ContentType",
+    "CurrencyThousandsVariant",
     "DuplicateCommunicationType",
     "EntityMergeBatchStatus",
     "EntityTypeAbbr",
@@ -91,6 +92,15 @@ class ContentType(_enum.IntEnum):
     PLAIN_TEXT = 1
     BBCODE = 2
     HTML = 3
+
+
+class CurrencyThousandsVariant(_enum.StrEnum):
+    """Thousands separator variant used by Bitrix24 currency localizations."""
+    NONE = "N"
+    DOT = "D"
+    COMMA = "C"
+    SPACE = "S"
+    NON_BREAKING_SPACE = "B"
 
 
 class DuplicateCommunicationType(_enum.StrEnum):

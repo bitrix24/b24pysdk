@@ -9,7 +9,9 @@ __all__ = [
 
 
 class Counters(BaseEntity):
-    """"""
+    """Class for retrieving unread message counters.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chats/im-counters-get.html"""
 
     @type_checker
     def get(
@@ -17,7 +19,18 @@ class Counters(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """"""
+        """Get counters
+
+        Documentation; https://apidocs.bitrix24.com/api-reference/chats/im-counters-get.html
+
+        The method retrieves the counters for unread messages and notifications for the current user.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,

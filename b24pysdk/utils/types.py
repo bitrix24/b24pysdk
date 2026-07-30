@@ -1,6 +1,12 @@
 import typing
 
-from .. import errors as _errors
+from .. import _constants
+
+if _constants.PYTHON_VERSION >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
+
 
 __all__ = [
     "B24APIResult",
@@ -21,6 +27,7 @@ __all__ = [
     "JSONValue",
     "Key",
     "Number",
+    "Self",
     "Timeout",
     "UserTypeIDLiteral",
     "cast",
@@ -29,7 +36,7 @@ __all__ = [
 _T = typing.TypeVar("_T")
 
 
-def cast(_: typing.Type[_T], value: typing.Any, /) -> _T:
+def cast(_: typing.Type[_T], value: typing.Any) -> _T:
     """Cast value to the requested target type when it cannot be inferred statically."""
     return typing.cast("_T", value)
 
@@ -138,9 +145,6 @@ UserTypeIDLiteral = typing.Literal[
 class B24Bool:
     """Represents a B24 boolean value with a specific literal mapping."""
 
-    class ValidationError(_errors.BitrixValidationError):
-        """"""
-
     __B24_DEFAULT: B24BoolLiteral = "D"
     __B24_FALSE: B24BoolLiteral = "N"
     __B24_TRUE: B24BoolLiteral = "Y"
@@ -211,7 +215,7 @@ class B24Bool:
             return True
 
         else:
-            raise cls.ValidationError(f"Invalid value for type {cls.__name__!r}: {value!r}")
+            raise ValueError(f"Invalid value for type {cls.__name__!r}: {value!r}")
 
     @classmethod
     def from_b24(cls, value: typing.Annotated[typing.Text, B24BoolLiteral]) -> "B24Bool":
@@ -372,7 +376,7 @@ class B24BoolStrict(B24Bool):
             return True
 
         else:
-            raise cls.ValidationError(f"Invalid value for type {cls.__name__!r}: {value!r}")
+            raise ValueError(f"Invalid value for type {cls.__name__!r}: {value!r}")
 
     @classmethod
     def _validate_as_number(
@@ -403,9 +407,6 @@ class B24BoolStrict(B24Bool):
 class DocumentType(tuple):
     """Represents a B24 document type which is always a list of 3 text elements."""
 
-    class ValidationError(_errors.BitrixValidationError):
-        """"""
-
     __AMOUNT_OF_VALUES: int = 3
 
     __slots__ = ()
@@ -433,10 +434,10 @@ class DocumentType(tuple):
         """Validate document type value."""
 
         if not isinstance(value, typing.Sequence):
-            raise cls.ValidationError(f"Invalid value for type {cls.__name__!r}: {value!r}")
+            raise TypeError(f"Invalid value for type {cls.__name__!r}: {value!r}")
 
         if not len(value) == cls.__AMOUNT_OF_VALUES:
-            raise cls.ValidationError(f"{cls.__name__!r} must have exactly {cls.__AMOUNT_OF_VALUES} elements, got {len(value)}")
+            raise TypeError(f"{cls.__name__!r} must have exactly {cls.__AMOUNT_OF_VALUES} elements, got {len(value)}")
 
         return value
 
@@ -447,9 +448,6 @@ class DocumentType(tuple):
 
 class B24File(tuple):
     """Represents a B24 file which is always a list of 2 text elements (name, base64_content)"""
-
-    class ValidationError(_errors.BitrixValidationError):
-        """"""
 
     __AMOUNT_OF_VALUES: int = 2
 
@@ -473,10 +471,10 @@ class B24File(tuple):
     def _validate(cls, value: typing.Sequence[typing.Text]) -> typing.Sequence[typing.Text]:
 
         if not isinstance(value, typing.Sequence):
-            raise cls.ValidationError(f"Invalid value for type {cls.__name__!r}: {value!r}")
+            raise TypeError(f"Invalid value for type {cls.__name__!r}: {value!r}")
 
         if not len(value) == cls.__AMOUNT_OF_VALUES:
-            raise cls.ValidationError(f"{cls.__name__!r} must have exactly {cls.__AMOUNT_OF_VALUES} elements, got {len(value)}")
+            raise ValueError(f"{cls.__name__!r} must have exactly {cls.__AMOUNT_OF_VALUES} elements, got {len(value)}")
 
         return value
 

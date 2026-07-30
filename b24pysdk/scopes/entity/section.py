@@ -1,8 +1,9 @@
-from typing import Optional, Text, Union
+from typing import Optional, Sequence, Text, Union
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import B24BoolStrict, JSONDict, Timeout
+from ...utils.types import B24BoolStrict, B24File, JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -22,9 +23,9 @@ class Section(BaseEntity):
             self,
             entity: Text,
             *,
-            sort: Optional[JSONDict] = None,
-            filter: Optional[JSONDict] = None,
-            start: Optional[int] = None,
+            sort: Optional[JSONDict] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -59,13 +60,13 @@ class Section(BaseEntity):
             "ENTITY": entity,
         }
 
-        if sort is not None:
+        if sort is not MISSING:
             params["SORT"] = sort
 
-        if filter is not None:
+        if filter is not MISSING:
             params["FILTER"] = filter
 
-        if start is not None:
+        if start is not MISSING:
             params["start"] = start
 
         return self._make_bitrix_api_request(
@@ -80,13 +81,15 @@ class Section(BaseEntity):
             entity: Text,
             name: Text,
             *,
-            description: Optional[Text] = None,
-            active: Optional[Union[bool, B24BoolStrict]] = None,
-            sort: Optional[int] = None,
-            picture: Optional[JSONDict] = None,
-            detail_picture: Optional[JSONDict] = None,
-            section: Optional[int] = None,
+            description: Optional[Text] = MISSING,
+            active: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            code: Optional[Text] = MISSING,
+            sort: Optional[int] = MISSING,
+            picture: Optional[Sequence[Text]] = MISSING,
+            detail_picture: Optional[Sequence[Text]] = MISSING,
+            section: Optional[int] = MISSING,
             timeout: Timeout = None,
+            **fields,
     ) -> BitrixAPIRequest:
         """
         Create a new section in the specified storage.
@@ -123,23 +126,28 @@ class Section(BaseEntity):
             "NAME": name,
         }
 
-        if description is not None:
+        if description is not MISSING:
             params["DESCRIPTION"] = description
 
-        if active is not None:
+        if active is not MISSING:
             params["ACTIVE"] = B24BoolStrict(active).to_b24()
 
-        if sort is not None:
+        if code is not MISSING:
+            params["CODE"] = code
+
+        if sort is not MISSING:
             params["SORT"] = sort
 
-        if picture is not None:
-            params["PICTURE"] = picture
+        if picture is not MISSING:
+            params["PICTURE"] = B24File(picture).to_b24()
 
-        if detail_picture is not None:
-            params["DETAIL_PICTURE"] = detail_picture
+        if detail_picture is not MISSING:
+            params["DETAIL_PICTURE"] = B24File(detail_picture).to_b24()
 
-        if section is not None:
+        if section is not MISSING:
             params["SECTION"] = section
+
+        params.update(fields)
 
         return self._make_bitrix_api_request(
             api_wrapper=self.add,
@@ -153,14 +161,16 @@ class Section(BaseEntity):
             entity: Text,
             bitrix_id: int,
             *,
-            name: Optional[Text] = None,
-            description: Optional[Text] = None,
-            active: Optional[Union[bool, B24BoolStrict]] = None,
-            sort: Optional[int] = None,
-            picture: Optional[JSONDict] = None,
-            detail_picture: Optional[JSONDict] = None,
-            section: Optional[int] = None,
+            name: Optional[Text] = MISSING,
+            description: Optional[Text] = MISSING,
+            active: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            code: Optional[Text] = MISSING,
+            sort: Optional[int] = MISSING,
+            picture: Optional[Sequence[Text]] = MISSING,
+            detail_picture: Optional[Sequence[Text]] = MISSING,
+            section: Optional[int] = MISSING,
             timeout: Timeout = None,
+            **fields,
     ) -> BitrixAPIRequest:
         """
         Update the details of a section in the specified storage.
@@ -199,26 +209,31 @@ class Section(BaseEntity):
             "ID": bitrix_id,
         }
 
-        if name is not None:
+        if name is not MISSING:
             params["NAME"] = name
 
-        if description is not None:
+        if description is not MISSING:
             params["DESCRIPTION"] = description
 
-        if active is not None:
+        if active is not MISSING:
             params["ACTIVE"] = B24BoolStrict(active).to_b24()
 
-        if sort is not None:
+        if code is not MISSING:
+            params["CODE"] = code
+
+        if sort is not MISSING:
             params["SORT"] = sort
 
-        if picture is not None:
-            params["PICTURE"] = picture
+        if picture is not MISSING:
+            params["PICTURE"] = B24File(picture).to_b24()
 
-        if detail_picture is not None:
-            params["DETAIL_PICTURE"] = detail_picture
+        if detail_picture is not MISSING:
+            params["DETAIL_PICTURE"] = B24File(detail_picture).to_b24()
 
-        if section is not None:
+        if section is not MISSING:
             params["SECTION"] = section
+
+        params.update(fields)
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,

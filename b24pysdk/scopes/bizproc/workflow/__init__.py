@@ -1,6 +1,7 @@
 from functools import cached_property
-from typing import Dict, Iterable, Optional, Sequence, Text
+from typing import Iterable, Optional, Sequence, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import DocumentType, JSONDict, Timeout
@@ -26,7 +27,7 @@ class Workflow(BaseEntity):
             template_id: int,
             document_id: Sequence[Text],
             *,
-            parameters: Optional[Dict] = None,
+            parameters: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -36,7 +37,7 @@ class Workflow(BaseEntity):
             "DOCUMENT_ID": DocumentType(document_id).to_b24(),
         }
 
-        if parameters is not None:
+        if parameters is not MISSING:
             params["PARAMETERS"] = parameters
 
         return self._make_bitrix_api_request(
@@ -49,29 +50,29 @@ class Workflow(BaseEntity):
     def instances(
             self,
             *,
-            select: Optional[Iterable[Text]] = None,
-            filter: Optional[JSONDict] = None,
-            order: Optional[JSONDict] = None,
-            start: Optional[int] = None,
+            select: Optional[Iterable[Text]] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            order: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        params: JSONDict = {}
 
-        if select is not None:
+        if select is not MISSING:
             if select.__class__ is not list:
                 select = list(select)
 
             params["SELECT"] = select
 
-        if filter is not None:
+        if filter is not MISSING:
             params["FILTER"] = filter
 
-        if order is not None:
+        if order is not MISSING:
             params["ORDER"] = order
 
-        if start is not None:
+        if start is not MISSING:
             params["start"] = start
 
         return self._make_bitrix_api_request(
@@ -83,7 +84,7 @@ class Workflow(BaseEntity):
     @type_checker
     def kill(
             self,
-            bitrix_id: int,
+            bitrix_id: Text,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
@@ -102,9 +103,9 @@ class Workflow(BaseEntity):
     @type_checker
     def terminate(
             self,
-            bitrix_id: int,
+            bitrix_id: Text,
             *,
-            status: Optional[Text] = None,
+            status: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -113,7 +114,7 @@ class Workflow(BaseEntity):
             "ID": bitrix_id,
         }
 
-        if status is not None:
+        if status is not MISSING:
             params["STATUS"] = status
 
         return self._make_bitrix_api_request(

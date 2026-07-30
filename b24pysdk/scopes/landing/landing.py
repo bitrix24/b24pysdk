@@ -1,6 +1,8 @@
 from typing import Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
+from ...utils.converters import bool_to_bitrix
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
 from .._base_entity import BaseEntity
@@ -18,6 +20,7 @@ class Landing(BaseEntity):
             self,
             fields: JSONDict,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -25,6 +28,9 @@ class Landing(BaseEntity):
         params: JSONDict = {
             "fields": fields,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.add,
@@ -38,7 +44,8 @@ class Landing(BaseEntity):
             site_id: int,
             code: Text,
             *,
-            fields: Optional[JSONDict] = None,
+            scope: Optional[Text] = MISSING,
+            fields: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -48,7 +55,10 @@ class Landing(BaseEntity):
             "code": code,
         }
 
-        if fields is not None:
+        if scope is not MISSING:
+            params["scope"] = scope
+
+        if fields is not MISSING:
             params["fields"] = fields
 
         return self._make_bitrix_api_request(
@@ -63,6 +73,8 @@ class Landing(BaseEntity):
             lid: int,
             fields: JSONDict,
             *,
+            scope: Optional[Text] = MISSING,
+            prevent_history: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -71,6 +83,12 @@ class Landing(BaseEntity):
             "lid": lid,
             "fields": fields,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
+
+        if prevent_history is not MISSING:
+            params["preventHistory"] = bool_to_bitrix(prevent_history, is_required=True)
 
         return self._make_bitrix_api_request(
             api_wrapper=self.addblock,
@@ -83,8 +101,10 @@ class Landing(BaseEntity):
             self,
             lid: int,
             *,
-            to_site_id: Optional[int] = None,
-            to_folder_id: Optional[int] = None,
+            scope: Optional[Text] = MISSING,
+            to_site_id: Optional[int] = MISSING,
+            to_folder_id: Optional[int] = MISSING,
+            skip_system: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -93,11 +113,17 @@ class Landing(BaseEntity):
             "lid": lid,
         }
 
-        if to_site_id is not None:
+        if scope is not MISSING:
+            params["scope"] = scope
+
+        if to_site_id is not MISSING:
             params["toSiteId"] = to_site_id
 
-        if to_folder_id is not None:
+        if to_folder_id is not MISSING:
             params["toFolderId"] = to_folder_id
+
+        if skip_system is not MISSING:
+            params["skipSystem"] = bool_to_bitrix(skip_system, is_required=True)
 
         return self._make_bitrix_api_request(
             api_wrapper=self.copy,
@@ -111,7 +137,8 @@ class Landing(BaseEntity):
             lid: int,
             block: int,
             *,
-            params: Optional[JSONDict] = None,
+            scope: Optional[Text] = MISSING,
+            params: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -121,7 +148,10 @@ class Landing(BaseEntity):
             "block": block,
         }
 
-        if params is not None:
+        if scope is not MISSING:
+            api_params["scope"] = scope
+
+        if params is not MISSING:
             api_params["params"] = params
 
         return self._make_bitrix_api_request(
@@ -135,6 +165,7 @@ class Landing(BaseEntity):
             self,
             lid: int,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -142,6 +173,9 @@ class Landing(BaseEntity):
         params: JSONDict = {
             "lid": lid,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.delete,
@@ -155,6 +189,7 @@ class Landing(BaseEntity):
             lid: int,
             block: int,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -163,6 +198,9 @@ class Landing(BaseEntity):
             "lid": lid,
             "block": block,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.deleteblock,
@@ -176,6 +214,8 @@ class Landing(BaseEntity):
             lid: int,
             block: int,
             *,
+            scope: Optional[Text] = MISSING,
+            prevent_history: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -184,6 +224,12 @@ class Landing(BaseEntity):
             "lid": lid,
             "block": block,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
+
+        if prevent_history is not MISSING:
+            params["preventHistory"] = bool_to_bitrix(prevent_history, is_required=True)
 
         return self._make_bitrix_api_request(
             api_wrapper=self.downblock,
@@ -197,7 +243,8 @@ class Landing(BaseEntity):
             lid: int,
             block: int,
             *,
-            meta: Optional[JSONDict] = None,
+            scope: Optional[Text] = MISSING,
+            meta: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -207,7 +254,10 @@ class Landing(BaseEntity):
             "block": block,
         }
 
-        if meta is not None:
+        if scope is not MISSING:
+            params["scope"] = scope
+
+        if meta is not MISSING:
             params["meta"] = meta
 
         return self._make_bitrix_api_request(
@@ -221,6 +271,7 @@ class Landing(BaseEntity):
             self,
             lid: int,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -228,6 +279,9 @@ class Landing(BaseEntity):
         params: JSONDict = {
             "lid": lid,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.getadditionalfields,
@@ -239,15 +293,23 @@ class Landing(BaseEntity):
     def get_list(
             self,
             *,
-            params: Optional[JSONDict] = None,
+            scope: Optional[Text] = MISSING,
+            params: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        api_params = dict()
+        api_params: JSONDict = {}
 
-        if params is not None:
+        if scope is not MISSING:
+            api_params["scope"] = scope
+
+        if params is not MISSING:
             api_params["params"] = params
+
+        if start is not MISSING:
+            api_params["start"] = start
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get_list,
@@ -260,6 +322,7 @@ class Landing(BaseEntity):
             self,
             lid: int,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -267,6 +330,9 @@ class Landing(BaseEntity):
         params: JSONDict = {
             "lid": lid,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.getpreview,
@@ -279,6 +345,7 @@ class Landing(BaseEntity):
             self,
             lid: int,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -286,6 +353,9 @@ class Landing(BaseEntity):
         params: JSONDict = {
             "lid": lid,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.getpublicurl,
@@ -299,6 +369,7 @@ class Landing(BaseEntity):
             lid: int,
             block: int,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -307,6 +378,9 @@ class Landing(BaseEntity):
             "lid": lid,
             "block": block,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.hideblock,
@@ -339,6 +413,9 @@ class Landing(BaseEntity):
             lid: int,
             block: int,
             *,
+            scope: Optional[Text] = MISSING,
+            mark: Optional[bool] = MISSING,
+            prevent_history: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -347,6 +424,15 @@ class Landing(BaseEntity):
             "lid": lid,
             "block": block,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
+
+        if mark is not MISSING:
+            params["mark"] = bool_to_bitrix(mark, is_required=True)
+
+        if prevent_history is not MISSING:
+            params["preventHistory"] = bool_to_bitrix(prevent_history, is_required=True)
 
         return self._make_bitrix_api_request(
             api_wrapper=self.mark_deleted_block,
@@ -379,6 +465,7 @@ class Landing(BaseEntity):
             lid: int,
             block: int,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -387,6 +474,9 @@ class Landing(BaseEntity):
             "lid": lid,
             "block": block,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.mark_undeleted_block,
@@ -399,8 +489,9 @@ class Landing(BaseEntity):
             self,
             lid: int,
             *,
-            to_site_id: Optional[int] = None,
-            to_folder_id: Optional[int] = None,
+            scope: Optional[Text] = MISSING,
+            to_site_id: Optional[int] = MISSING,
+            to_folder_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -409,10 +500,13 @@ class Landing(BaseEntity):
             "lid": lid,
         }
 
-        if to_site_id is not None:
+        if scope is not MISSING:
+            params["scope"] = scope
+
+        if to_site_id is not MISSING:
             params["toSiteId"] = to_site_id
 
-        if to_folder_id is not None:
+        if to_folder_id is not MISSING:
             params["toFolderId"] = to_folder_id
 
         return self._make_bitrix_api_request(
@@ -427,7 +521,8 @@ class Landing(BaseEntity):
             lid: int,
             block: int,
             *,
-            params: Optional[JSONDict] = None,
+            scope: Optional[Text] = MISSING,
+            params: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -437,7 +532,10 @@ class Landing(BaseEntity):
             "block": block,
         }
 
-        if params is not None:
+        if scope is not MISSING:
+            api_params["scope"] = scope
+
+        if params is not MISSING:
             api_params["params"] = params
 
         return self._make_bitrix_api_request(
@@ -451,6 +549,7 @@ class Landing(BaseEntity):
             self,
             lid: int,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -458,6 +557,9 @@ class Landing(BaseEntity):
         params: JSONDict = {
             "lid": lid,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.publication,
@@ -513,6 +615,7 @@ class Landing(BaseEntity):
             lid: int,
             block: int,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -521,6 +624,9 @@ class Landing(BaseEntity):
             "lid": lid,
             "block": block,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.showblock,
@@ -552,6 +658,7 @@ class Landing(BaseEntity):
             self,
             lid: int,
             *,
+            scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -559,6 +666,9 @@ class Landing(BaseEntity):
         params: JSONDict = {
             "lid": lid,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
 
         return self._make_bitrix_api_request(
             api_wrapper=self.unpublic,
@@ -593,6 +703,8 @@ class Landing(BaseEntity):
             lid: int,
             block: int,
             *,
+            scope: Optional[Text] = MISSING,
+            prevent_history: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -601,6 +713,12 @@ class Landing(BaseEntity):
             "lid": lid,
             "block": block,
         }
+
+        if scope is not MISSING:
+            params["scope"] = scope
+
+        if prevent_history is not MISSING:
+            params["preventHistory"] = bool_to_bitrix(prevent_history, is_required=True)
 
         return self._make_bitrix_api_request(
             api_wrapper=self.upblock,

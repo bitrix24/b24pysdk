@@ -4,11 +4,11 @@ from typing import TYPE_CHECKING, Callable, Optional, Text, Type, Union, overloa
 from ..api.requests import BitrixAPIRequest
 from ..protocols import BitrixTokenFullProtocol
 from ..utils.functional import classproperty
-from ..utils.type_vars import BARequestT, BAResultT, BAValueT
+from ..utils.type_vars import BARequestT, BAResultT, BValueT
 from ..utils.types import JSONDict, Timeout
 
 if TYPE_CHECKING:
-    from ..client import BaseClient
+    from ..client import ClientType
 
 __all__ = [
     "BaseContext",
@@ -43,7 +43,7 @@ class BaseContext(ABC):
 
     @property
     @abstractmethod
-    def _context(self) -> Union["BaseContext", "BaseClient"]:
+    def _context(self) -> Union["BaseContext", "ClientType"]:
         """
         Return parent context or client.
 
@@ -54,6 +54,16 @@ class BaseContext(ABC):
             Parent context or root client.
         """
         raise NotImplementedError
+
+    @property
+    def _client(self) -> "ClientType":
+        """
+        Return SDK client inherited from the parent context.
+
+        Returns:
+            Root SDK client used by the current scope or entity.
+        """
+        return getattr(self._context, "_client")
 
     @property
     def _bitrix_token(self) -> BitrixTokenFullProtocol:
@@ -137,7 +147,7 @@ class BaseContext(ABC):
             timeout: Timeout = None,
             *,
             bitrix_api_request_type: Type[BARequestT],
-            result_adapter: Callable[[BAResultT], BAValueT],
+            result_adapter: Callable[[BAResultT], BValueT],
             **kwargs,
     ) -> BARequestT: ...
 
@@ -148,7 +158,7 @@ class BaseContext(ABC):
             timeout: Timeout = None,
             *,
             bitrix_api_request_type: Type[BARequestT] = BitrixAPIRequest,
-            result_adapter: Optional[Callable[[BAResultT], BAValueT]] = None,
+            result_adapter: Optional[Callable[[BAResultT], BValueT]] = None,
             **kwargs,
     ) -> BARequestT:
         """

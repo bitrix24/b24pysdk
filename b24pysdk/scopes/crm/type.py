@@ -1,5 +1,6 @@
 from typing import List, NoReturn, Optional
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest
 from ...schemas.crm.field import CRMFieldsDict, CRMFieldsResultData
 from ...utils.functional import type_checker
@@ -119,9 +120,9 @@ class Type(BaseCRM):
     def list(
             self,
             *,
-            filter: Optional[JSONDict] = None,
-            order: Optional[JSONDict] = None,
-            start: Optional[int] = None,
+            filter: Optional[JSONDict] = MISSING,
+            order: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of custom types.

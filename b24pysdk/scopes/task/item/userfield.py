@@ -1,5 +1,6 @@
 from typing import Optional
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
@@ -86,17 +87,18 @@ class Userfield(BaseEntity):
     def getlist(
             self,
             *,
-            order: Optional[JSONDict] = None,
-            filter: Optional[JSONDict] = None,
+            order: Optional[JSONDict] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = {
-            "FILTER": filter,
-        }
+        params: JSONDict = {}
 
-        if order is not None:
+        if filter is not MISSING:
+            params["FILTER"] = filter
+
+        if order is not MISSING:
             params["ORDER"] = order
 
         return self._make_bitrix_api_request(

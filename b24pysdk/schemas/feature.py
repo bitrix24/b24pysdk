@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Annotated, Optional, Text, TypedDict
 
-from ..utils.converters import bool_from_bitrix, bool_to_bitrix
+from ..utils.converters import bool_from_bitrix, bool_to_bitrix, text_from_bitrix, text_to_bitrix
 from ..utils.dataclasses import frozen_dataclass_kwargs
 from ..utils.types import B24BoolStrictLiteral
 from ._base_schema import BaseSchema
@@ -45,7 +45,7 @@ class FeatureGet(BaseSchema[FeatureGetData]):
         """
         return cls(
             value=bool_from_bitrix(bitrix_data["value"], is_required=True),
-            lang_selfhosted=bitrix_data.get("lang_selfhosted"),
+            lang_selfhosted=text_from_bitrix(bitrix_data.get("lang_selfhosted")),
         )
 
     def to_bitrix(self) -> FeatureGetData:
@@ -61,6 +61,6 @@ class FeatureGet(BaseSchema[FeatureGetData]):
         }
 
         if self.lang_selfhosted is not None:
-            bitrix_data["lang_selfhosted"] = self.lang_selfhosted
+            bitrix_data["lang_selfhosted"] = text_to_bitrix(self.lang_selfhosted, is_required=True)
 
         return bitrix_data

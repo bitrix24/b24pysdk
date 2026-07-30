@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Optional
 
+from ....._constants import MISSING
 from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
 from .....utils.types import JSONDict, Timeout
@@ -81,18 +82,18 @@ class Resource(BaseEntity):
     def list(
             self,
             *,
-            filter: Optional[JSONDict] = None,
-            order: Optional[JSONDict] = None,
+            filter: Optional[JSONDict] = MISSING,
+            order: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        params: JSONDict = {}
 
-        if filter is not None:
+        if filter is not MISSING:
             params["filter"] = filter
 
-        if order is not None:
+        if order is not MISSING:
             params["order"] = order
 
         return self._make_bitrix_api_request(

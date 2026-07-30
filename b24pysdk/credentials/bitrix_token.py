@@ -11,7 +11,7 @@ from ..errors import BitrixAPIExpiredToken, BitrixResponse302JSONDecodeError
 from ..events import OAuthTokenRenewedEvent, PortalDomainChangedEvent
 from ..schemas.api import BatchResponseData, ListFastResponseData, ListResponseData
 from ..utils.functional import classproperty
-from ..utils.type_vars import ResponseT
+from ..utils.type_vars import BResponseT
 from ..utils.types import B24APIVersionLiteral, B24Requests, B24RequestTuple, JSONDict, Key, Timeout
 from .oauth_token import OAuthToken
 
@@ -38,7 +38,7 @@ __all__ = [
 ]
 
 
-def _bitrix_app_required(func: Callable[..., ResponseT]) -> Callable[..., ResponseT]:
+def _bitrix_app_required(func: Callable[..., BResponseT]) -> Callable[..., BResponseT]:
     """Require a token to be bound to a Bitrix app before calling an OAuth-only method."""
 
     @wraps(func)
@@ -347,7 +347,7 @@ class AbstractBitrixToken:
 
         return True
 
-    def _execute_with_retries(self, func: Callable[[], ResponseT]) -> ResponseT:
+    def _execute_with_retries(self, func: Callable[[], BResponseT]) -> BResponseT:
         """
         Execute ``func`` with SDK-level recovery for expired tokens and domain redirects.
 
@@ -404,7 +404,7 @@ class AbstractBitrixToken:
                 return func()
             raise
 
-    def _call_with_retries(self, call_func: Callable[..., ResponseT], parameters: JSONDict) -> ResponseT:
+    def _call_with_retries(self, call_func: Callable[..., BResponseT], parameters: JSONDict) -> BResponseT:
         """Call a low-level API function with token auth data and retry handling."""
         return self._execute_with_retries(lambda: call_func(**self._auth_data, **parameters))
 
@@ -621,18 +621,21 @@ class AbstractBitrixToken:
 class AbstractBitrixTokenLocal(AbstractBitrixToken):
     """Token wrapper bound to a local Bitrix app."""
 
-    bitrix_app: "AbstractBitrixAppLocal" = MISSING
+    bitrix_app: "AbstractBitrixAppLocal"
     """Local Bitrix application that supplies the current portal domain."""
 
-    @property
-    def domain(self) -> Text:
-        """Return the portal domain from the bound local Bitrix app."""
-        return self.bitrix_app.domain
+    if TYPE_CHECKING:
+        domain: Text
+    else:
+        @property
+        def domain(self) -> Text:
+            """Return the portal domain from the bound local Bitrix app."""
+            return self.bitrix_app.domain
 
-    @domain.setter
-    def domain(self, domain: Text):
-        """Update the portal domain on the bound local Bitrix app."""
-        self.bitrix_app.domain = domain
+        @domain.setter
+        def domain(self, domain: Text):
+            """Update the portal domain on the bound local Bitrix app."""
+            self.bitrix_app.domain = domain
 
 
 class BitrixToken(AbstractBitrixToken):

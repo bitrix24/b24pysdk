@@ -1,5 +1,6 @@
 from typing import Iterable, List, Optional, Text, Union
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import B24BoolStrict, Timeout
@@ -19,7 +20,7 @@ class User(BaseEntity):
             chat_id: int,
             users: Iterable[int],
             *,
-            hide_history: Optional[Union[bool, B24BoolStrict]] = None,
+            hide_history: Optional[Union[bool, B24BoolStrict]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """"""
@@ -32,7 +33,7 @@ class User(BaseEntity):
             USERS=users,
         )
 
-        if hide_history is not None:
+        if hide_history is not MISSING:
             params["HIDE_HISTORY"] = B24BoolStrict(hide_history).to_b24()
 
         return self._make_bitrix_api_request(

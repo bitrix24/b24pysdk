@@ -1,10 +1,12 @@
 from functools import cached_property
 from typing import Annotated, Iterable, Literal, Optional, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest, BitrixAPIValuesRequest
 from ....schemas.crm.calllist import CalllistStatus, CalllistStatusesData
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
+from ..._adapters import BitrixSchemasAdapter
 from .._base_crm import BaseCRM
 from .items import Items
 
@@ -30,7 +32,7 @@ class Calllist(BaseCRM):
             *,
             entity_type: Annotated[Text, Literal["CONTACT", "COMPANY"]],
             entities: Iterable[int],
-            webform_id: Optional[int] = None,
+            webform_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[int]:
         """Create a new call list.
@@ -64,7 +66,7 @@ class Calllist(BaseCRM):
             "ENTITIES": entities,
         }
 
-        if webform_id is not None:
+        if webform_id is not MISSING:
             params["WEBFORM_ID"] = webform_id
 
         return self._make_bitrix_api_request(
@@ -109,9 +111,9 @@ class Calllist(BaseCRM):
     def list(
             self,
             *,
-            select: Optional[Iterable[Text]] = None,
-            filter: Optional[JSONDict] = None,
-            order: Optional[JSONDict] = None,
+            select: Optional[Iterable[Text]] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            order: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get the list of call lists.
@@ -154,18 +156,18 @@ class Calllist(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        params = {}
+        params: JSONDict = {}
 
-        if select is not None:
+        if select is not MISSING:
             if select.__class__ is not list:
                 select = list(select)
 
             params["SELECT"] = select
 
-        if filter is not None:
+        if filter is not MISSING:
             params["FILTER"] = filter
 
-        if order is not None:
+        if order is not MISSING:
             params["ORDER"] = order
 
         return self._make_bitrix_api_request(
@@ -196,7 +198,7 @@ class Calllist(BaseCRM):
             api_wrapper=self.statuslist,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValuesRequest,
-            result_adapter=CalllistStatus.from_bitrix_result,
+            result_adapter=BitrixSchemasAdapter(CalllistStatus),
         )
 
     @type_checker
@@ -206,7 +208,7 @@ class Calllist(BaseCRM):
             list_id: int,
             entity_type: Annotated[Text, Literal["CONTACT", "COMPANY"]],
             entities: Iterable[int],
-            webform_id: Optional[int] = None,
+            webform_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Update call list composition.
@@ -243,7 +245,7 @@ class Calllist(BaseCRM):
             "ENTITIES": entities,
         }
 
-        if webform_id is not None:
+        if webform_id is not MISSING:
             params["WEBFORM_ID"] = webform_id
 
         return self._make_bitrix_api_request(

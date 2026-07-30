@@ -1,10 +1,11 @@
 from datetime import datetime
 from typing import List, Optional, Text
 
-from ....api.requests import BitrixAPIRequest
+from ...._constants import MISSING
+from ....api.requests import BitrixAPIValueRequest
 from ....schemas.results import IDResultData
 from ....utils.functional import type_checker
-from ....utils.types import Timeout
+from ....utils.types import JSONDict, Timeout
 from .._base_crm import BaseCRM
 
 __all__ = [
@@ -25,14 +26,14 @@ class Todo(BaseCRM):
             owner_id: int,
             deadline: datetime,
             *,
-            title: Optional[Text] = None,
-            description: Optional[Text] = None,
-            responsible_id: Optional[int] = None,
-            parent_activity_id: Optional[int] = None,
-            ping_offsets: Optional[List[int]] = None,
-            color_id: Optional[Text] = None,
+            title: Optional[Text] = MISSING,
+            description: Optional[Text] = MISSING,
+            responsible_id: Optional[int] = MISSING,
+            parent_activity_id: Optional[int] = MISSING,
+            ping_offsets: Optional[List[int]] = MISSING,
+            color_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest[Optional[IDResultData]]:
+    ) -> BitrixAPIValueRequest[Optional[IDResultData], Optional[int]]:
         """Add a new universal activity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/todo/crm-activity-todo-add.html
@@ -61,37 +62,39 @@ class Todo(BaseCRM):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValueRequest
         """
 
-        params = {
+        params: JSONDict = {
             "ownerTypeId": owner_type_id,
             "ownerId": owner_id,
             "deadline": deadline,
         }
 
-        if title is not None:
+        if title is not MISSING:
             params["title"] = title
 
-        if description is not None:
+        if description is not MISSING:
             params["description"] = description
 
-        if color_id is not None:
+        if color_id is not MISSING:
             params["colorId"] = color_id
 
-        if ping_offsets is not None:
+        if ping_offsets is not MISSING:
             params["pingOffsets"] = ping_offsets
 
-        if responsible_id is not None:
+        if responsible_id is not MISSING:
             params["responsibleId"] = responsible_id
 
-        if parent_activity_id is not None:
+        if parent_activity_id is not MISSING:
             params["parentActivityId"] = parent_activity_id
 
         return self._make_bitrix_api_request(
             api_wrapper=self.add,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=lambda result: result["id"] if result is not None else None,
         )
 
     @type_checker
@@ -102,14 +105,14 @@ class Todo(BaseCRM):
             owner_id: int,
             deadline: datetime,
             *,
-            title: Optional[Text] = None,
-            description: Optional[Text] = None,
-            responsible_id: Optional[int] = None,
-            parent_activity_id: Optional[int] = None,
-            ping_offsets: Optional[List[int]] = None,
-            color_id: Optional[Text] = None,
+            title: Optional[Text] = MISSING,
+            description: Optional[Text] = MISSING,
+            responsible_id: Optional[int] = MISSING,
+            parent_activity_id: Optional[int] = MISSING,
+            ping_offsets: Optional[List[int]] = MISSING,
+            color_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest[Optional[IDResultData]]:
+    ) -> BitrixAPIValueRequest[Optional[IDResultData], Optional[int]]:
         """Update universal activity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/todo/crm-activity-todo-update.html
@@ -140,38 +143,40 @@ class Todo(BaseCRM):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValueRequest
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "ownerTypeId": owner_type_id,
             "ownerId": owner_id,
             "deadline": deadline,
         }
 
-        if title is not None:
+        if title is not MISSING:
             params["title"] = title
 
-        if description is not None:
+        if description is not MISSING:
             params["description"] = description
 
-        if color_id is not None:
+        if color_id is not MISSING:
             params["colorId"] = color_id
 
-        if ping_offsets is not None:
+        if ping_offsets is not MISSING:
             params["pingOffsets"] = ping_offsets
 
-        if responsible_id is not None:
+        if responsible_id is not MISSING:
             params["responsibleId"] = responsible_id
 
-        if parent_activity_id is not None:
+        if parent_activity_id is not MISSING:
             params["parentActivityId"] = parent_activity_id
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=lambda result: result["id"] if result is not None else None,
         )
 
     @type_checker
@@ -183,7 +188,7 @@ class Todo(BaseCRM):
             color_id: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest[Optional[IDResultData]]:
+    ) -> BitrixAPIValueRequest[Optional[IDResultData], Optional[int]]:
         """Update the color of the universal activity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/todo/crm-activity-todo-update-color.html
@@ -202,10 +207,10 @@ class Todo(BaseCRM):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValueRequest
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "ownerTypeId": owner_type_id,
             "ownerId": owner_id,
@@ -216,6 +221,8 @@ class Todo(BaseCRM):
             api_wrapper=self.update_color,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=lambda result: result["id"] if result is not None else None,
         )
 
     @type_checker
@@ -227,7 +234,7 @@ class Todo(BaseCRM):
             value: datetime,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest[Optional[IDResultData]]:
+    ) -> BitrixAPIValueRequest[Optional[IDResultData], Optional[int]]:
         """Update the deadline of the universal activity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/todo/crm-activity-todo-update-deadline.html
@@ -246,10 +253,10 @@ class Todo(BaseCRM):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValueRequest
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "ownerTypeId": owner_type_id,
             "ownerId": owner_id,
@@ -260,6 +267,8 @@ class Todo(BaseCRM):
             api_wrapper=self.update_deadline,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=lambda result: result["id"] if result is not None else None,
         )
 
     @type_checker
@@ -271,7 +280,7 @@ class Todo(BaseCRM):
             value: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest[Optional[IDResultData]]:
+    ) -> BitrixAPIValueRequest[Optional[IDResultData], Optional[int]]:
         """Update the description of the universal activity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/todo/crm-activity-todo-update-description.html
@@ -290,10 +299,10 @@ class Todo(BaseCRM):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValueRequest
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "ownerTypeId": owner_type_id,
             "ownerId": owner_id,
@@ -304,6 +313,8 @@ class Todo(BaseCRM):
             api_wrapper=self.update_description,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=lambda result: result["id"] if result is not None else None,
         )
 
     @type_checker
@@ -315,7 +326,7 @@ class Todo(BaseCRM):
             responsible_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest[Optional[IDResultData]]:
+    ) -> BitrixAPIValueRequest[Optional[IDResultData], Optional[int]]:
         """Update the responsible user for the universal activity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/todo/crm-activity-todo-update-responsible-user.html
@@ -334,10 +345,10 @@ class Todo(BaseCRM):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValueRequest
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "ownerTypeId": owner_type_id,
             "ownerId": owner_id,
@@ -348,4 +359,6 @@ class Todo(BaseCRM):
             api_wrapper=self.update_responsible_user,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=lambda result: result["id"] if result is not None else None,
         )

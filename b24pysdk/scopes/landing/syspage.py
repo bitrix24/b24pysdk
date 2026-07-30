@@ -1,8 +1,10 @@
-from typing import Optional, Text, Union
+from typing import Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
+from ...utils.converters import bool_to_bitrix
 from ...utils.functional import type_checker
-from ...utils.types import B24BoolStrict, JSONDict, Timeout
+from ...utils.types import JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -18,7 +20,7 @@ class SysPage(BaseEntity):
             self,
             bitrix_id: int,
             *,
-            active: Optional[Union[bool, B24BoolStrict]] = None,
+            active: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -27,8 +29,8 @@ class SysPage(BaseEntity):
             "id": bitrix_id,
         }
 
-        if active is not None:
-            params["active"] = B24BoolStrict(active).to_b24()
+        if active is not MISSING:
+            params["active"] = bool_to_bitrix(active, is_required=True)
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
@@ -42,7 +44,7 @@ class SysPage(BaseEntity):
             site_id: int,
             type: Text,
             *,
-            additional: Optional[JSONDict] = None,
+            additional: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -52,7 +54,7 @@ class SysPage(BaseEntity):
             "type": type,
         }
 
-        if additional is not None:
+        if additional is not MISSING:
             params["additional"] = additional
 
         return self._make_bitrix_api_request(
@@ -67,7 +69,7 @@ class SysPage(BaseEntity):
             bitrix_id: int,
             type: Text,
             *,
-            lid: Optional[int] = None,
+            lid: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -77,7 +79,7 @@ class SysPage(BaseEntity):
             "type": type,
         }
 
-        if lid is not None:
+        if lid is not MISSING:
             params["lid"] = lid
 
         return self._make_bitrix_api_request(

@@ -123,7 +123,7 @@ class _BatchCaller(BaseCaller):
         return cmd
 
     @property
-    def _dynamic_params(self) -> JSONDict:
+    def _effective_params(self) -> JSONDict:
         """Return the payload expected by the classic Bitrix ``batch`` method."""
         return {
             "cmd": self._cmd,
@@ -135,13 +135,13 @@ class _BatchCaller(BaseCaller):
         Execute the batch request through the token wrapper or raw method caller.
 
         When a ``BitrixToken`` wrapper is available, nested execution goes
-        through token retry/refresh logic. Otherwise the function calls the
+        through token retry/refresh logic. Otherwise, the function calls the
         low-level ``call_method`` directly with stored auth context.
         """
         if self._bitrix_token:
             return self._bitrix_token.call_method(
                 api_method=self._api_method,
-                params=self._dynamic_params,
+                params=self._effective_params,
                 **self._kwargs,
             )
         else:
@@ -150,7 +150,7 @@ class _BatchCaller(BaseCaller):
                 auth_token=self._auth_token,
                 is_webhook=self._is_webhook,
                 api_method=self._api_method,
-                params=self._dynamic_params,
+                params=self._effective_params,
                 **self._kwargs,
             )
 

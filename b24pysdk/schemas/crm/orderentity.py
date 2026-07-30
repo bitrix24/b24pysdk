@@ -16,4 +16,3 @@ class OrderentityFieldsDict(CRMFieldsDict):
     """
     CRM order entity fields returned under the ``orderEntity`` wrapper key.
     """
-    _WRAPPER = "orderEntity"

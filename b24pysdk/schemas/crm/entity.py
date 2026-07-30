@@ -1,7 +1,8 @@
 from dataclasses import dataclass
-from typing import List, Text, TypedDict
+from typing import Annotated, List, Literal, Text, TypedDict
 
 from ...constants.crm import EntityMergeBatchStatus
+from ...utils.converters import int_from_bitrix, int_to_bitrix
 from ...utils.dataclasses import frozen_dataclass_kwargs
 from .._base_schema import BaseSchema
 
@@ -12,7 +13,7 @@ __all__ = [
 
 
 class CRMEntityMergeBatchData(TypedDict):
-    STATUS: Text
+    STATUS: Annotated[Text, Literal["SUCCESS", "CONFLICT", "ERROR"]]
     ENTITY_IDS: List[int]
 
 
@@ -42,7 +43,10 @@ class CRMEntityMergeBatch(BaseSchema[CRMEntityMergeBatchData]):
         """
         return cls(
             status=EntityMergeBatchStatus(bitrix_data["STATUS"]),
-            entity_ids=bitrix_data["ENTITY_IDS"],
+            entity_ids=[
+                int_from_bitrix(entity_id, is_required=True)
+                for entity_id in bitrix_data["ENTITY_IDS"]
+            ],
         )
 
     def to_bitrix(self) -> CRMEntityMergeBatchData:
@@ -54,5 +58,8 @@ class CRMEntityMergeBatch(BaseSchema[CRMEntityMergeBatchData]):
         """
         return {
             "STATUS": self.status.value,
-            "ENTITY_IDS": self.entity_ids,
+            "ENTITY_IDS": [
+                int_to_bitrix(entity_id, is_required=True)
+                for entity_id in self.entity_ids
+            ],
         }

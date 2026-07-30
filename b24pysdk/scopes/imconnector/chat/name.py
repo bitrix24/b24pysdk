@@ -1,5 +1,6 @@
 from typing import Optional, Text, Union
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
@@ -21,7 +22,7 @@ class Name(BaseEntity):
             chat_id: Text,
             name: Text,
             *,
-            user_id: Optional[Text] = None,
+            user_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -33,7 +34,7 @@ class Name(BaseEntity):
             NAME=name,
         )
 
-        if user_id is not None:
+        if user_id is not MISSING:
             params["USER_ID"] = user_id
 
         return self._make_bitrix_api_request(

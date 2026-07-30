@@ -1,5 +1,6 @@
 from typing import Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONList, Number, Timeout
@@ -19,8 +20,8 @@ class Call(BaseEntity):
             call_id: Text,
             messages: JSONList,
             *,
-            cost: Optional[Number] = None,
-            cost_currency: Optional[Text] = None,
+            cost: Optional[Number] = MISSING,
+            cost_currency: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -30,10 +31,10 @@ class Call(BaseEntity):
             "MESSAGES": messages,
         }
 
-        if cost is not None:
+        if cost is not MISSING:
             params["COST"] = cost
 
-        if cost_currency is not None:
+        if cost_currency is not MISSING:
             params["COST_CURRENCY"] = cost_currency
 
         return self._make_bitrix_api_request(

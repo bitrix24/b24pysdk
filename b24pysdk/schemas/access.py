@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict, Text, TypedDict
 
+from ..utils.converters import text_from_bitrix, text_to_bitrix
 from ..utils.dataclasses import frozen_dataclass_kwargs
 from ._base_schema import BaseSchema
 from ._base_schema_dict import BaseSchemaDict
@@ -41,9 +42,9 @@ class AccessName(BaseSchema[AccessNameData]):
             AccessNameItem schema with Python-friendly fields.
         """
         return cls(
-            provider=bitrix_data["provider"],
-            name=bitrix_data["name"],
-            provider_id=bitrix_data["provider_id"],
+            provider=text_from_bitrix(bitrix_data["provider"], is_required=True),
+            name=text_from_bitrix(bitrix_data["name"], is_required=True),
+            provider_id=text_from_bitrix(bitrix_data["provider_id"], is_required=True),
         )
 
     def to_bitrix(self) -> AccessNameData:
@@ -54,9 +55,9 @@ class AccessName(BaseSchema[AccessNameData]):
             Dictionary with Bitrix24 field names.
         """
         return {
-            "provider": self.provider,
-            "name": self.name,
-            "provider_id": self.provider_id,
+            "provider": text_to_bitrix(self.provider, is_required=True),
+            "name": text_to_bitrix(self.name, is_required=True),
+            "provider_id": text_to_bitrix(self.provider_id, is_required=True),
         }
 
 
@@ -70,4 +71,4 @@ class AccessNamesDict(BaseSchemaDict[AccessName, AccessNameData]):
     The method returns access permission descriptions indexed by access
     identifier, for example ``G2`` or ``AU``.
     """
-    _ITEM_SCHEMA = AccessName
+    _VALUE_SCHEMA = AccessName

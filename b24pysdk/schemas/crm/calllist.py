@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from typing import List, Text, TypedDict
 
+from ...utils.converters import int_from_bitrix, int_to_bitrix, text_from_bitrix, text_to_bitrix
 from ...utils.dataclasses import frozen_dataclass_kwargs
-from .._base_listable_schema import BaseListableSchema
+from .._base_schema import BaseSchema
 
 __all__ = [
     "CalllistStatus",
@@ -22,7 +23,7 @@ CalllistStatusesData = List[CalllistStatusData]
 
 
 @dataclass(**frozen_dataclass_kwargs())
-class CalllistStatus(BaseListableSchema[CalllistStatusData]):
+class CalllistStatus(BaseSchema[CalllistStatusData]):
     """Call list status returned by ``crm.calllist.statuslist``."""
 
     bitrix_id: int
@@ -34,17 +35,17 @@ class CalllistStatus(BaseListableSchema[CalllistStatusData]):
     def from_bitrix(cls, bitrix_data: CalllistStatusData, /) -> "CalllistStatus":
         """Create a call list status schema from Bitrix24 data."""
         return cls(
-            bitrix_id=int(bitrix_data["ID"]),
-            name=bitrix_data["NAME"],
-            sort=int(bitrix_data["SORT"]),
-            status_id=bitrix_data["STATUS_ID"],
+            bitrix_id=int_from_bitrix(bitrix_data["ID"], is_required=True),
+            name=text_from_bitrix(bitrix_data["NAME"], is_required=True),
+            sort=int_from_bitrix(bitrix_data["SORT"], is_required=True),
+            status_id=text_from_bitrix(bitrix_data["STATUS_ID"], is_required=True),
         )
 
     def to_bitrix(self) -> CalllistStatusData:
         """Convert the schema back to a Bitrix-compatible dictionary."""
         return {
-            "ID": self.bitrix_id,
-            "NAME": self.name,
-            "SORT": self.sort,
-            "STATUS_ID": self.status_id,
+            "ID": int_to_bitrix(self.bitrix_id, is_required=True),
+            "NAME": text_to_bitrix(self.name, is_required=True),
+            "SORT": int_to_bitrix(self.sort, is_required=True),
+            "STATUS_ID": text_to_bitrix(self.status_id, is_required=True),
         }

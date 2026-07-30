@@ -1,6 +1,6 @@
 from ._config import Config
 from ._version import __title__, __version__
-from .client import Client
+from .client import Client, ClientType
 from .credentials import (
     AbstractBitrixApp,
     AbstractBitrixAppLocal,
@@ -27,6 +27,7 @@ __all__ = [
     "BitrixTokenLocal",
     "BitrixWebhook",
     "Client",
+    "ClientType",
     "Config",
     "__title__",
     "__version__",

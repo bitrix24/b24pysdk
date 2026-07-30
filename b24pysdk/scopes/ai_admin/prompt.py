@@ -1,5 +1,6 @@
 from typing import Annotated, Iterable, Literal, Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -22,12 +23,12 @@ class Prompt(BaseEntity):
             code: Text,
             prompt: Text,
             *,
-            category: Optional[Iterable[Text]] = None,
-            icon: Optional[Text] = None,
-            parent_code: Optional[Text] = None,
-            section: Optional[Annotated[Text, Literal["create", "edit"]]] = None,
-            sort: Optional[int] = None,
-            translate: Optional[JSONDict] = None,
+            category: Optional[Iterable[Text]] = MISSING,
+            icon: Optional[Text] = MISSING,
+            parent_code: Optional[Text] = MISSING,
+            section: Optional[Annotated[Text, Literal["create", "edit"]]] = MISSING,
+            sort: Optional[int] = MISSING,
+            translate: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Add a new AI prompt.
@@ -64,25 +65,25 @@ class Prompt(BaseEntity):
             "prompt": prompt,
         }
 
-        if category is not None:
+        if category is not MISSING:
             if category.__class__ is not list:
                 category = list(category)
 
             params["category"] = category
 
-        if icon is not None:
+        if icon is not MISSING:
             params["icon"] = icon
 
-        if parent_code is not None:
+        if parent_code is not MISSING:
             params["parent_code"] = parent_code
 
-        if section is not None:
+        if section is not MISSING:
             params["section"] = section
 
-        if sort is not None:
+        if sort is not MISSING:
             params["sort"] = sort
 
-        if translate is not None:
+        if translate is not MISSING:
             params["translate"] = translate
 
         return self._make_bitrix_api_request(

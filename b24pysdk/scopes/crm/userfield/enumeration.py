@@ -1,7 +1,8 @@
 from ....api.requests import BitrixAPIValueRequest
-from ....schemas.crm.field import CRMFieldsData, CRMFieldsDict
+from ....schemas.crm.userfield import CRMUserfieldFieldsData, CRMUserfieldFieldsDict
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
+from ..._adapters import BitrixSchemaDictAdapter
 from .._base_crm import BaseCRM
 
 __all__ = [
@@ -17,7 +18,7 @@ class Enumeration(BaseCRM):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIValueRequest[CRMFieldsData, CRMFieldsDict]:
+    ) -> BitrixAPIValueRequest[CRMUserfieldFieldsData, CRMUserfieldFieldsDict]:
         """Get field descriptions for custom field type
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/user-defined-fields/crm-userfield-enumeration-fields.html
@@ -30,4 +31,4 @@ class Enumeration(BaseCRM):
         Returns:
             Instance of BitrixAPIRequest
         """
-        return self._fields(timeout=timeout)
+        return self._fields(timeout=timeout, result_adapter=BitrixSchemaDictAdapter(CRMUserfieldFieldsDict))

@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Callable, Generator, Generic, List, NoReturn, 
 
 from ...schemas.api import ListFastResponseData, ListResponseData, ResponseData
 from ...utils.dataclasses import frozen_dataclass_kwargs
-from ...utils.type_vars import BAResultT, BAValueResponseT, BAValueT
+from ...utils.type_vars import BAResultT, BAValueResponseT, BValueT
 from ...utils.types import JSONGenerator, JSONList
 from .abstract_bitrix_response import AbstractBitrixResponse
 from .bitrix_api_list_response import BitrixAPIListFastResponse, BitrixAPIListResponse
@@ -25,7 +25,7 @@ def _missing_result_adapter(_: BAResultT, /) -> NoReturn:
 
 
 @dataclass(**frozen_dataclass_kwargs(repr=False, eq=False))
-class AbstractBitrixAPIValueResponse(AbstractBitrixResponse[BAResultT], ABC, Generic[BAResultT, BAValueT]):
+class AbstractBitrixAPIValueResponse(AbstractBitrixResponse[BAResultT], ABC, Generic[BAResultT, BValueT]):
     """
     Base marker for Bitrix24 API responses that expose an adapted view.
 
@@ -35,11 +35,11 @@ class AbstractBitrixAPIValueResponse(AbstractBitrixResponse[BAResultT], ABC, Gen
     """
 
     if TYPE_CHECKING:
-        _result_adapter: Callable[[BAResultT], Union[BAValueT, List[BAValueT], Generator[BAValueT, None, None]]]
+        _result_adapter: Callable[[BAResultT], Union[BValueT, List[BValueT], Generator[BValueT, None, None]]]
 
 
 @dataclass(**frozen_dataclass_kwargs(repr=False, eq=False))
-class BitrixAPIBaseValueResponse(BitrixAPIResponse[BAResultT], AbstractBitrixAPIValueResponse[BAResultT, BAValueT], ABC, Generic[BAResultT, BAValueT]):
+class BitrixAPIBaseValueResponse(BitrixAPIResponse[BAResultT], AbstractBitrixAPIValueResponse[BAResultT, BValueT], ABC, Generic[BAResultT, BValueT]):
     """
     Base Bitrix24 API response with a Python-friendly view over ``result``.
 
@@ -47,7 +47,7 @@ class BitrixAPIBaseValueResponse(BitrixAPIResponse[BAResultT], AbstractBitrixAPI
     through ``value`` or ``values`` using the stored ``result_adapter``.
     """
 
-    _result_adapter: Callable[[BAResultT], Union[BAValueT, List[BAValueT]]]
+    _result_adapter: Callable[[BAResultT], Union[BValueT, List[BValueT]]]
 
     @classmethod
     def from_dict(
@@ -55,7 +55,7 @@ class BitrixAPIBaseValueResponse(BitrixAPIResponse[BAResultT], AbstractBitrixAPI
             json_response: ResponseData,
             /,
             *,
-            result_adapter: Callable[[BAResultT], Union[BAValueT, List[BAValueT]]] = _missing_result_adapter,
+            result_adapter: Callable[[BAResultT], Union[BValueT, List[BValueT]]] = _missing_result_adapter,
     ) -> BAValueResponseT:
         """
         Create an adapted response from raw JSON response.
@@ -76,7 +76,7 @@ class BitrixAPIBaseValueResponse(BitrixAPIResponse[BAResultT], AbstractBitrixAPI
         )
 
 @dataclass(**frozen_dataclass_kwargs(repr=False, eq=False))
-class BitrixAPIValueResponse(BitrixAPIBaseValueResponse[BAResultT, BAValueT], Generic[BAResultT, BAValueT]):
+class BitrixAPIValueResponse(BitrixAPIBaseValueResponse[BAResultT, BValueT], Generic[BAResultT, BValueT]):
     """
     Bitrix24 API response with a single adapted value.
 
@@ -84,10 +84,10 @@ class BitrixAPIValueResponse(BitrixAPIBaseValueResponse[BAResultT, BAValueT], Ge
     Python-friendly object produced by ``result_adapter``.
     """
 
-    _result_adapter: Callable[[BAResultT], BAValueT]
+    _result_adapter: Callable[[BAResultT], BValueT]
 
     @property
-    def value(self) -> BAValueT:
+    def value(self) -> BValueT:
         """
         Return adapted Python-friendly value.
 
@@ -97,7 +97,7 @@ class BitrixAPIValueResponse(BitrixAPIBaseValueResponse[BAResultT, BAValueT], Ge
 
 
 @dataclass(**frozen_dataclass_kwargs(repr=False, eq=False))
-class BitrixAPIValuesResponse(BitrixAPIBaseValueResponse[BAResultT, List[BAValueT]], Generic[BAResultT, BAValueT]):
+class BitrixAPIValuesResponse(BitrixAPIBaseValueResponse[BAResultT, BValueT], Generic[BAResultT, BValueT]):
     """
     Bitrix24 API response with adapted values collection.
 
@@ -105,10 +105,10 @@ class BitrixAPIValuesResponse(BitrixAPIBaseValueResponse[BAResultT, List[BAValue
     Python-friendly objects produced by ``result_adapter``.
     """
 
-    _result_adapter: Callable[[BAResultT], List[BAValueT]]
+    _result_adapter: Callable[[BAResultT], List[BValueT]]
 
     @property
-    def values(self) -> List[BAValueT]:
+    def values(self) -> List[BValueT]:
         """
         Return adapted Python-friendly values.
 
@@ -118,7 +118,7 @@ class BitrixAPIValuesResponse(BitrixAPIBaseValueResponse[BAResultT, List[BAValue
 
 
 @dataclass(**frozen_dataclass_kwargs(repr=False, eq=False))
-class BitrixAPIValuesListResponse(BitrixAPIListResponse, AbstractBitrixAPIValueResponse[JSONList, List[BAValueT]], Generic[BAValueT]):
+class BitrixAPIValuesListResponse(BitrixAPIListResponse, AbstractBitrixAPIValueResponse[JSONList, BValueT], Generic[BValueT]):
     """
     Bitrix24 list response with adapted values collection.
 
@@ -129,10 +129,10 @@ class BitrixAPIValuesListResponse(BitrixAPIListResponse, AbstractBitrixAPIValueR
     ``call_list``.
     """
 
-    _result_adapter: Callable[[JSONList], List[BAValueT]]
+    _result_adapter: Callable[[JSONList], List[BValueT]]
 
     @property
-    def values(self) -> List[BAValueT]:
+    def values(self) -> List[BValueT]:
         """
         Return adapted Python-friendly values.
 
@@ -146,8 +146,8 @@ class BitrixAPIValuesListResponse(BitrixAPIListResponse, AbstractBitrixAPIValueR
             json_response: ListResponseData,
             /,
             *,
-            result_adapter: Callable[[JSONList], List[BAValueT]] = _missing_result_adapter,
-    ) -> "BitrixAPIValuesListResponse[BAValueT]":
+            result_adapter: Callable[[JSONList], List[BValueT]] = _missing_result_adapter,
+    ) -> "BitrixAPIValuesListResponse[BValueT]":
         """
         Create an adapted list response from raw JSON response.
 
@@ -179,7 +179,7 @@ class BitrixAPIValuesListResponse(BitrixAPIListResponse, AbstractBitrixAPIValueR
 
 
 @dataclass(**frozen_dataclass_kwargs(repr=False, eq=False))
-class BitrixAPIValuesListFastResponse(BitrixAPIListFastResponse, AbstractBitrixAPIValueResponse[JSONGenerator, Generator[BAValueT, None, None]], Generic[BAValueT]):
+class BitrixAPIValuesListFastResponse(BitrixAPIListFastResponse, AbstractBitrixAPIValueResponse[JSONGenerator, BValueT], Generic[BValueT]):
     """
     Fast Bitrix24 list response with adapted values collection.
 
@@ -189,10 +189,10 @@ class BitrixAPIValuesListFastResponse(BitrixAPIListFastResponse, AbstractBitrixA
     ``BitrixAPIListFastResponse`` behavior.
     """
 
-    _result_adapter: Callable[[JSONGenerator], Generator[BAValueT, None, None]] = _missing_result_adapter
+    _result_adapter: Callable[[JSONGenerator], Generator[BValueT, None, None]] = _missing_result_adapter
 
     @property
-    def values(self) -> Generator[BAValueT, None, None]:
+    def values(self) -> Generator[BValueT, None, None]:
         """
         Return adapted Python-friendly values.
 
@@ -206,8 +206,8 @@ class BitrixAPIValuesListFastResponse(BitrixAPIListFastResponse, AbstractBitrixA
             json_response: ListFastResponseData,
             /,
             *,
-            result_adapter: Callable[[JSONGenerator], Generator[BAValueT, None, None]] = _missing_result_adapter,
-    ) -> "BitrixAPIValuesListFastResponse[BAValueT]":
+            result_adapter: Callable[[JSONGenerator], Generator[BValueT, None, None]] = _missing_result_adapter,
+    ) -> "BitrixAPIValuesListFastResponse[BValueT]":
         """
         Create an adapted fast list response from raw JSON response.
 

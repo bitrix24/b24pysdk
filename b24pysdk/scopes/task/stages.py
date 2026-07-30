@@ -1,5 +1,6 @@
 from typing import Annotated, Literal, Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -18,7 +19,7 @@ class Stages(BaseEntity):
             self,
             fields: JSONDict,
             *,
-            is_admin: Optional[bool] = None,
+            is_admin: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -27,7 +28,7 @@ class Stages(BaseEntity):
             "fields": fields,
         }
 
-        if is_admin is not None:
+        if is_admin is not MISSING:
             params["isAdmin"] = is_admin
 
         return self._make_bitrix_api_request(
@@ -62,7 +63,7 @@ class Stages(BaseEntity):
             self,
             bitrix_id: int,
             *,
-            is_admin: Optional[bool] = None,
+            is_admin: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -71,7 +72,7 @@ class Stages(BaseEntity):
             "id": bitrix_id,
         }
 
-        if is_admin is not None:
+        if is_admin is not MISSING:
             params["isAdmin"] = is_admin
 
         return self._make_bitrix_api_request(
@@ -85,7 +86,7 @@ class Stages(BaseEntity):
             self,
             entity_id: int,
             *,
-            is_admin: Optional[bool] = None,
+            is_admin: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -94,7 +95,7 @@ class Stages(BaseEntity):
             "entityId": entity_id,
         }
 
-        if is_admin is not None:
+        if is_admin is not MISSING:
             params["isAdmin"] = is_admin
 
         return self._make_bitrix_api_request(
@@ -109,8 +110,8 @@ class Stages(BaseEntity):
             bitrix_id: int,
             stage_id: int,
             *,
-            before: Optional[int] = None,
-            after: Optional[int] = None,
+            before: Optional[int] = MISSING,
+            after: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -120,10 +121,10 @@ class Stages(BaseEntity):
             "stageId": stage_id,
         }
 
-        if before is not None:
+        if before is not MISSING:
             params["before"] = before
 
-        if after is not None:
+        if after is not MISSING:
             params["after"] = after
 
         return self._make_bitrix_api_request(
@@ -138,7 +139,7 @@ class Stages(BaseEntity):
             bitrix_id: int,
             fields: JSONDict,
             *,
-            is_admin: Optional[bool] = None,
+            is_admin: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -148,7 +149,7 @@ class Stages(BaseEntity):
             "fields": fields,
         }
 
-        if is_admin is not None:
+        if is_admin is not MISSING:
             params["isAdmin"] = is_admin
 
         return self._make_bitrix_api_request(

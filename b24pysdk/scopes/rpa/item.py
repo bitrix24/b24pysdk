@@ -1,5 +1,6 @@
 from typing import Optional
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -18,7 +19,7 @@ class Item(BaseEntity):
             self,
             type_id: int,
             *,
-            fields: Optional[JSONDict] = None,
+            fields: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -27,7 +28,7 @@ class Item(BaseEntity):
             "typeId": type_id,
         }
 
-        if fields is not None:
+        if fields is not MISSING:
             params["fields"] = fields
 
         return self._make_bitrix_api_request(
@@ -104,9 +105,9 @@ class Item(BaseEntity):
             self,
             type_id: int,
             *,
-            order: Optional[JSONDict] = None,
-            filter: Optional[JSONDict] = None,
-            start: Optional[int] = None,
+            order: Optional[JSONDict] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -115,13 +116,13 @@ class Item(BaseEntity):
             "typeId": type_id,
         }
 
-        if order is not None:
+        if order is not MISSING:
             params["order"] = order
 
-        if filter is not None:
+        if filter is not MISSING:
             params["filter"] = filter
 
-        if start is not None:
+        if start is not MISSING:
             params["start"] = start
 
         return self._make_bitrix_api_request(

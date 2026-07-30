@@ -1,9 +1,12 @@
 import pytest
 
-from b24pysdk.api.responses import BitrixAPIResponse
+from b24pysdk.api.responses import BitrixAPIResponse, BitrixAPIValuesResponse
 from b24pysdk.client import BaseClient
 from b24pysdk.constants.crm import ConfigurationScope
-from b24pysdk.utils.types import JSONDict
+from b24pysdk.schemas.crm.details_configuration import (
+    CRMDetailsConfigurationSection,
+    CRMDetailsConfigurationSectionData,
+)
 
 from .....constants import BITRIX_PORTAL_OWNER_ID, SDK_NAME
 
@@ -15,10 +18,10 @@ pytestmark = [
     pytest.mark.crm_company_details_configuration,
 ]
 
-_SCOPE_COMMON: ConfigurationScope = ConfigurationScope.COMMON
+_SCOPE: ConfigurationScope = ConfigurationScope.PERSONAL
 _USER_ID: int = BITRIX_PORTAL_OWNER_ID
 
-_CONFIG_DATA: JSONDict = {
+_CONFIG_DATA: CRMDetailsConfigurationSectionData = {
     "name": "main",
     "title": f"{SDK_NAME} Company Configuration",
     "type": "section",
@@ -36,7 +39,7 @@ def test_crm_company_details_configuration_set(bitrix_client: BaseClient):
 
     bitrix_response = bitrix_client.crm.company.details.configuration.set(
         data=[_CONFIG_DATA],
-        scope=_SCOPE_COMMON,
+        scope=_SCOPE,
         user_id=_USER_ID,
     ).response
 
@@ -51,21 +54,25 @@ def test_crm_company_details_configuration_get(bitrix_client: BaseClient):
     """"""
 
     bitrix_response = bitrix_client.crm.company.details.configuration.get(
-        scope=_SCOPE_COMMON,
+        scope=_SCOPE,
+        user_id=_USER_ID,
     ).response
 
-    assert isinstance(bitrix_response, BitrixAPIResponse)
-    assert isinstance(bitrix_response.result, list)
+    assert isinstance(bitrix_response, BitrixAPIValuesResponse)
+    assert isinstance(bitrix_response.values, list)
+
+    for section in bitrix_response.values:
+        assert isinstance(section, CRMDetailsConfigurationSection)
+        assert isinstance(section.elements, list)
 
 
-@pytest.mark.dependency(name="test_crm_company_details_configuration_force_common_scope_for_all", depends=["test_crm_company_details_configuration_set"])
-def test_crm_company_details_configuration_force_common_scope_for_all(bitrix_client: BaseClient):
+@pytest.mark.dependency(name="test_crm_company_details_configuration_reset", depends=["test_crm_company_details_configuration_get"])
+def test_crm_company_details_configuration_reset(bitrix_client: BaseClient):
     """"""
 
-    bitrix_response = bitrix_client.crm.company.details.configuration.force_common_scope_for_all(
-        extras={
-            "data": [_CONFIG_DATA],
-        },
+    bitrix_response = bitrix_client.crm.company.details.configuration.reset(
+        scope=_SCOPE,
+        user_id=_USER_ID,
     ).response
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
@@ -74,13 +81,14 @@ def test_crm_company_details_configuration_force_common_scope_for_all(bitrix_cli
     assert bitrix_response.result is True
 
 
-@pytest.mark.dependency(name="test_crm_company_details_configuration_reset", depends=["test_crm_company_details_configuration_set"])
-def test_crm_company_details_configuration_reset(bitrix_client: BaseClient):
+@pytest.mark.dependency(name="test_crm_company_details_configuration_force_common_scope_for_all", depends=["test_crm_company_details_configuration_get"])
+def test_crm_company_details_configuration_force_common_scope_for_all(bitrix_client: BaseClient):
     """"""
 
-    bitrix_response = bitrix_client.crm.company.details.configuration.reset(
-        scope=_SCOPE_COMMON,
-        user_id=_USER_ID,
+    bitrix_response = bitrix_client.crm.company.details.configuration.force_common_scope_for_all(
+        extras={
+            "data": [_CONFIG_DATA],
+        },
     ).response
 
     assert isinstance(bitrix_response, BitrixAPIResponse)

@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from typing import Annotated, List, Literal, Text, TypedDict
 
+from ....utils.converters import int_from_bitrix, int_to_bitrix, text_from_bitrix, text_to_bitrix
 from ....utils.dataclasses import frozen_dataclass_kwargs
-from ..._base_listable_schema import BaseListableSchema
+from ..._base_schema import BaseSchema
 
 __all__ = [
     "CRMDuplicateVolatileType",
@@ -24,7 +25,7 @@ CRMDuplicateVolatileTypeFieldsData = List[CRMDuplicateVolatileTypeFieldData]
 
 
 @dataclass(**frozen_dataclass_kwargs())
-class CRMDuplicateVolatileTypeField(BaseListableSchema[CRMDuplicateVolatileTypeFieldData]):
+class CRMDuplicateVolatileTypeField(BaseSchema[CRMDuplicateVolatileTypeFieldData]):
     """
     Field that can be used for duplicate search.
 
@@ -47,9 +48,9 @@ class CRMDuplicateVolatileTypeField(BaseListableSchema[CRMDuplicateVolatileTypeF
             CRMDuplicateVolatileTypeField schema with Python-friendly field names.
         """
         return cls(
-            entity_type_id=bitrix_data["entityTypeId"],
-            field_code=bitrix_data["fieldCode"],
-            field_title=bitrix_data["fieldTitle"],
+            entity_type_id=int_from_bitrix(bitrix_data["entityTypeId"], is_required=True),
+            field_code=text_from_bitrix(bitrix_data["fieldCode"], is_required=True),
+            field_title=text_from_bitrix(bitrix_data["fieldTitle"], is_required=True),
         )
 
     def to_bitrix(self) -> CRMDuplicateVolatileTypeFieldData:
@@ -60,9 +61,9 @@ class CRMDuplicateVolatileTypeField(BaseListableSchema[CRMDuplicateVolatileTypeF
             Dictionary with Bitrix24 duplicate volatile type field names.
         """
         return {
-            "entityTypeId": self.entity_type_id,
-            "fieldCode": self.field_code,
-            "fieldTitle": self.field_title,
+            "entityTypeId": int_to_bitrix(self.entity_type_id, is_required=True),
+            "fieldCode": text_to_bitrix(self.field_code, is_required=True),
+            "fieldTitle": text_to_bitrix(self.field_title, is_required=True),
         }
 
 
@@ -76,7 +77,7 @@ CRMDuplicateVolatileTypesData = List[CRMDuplicateVolatileTypeData]
 
 
 @dataclass(**frozen_dataclass_kwargs())
-class CRMDuplicateVolatileType(BaseListableSchema[CRMDuplicateVolatileTypeData]):
+class CRMDuplicateVolatileType(BaseSchema[CRMDuplicateVolatileTypeData]):
     """
     Field already registered for duplicate search.
 
@@ -99,9 +100,9 @@ class CRMDuplicateVolatileType(BaseListableSchema[CRMDuplicateVolatileTypeData])
             CRMDuplicateVolatileType schema with Python-friendly field names.
         """
         return cls(
-            bitrix_id=bitrix_data["id"],
-            entity_type_id=bitrix_data["entityTypeId"],
-            field_code=bitrix_data["fieldCode"],
+            bitrix_id=int_from_bitrix(bitrix_data["id"], is_required=True),
+            entity_type_id=int_from_bitrix(bitrix_data["entityTypeId"], is_required=True),
+            field_code=text_from_bitrix(bitrix_data["fieldCode"], is_required=True),
         )
 
     def to_bitrix(self) -> CRMDuplicateVolatileTypeData:
@@ -112,7 +113,7 @@ class CRMDuplicateVolatileType(BaseListableSchema[CRMDuplicateVolatileTypeData])
             Dictionary with Bitrix24 duplicate volatile type field names.
         """
         return {
-            "id": self.bitrix_id,
-            "entityTypeId": self.entity_type_id,
-            "fieldCode": self.field_code,
+            "id": int_to_bitrix(self.bitrix_id, is_required=True),
+            "entityTypeId": int_to_bitrix(self.entity_type_id, is_required=True),
+            "fieldCode": text_to_bitrix(self.field_code, is_required=True),
         }

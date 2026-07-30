@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Annotated, Iterable, Literal, Optional, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIValueRequest
 from ....schemas.crm.duplicate import CRMDuplicateFindByComm, CRMDuplicateFindByCommData
 from ....utils.functional import type_checker
@@ -30,7 +31,7 @@ class Duplicate(BaseCRM):
             type: Annotated[Text, Literal["EMAIL", "PHONE"]],
             values: Iterable[Text],
             *,
-            entity_type: Optional[Annotated[Text, Literal["LEAD", "COMPANY", "CONTACT"]]] = None,
+            entity_type: Optional[Annotated[Text, Literal["LEAD", "COMPANY", "CONTACT"]]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIValueRequest[CRMDuplicateFindByCommData, CRMDuplicateFindByComm]:
         """Get leads, contacts, and companies with matching data
@@ -71,7 +72,7 @@ class Duplicate(BaseCRM):
             "values": values,
         }
 
-        if entity_type is not None:
+        if entity_type is not MISSING:
             params["entity_type"] = entity_type
 
         return self._make_bitrix_api_request(

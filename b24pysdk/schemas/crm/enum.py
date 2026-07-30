@@ -2,13 +2,13 @@ from abc import ABC
 from dataclasses import dataclass
 from typing import Generic, List, Optional, Text, TypedDict
 
+from ...utils.converters import int_from_bitrix, int_to_bitrix, text_from_bitrix, text_to_bitrix
 from ...utils.dataclasses import frozen_dataclass_kwargs
 from ...utils.type_vars import BSDataT
-from .._base_listable_schema import BaseListableSchema
+from .._base_schema import BaseSchema
 
 __all__ = [
     "CRMEnumItem",
-    "CRMEnumItemBase",
     "CRMEnumItemData",
     "CRMEnumItemsData",
     "OrderOwnerType",
@@ -18,7 +18,7 @@ __all__ = [
 
 
 @dataclass(**frozen_dataclass_kwargs())
-class CRMEnumItemBase(BaseListableSchema[BSDataT], ABC, Generic[BSDataT]):
+class _BaseCRMEnumItem(BaseSchema[BSDataT], ABC, Generic[BSDataT]):
     """
     Base class for CRM enum-like items.
 
@@ -39,7 +39,7 @@ CRMEnumItemsData = List[CRMEnumItemData]
 
 
 @dataclass(**frozen_dataclass_kwargs())
-class CRMEnumItem(CRMEnumItemBase[CRMEnumItemData]):
+class CRMEnumItem(_BaseCRMEnumItem[CRMEnumItemData]):
     """
     Single CRM enum item returned by most ``crm.enum.*`` methods.
 
@@ -68,10 +68,10 @@ class CRMEnumItem(CRMEnumItemBase[CRMEnumItemData]):
             CRMEnumItem schema with Python-friendly field names.
         """
         return cls(
-            bitrix_id=int(bitrix_data["ID"]),
-            name=bitrix_data["NAME"],
-            symbol_code=bitrix_data["SYMBOL_CODE"],
-            symbol_code_short=bitrix_data["SYMBOL_CODE_SHORT"],
+            bitrix_id=int_from_bitrix(bitrix_data["ID"], is_required=True),
+            name=text_from_bitrix(bitrix_data["NAME"], is_required=True),
+            symbol_code=text_from_bitrix(bitrix_data["SYMBOL_CODE"]),
+            symbol_code_short=text_from_bitrix(bitrix_data["SYMBOL_CODE_SHORT"]),
         )
 
     def to_bitrix(self) -> CRMEnumItemData:
@@ -82,10 +82,10 @@ class CRMEnumItem(CRMEnumItemBase[CRMEnumItemData]):
             Dictionary with Bitrix24 CRM enum item field names.
         """
         return {
-            "ID": self.bitrix_id,
-            "NAME": self.name,
-            "SYMBOL_CODE": self.symbol_code,
-            "SYMBOL_CODE_SHORT": self.symbol_code_short,
+            "ID": int_to_bitrix(self.bitrix_id, is_required=True),
+            "NAME": text_to_bitrix(self.name, is_required=True),
+            "SYMBOL_CODE": text_to_bitrix(self.symbol_code),
+            "SYMBOL_CODE_SHORT": text_to_bitrix(self.symbol_code_short),
         }
 
 
@@ -100,7 +100,7 @@ OrderOwnerTypesData = List[OrderOwnerTypeData]
 
 
 @dataclass(**frozen_dataclass_kwargs())
-class OrderOwnerType(CRMEnumItemBase[OrderOwnerTypeData]):
+class OrderOwnerType(_BaseCRMEnumItem[OrderOwnerTypeData]):
     """
     Single order owner type returned by ``crm.enum.getorderownertypes``.
 
@@ -123,10 +123,10 @@ class OrderOwnerType(CRMEnumItemBase[OrderOwnerTypeData]):
             OrderOwnerType schema with Python-friendly field names.
         """
         return cls(
-            bitrix_id=int(bitrix_data["id"]),
-            name=bitrix_data["name"],
-            attribute=bitrix_data["attribute"],
-            code=bitrix_data["code"],
+            bitrix_id=int_from_bitrix(bitrix_data["id"], is_required=True),
+            name=text_from_bitrix(bitrix_data["name"], is_required=True),
+            attribute=text_from_bitrix(bitrix_data["attribute"], is_required=True),
+            code=text_from_bitrix(bitrix_data["code"], is_required=True),
         )
 
     def to_bitrix(self) -> OrderOwnerTypeData:
@@ -137,8 +137,8 @@ class OrderOwnerType(CRMEnumItemBase[OrderOwnerTypeData]):
             Dictionary with Bitrix24 order owner type field names.
         """
         return {
-            "attribute": self.attribute,
-            "code": self.code,
-            "id": self.bitrix_id,
-            "name": self.name,
+            "attribute": text_to_bitrix(self.attribute, is_required=True),
+            "code": text_to_bitrix(self.code, is_required=True),
+            "id": int_to_bitrix(self.bitrix_id, is_required=True),
+            "name": text_to_bitrix(self.name, is_required=True),
         }

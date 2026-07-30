@@ -1,5 +1,6 @@
 from typing import Annotated, Literal, Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -20,21 +21,36 @@ class Engine(BaseEntity):
     def list(
             self,
             *,
+            filter: Optional[JSONDict] = MISSING,
+            limit: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Retrieve the list of registered AI engines.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/ai/ai-engine-list.html
 
-        This method returns the list of engines registered for the current partner. The API call does not require parameters.
+        This method returns the list of engines registered for the current partner.
 
         Args:
+            filter: Filter fields;
+
+            limit: Maximum number of items in the response;
+
             timeout: Timeout in seconds;
         Returns:
             Instance of BitrixAPIRequest.
         """
+        params: JSONDict = {}
+
+        if filter is not MISSING:
+            params["filter"] = filter
+
+        if limit is not MISSING:
+            params["limit"] = limit
+
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
+            params=params,
             timeout=timeout,
         )
 
@@ -46,7 +62,7 @@ class Engine(BaseEntity):
             category: Annotated[Text, Literal["text", "image", "audio"]],
             completions_url: Text,
             *,
-            settings: Optional[JSONDict] = None,
+            settings: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Register an AI engine.
@@ -78,7 +94,7 @@ class Engine(BaseEntity):
             completions_url=completions_url,
         )
 
-        if settings is not None:
+        if settings is not MISSING:
             params["settings"] = settings
 
         return self._make_bitrix_api_request(

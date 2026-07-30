@@ -1,8 +1,11 @@
 from abc import ABC
 from typing import Optional, Text
 
-from ......api.requests import BitrixAPIRequest
-from ......utils.types import JSONDict, JSONList, Timeout
+from ......_constants import MISSING
+from ......api.requests import BitrixAPIRequest, BitrixAPIValuesRequest
+from ......schemas.crm.details_configuration import CRMDetailsConfigurationSection, CRMDetailsConfigurationSectionsData
+from ......utils.types import JSONDict, Timeout
+from ....._adapters import BitrixSchemasAdapter
 from ...._base_crm import BaseCRM
 
 __all__ = [
@@ -19,12 +22,12 @@ class BaseConfiguration(BaseCRM, ABC):
     def _get(
             self,
             *,
-            entity_type_id: Optional[int] = None,
-            user_id: Optional[int] = None,
-            scope: Optional[Text] = None,
-            extras: Optional[JSONDict] = None,
+            entity_type_id: Optional[int] = MISSING,
+            user_id: Optional[int] = MISSING,
+            scope: Optional[Text] = MISSING,
+            extras: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValuesRequest[Optional[CRMDetailsConfigurationSectionsData], CRMDetailsConfigurationSection]:
         """Get parameters of CRM item detail configuration.
 
         The method returns the settings of the detail form for a specific CRM entity.
@@ -46,37 +49,39 @@ class BaseConfiguration(BaseCRM, ABC):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValuesRequest
         """
 
-        params = {}
+        params: JSONDict = {}
 
-        if entity_type_id is not None:
+        if entity_type_id is not MISSING:
             params["entityTypeId"] = entity_type_id
 
-        if user_id is not None:
+        if user_id is not MISSING:
             params["userId"] = user_id
 
-        if scope is not None:
+        if scope is not MISSING:
             params["scope"] = scope
 
-        if extras is not None:
+        if extras is not MISSING:
             params["extras"] = extras
 
         return self._make_bitrix_api_request(
             api_wrapper=self._get,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValuesRequest,
+            result_adapter=BitrixSchemasAdapter(CRMDetailsConfigurationSection),
         )
 
     def _set(
             self,
             *,
-            entity_type_id: Optional[int] = None,
-            data: JSONList,
-            user_id: Optional[int] = None,
-            scope: Optional[str] = None,
-            extras: Optional[JSONDict] = None,
+            entity_type_id: Optional[int] = MISSING,
+            data: CRMDetailsConfigurationSectionsData,
+            user_id: Optional[int] = MISSING,
+            scope: Optional[str] = MISSING,
+            extras: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Set parameters for CRM item detail card configuration.
@@ -105,20 +110,20 @@ class BaseConfiguration(BaseCRM, ABC):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "data": data,
         }
 
-        if entity_type_id is not None:
+        if entity_type_id is not MISSING:
             params["entityTypeId"] = entity_type_id
 
-        if user_id is not None:
+        if user_id is not MISSING:
             params["userId"] = user_id
 
-        if scope is not None:
+        if scope is not MISSING:
             params["scope"] = scope
 
-        if extras is not None:
+        if extras is not MISSING:
             params["extras"] = extras
 
         return self._make_bitrix_api_request(
@@ -130,10 +135,10 @@ class BaseConfiguration(BaseCRM, ABC):
     def _reset(
             self,
             *,
-            entity_type_id: Optional[int] = None,
-            user_id: Optional[int] = None,
-            scope: Optional[str] = None,
-            extras: Optional[JSONDict] = None,
+            entity_type_id: Optional[int] = MISSING,
+            user_id: Optional[int] = MISSING,
+            scope: Optional[str] = MISSING,
+            extras: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Reset item card parameters.
@@ -162,18 +167,18 @@ class BaseConfiguration(BaseCRM, ABC):
             Instance of BitrixAPIRequest
         """
 
-        params = {}
+        params: JSONDict = {}
 
-        if entity_type_id is not None:
+        if entity_type_id is not MISSING:
             params["entityTypeId"] = entity_type_id
 
-        if user_id is not None:
+        if user_id is not MISSING:
             params["userId"] = user_id
 
-        if scope is not None:
+        if scope is not MISSING:
             params["scope"] = scope
 
-        if extras is not None:
+        if extras is not MISSING:
             params["extras"] = extras
 
         return self._make_bitrix_api_request(
@@ -185,8 +190,8 @@ class BaseConfiguration(BaseCRM, ABC):
     def _force_common_scope_for_all(
             self,
             *,
-            entity_type_id: Optional[int] = None,
-            extras: Optional[JSONDict] = None,
+            entity_type_id: Optional[int] = MISSING,
+            extras: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Set common detail for all users.
@@ -206,12 +211,12 @@ class BaseConfiguration(BaseCRM, ABC):
             Instance of BitrixAPIRequest
         """
 
-        params = {}
+        params: JSONDict = {}
 
-        if entity_type_id is not None:
+        if entity_type_id is not MISSING:
             params["entityTypeId"] = entity_type_id
 
-        if extras is not None:
+        if extras is not MISSING:
             params["extras"] = extras
 
         return self._make_bitrix_api_request(

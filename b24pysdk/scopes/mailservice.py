@@ -1,5 +1,6 @@
 from typing import Optional, Text
 
+from .._constants import MISSING
 from ..api.requests import BitrixAPIRequest
 from ..utils.functional import type_checker
 from ..utils.types import B24Bool, Timeout
@@ -19,11 +20,11 @@ class Mailservice(BaseScope):
             name: Text,
             encryption: bool,
             *,
-            active: Optional[bool] = None,
-            server: Optional[Text] = None,
-            port: Optional[int] = None,
-            link: Optional[Text] = None,
-            sort: Optional[int] = None,
+            active: Optional[bool] = MISSING,
+            server: Optional[Text] = MISSING,
+            port: Optional[int] = MISSING,
+            link: Optional[Text] = MISSING,
+            sort: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -33,19 +34,19 @@ class Mailservice(BaseScope):
             "ENCRYPTION": B24Bool(encryption).to_b24(),
         }
 
-        if active is not None:
+        if active is not MISSING:
             params["ACTIVE"] = B24Bool(active).to_b24()
 
-        if server is not None:
+        if server is not MISSING:
             params["SERVER"] = server
 
-        if port is not None:
+        if port is not MISSING:
             params["PORT"] = port
 
-        if link is not None:
+        if link is not MISSING:
             params["LINK"] = link
 
-        if sort is not None:
+        if sort is not MISSING:
             params["SORT"] = sort
 
         return self._make_bitrix_api_request(
@@ -121,13 +122,13 @@ class Mailservice(BaseScope):
             self,
             bitrix_id: int,
             *,
-            active: Optional[bool] = None,
-            name: Optional[Text] = None,
-            server: Optional[Text] = None,
-            port: Optional[int] = None,
-            encryption: Optional[bool] = None,
-            link: Optional[Text] = None,
-            sort: Optional[int] = None,
+            active: Optional[bool] = MISSING,
+            name: Optional[Text] = MISSING,
+            server: Optional[Text] = MISSING,
+            port: Optional[int] = MISSING,
+            encryption: Optional[bool] = MISSING,
+            link: Optional[Text] = MISSING,
+            sort: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -136,25 +137,25 @@ class Mailservice(BaseScope):
             "ID": bitrix_id,
         }
 
-        if active is not None:
+        if active is not MISSING:
             params["ACTIVE"] = B24Bool(active).to_b24()
 
-        if name is not None:
+        if name is not MISSING:
             params["NAME"] = name
 
-        if server is not None:
+        if server is not MISSING:
             params["SERVER"] = server
 
-        if port is not None:
+        if port is not MISSING:
             params["PORT"] = port
 
-        if encryption is not None:
+        if encryption is not MISSING:
             params["ENCRYPTION"] = B24Bool(encryption).to_b24()
 
-        if link is not None:
+        if link is not MISSING:
             params["LINK"] = link
 
-        if sort is not None:
+        if sort is not MISSING:
             params["SORT"] = sort
 
         return self._make_bitrix_api_request(

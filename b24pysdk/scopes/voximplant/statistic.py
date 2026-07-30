@@ -1,5 +1,6 @@
 from typing import Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -17,22 +18,22 @@ class Statistic(BaseEntity):
     def get(
             self,
             *,
-            filter: Optional[JSONDict] = None,
-            sort: Optional[Text] = None,
-            order: Optional[Text] = None,
+            filter: Optional[JSONDict] = MISSING,
+            sort: Optional[Text] = MISSING,
+            order: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        params: JSONDict = {}
 
-        if filter is not None:
+        if filter is not MISSING:
             params["FILTER"] = filter
 
-        if sort is not None:
+        if sort is not MISSING:
             params["SORT"] = sort
 
-        if order is not None:
+        if order is not MISSING:
             params["ORDER"] = order
 
         return self._make_bitrix_api_request(

@@ -1,5 +1,6 @@
 from typing import Iterable, Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import classproperty, type_checker
 from ...utils.types import JSONDict, Timeout
@@ -174,10 +175,10 @@ class PriceTypeLang(BaseEntity):
     def list(
             self,
             *,
-            select: Optional[Iterable[Text]] = None,
-            filter: Optional[JSONDict] = None,
-            order: Optional[JSONDict] = None,
-            start: Optional[int] = None,
+            select: Optional[Iterable[Text]] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            order: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """List translations of price type names by filter.
@@ -220,21 +221,21 @@ class PriceTypeLang(BaseEntity):
             Instance of BitrixAPIRequest.
         """
 
-        params: JSONDict = dict()
+        params: JSONDict = {}
 
-        if select is not None:
+        if select is not MISSING:
             if select.__class__ is not list:
                 select = list(select)
 
             params["select"] = select
 
-        if filter is not None:
+        if filter is not MISSING:
             params["filter"] = filter
 
-        if order is not None:
+        if order is not MISSING:
             params["order"] = order
 
-        if start is not None:
+        if start is not MISSING:
             params["start"] = start
 
         return self._make_bitrix_api_request(

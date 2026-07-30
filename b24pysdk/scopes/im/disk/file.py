@@ -1,5 +1,6 @@
 from typing import Optional, Text, Union
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import B24BoolStrict, JSONDict, Timeout
@@ -20,8 +21,8 @@ class File(BaseEntity):
             upload_id: Union[int, Text],
             disk_id: Union[int, Text],
             *,
-            message: Optional[Text] = None,
-            silent_mode: Optional[Union[bool, B24BoolStrict]] = None,
+            message: Optional[Text] = MISSING,
+            silent_mode: Optional[Union[bool, B24BoolStrict]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
         """"""
@@ -32,10 +33,10 @@ class File(BaseEntity):
             DISK_ID=disk_id,
         )
 
-        if message is not None:
+        if message is not MISSING:
             params["MESSAGE"] = message
 
-        if silent_mode is not None:
+        if silent_mode is not MISSING:
             params["SILENT_MODE"] = B24BoolStrict(silent_mode).to_b24()
 
         return self._make_bitrix_api_request(

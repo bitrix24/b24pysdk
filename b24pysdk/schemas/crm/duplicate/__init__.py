@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Optional, TypedDict
 
+from ....utils.converters import int_from_bitrix, int_to_bitrix
 from ....utils.dataclasses import frozen_dataclass_kwargs
 from ..._base_schema import BaseSchema
 
@@ -40,9 +41,21 @@ class CRMDuplicateFindByComm(BaseSchema[CRMDuplicateFindByCommData]):
             CRMDuplicateFindByComm schema with Python-friendly field names.
         """
         return cls(
-            lead_ids=bitrix_data.get("LEAD"),
-            contact_ids=bitrix_data.get("CONTACT"),
-            company_ids=bitrix_data.get("COMPANY"),
+            lead_ids=(
+                [int_from_bitrix(bitrix_id, is_required=True) for bitrix_id in bitrix_data["LEAD"]]
+                if "LEAD" in bitrix_data
+                else None
+            ),
+            contact_ids=(
+                [int_from_bitrix(bitrix_id, is_required=True) for bitrix_id in bitrix_data["CONTACT"]]
+                if "CONTACT" in bitrix_data
+                else None
+            ),
+            company_ids=(
+                [int_from_bitrix(bitrix_id, is_required=True) for bitrix_id in bitrix_data["COMPANY"]]
+                if "COMPANY" in bitrix_data
+                else None
+            ),
         )
 
     def to_bitrix(self) -> CRMDuplicateFindByCommData:
@@ -56,12 +69,12 @@ class CRMDuplicateFindByComm(BaseSchema[CRMDuplicateFindByCommData]):
         bitrix_data: CRMDuplicateFindByCommData = {}
 
         if self.lead_ids is not None:
-            bitrix_data["LEAD"] = self.lead_ids
+            bitrix_data["LEAD"] = [int_to_bitrix(bitrix_id, is_required=True) for bitrix_id in self.lead_ids]
 
         if self.contact_ids is not None:
-            bitrix_data["CONTACT"] = self.contact_ids
+            bitrix_data["CONTACT"] = [int_to_bitrix(bitrix_id, is_required=True) for bitrix_id in self.contact_ids]
 
         if self.company_ids is not None:
-            bitrix_data["COMPANY"] = self.company_ids
+            bitrix_data["COMPANY"] = [int_to_bitrix(bitrix_id, is_required=True) for bitrix_id in self.company_ids]
 
         return bitrix_data

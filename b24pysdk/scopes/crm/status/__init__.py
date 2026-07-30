@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Optional
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
 from ....schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ....utils.functional import type_checker
@@ -112,8 +113,8 @@ class Status(BaseCRM):
     def list(
             self,
             *,
-            filter: Optional[JSONDict] = None,
-            order: Optional[JSONDict] = None,
+            filter: Optional[JSONDict] = MISSING,
+            order: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of directory items by filter.
@@ -157,10 +158,10 @@ class Status(BaseCRM):
 
         params: JSONDict = {}
 
-        if filter is not None:
+        if filter is not MISSING:
             params["filter"] = filter
 
-        if order is not None:
+        if order is not MISSING:
             params["order"] = order
 
         return self._make_bitrix_api_request(
@@ -214,7 +215,7 @@ class Status(BaseCRM):
             self,
             bitrix_id: int,
             *,
-            params: Optional[JSONDict] = None,
+            params: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Delete CRM status element.
@@ -238,7 +239,7 @@ class Status(BaseCRM):
             "id": bitrix_id,
         }
 
-        if params is not None:
+        if params is not MISSING:
             _params["params"] = params
 
         return self._make_bitrix_api_request(

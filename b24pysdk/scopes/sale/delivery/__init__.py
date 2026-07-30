@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Iterable, Optional, Text, Union
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import B24BoolStrict, JSONDict, JSONList, Timeout
@@ -45,11 +46,11 @@ class Delivery(BaseEntity):
         name: Text,
         currency: Text,
         *,
-        description: Optional[Text] = None,
-        sort: Optional[int] = None,
-        active: Optional[Union[bool, B24BoolStrict]] = None,
-        config: Optional[JSONList] = None,
-        logotype: Optional[Text] = None,
+        description: Optional[Text] = MISSING,
+        sort: Optional[int] = MISSING,
+        active: Optional[Union[bool, B24BoolStrict]] = MISSING,
+        config: Optional[JSONList] = MISSING,
+        logotype: Optional[Text] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -60,19 +61,19 @@ class Delivery(BaseEntity):
             "CURRENCY": currency,
         }
 
-        if description is not None:
+        if description is not MISSING:
             params["DESCRIPTION"] = description
 
-        if sort is not None:
+        if sort is not MISSING:
             params["SORT"] = sort
 
-        if active is not None:
+        if active is not MISSING:
             params["ACTIVE"] = B24BoolStrict(active).to_b24()
 
-        if config is not None:
+        if config is not MISSING:
             params["CONFIG"] = config
 
-        if logotype is not None:
+        if logotype is not MISSING:
             params["LOGOTYPE"] = logotype
 
         return self._make_bitrix_api_request(
@@ -86,34 +87,34 @@ class Delivery(BaseEntity):
         self,
         bitrix_id: int,
         *,
-        name: Optional[Text] = None,
-        currency: Optional[Text] = None,
-        description: Optional[Text] = None,
-        sort: Optional[int] = None,
-        active: Optional[Union[bool, B24BoolStrict]] = None,
-        logotype: Optional[Text] = None,
+        name: Optional[Text] = MISSING,
+        currency: Optional[Text] = MISSING,
+        description: Optional[Text] = MISSING,
+        sort: Optional[int] = MISSING,
+        active: Optional[Union[bool, B24BoolStrict]] = MISSING,
+        logotype: Optional[Text] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
         fields: JSONDict = {}
 
-        if name is not None:
+        if name is not MISSING:
             fields["NAME"] = name
 
-        if currency is not None:
+        if currency is not MISSING:
             fields["CURRENCY"] = currency
 
-        if description is not None:
+        if description is not MISSING:
             fields["DESCRIPTION"] = description
 
-        if sort is not None:
+        if sort is not MISSING:
             fields["SORT"] = sort
 
-        if active is not None:
+        if active is not MISSING:
             fields["ACTIVE"] = B24BoolStrict(active).to_b24()
 
-        if logotype is not None:
+        if logotype is not MISSING:
             fields["LOGOTYPE"] = logotype
 
         params: JSONDict = {
@@ -150,24 +151,24 @@ class Delivery(BaseEntity):
     def getlist(
         self,
         *,
-        select: Optional[Iterable[Text]] = None,
-        filter: Optional[JSONDict] = None,
-        order: Optional[JSONDict] = None,
+        select: Optional[Iterable[Text]] = MISSING,
+        filter: Optional[JSONDict] = MISSING,
+        order: Optional[JSONDict] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
         params: JSONDict = {}
 
-        if select is not None:
+        if select is not MISSING:
             if select.__class__ is not list:
                 select = list(select)
             params["SELECT"] = select
 
-        if filter is not None:
+        if filter is not MISSING:
             params["FILTER"] = filter
 
-        if order is not None:
+        if order is not MISSING:
             params["ORDER"] = order
 
         return self._make_bitrix_api_request(

@@ -12,6 +12,7 @@ from .recent import Recent
 from .revision import Revision
 from .search import Search
 from .user import User
+from .v2 import V2
 
 __all__ = [
     "Im",
@@ -75,3 +76,8 @@ class Im(BaseScope):
     def user(self) -> User:
         """"""
         return User(self)
+
+    @cached_property
+    def v2(self) -> V2:
+        """"""
+        return V2(self)

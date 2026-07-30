@@ -1,9 +1,11 @@
 from typing import List, Optional, Text
 
+from .._constants import MISSING
 from ..api.requests import BitrixAPIRequest, BitrixAPIValueRequest
 from ..schemas.results import CountResultData
 from ..utils.functional import type_checker
 from ..utils.types import JSONDict, Timeout
+from ._adapters import BitrixResultAdapter
 from ._base_scope import BaseScope
 
 __all__ = [
@@ -23,12 +25,12 @@ class Placement(BaseScope):
             placement: Text,
             handler: Text,
             *,
-            title: Optional[Text] = None,
-            description: Optional[Text] = None,
-            group_name: Optional[Text] = None,
-            lang_all: Optional[JSONDict] = None,
-            options: Optional[JSONDict] = None,
-            user_id: Optional[int] = None,
+            title: Optional[Text] = MISSING,
+            description: Optional[Text] = MISSING,
+            group_name: Optional[Text] = MISSING,
+            lang_all: Optional[JSONDict] = MISSING,
+            options: Optional[JSONDict] = MISSING,
+            user_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """
@@ -58,22 +60,22 @@ class Placement(BaseScope):
             "HANDLER": handler,
         }
 
-        if title is not None:
+        if title is not MISSING:
             params["TITLE"] = title
 
-        if description is not None:
+        if description is not MISSING:
             params["DESCRIPTION"] = description
 
-        if group_name is not None:
+        if group_name is not MISSING:
             params["GROUP_NAME"] = group_name
 
-        if lang_all is not None:
+        if lang_all is not MISSING:
             params["LANG_ALL"] = lang_all
 
-        if options is not None:
+        if options is not MISSING:
             params["OPTIONS"] = options
 
-        if user_id is not None:
+        if user_id is not MISSING:
             params["USER_ID"] = user_id
 
         return self._make_bitrix_api_request(
@@ -110,8 +112,8 @@ class Placement(BaseScope):
     def list(
             self,
             *,
-            scope: Optional[Text] = None,
-            full: Optional[bool] = None,
+            scope: Optional[Text] = MISSING,
+            full: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[List[Text]]:
         """
@@ -132,10 +134,10 @@ class Placement(BaseScope):
 
         params: JSONDict = {}
 
-        if scope is not None:
+        if scope is not MISSING:
             params["SCOPE"] = scope
 
-        if full is not None:
+        if full is not MISSING:
             params["FULL"] = full
 
         return self._make_bitrix_api_request(
@@ -149,8 +151,8 @@ class Placement(BaseScope):
             self,
             placement: Text,
             *,
-            handler: Optional[Text] = None,
-            user_id: Optional[int] = None,
+            handler: Optional[Text] = MISSING,
+            user_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIValueRequest[CountResultData, int]:
         """
@@ -174,10 +176,10 @@ class Placement(BaseScope):
             "PLACEMENT": placement,
         }
 
-        if handler is not None:
+        if handler is not MISSING:
             params["HANDLER"] = handler
 
-        if user_id is not None:
+        if user_id is not MISSING:
             params["USER_ID"] = user_id
 
         return self._make_bitrix_api_request(
@@ -185,5 +187,5 @@ class Placement(BaseScope):
             params=params,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValueRequest,
-            result_adapter=lambda result: result["count"],
+            result_adapter=BitrixResultAdapter(int, wrapper="count"),
         )

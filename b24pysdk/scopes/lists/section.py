@@ -1,5 +1,6 @@
 from typing import Iterable, Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -20,9 +21,9 @@ class Section(BaseEntity):
             section_code: Text,
             fields: JSONDict,
             *,
-            iblock_id: Optional[int] = None,
-            iblock_code: Optional[Text] = None,
-            iblock_section_id: Optional[int] = None,
+            iblock_id: Optional[int] = MISSING,
+            iblock_code: Optional[Text] = MISSING,
+            iblock_section_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -33,13 +34,13 @@ class Section(BaseEntity):
             "FIELDS": fields,
         }
 
-        if iblock_id is not None:
+        if iblock_id is not MISSING:
             params["IBLOCK_ID"] = iblock_id
 
-        if iblock_code is not None:
+        if iblock_code is not MISSING:
             params["IBLOCK_CODE"] = iblock_code
 
-        if iblock_section_id is not None:
+        if iblock_section_id is not MISSING:
             params["IBLOCK_SECTION_ID"] = iblock_section_id
 
         return self._make_bitrix_api_request(
@@ -53,10 +54,10 @@ class Section(BaseEntity):
             self,
             iblock_type_id: Text,
             *,
-            iblock_id: Optional[int] = None,
-            iblock_code: Optional[Text] = None,
-            section_id: Optional[int] = None,
-            section_code: Optional[Text] = None,
+            iblock_id: Optional[int] = MISSING,
+            iblock_code: Optional[Text] = MISSING,
+            section_id: Optional[int] = MISSING,
+            section_code: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -65,16 +66,16 @@ class Section(BaseEntity):
             "IBLOCK_TYPE_ID": iblock_type_id,
         }
 
-        if iblock_id is not None:
+        if iblock_id is not MISSING:
             params["IBLOCK_ID"] = iblock_id
 
-        if iblock_code is not None:
+        if iblock_code is not MISSING:
             params["IBLOCK_CODE"] = iblock_code
 
-        if section_id is not None:
+        if section_id is not MISSING:
             params["SECTION_ID"] = section_id
 
-        if section_code is not None:
+        if section_code is not MISSING:
             params["SECTION_CODE"] = section_code
 
         return self._make_bitrix_api_request(
@@ -88,10 +89,10 @@ class Section(BaseEntity):
             self,
             iblock_type_id: Text,
             *,
-            iblock_id: Optional[int] = None,
-            iblock_code: Optional[Text] = None,
-            filter: Optional[JSONDict] = None,
-            select: Optional[Iterable[Text]] = None,
+            iblock_id: Optional[int] = MISSING,
+            iblock_code: Optional[Text] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            select: Optional[Iterable[Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -100,16 +101,16 @@ class Section(BaseEntity):
             "IBLOCK_TYPE_ID": iblock_type_id,
         }
 
-        if iblock_id is not None:
+        if iblock_id is not MISSING:
             params["IBLOCK_ID"] = iblock_id
 
-        if iblock_code is not None:
+        if iblock_code is not MISSING:
             params["IBLOCK_CODE"] = iblock_code
 
-        if filter is not None:
+        if filter is not MISSING:
             params["FILTER"] = filter
 
-        if select is not None:
+        if select is not MISSING:
             if select.__class__ is not list:
                 select = list(select)
 
@@ -127,10 +128,10 @@ class Section(BaseEntity):
             iblock_type_id: Text,
             fields: JSONDict,
             *,
-            iblock_id: Optional[int] = None,
-            iblock_code: Optional[Text] = None,
-            section_id: Optional[int] = None,
-            section_code: Optional[Text] = None,
+            iblock_id: Optional[int] = MISSING,
+            iblock_code: Optional[Text] = MISSING,
+            section_id: Optional[int] = MISSING,
+            section_code: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -140,16 +141,16 @@ class Section(BaseEntity):
             "FIELDS": fields,
         }
 
-        if iblock_id is not None:
+        if iblock_id is not MISSING:
             params["IBLOCK_ID"] = iblock_id
 
-        if iblock_code is not None:
+        if iblock_code is not MISSING:
             params["IBLOCK_CODE"] = iblock_code
 
-        if section_id is not None:
+        if section_id is not MISSING:
             params["SECTION_ID"] = section_id
 
-        if section_code is not None:
+        if section_code is not MISSING:
             params["SECTION_CODE"] = section_code
 
         return self._make_bitrix_api_request(

@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Iterable, Optional, Text, Union
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import B24BoolStrict, JSONDict, Timeout
@@ -33,13 +34,13 @@ class Cashbox(BaseEntity):
         rest_code: Text,
         email: Text,
         *,
-        ofd: Optional[Text] = None,
-        ofd_settings: Optional[JSONDict] = None,
-        number_kkm: Optional[Text] = None,
-        active: Optional[Union[bool, B24BoolStrict]] = None,
-        sort: Optional[int] = None,
-        use_offline: Optional[Union[bool, B24BoolStrict]] = None,
-        settings: Optional[JSONDict] = None,
+        ofd: Optional[Text] = MISSING,
+        ofd_settings: Optional[JSONDict] = MISSING,
+        number_kkm: Optional[Text] = MISSING,
+        active: Optional[Union[bool, B24BoolStrict]] = MISSING,
+        sort: Optional[int] = MISSING,
+        use_offline: Optional[Union[bool, B24BoolStrict]] = MISSING,
+        settings: Optional[JSONDict] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -50,25 +51,25 @@ class Cashbox(BaseEntity):
             "EMAIL": email,
         }
 
-        if ofd is not None:
+        if ofd is not MISSING:
             params["OFD"] = ofd
 
-        if ofd_settings is not None:
+        if ofd_settings is not MISSING:
             params["OFD_SETTINGS"] = ofd_settings
 
-        if number_kkm is not None:
+        if number_kkm is not MISSING:
             params["NUMBER_KKM"] = number_kkm
 
-        if active is not None:
+        if active is not MISSING:
             params["ACTIVE"] = B24BoolStrict(active).to_b24()
 
-        if sort is not None:
+        if sort is not MISSING:
             params["SORT"] = sort
 
-        if use_offline is not None:
+        if use_offline is not MISSING:
             params["USE_OFFLINE"] = B24BoolStrict(use_offline).to_b24()
 
-        if settings is not None:
+        if settings is not MISSING:
             params["SETTINGS"] = settings
 
         return self._make_bitrix_api_request(
@@ -100,24 +101,24 @@ class Cashbox(BaseEntity):
     def list(
         self,
         *,
-        select: Optional[Iterable[Text]] = None,
-        filter: Optional[JSONDict] = None,
-        order: Optional[JSONDict] = None,
+        select: Optional[Iterable[Text]] = MISSING,
+        filter: Optional[JSONDict] = MISSING,
+        order: Optional[JSONDict] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params: JSONDict = dict()
+        params: JSONDict = {}
 
-        if select is not None:
+        if select is not MISSING:
             if select.__class__ is not list:
                 select = list(select)
             params["SELECT"] = select
 
-        if filter is not None:
+        if filter is not MISSING:
             params["FILTER"] = filter
 
-        if order is not None:
+        if order is not MISSING:
             params["ORDER"] = order
 
         return self._make_bitrix_api_request(

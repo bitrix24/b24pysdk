@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import TypedDict
 
+from ..utils.converters import bool_from_bitrix
 from ..utils.dataclasses import frozen_dataclass_kwargs
 from ._base_schema import BaseSchema
 
@@ -39,8 +40,8 @@ class MethodGet(BaseSchema[MethodGetData]):
             MethodGet schema with Python-friendly field names.
         """
         return cls(
-            is_existing=bitrix_data["isExisting"],
-            is_available=bitrix_data["isAvailable"],
+            is_existing=bool_from_bitrix(bitrix_data["isExisting"], is_required=True),
+            is_available=bool_from_bitrix(bitrix_data["isAvailable"], is_required=True),
         )
 
     def to_bitrix(self) -> MethodGetData:
@@ -51,6 +52,6 @@ class MethodGet(BaseSchema[MethodGetData]):
             Dictionary with Bitrix24 field names.
         """
         return {
-            "isExisting": self.is_existing,
-            "isAvailable": self.is_available,
+            "isExisting": bool_from_bitrix(self.is_existing, is_required=True),
+            "isAvailable": bool_from_bitrix(self.is_available, is_required=True),
         }

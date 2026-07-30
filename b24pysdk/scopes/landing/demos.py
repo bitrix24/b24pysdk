@@ -1,5 +1,6 @@
 from typing import Annotated, Literal, Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -17,15 +18,19 @@ class Demos(BaseEntity):
     def get_list(
             self,
             *,
-            params: Optional[JSONDict] = None,
+            params: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        api_params = dict()
+        api_params: JSONDict = {}
 
-        if params is not None:
+        if params is not MISSING:
             api_params["params"] = params
+
+        if start is not MISSING:
+            api_params["start"] = start
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get_list,
@@ -36,8 +41,9 @@ class Demos(BaseEntity):
     @type_checker
     def get_site_list(
             self,
-            type: Annotated[Text, Literal["page", "store"]],
+            type: Annotated[Text, Literal["page", "store", "knowledge", "group", "mainpage"]],
             *,
+            filter: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -45,6 +51,9 @@ class Demos(BaseEntity):
         params: JSONDict = {
             "type": type,
         }
+
+        if filter is not MISSING:
+            params["filter"] = filter
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get_site_list,
@@ -55,8 +64,9 @@ class Demos(BaseEntity):
     @type_checker
     def get_page_list(
             self,
-            type: Annotated[Text, Literal["page", "store"]],
+            type: Annotated[Text, Literal["page", "store", "knowledge", "group", "mainpage"]],
             *,
+            filter: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -64,6 +74,9 @@ class Demos(BaseEntity):
         params: JSONDict = {
             "type": type,
         }
+
+        if filter is not MISSING:
+            params["filter"] = filter
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get_page_list,
@@ -76,7 +89,7 @@ class Demos(BaseEntity):
             self,
             data: JSONDict,
             *,
-            params: Optional[JSONDict] = None,
+            params: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -85,7 +98,7 @@ class Demos(BaseEntity):
             "data": data,
         }
 
-        if params is not None:
+        if params is not MISSING:
             api_params["params"] = params
 
         return self._make_bitrix_api_request(

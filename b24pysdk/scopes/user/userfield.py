@@ -1,8 +1,11 @@
 from typing import Optional
 
-from ...api.requests import BitrixAPIRequest
+from ..._constants import MISSING
+from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest, BitrixAPIValuesRequest
+from ...objects.user.user_userfield import UserUserfield as UserUserfieldObject
 from ...utils.functional import type_checker
-from ...utils.types import JSONDict, Timeout
+from ...utils.types import JSONDict, JSONList, Timeout
+from .._adapters import BitrixObjectAdapter, BitrixObjectsAdapter
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -22,7 +25,7 @@ class Userfield(BaseEntity):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest[int]:
+    ) -> BitrixAPIValueRequest[int, UserUserfieldObject]:
         """
         Add a custom field.
 
@@ -47,16 +50,18 @@ class Userfield(BaseEntity):
             api_wrapper=self.add,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=BitrixObjectAdapter(UserUserfieldObject, client=self._client),
         )
 
     @type_checker
     def list(
             self,
             *,
-            order: Optional[JSONDict] = None,
-            filter: Optional[JSONDict] = None,
+            order: Optional[JSONDict] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValuesRequest[JSONList, UserUserfieldObject]:
         """
         Retrieve a list of custom fields.
 
@@ -77,16 +82,18 @@ class Userfield(BaseEntity):
 
         params: JSONDict = {}
 
-        if order is not None:
+        if order is not MISSING:
             params["order"] = order
 
-        if filter is not None:
+        if filter is not MISSING:
             params["filter"] = filter
 
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValuesRequest,
+            result_adapter=BitrixObjectsAdapter(UserUserfieldObject, client=self._client),
         )
 
     @type_checker

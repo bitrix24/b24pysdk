@@ -1,5 +1,6 @@
 from typing import Dict, Iterable, Optional, Sequence, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import B24Bool, B24File, JSONDict, Timeout
@@ -187,8 +188,9 @@ class Folder(BaseEntity):
             self,
             bitrix_id: int,
             *,
-            filter: Optional[JSONDict] = None,
-            start: Optional[int] = None,
+            filter: Optional[JSONDict] = MISSING,
+            order: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -201,6 +203,7 @@ class Folder(BaseEntity):
         Args:
             bitrix_id: The ID of the folder;
             filter: Filter based on fields described in disk.folder.getfields;
+            order: Sort order based on fields described in disk.folder.getfields;
             start: Starting item number for retrieval;
             timeout: Timeout in seconds.
 
@@ -212,10 +215,13 @@ class Folder(BaseEntity):
             "id": bitrix_id,
         }
 
-        if filter is not None:
+        if filter is not MISSING:
             params["filter"] = filter
 
-        if start is not None:
+        if order is not MISSING:
+            params["order"] = order
+
+        if start is not MISSING:
             params["START"] = start
 
         return self._make_bitrix_api_request(
@@ -384,14 +390,37 @@ class Folder(BaseEntity):
         )
 
     @type_checker
+    def sharetouser(
+            self,
+            bitrix_id: int,
+            user_id: int,
+            task_name: Text,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params = {
+            "id": bitrix_id,
+            "userId": user_id,
+            "taskName": task_name,
+        }
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.sharetouser,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
     def uploadfile(
             self,
             bitrix_id: int,
             file_content: Sequence[Text],
             data: JSONDict,
             *,
-            generate_unique_name: Optional[bool] = None,
-            rights: Optional[Iterable[Dict]] = None,
+            generate_unique_name: Optional[bool] = MISSING,
+            rights: Optional[Iterable[Dict]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -419,10 +448,10 @@ class Folder(BaseEntity):
             "data": data,
         }
 
-        if generate_unique_name is not None:
+        if generate_unique_name is not MISSING:
             params["generateUniqueName"] = B24Bool(generate_unique_name).to_b24()
 
-        if rights is not None:
+        if rights is not MISSING:
             if rights.__class__ is not list:
                 rights = list(rights)
 

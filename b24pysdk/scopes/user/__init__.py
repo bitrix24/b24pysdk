@@ -1,9 +1,12 @@
 from functools import cached_property
 from typing import Dict, Iterable, Optional, Text
 
-from ...api.requests import BitrixAPIRequest
+from ..._constants import MISSING
+from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest, BitrixAPIValuesRequest
+from ...objects.user import User as UserObject
 from ...utils.functional import type_checker
-from ...utils.types import JSONDict, Timeout
+from ...utils.types import JSONDict, JSONList, Timeout
+from .._adapters import BitrixObjectAdapter, BitrixObjectsAdapter
 from .._base_scope import BaseScope
 from .option import Option
 from .userfield import Userfield
@@ -44,48 +47,52 @@ class User(BaseScope):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest[int]:
+    ) -> BitrixAPIValueRequest[int, UserObject]:
         """"""
         return self._make_bitrix_api_request(
             api_wrapper=self.add,
             params=fields,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=BitrixObjectAdapter(UserObject, client=self._client),
         )
 
     @type_checker
     def get(
             self,
             *,
-            sort: Optional[Text] = None,
-            order: Optional[Text] = None,
-            filter: Optional[JSONDict] = None,
-            admin_mode: Optional[bool] = None,
-            start: Optional[int] = None,
+            sort: Optional[Text] = MISSING,
+            order: Optional[Text] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            admin_mode: Optional[bool] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValuesRequest[JSONList, UserObject]:
         """"""
 
         params: JSONDict = {}
 
-        if sort is not None:
+        if sort is not MISSING:
             params["sort"] = sort
 
-        if order is not None:
+        if order is not MISSING:
             params["order"] = order
 
-        if filter is not None:
+        if filter is not MISSING:
             params["filter"] = filter
 
-        if admin_mode is not None:
+        if admin_mode is not MISSING:
             params["ADMIN_MODE"] = int(admin_mode)
 
-        if start is not None:
+        if start is not MISSING:
             params["start"] = start
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValuesRequest,
+            result_adapter=BitrixObjectsAdapter(UserObject, client=self._client),
         )
 
     @type_checker
@@ -106,36 +113,38 @@ class User(BaseScope):
     def search(
             self,
             *,
-            filter: Optional[JSONDict] = None,
-            sort: Optional[Text] = None,
-            order: Optional[Text] = None,
-            admin_mode: Optional[bool] = None,
-            start: Optional[int] = None,
+            filter: Optional[JSONDict] = MISSING,
+            sort: Optional[Text] = MISSING,
+            order: Optional[Text] = MISSING,
+            admin_mode: Optional[bool] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValuesRequest[JSONList, UserObject]:
         """"""
 
         params: JSONDict = {}
 
-        if filter is not None:
+        if filter is not MISSING:
             params["filter"] = filter
 
-        if sort is not None:
+        if sort is not MISSING:
             params["sort"] = sort
 
-        if order is not None:
+        if order is not MISSING:
             params["order"] = order
 
-        if admin_mode is not None:
+        if admin_mode is not MISSING:
             params["ADMIN_MODE"] = int(admin_mode)
 
-        if start is not None:
+        if start is not MISSING:
             params["start"] = start
 
         return self._make_bitrix_api_request(
             api_wrapper=self.search,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValuesRequest,
+            result_adapter=BitrixObjectsAdapter(UserObject, client=self._client),
         )
 
     @type_checker
@@ -143,11 +152,13 @@ class User(BaseScope):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[JSONDict, UserObject]:
         """"""
         return self._make_bitrix_api_request(
             api_wrapper=self.current,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=BitrixObjectAdapter(UserObject, client=self._client),
         )
 
     @type_checker

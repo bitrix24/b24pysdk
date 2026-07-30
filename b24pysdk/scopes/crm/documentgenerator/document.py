@@ -1,5 +1,6 @@
 from typing import Iterable, Optional, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
@@ -21,7 +22,7 @@ class Document(BaseCRM):
             self,
             bitrix_id: int,
             *,
-            values: Optional[JSONDict] = None,
+            values: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get document fields.
@@ -45,7 +46,7 @@ class Document(BaseCRM):
             "id": bitrix_id,
         }
 
-        if values is not None:
+        if values is not MISSING:
             params["values"] = values
 
         return self._make_bitrix_api_request(
@@ -61,9 +62,9 @@ class Document(BaseCRM):
             entity_type_id: int,
             entity_id: int,
             *,
-            values: Optional[JSONDict] = None,
-            stamps_enabled: Optional[int] = None,
-            fields: Optional[JSONDict] = None,
+            values: Optional[JSONDict] = MISSING,
+            stamps_enabled: Optional[int] = MISSING,
+            fields: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Create a new document.
@@ -97,13 +98,13 @@ class Document(BaseCRM):
             "entityId": entity_id,
         }
 
-        if values is not None:
+        if values is not MISSING:
             params["values"] = values
 
-        if stamps_enabled is not None:
+        if stamps_enabled is not MISSING:
             params["stampsEnabled"] = int(stamps_enabled)
 
-        if fields is not None:
+        if fields is not MISSING:
             params["fields"] = fields
 
         return self._make_bitrix_api_request(
@@ -139,10 +140,10 @@ class Document(BaseCRM):
     def list(
             self,
             *,
-            select: Optional[Iterable[Text]] = None,
-            order: Optional[JSONDict] = None,
-            filter: Optional[JSONDict] = None,
-            start: Optional[int] = None,
+            select: Optional[Iterable[Text]] = MISSING,
+            order: Optional[JSONDict] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get the list of documents.
@@ -200,8 +201,8 @@ class Document(BaseCRM):
             self,
             bitrix_id: int,
             *,
-            values: Optional[JSONDict] = None,
-            stamps_enabled: Optional[int] = None,
+            values: Optional[JSONDict] = MISSING,
+            stamps_enabled: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update document.
@@ -227,10 +228,10 @@ class Document(BaseCRM):
             "id": bitrix_id,
         }
 
-        if values is not None:
+        if values is not MISSING:
             params["values"] = values
 
-        if stamps_enabled is not None:
+        if stamps_enabled is not MISSING:
             params["stampsEnabled"] = int(stamps_enabled)
 
         return self._make_bitrix_api_request(
@@ -267,7 +268,7 @@ class Document(BaseCRM):
             self,
             bitrix_id: int,
             *,
-            status: Optional[int] = None,
+            status: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Enable and disable public link for document.
@@ -291,7 +292,7 @@ class Document(BaseCRM):
             "id": bitrix_id,
         }
 
-        if status is not None:
+        if status is not MISSING:
             params["status"] = int(status)
 
         return self._make_bitrix_api_request(

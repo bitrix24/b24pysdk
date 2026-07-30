@@ -5,6 +5,7 @@ from ..api.requests import BitrixAPIValueRequest
 from ..utils.converters import datetime_from_bitrix
 from ..utils.functional import type_checker
 from ..utils.types import Timeout
+from ._adapters import BitrixResultAdapter
 from ._base_scope import BaseScope
 
 __all__ = [
@@ -26,5 +27,5 @@ class Server(BaseScope):
             api_wrapper=self.time,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValueRequest,
-            result_adapter=lambda result: datetime_from_bitrix(result, is_required=True),
+            result_adapter=BitrixResultAdapter(lambda result: datetime_from_bitrix(result, is_required=True)),
         )

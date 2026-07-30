@@ -1,5 +1,6 @@
 from typing import Optional
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
@@ -74,7 +75,7 @@ class Numerator(BaseCRM):
     def list(
             self,
             *,
-            start: Optional[int] = None,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get the list of numerators.

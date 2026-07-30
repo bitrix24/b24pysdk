@@ -1,8 +1,9 @@
 from typing import Iterable, Optional, Sequence, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import B24Bool, B24File, JSONDict, Timeout
+from ...utils.types import B24Bool, B24File, JSONDict, JSONList, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -22,6 +23,7 @@ class Storage(BaseEntity):
             bitrix_id: int,
             data: JSONDict,
             *,
+            rights: Optional[JSONList] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -35,6 +37,7 @@ class Storage(BaseEntity):
                 {
                     'NAME': 'New folder name'
                 };
+            rights: Access rights for the folder;
             timeout: Timeout in seconds.
 
         Returns:
@@ -45,6 +48,12 @@ class Storage(BaseEntity):
             "id": bitrix_id,
             "data": data,
         }
+
+        if rights is not MISSING:
+            if rights.__class__ is not list:
+                rights = list(rights)
+
+            params["rights"] = rights
 
         return self._make_bitrix_api_request(
             api_wrapper=self.addfolder,
@@ -87,7 +96,9 @@ class Storage(BaseEntity):
             self,
             bitrix_id: int,
             *,
-            filter: Optional[JSONDict] = None,
+            filter: Optional[JSONDict] = MISSING,
+            order: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -101,6 +112,8 @@ class Storage(BaseEntity):
                 {
                     'field': 'value'
                 };
+            order: Sort order based on fields described in disk.storage.getfields;
+            start: Starting point for element retrieval;
             timeout: Timeout in seconds.
 
         Returns:
@@ -111,8 +124,14 @@ class Storage(BaseEntity):
             "id": bitrix_id,
         }
 
-        if filter is not None:
+        if filter is not MISSING:
             params["filter"] = filter
+
+        if order is not MISSING:
+            params["order"] = order
+
+        if start is not MISSING:
+            params["START"] = start
 
         return self._make_bitrix_api_request(
             api_wrapper=self.getchildren,
@@ -170,8 +189,9 @@ class Storage(BaseEntity):
     def getlist(
             self,
             *,
-            filter: Optional[JSONDict] = None,
-            start: Optional[int] = None,
+            filter: Optional[JSONDict] = MISSING,
+            order: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -184,6 +204,7 @@ class Storage(BaseEntity):
                 {
                     'field': 'value'
                 };
+            order: Sort order based on fields described in disk.storage.getfields;
             start: Starting point for element retrieval;
             timeout: Timeout in seconds.
 
@@ -191,12 +212,15 @@ class Storage(BaseEntity):
             Instance of BitrixAPIRequest.
         """
 
-        params = dict()
+        params: JSONDict = {}
 
-        if filter is not None:
+        if filter is not MISSING:
             params["filter"] = filter
 
-        if start is not None:
+        if order is not MISSING:
+            params["order"] = order
+
+        if start is not MISSING:
             params["START"] = start
 
         return self._make_bitrix_api_request(
@@ -268,8 +292,8 @@ class Storage(BaseEntity):
             file_content: Sequence[Text],
             data: JSONDict,
             *,
-            generate_unique_name: Optional[bool] = None,
-            rights: Optional[Iterable[JSONDict]] = None,
+            generate_unique_name: Optional[bool] = MISSING,
+            rights: Optional[Iterable[JSONDict]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -298,10 +322,10 @@ class Storage(BaseEntity):
             "data": data,
         }
 
-        if generate_unique_name is not None:
+        if generate_unique_name is not MISSING:
             params["generateUniqueName"] = B24Bool(generate_unique_name).to_b24()
 
-        if rights is not None:
+        if rights is not MISSING:
             if rights.__class__ is not list:
                 rights = list(rights)
 

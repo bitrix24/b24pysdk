@@ -2,6 +2,7 @@ from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest
 from ...schemas.crm.field import CRMFieldsDict, CRMFieldsResultData
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
+from .._adapters import BitrixSchemaDictAdapter
 from ._base_crm import BaseCRM
 
 __all__ = [
@@ -42,12 +43,10 @@ class Category(BaseCRM):
             "entityTypeId": entity_type_id,
         }
 
-        return self._make_bitrix_api_request(
-            api_wrapper=self.fields,
+        return self._fields(
             params=params,
             timeout=timeout,
-            bitrix_api_request_type=BitrixAPIValueRequest,
-            result_adapter=CRMFieldsDict.from_bitrix,
+            result_adapter=BitrixSchemaDictAdapter(CRMFieldsDict, wrapper="fields"),
         )
 
     @type_checker

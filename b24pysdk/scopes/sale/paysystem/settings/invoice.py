@@ -1,5 +1,6 @@
 from typing import Optional, Text
 
+from ....._constants import MISSING
 from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
 from .....utils.types import Timeout
@@ -16,8 +17,8 @@ class Invoice(BaseEntity):
             self,
             payment_id: int,
             *,
-            pay_system_id: Optional[int] = None,
-            bx_rest_handler: Optional[Text] = None,
+            pay_system_id: Optional[int] = MISSING,
+            bx_rest_handler: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -50,10 +51,10 @@ class Invoice(BaseEntity):
             "INVOICE_ID": payment_id,
         }
 
-        if pay_system_id is not None:
+        if pay_system_id is not MISSING:
             params["PAY_SYSTEM_ID"] = pay_system_id
 
-        if bx_rest_handler is not None:
+        if bx_rest_handler is not MISSING:
             params["BX_REST_HANDLER"] = bx_rest_handler
 
         return self._make_bitrix_api_request(

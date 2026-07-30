@@ -1,10 +1,12 @@
 from abc import ABC
-from typing import Iterable, Optional, Text, Type
+from typing import Callable, Iterable, Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest
 from ...schemas.crm.field import CRMFieldsDict
-from ...utils.type_vars import BSDT, BAResultT
+from ...utils.type_vars import BAResultT, BSDictT
 from ...utils.types import JSONDict, Timeout
+from .._adapters import BitrixSchemaDictAdapter
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -18,15 +20,17 @@ class BaseCRM(BaseEntity, ABC):
     def _fields(
             self,
             *,
+            params: Optional[JSONDict] = None,
             timeout: Timeout = None,
-            value_type: Type[BSDT] = CRMFieldsDict,
-    ) -> BitrixAPIValueRequest[BAResultT, BSDT]:
+            result_adapter: Callable[[BAResultT], BSDictT] = BitrixSchemaDictAdapter(CRMFieldsDict),
+    ) -> BitrixAPIValueRequest[BAResultT, BSDictT]:
         """"""
         return self._make_bitrix_api_request(
             api_wrapper=self._fields,
+            params=params,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValueRequest,
-            result_adapter=value_type.from_bitrix,
+            result_adapter=result_adapter,
         )
 
     def _add(
@@ -68,29 +72,29 @@ class BaseCRM(BaseEntity, ABC):
     def _list(
             self,
             *,
-            select: Optional[Iterable[Text]] = None,
-            filter: Optional[JSONDict] = None,
-            order: Optional[JSONDict] = None,
-            start: Optional[int] = None,
+            select: Optional[Iterable[Text]] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            order: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
         params: JSONDict = {}
 
-        if select is not None:
+        if select is not MISSING:
             if select.__class__ is not list:
                 select = list(select)
 
             params["select"] = select
 
-        if filter is not None:
+        if filter is not MISSING:
             params["filter"] = filter
 
-        if order is not None:
+        if order is not MISSING:
             params["order"] = order
 
-        if start is not None:
+        if start is not MISSING:
             params["start"] = start
 
         return self._make_bitrix_api_request(

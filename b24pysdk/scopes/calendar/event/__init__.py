@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Dict, Iterable, Optional, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
@@ -27,21 +28,21 @@ class Event(BaseEntity):
             attendees: Iterable[int],
             host: int,
             *,
-            skip_time: Optional[Text] = None,
-            timezone_from: Optional[Text] = None,
-            timezone_to: Optional[Text] = None,
-            description: Optional[Text] = None,
-            color: Optional[Text] = None,
-            text_color: Optional[Text] = None,
-            accessibility: Optional[Text] = None,
-            importance: Optional[Text] = None,
-            private_event: Optional[Text] = None,
-            is_meeting: Optional[Text] = None,
-            location: Optional[Text] = None,
-            remind: Optional[Iterable] = None,
-            meeting: Optional[Dict] = None,
-            rrule: Optional[Dict] = None,
-            crm_fields: Optional[Iterable[Text]] = None,
+            skip_time: Optional[Text] = MISSING,
+            timezone_from: Optional[Text] = MISSING,
+            timezone_to: Optional[Text] = MISSING,
+            description: Optional[Text] = MISSING,
+            color: Optional[Text] = MISSING,
+            text_color: Optional[Text] = MISSING,
+            accessibility: Optional[Text] = MISSING,
+            importance: Optional[Text] = MISSING,
+            private_event: Optional[Text] = MISSING,
+            is_meeting: Optional[Text] = MISSING,
+            location: Optional[Text] = MISSING,
+            remind: Optional[Iterable] = MISSING,
+            meeting: Optional[Dict] = MISSING,
+            rrule: Optional[Dict] = MISSING,
+            crm_fields: Optional[Iterable[Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -60,52 +61,52 @@ class Event(BaseEntity):
             "host": host,
         }
 
-        if skip_time is not None:
+        if skip_time is not MISSING:
             params["skip_time"] = skip_time
 
-        if timezone_from is not None:
+        if timezone_from is not MISSING:
             params["timezone_from"] = timezone_from
 
-        if timezone_to is not None:
+        if timezone_to is not MISSING:
             params["timezone_to"] = timezone_to
 
-        if description is not None:
+        if description is not MISSING:
             params["description"] = description
 
-        if color is not None:
+        if color is not MISSING:
             params["color"] = color
 
-        if text_color is not None:
+        if text_color is not MISSING:
             params["text_color"] = text_color
 
-        if accessibility is not None:
+        if accessibility is not MISSING:
             params["accessibility"] = accessibility
 
-        if importance is not None:
+        if importance is not MISSING:
             params["importance"] = importance
 
-        if private_event is not None:
+        if private_event is not MISSING:
             params["private_event"] = private_event
 
-        if is_meeting is not None:
+        if is_meeting is not MISSING:
             params["is_meeting"] = is_meeting
 
-        if location is not None:
+        if location is not MISSING:
             params["location"] = location
 
-        if remind is not None:
+        if remind is not MISSING:
             if remind.__class__ is not list:
                 remind = list(remind)
 
             params["remind"] = remind
 
-        if meeting is not None:
+        if meeting is not MISSING:
             params["meeting"] = meeting
 
-        if rrule is not None:
+        if rrule is not MISSING:
             params["rrule"] = rrule
 
-        if crm_fields is not None:
+        if crm_fields is not MISSING:
             if crm_fields.__class__ is not list:
                 crm_fields = list(crm_fields)
 
@@ -142,7 +143,7 @@ class Event(BaseEntity):
         return Get(self)
 
     @type_checker
-    def get_by_id(
+    def getbyid(
             self,
             bitrix_id: int,
             *,
@@ -155,7 +156,7 @@ class Event(BaseEntity):
         }
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.get_by_id,
+            api_wrapper=self.getbyid,
             params=params,
             timeout=timeout,
         )
@@ -170,26 +171,26 @@ class Event(BaseEntity):
             attendees: Iterable[int],
             host: int,
             *,
-            from_date: Optional[Text] = None,
-            to: Optional[Text] = None,
-            section: Optional[int] = None,
-            skip_time: Optional[Text] = None,
-            timezone_from: Optional[Text] = None,
-            timezone_to: Optional[Text] = None,
-            description: Optional[Text] = None,
-            color: Optional[Text] = None,
-            text_color: Optional[Text] = None,
-            accessibility: Optional[Text] = None,
-            importance: Optional[Text] = None,
-            private_event: Optional[Text] = None,
-            is_meeting: Optional[Text] = None,
-            location: Optional[Text] = None,
-            remind: Optional[Iterable] = None,
-            meeting: Optional[Dict] = None,
-            rrule: Optional[Dict] = None,
-            crm_fields: Optional[Iterable[Text]] = None,
-            recurrence_mode: Optional[Text] = None,
-            current_date_from: Optional[Text] = None,
+            from_date: Optional[Text] = MISSING,
+            to: Optional[Text] = MISSING,
+            section: Optional[int] = MISSING,
+            skip_time: Optional[Text] = MISSING,
+            timezone_from: Optional[Text] = MISSING,
+            timezone_to: Optional[Text] = MISSING,
+            description: Optional[Text] = MISSING,
+            color: Optional[Text] = MISSING,
+            text_color: Optional[Text] = MISSING,
+            accessibility: Optional[Text] = MISSING,
+            importance: Optional[Text] = MISSING,
+            private_event: Optional[Text] = MISSING,
+            is_meeting: Optional[Text] = MISSING,
+            location: Optional[Text] = MISSING,
+            remind: Optional[Iterable] = MISSING,
+            meeting: Optional[Dict] = MISSING,
+            rrule: Optional[Dict] = MISSING,
+            crm_fields: Optional[Iterable[Text]] = MISSING,
+            recurrence_mode: Optional[Text] = MISSING,
+            current_date_from: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -206,70 +207,70 @@ class Event(BaseEntity):
             "host": host,
         }
 
-        if from_date is not None:
+        if from_date is not MISSING:
             params["from"] = from_date
 
-        if to is not None:
+        if to is not MISSING:
             params["to"] = to
 
-        if section is not None:
+        if section is not MISSING:
             params["section"] = section
 
-        if skip_time is not None:
+        if skip_time is not MISSING:
             params["skip_time"] = skip_time
 
-        if timezone_from is not None:
+        if timezone_from is not MISSING:
             params["timezone_from"] = timezone_from
 
-        if timezone_to is not None:
+        if timezone_to is not MISSING:
             params["timezone_to"] = timezone_to
 
-        if description is not None:
+        if description is not MISSING:
             params["description"] = description
 
-        if color is not None:
+        if color is not MISSING:
             params["color"] = color
 
-        if text_color is not None:
+        if text_color is not MISSING:
             params["text_color"] = text_color
 
-        if accessibility is not None:
+        if accessibility is not MISSING:
             params["accessibility"] = accessibility
 
-        if importance is not None:
+        if importance is not MISSING:
             params["importance"] = importance
 
-        if private_event is not None:
+        if private_event is not MISSING:
             params["private_event"] = private_event
 
-        if is_meeting is not None:
+        if is_meeting is not MISSING:
             params["is_meeting"] = is_meeting
 
-        if location is not None:
+        if location is not MISSING:
             params["location"] = location
 
-        if remind is not None:
+        if remind is not MISSING:
             if remind.__class__ is not list:
                 remind = list(remind)
 
             params["remind"] = remind
 
-        if meeting is not None:
+        if meeting is not MISSING:
             params["meeting"] = meeting
 
-        if rrule is not None:
+        if rrule is not MISSING:
             params["rrule"] = rrule
 
-        if crm_fields is not None:
+        if crm_fields is not MISSING:
             if crm_fields.__class__ is not list:
                 crm_fields = list(crm_fields)
 
             params["crm_fields"] = crm_fields
 
-        if recurrence_mode is not None:
+        if recurrence_mode is not MISSING:
             params["recurrence_mode"] = recurrence_mode
 
-        if current_date_from is not None:
+        if current_date_from is not MISSING:
             params["current_date_from"] = current_date_from
 
         return self._make_bitrix_api_request(

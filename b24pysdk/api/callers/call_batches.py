@@ -211,6 +211,7 @@ class _BatchesCaller(BaseCaller):
                     break
 
             return self._combine_responses(batch_responses)
+
         finally:
             self._config.logger.debug("finish call_batches")
 

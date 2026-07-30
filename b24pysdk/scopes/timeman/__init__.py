@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Number, Timeout
@@ -36,30 +37,30 @@ class Timeman(BaseScope):
     def close(
             self,
             *,
-            user_id: Optional[int] = None,
-            time: Optional[Text] = None,
-            report: Optional[Text] = None,
-            lat: Optional[Number] = None,
-            lon: Optional[Number] = None,
+            user_id: Optional[int] = MISSING,
+            time: Optional[Text] = MISSING,
+            report: Optional[Text] = MISSING,
+            lat: Optional[Number] = MISSING,
+            lon: Optional[Number] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
         params: JSONDict = {}
 
-        if user_id is not None:
+        if user_id is not MISSING:
             params["USER_ID"] = user_id
 
-        if time is not None:
+        if time is not MISSING:
             params["TIME"] = time
 
-        if report is not None:
+        if report is not MISSING:
             params["REPORT"] = report
 
-        if lat is not None:
+        if lat is not MISSING:
             params["LAT"] = lat
 
-        if lon is not None:
+        if lon is not MISSING:
             params["LON"] = lon
 
         return self._make_bitrix_api_request(
@@ -72,30 +73,30 @@ class Timeman(BaseScope):
     def open(
             self,
             *,
-            user_id: Optional[int] = None,
-            time: Optional[Text] = None,
-            report: Optional[Text] = None,
-            lat: Optional[Number] = None,
-            lon: Optional[Number] = None,
+            user_id: Optional[int] = MISSING,
+            time: Optional[Text] = MISSING,
+            report: Optional[Text] = MISSING,
+            lat: Optional[Number] = MISSING,
+            lon: Optional[Number] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
         params: JSONDict = {}
 
-        if user_id is not None:
+        if user_id is not MISSING:
             params["USER_ID"] = user_id
 
-        if time is not None:
+        if time is not MISSING:
             params["TIME"] = time
 
-        if report is not None:
+        if report is not MISSING:
             params["REPORT"] = report
 
-        if lat is not None:
+        if lat is not MISSING:
             params["LAT"] = lat
 
-        if lon is not None:
+        if lon is not MISSING:
             params["LON"] = lon
 
         return self._make_bitrix_api_request(
@@ -108,14 +109,14 @@ class Timeman(BaseScope):
     def pause(
             self,
             *,
-            user_id: Optional[int] = None,
+            user_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
         params: JSONDict = {}
 
-        if user_id is not None:
+        if user_id is not MISSING:
             params["USER_ID"] = user_id
 
         return self._make_bitrix_api_request(
@@ -128,14 +129,14 @@ class Timeman(BaseScope):
     def settings(
             self,
             *,
-            user_id: Optional[int] = None,
+            user_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
         params: JSONDict = {}
 
-        if user_id is not None:
+        if user_id is not MISSING:
             params["USER_ID"] = user_id
 
         return self._make_bitrix_api_request(
@@ -148,14 +149,14 @@ class Timeman(BaseScope):
     def status(
             self,
             *,
-            user_id: Optional[int] = None,
+            user_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
         params: JSONDict = {}
 
-        if user_id is not None:
+        if user_id is not MISSING:
             params["USER_ID"] = user_id
 
         return self._make_bitrix_api_request(

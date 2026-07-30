@@ -1,5 +1,6 @@
 from typing import Iterable, Optional, Union
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import B24BoolStrict, JSONDict, Timeout
@@ -18,7 +19,8 @@ class Read(BaseEntity):
             self,
             bitrix_id: int,
             *,
-            only_current: Optional[Union[bool, B24BoolStrict]] = None,
+            action: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            only_current: Optional[Union[bool, B24BoolStrict]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """"""
@@ -27,7 +29,10 @@ class Read(BaseEntity):
             "ID": bitrix_id,
         }
 
-        if only_current is not None:
+        if action is not MISSING:
+            params["ACTION"] = B24BoolStrict(action).to_b24()
+
+        if only_current is not MISSING:
             params["ONLY_CURRENT"] = B24BoolStrict(only_current).to_b24()
 
         return self._make_bitrix_api_request(
@@ -41,7 +46,7 @@ class Read(BaseEntity):
             self,
             ids: Iterable[int],
             *,
-            action: Optional[Union[bool, B24BoolStrict]] = None,
+            action: Optional[Union[bool, B24BoolStrict]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """"""
@@ -53,7 +58,7 @@ class Read(BaseEntity):
             "IDS": ids,
         }
 
-        if action is not None:
+        if action is not MISSING:
             params["ACTION"] = B24BoolStrict(action).to_b24()
 
         return self._make_bitrix_api_request(

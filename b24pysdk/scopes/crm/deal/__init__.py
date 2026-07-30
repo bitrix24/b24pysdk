@@ -1,12 +1,13 @@
 from functools import cached_property
 from typing import Iterable, Optional, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
 from ....schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
+from .._links import Contact
 from .._productrows import Productrows
-from .._relationships import Contact
 from .._userfield import Userfield
 from ..details import Details
 from ..item.base_item import BaseItem
@@ -74,7 +75,7 @@ class Deal(BaseItem):
             self,
             fields: JSONDict,
             *,
-            params: Optional[JSONDict] = None,
+            params: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[int]:
         """Create a new deal.
@@ -138,10 +139,10 @@ class Deal(BaseItem):
     def list(
             self,
             *,
-            select: Optional[Iterable[Text]] = None,
-            filter: Optional[JSONDict] = None,
-            order: Optional[JSONDict] = None,
-            start: Optional[int] = None,
+            select: Optional[Iterable[Text]] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            order: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of deals.
@@ -200,7 +201,7 @@ class Deal(BaseItem):
             bitrix_id: int,
             fields: JSONDict,
             *,
-            params: Optional[JSONDict] = None,
+            params: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Update deal.

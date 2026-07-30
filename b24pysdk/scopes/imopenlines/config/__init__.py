@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Optional, Text, Union
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import B24BoolStrict, JSONDict, Timeout
@@ -30,14 +31,14 @@ class Config(BaseEntity):
     def add(
             self,
             *,
-            params: Optional[JSONDict] = None,
+            params: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
         payload = dict()
 
-        if params is not None:
+        if params is not MISSING:
             payload["PARAMS"] = params
 
         return self._make_bitrix_api_request(
@@ -70,8 +71,8 @@ class Config(BaseEntity):
             self,
             config_id: Union[int, Text],
             *,
-            with_queue: Optional[Union[bool, B24BoolStrict]] = None,
-            show_offline: Optional[Union[bool, B24BoolStrict]] = None,
+            with_queue: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            show_offline: Optional[Union[bool, B24BoolStrict]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -80,10 +81,10 @@ class Config(BaseEntity):
             CONFIG_ID=config_id,
         )
 
-        if with_queue is not None:
+        if with_queue is not MISSING:
             params["WITH_QUEUE"] = B24BoolStrict(with_queue).to_b24()
 
-        if show_offline is not None:
+        if show_offline is not MISSING:
             params["SHOW_OFFLINE"] = B24BoolStrict(show_offline).to_b24()
 
         return self._make_bitrix_api_request(
@@ -97,7 +98,7 @@ class Config(BaseEntity):
             self,
             config_id: Union[int, Text],
             *,
-            params: Optional[JSONDict] = None,
+            params: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -106,7 +107,7 @@ class Config(BaseEntity):
             CONFIG_ID=config_id,
         )
 
-        if params is not None:
+        if params is not MISSING:
             payload["PARAMS"] = params
 
         return self._make_bitrix_api_request(

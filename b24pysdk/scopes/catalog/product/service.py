@@ -1,5 +1,6 @@
 from typing import Iterable, Optional, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
@@ -204,8 +205,8 @@ class Service(BaseEntity):
             select: Iterable[Text],
             filter: JSONDict,
             *,
-            order: Optional[JSONDict] = None,
-            start: Optional[int] = None,
+            order: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -246,10 +247,10 @@ class Service(BaseEntity):
             "filter": filter,
         }
 
-        if order is not None:
+        if order is not MISSING:
             params["order"] = order
 
-        if start is not None:
+        if start is not MISSING:
             params["start"] = start
 
         return self._make_bitrix_api_request(

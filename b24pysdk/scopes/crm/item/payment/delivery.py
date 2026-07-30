@@ -1,5 +1,6 @@
 from typing import Optional
 
+from ....._constants import MISSING
 from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
 from .....utils.types import JSONDict, Timeout
@@ -58,7 +59,7 @@ class Delivery(BaseCRM):
             payment_id: int,
             filter: JSONDict,
             *,
-            order: Optional[JSONDict] = None,
+            order: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get the list of delivery items.
@@ -107,7 +108,7 @@ class Delivery(BaseCRM):
             "filter": filter,
         }
 
-        if order is not None:
+        if order is not MISSING:
             params["order"] = order
 
         return self._make_bitrix_api_request(

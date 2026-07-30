@@ -15,7 +15,7 @@ Each client exposes Bitrix API scopes as attributes (e.g. ``crm``, ``user``,
 import inspect
 from abc import ABC
 from functools import cached_property
-from typing import TYPE_CHECKING, ClassVar, List, Literal, Mapping, Optional, Sequence, Text, Union, overload
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Literal, Mapping, Optional, Sequence, Text, Type, Union, overload
 
 from . import scopes
 from ._constants import MISSING
@@ -27,14 +27,66 @@ from .utils.types import B24APIVersionLiteral, JSONDict, Key, Number, Timeout
 
 if TYPE_CHECKING:
     from .api.requests import BitrixAPIRequest
+    from .objects._base_object import BaseObject
 
 __all__ = [
     "BaseClient",
     "Client",
+    "ClientType",
     "ClientV1",
     "ClientV2",
     "ClientV3",
 ]
+
+
+_ClientCacheKey = Literal["fields"]
+
+
+class _ClientCache:
+    """Internal lazily initialized cache owned by one client instance."""
+
+    __slots__ = ("_fields",)
+
+    _fields: Optional[Dict[Type["BaseObject"], Any]]
+
+    def __init__(self):
+        self._fields = None
+
+    def get(self, key: _ClientCacheKey) -> Dict[Any, Any]:
+        """Return one cache section, creating it on first access."""
+
+        attr_name = f"_{key}"
+        cache = getattr(self, attr_name)
+
+        if cache is None:
+            cache = {}
+            setattr(self, attr_name, cache)
+
+        return cache
+
+    def set(
+            self,
+            key: _ClientCacheKey,
+            cache: Mapping[Any, Any],
+    ):
+        """Replace one cache section."""
+        setattr(self, f"_{key}", dict(cache))
+
+    def update(
+            self,
+            key: _ClientCacheKey,
+            cache: Mapping[Any, Any],
+    ):
+        """Update one cache section."""
+        self.get(key).update(cache)
+
+    def clear(self, key: Optional[_ClientCacheKey] = None):
+        """Clear one cache section or all client cache data."""
+        if key is None:
+            for attr_name in self.__slots__:
+                setattr(self, attr_name, None)
+        else:
+            setattr(self, f"_{key}", None)
 
 
 class BaseClient(ABC):
@@ -55,12 +107,15 @@ class BaseClient(ABC):
     VERSION: ClassVar[Union[B24APIVersion, B24APIVersionLiteral]] = MISSING
 
     _bitrix_token: BitrixTokenFullProtocol
+    _cache: _ClientCache
+    _enable_cache: bool
     _kwargs: JSONDict
 
     def __init__(
             self,
             bitrix_token: BitrixTokenFullProtocol,
             *,
+            enable_cache: bool = True,
             timeout: Timeout = None,
             max_retries: Optional[int] = None,
             initial_retry_delay: Optional[Number] = None,
@@ -72,6 +127,7 @@ class BaseClient(ABC):
 
         Args:
             bitrix_token: Authentication token used to access the Bitrix REST API.
+            enable_cache: Whether client-level SDK caching is enabled.
             timeout: Default request timeout.
             max_retries: Maximum number of request attempts.
             initial_retry_delay: Delay before the first retry attempt.
@@ -80,6 +136,8 @@ class BaseClient(ABC):
         """
 
         self._bitrix_token = bitrix_token
+        self._cache = _ClientCache()
+        self._enable_cache = enable_cache
 
         self._kwargs = kwargs | {"prefer_version": self.VERSION}
 
@@ -94,6 +152,46 @@ class BaseClient(ABC):
 
         if retry_delay_increment is not None:
             self._kwargs["retry_delay_increment"] = retry_delay_increment
+
+    def get_token(self) -> BitrixTokenFullProtocol:
+        """Return the Bitrix24 token used by this client."""
+        return self._bitrix_token
+
+    def get_cache(self, key: _ClientCacheKey) -> Dict[Any, Any]:
+        """Return a selected client cache section."""
+
+        if not self._enable_cache:
+            return {}
+
+        return self._cache.get(key)
+
+    def set_cache(
+            self,
+            key: _ClientCacheKey,
+            cache: Mapping[Any, Any],
+    ):
+        """Replace the selected client cache section."""
+
+        if not self._enable_cache:
+            return
+
+        self._cache.set(key, cache)
+
+    def update_cache(
+            self,
+            key: _ClientCacheKey,
+            cache: Mapping[Any, Any],
+    ):
+        """Update the selected client cache section."""
+
+        if not self._enable_cache:
+            return
+
+        self._cache.update(key, cache)
+
+    def clear_cache(self, key: Optional[_ClientCacheKey] = None):
+        """Clear one cache section or all client cache data."""
+        self._cache.clear(key)
 
     @cached_property
     def access(self) -> "scopes.Access":
@@ -184,6 +282,10 @@ class BaseClient(ABC):
         return scopes.Lists(self)
 
     @cached_property
+    def log(self) -> "scopes.Log":
+        return scopes.Log(self)
+
+    @cached_property
     def mailservice(self) -> "scopes.Mailservice":
         return scopes.Mailservice(self)
 
@@ -248,10 +350,6 @@ class BaseClient(ABC):
         return scopes.Telephony(self)
 
     @cached_property
-    def timeman(self) -> "scopes.Timeman":
-        return scopes.Timeman(self)
-
-    @cached_property
     def user(self) -> "scopes.User":
         return scopes.User(self)
 
@@ -276,10 +374,7 @@ class BaseClient(ABC):
         return scopes.Voximplant(self)
 
     def __str__(self):
-        if hasattr(self._bitrix_token, "domain"):
-            return f"<{self.__class__.__name__} of portal {self._bitrix_token.domain}>"
-        else:
-            return repr(self)
+        return f"<{self.__class__.__name__} of portal {self._bitrix_token.domain}>"
 
     def __repr__(self):
         return f"{self.__class__.__name__}(bitrix_token={self._bitrix_token})"
@@ -535,6 +630,10 @@ class ClientV1(BaseClient):
     def tasks(self) -> "scopes.Tasks":
         return scopes.Tasks(self)
 
+    @cached_property
+    def timeman(self) -> "scopes.Timeman":
+        return scopes.Timeman(self)
+
 
 class ClientV2(ClientV1):
     """
@@ -580,12 +679,21 @@ class ClientV3(BaseClient):
     def tasks(self) -> "scopes.v3.Tasks":
         return scopes.v3.Tasks(self)
 
+    @cached_property
+    def timeman(self) -> "scopes.v3.Timeman":
+        return scopes.v3.Timeman(self)
+
+
+ClientType = Union[BaseClient, ClientV1, ClientV2, ClientV3]
+"""Union of all concrete Bitrix API client implementations."""
+
 
 @overload
 def Client(
         bitrix_token: BitrixTokenFullProtocol,
         *,
         prefer_version: Literal[2, B24APIVersion.V2] = B24APIVersion.V2,
+        enable_cache: bool = True,
         timeout: Timeout = None,
         max_retries: Optional[int] = None,
         initial_retry_delay: Optional[Number] = None,
@@ -599,6 +707,7 @@ def Client(
         bitrix_token: BitrixTokenFullProtocol,
         *,
         prefer_version: Literal[1, B24APIVersion.V1],
+        enable_cache: bool = True,
         timeout: Timeout = None,
         max_retries: Optional[int] = None,
         initial_retry_delay: Optional[Number] = None,
@@ -612,6 +721,7 @@ def Client(
         bitrix_token: BitrixTokenFullProtocol,
         *,
         prefer_version: Literal[3, B24APIVersion.V3],
+        enable_cache: bool = True,
         timeout: Timeout = None,
         max_retries: Optional[int] = None,
         initial_retry_delay: Optional[Number] = None,
@@ -624,18 +734,20 @@ def Client(  # noqa: N802
         bitrix_token: BitrixTokenFullProtocol,
         *,
         prefer_version: Union[B24APIVersionLiteral, B24APIVersion] = B24APIVersion.V2,
+        enable_cache: bool = True,
         timeout: Timeout = None,
         max_retries: Optional[int] = None,
         initial_retry_delay: Optional[Number] = None,
         retry_delay_increment: Optional[Number] = None,
         **kwargs,
-) -> BaseClient:
+) -> ClientType:
     """
     Create a Bitrix API client for the requested API version.
 
     Args:
         bitrix_token: Authentication token used for API access.
         prefer_version: Preferred Bitrix REST API version.
+        enable_cache: Whether client-level SDK caching is enabled.
         timeout: Default request timeout.
         max_retries: Maximum number of request attempts.
         initial_retry_delay: Delay before the first retry attempt.
@@ -663,6 +775,7 @@ def Client(  # noqa: N802
 
     return client_class(
         bitrix_token=bitrix_token,
+        enable_cache=enable_cache,
         timeout=timeout,
         max_retries=max_retries,
         initial_retry_delay=initial_retry_delay,

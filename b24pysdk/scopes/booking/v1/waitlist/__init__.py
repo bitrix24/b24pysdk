@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Optional
 
+from ....._constants import MISSING
 from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
 from .....utils.types import JSONDict, Timeout
@@ -106,14 +107,14 @@ class Waitlist(BaseEntity):
     def list(
             self,
             *,
-            filter: Optional[JSONDict] = None,
+            filter: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
         params: JSONDict = {}
 
-        if filter is not None:
+        if filter is not MISSING:
             params["filter"] = filter
 
         return self._make_bitrix_api_request(

@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Optional
 
+from ....._constants import MISSING
 from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
 from .....utils.types import JSONDict, Timeout
@@ -94,8 +95,8 @@ class Payment(BaseCRM):
             entity_type_id: int,
             entity_id: int,
             *,
-            filter: Optional[JSONDict] = None,
-            order: Optional[JSONDict] = None,
+            filter: Optional[JSONDict] = MISSING,
+            order: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of payments.
@@ -144,10 +145,10 @@ class Payment(BaseCRM):
             "entityId": entity_id,
         }
 
-        if filter is not None:
+        if filter is not MISSING:
             params["filter"] = filter
 
-        if order is not None:
+        if order is not MISSING:
             params["order"] = order
 
         return self._make_bitrix_api_request(

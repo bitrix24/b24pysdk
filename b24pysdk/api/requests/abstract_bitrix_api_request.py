@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Generic, Optional, Text
 
 from ...protocols import BitrixTokenFullProtocol
-from ...utils.type_vars import ResponseT
+from ...utils.type_vars import BResponseT
 from ...utils.types import B24RequestTuple, JSONDict
 
 __all__ = [
@@ -10,7 +10,7 @@ __all__ = [
 ]
 
 
-class AbstractBitrixAPIRequest(ABC, Generic[ResponseT]):
+class AbstractBitrixAPIRequest(ABC, Generic[BResponseT]):
     """
     Base class for lazy Bitrix24 API request objects.
 
@@ -25,7 +25,7 @@ class AbstractBitrixAPIRequest(ABC, Generic[ResponseT]):
     _api_method: Text
     _params: Optional[JSONDict]
     _kwargs: JSONDict
-    _response: Optional[ResponseT]
+    _response: Optional[BResponseT]
 
     def __init__(
             self,
@@ -86,7 +86,7 @@ class AbstractBitrixAPIRequest(ABC, Generic[ResponseT]):
         return self._api_method, self._params
 
     @property
-    def response(self) -> ResponseT:
+    def response(self) -> BResponseT:
         """
         Return cached response or execute the request once.
 
@@ -110,7 +110,7 @@ class AbstractBitrixAPIRequest(ABC, Generic[ResponseT]):
         )
 
     @abstractmethod
-    def _convert_response(self, json_response: Any) -> ResponseT:
+    def _convert_response(self, json_response: Any) -> BResponseT:
         """
         Convert raw JSON response into a typed response object.
 
@@ -122,7 +122,7 @@ class AbstractBitrixAPIRequest(ABC, Generic[ResponseT]):
         """
         raise NotImplementedError
 
-    def _get_and_set_response(self) -> ResponseT:
+    def _get_and_set_response(self) -> BResponseT:
         """
         Execute the request, convert response, and cache it.
 
@@ -132,7 +132,7 @@ class AbstractBitrixAPIRequest(ABC, Generic[ResponseT]):
         self._response = self._convert_response(self._call())
         return self._response
 
-    def call(self) -> ResponseT:
+    def call(self) -> BResponseT:
         """
         Execute the request immediately.
 

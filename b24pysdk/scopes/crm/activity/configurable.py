@@ -1,4 +1,6 @@
-from ....api.requests import BitrixAPIRequest
+from typing import Optional
+
+from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
 from ....schemas.crm.activity import ConfigurableActivityResultData
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
@@ -24,7 +26,7 @@ class Configurable(BaseCRM):
             fields: JSONDict,
             layout: JSONDict,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest[ConfigurableActivityResultData]:
+    ) -> BitrixAPIValueRequest[Optional[ConfigurableActivityResultData], Optional[int]]:
         """Add configurable activity.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/activities/configurable/crm-activity-configurable-add.html
@@ -63,10 +65,10 @@ class Configurable(BaseCRM):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValueRequest
         """
 
-        params = {
+        params: JSONDict = {
             "ownerTypeId": owner_type_id,
             "ownerId": owner_id,
             "fields": fields,
@@ -77,6 +79,8 @@ class Configurable(BaseCRM):
             api_wrapper=self.add,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=lambda result: result["activity"]["id"] if result is not None else None,
         )
 
     @type_checker

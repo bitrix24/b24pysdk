@@ -1,5 +1,6 @@
 from typing import Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -22,7 +23,7 @@ class Event(BaseEntity):
             event_token: Text,
             return_values: JSONDict,
             *,
-            log_message: Optional[Text] = None,
+            log_message: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -61,7 +62,7 @@ class Event(BaseEntity):
             "RETURN_VALUES": return_values,
         }
 
-        if log_message is not None:
+        if log_message is not MISSING:
             params["LOG_MESSAGE"] = log_message
 
         return self._make_bitrix_api_request(

@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Optional, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
 from ....schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ....utils.functional import type_checker
@@ -123,7 +124,7 @@ class Currency(BaseCRM):
     def list(
             self,
             *,
-            order: Optional[JSONDict] = None,
+            order: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get the list of currencies.

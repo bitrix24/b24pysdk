@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Iterable, Optional, Text, Union
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import B24BoolStrict, JSONDict, Timeout
@@ -25,15 +26,15 @@ class Chat(BaseEntity):
             self,
             users: Iterable[Union[int, Text]],
             *,
-            type: Optional[Text] = None,
-            title: Optional[Text] = None,
-            description: Optional[Text] = None,
-            color: Optional[Text] = None,
-            message: Optional[Text] = None,
-            avatar: Optional[Text] = None,
-            entity_type: Optional[Text] = None,
-            entity_id: Optional[Union[int, Text]] = None,
-            owner_id: Optional[Union[int, Text]] = None,
+            type: Optional[Text] = MISSING,
+            title: Optional[Text] = MISSING,
+            description: Optional[Text] = MISSING,
+            color: Optional[Text] = MISSING,
+            message: Optional[Text] = MISSING,
+            avatar: Optional[Text] = MISSING,
+            entity_type: Optional[Text] = MISSING,
+            entity_id: Optional[Union[int, Text]] = MISSING,
+            owner_id: Optional[Union[int, Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[int]:
         """"""
@@ -45,31 +46,31 @@ class Chat(BaseEntity):
             USERS=users,
         )
 
-        if type is not None:
+        if type is not MISSING:
             params["TYPE"] = type
 
-        if title is not None:
+        if title is not MISSING:
             params["TITLE"] = title
 
-        if description is not None:
+        if description is not MISSING:
             params["DESCRIPTION"] = description
 
-        if color is not None:
+        if color is not MISSING:
             params["COLOR"] = color
 
-        if message is not None:
+        if message is not MISSING:
             params["MESSAGE"] = message
 
-        if avatar is not None:
+        if avatar is not MISSING:
             params["AVATAR"] = avatar
 
-        if entity_type is not None:
+        if entity_type is not MISSING:
             params["ENTITY_TYPE"] = entity_type
 
-        if entity_id is not None:
+        if entity_id is not MISSING:
             params["ENTITY_ID"] = entity_id
 
-        if owner_id is not None:
+        if owner_id is not MISSING:
             params["OWNER_ID"] = owner_id
 
         return self._make_bitrix_api_request(

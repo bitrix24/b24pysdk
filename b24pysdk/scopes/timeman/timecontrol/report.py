@@ -1,5 +1,6 @@
 from typing import Optional, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
@@ -19,9 +20,9 @@ class Report(BaseEntity):
             report_id: int,
             text: Text,
             *,
-            user_id: Optional[int] = None,
-            type: Optional[Text] = None,
-            calendar: Optional[Text] = None,
+            user_id: Optional[int] = MISSING,
+            type: Optional[Text] = MISSING,
+            calendar: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -31,13 +32,13 @@ class Report(BaseEntity):
             "TEXT": text,
         }
 
-        if user_id is not None:
+        if user_id is not MISSING:
             params["USER_ID"] = user_id
 
-        if type is not None:
+        if type is not MISSING:
             params["TYPE"] = type
 
-        if calendar is not None:
+        if calendar is not MISSING:
             params["CALENDAR"] = calendar
 
         return self._make_bitrix_api_request(

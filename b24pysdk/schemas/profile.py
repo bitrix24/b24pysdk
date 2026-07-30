@@ -3,7 +3,15 @@ from typing import Annotated, Literal, Optional, Text, TypedDict
 from zoneinfo import ZoneInfo
 
 from ..constants.user import PersonalGender
-from ..utils.converters import timezone_from_bitrix, timezone_to_bitrix
+from ..utils.converters import (
+    bool_from_bitrix,
+    int_from_bitrix,
+    int_to_bitrix,
+    text_from_bitrix,
+    text_to_bitrix,
+    timezone_from_bitrix,
+    timezone_to_bitrix,
+)
 from ..utils.dataclasses import frozen_dataclass_kwargs
 from ._base_schema import BaseSchema
 
@@ -50,10 +58,10 @@ class Profile(BaseSchema[ProfileData]):
             Profile schema with Python-friendly field names and types.
         """
         return cls(
-            bitrix_id=int(bitrix_data["ID"]),
-            admin=bitrix_data["ADMIN"],
-            name=bitrix_data["NAME"],
-            last_name=bitrix_data["LAST_NAME"],
+            bitrix_id=int_from_bitrix(bitrix_data["ID"], is_required=True),
+            admin=bool_from_bitrix(bitrix_data["ADMIN"], is_required=True),
+            name=text_from_bitrix(bitrix_data["NAME"], is_required=True),
+            last_name=text_from_bitrix(bitrix_data["LAST_NAME"], is_required=True),
             personal_gender=PersonalGender(bitrix_data["PERSONAL_GENDER"]),
             time_zone=timezone_from_bitrix(bitrix_data["TIME_ZONE"]),
         )
@@ -66,10 +74,10 @@ class Profile(BaseSchema[ProfileData]):
             Dictionary with Bitrix24 field names.
         """
         return {
-            "ID": self.bitrix_id,
-            "ADMIN": self.admin,
-            "NAME": self.name,
-            "LAST_NAME": self.last_name,
+            "ID": int_to_bitrix(self.bitrix_id, is_required=True),
+            "ADMIN": bool_from_bitrix(self.admin, is_required=True),
+            "NAME": text_to_bitrix(self.name, is_required=True),
+            "LAST_NAME": text_to_bitrix(self.last_name, is_required=True),
             "PERSONAL_GENDER": self.personal_gender.value,
             "TIME_ZONE": timezone_to_bitrix(self.time_zone) or "",
         }

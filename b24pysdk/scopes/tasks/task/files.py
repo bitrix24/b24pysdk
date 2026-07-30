@@ -1,5 +1,6 @@
 from typing import Optional
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
@@ -19,7 +20,7 @@ class Files(BaseEntity):
             task_id: int,
             file_id: int,
             *,
-            params: Optional[JSONDict] = None,
+            params: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -29,7 +30,7 @@ class Files(BaseEntity):
             "fileId": file_id,
         }
 
-        if params is not None:
+        if params is not MISSING:
             payload["params"] = params
 
         return self._make_bitrix_api_request(

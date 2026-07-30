@@ -6,6 +6,7 @@ from ....schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ....scopes.crm._base_crm import BaseCRM
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
+from ..._adapters import BitrixSchemasAdapter
 from .settings import Settings
 
 __all__ = [
@@ -66,7 +67,7 @@ class Enum(BaseCRM):
             api_wrapper=self.activitydirection,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValuesRequest,
-            result_adapter=CRMEnumItem.from_bitrix_result,
+            result_adapter=BitrixSchemasAdapter(CRMEnumItem),
         )
 
     @type_checker
@@ -91,7 +92,7 @@ class Enum(BaseCRM):
             api_wrapper=self.activitynotifytype,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValuesRequest,
-            result_adapter=CRMEnumItem.from_bitrix_result,
+            result_adapter=BitrixSchemasAdapter(CRMEnumItem),
         )
 
     @type_checker
@@ -116,7 +117,7 @@ class Enum(BaseCRM):
             api_wrapper=self.activitypriority,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValuesRequest,
-            result_adapter=CRMEnumItem.from_bitrix_result,
+            result_adapter=BitrixSchemasAdapter(CRMEnumItem),
         )
 
     @type_checker
@@ -141,7 +142,7 @@ class Enum(BaseCRM):
             api_wrapper=self.activitystatus,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValuesRequest,
-            result_adapter=CRMEnumItem.from_bitrix_result,
+            result_adapter=BitrixSchemasAdapter(CRMEnumItem),
         )
 
     @type_checker
@@ -166,7 +167,7 @@ class Enum(BaseCRM):
             api_wrapper=self.activitytype,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValuesRequest,
-            result_adapter=CRMEnumItem.from_bitrix_result,
+            result_adapter=BitrixSchemasAdapter(CRMEnumItem),
         )
 
     @type_checker
@@ -191,7 +192,7 @@ class Enum(BaseCRM):
             api_wrapper=self.addresstype,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValuesRequest,
-            result_adapter=CRMEnumItem.from_bitrix_result,
+            result_adapter=BitrixSchemasAdapter(CRMEnumItem),
         )
 
     @type_checker
@@ -216,7 +217,7 @@ class Enum(BaseCRM):
             api_wrapper=self.contenttype,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValuesRequest,
-            result_adapter=CRMEnumItem.from_bitrix_result,
+            result_adapter=BitrixSchemasAdapter(CRMEnumItem),
         )
 
     @type_checker
@@ -241,7 +242,7 @@ class Enum(BaseCRM):
             api_wrapper=self.getorderownertypes,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValuesRequest,
-            result_adapter=OrderOwnerType.from_bitrix_result,
+            result_adapter=BitrixSchemasAdapter(OrderOwnerType),
         )
 
     @type_checker
@@ -266,5 +267,5 @@ class Enum(BaseCRM):
             api_wrapper=self.ownertype,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValuesRequest,
-            result_adapter=CRMEnumItem.from_bitrix_result,
+            result_adapter=BitrixSchemasAdapter(CRMEnumItem),
         )

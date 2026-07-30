@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Text, TypedDict
 
+from ...utils.converters import bool_from_bitrix, int_from_bitrix, int_to_bitrix, text_from_bitrix, text_to_bitrix
 from ...utils.dataclasses import frozen_dataclass_kwargs
 from ...utils.types import JSONDict
 from .._base_schema import BaseSchema
@@ -43,8 +44,8 @@ class CRMFieldItem(BaseSchema[CRMFieldItemData]):
             CRMFieldItem schema with Python-friendly fields.
         """
         return cls(
-            bitrix_id=int(bitrix_data["ID"]),
-            value=bitrix_data["VALUE"],
+            bitrix_id=int_from_bitrix(bitrix_data["ID"], is_required=True),
+            value=text_from_bitrix(bitrix_data["VALUE"], is_required=True),
         )
 
     def to_bitrix(self) -> CRMFieldItemData:
@@ -55,8 +56,8 @@ class CRMFieldItem(BaseSchema[CRMFieldItemData]):
             Dictionary with Bitrix24 CRM field item names.
         """
         return {
-            "ID": self.bitrix_id,
-            "VALUE": self.value,
+            "ID": int_to_bitrix(self.bitrix_id, is_required=True),
+            "VALUE": text_to_bitrix(self.value, is_required=True),
         }
 
 
@@ -116,20 +117,20 @@ class CRMField(BaseSchema[CRMFieldData]):
             CRMField schema with Python-friendly field names.
         """
         return cls(
-            type=bitrix_data["type"],
-            is_required=bitrix_data["isRequired"],
-            is_read_only=bitrix_data["isReadOnly"],
-            is_immutable=bitrix_data["isImmutable"],
-            is_multiple=bitrix_data["isMultiple"],
-            is_dynamic=bitrix_data["isDynamic"],
-            title=bitrix_data["title"],
-            is_deprecated=bitrix_data.get("isDeprecated"),
-            status_type=bitrix_data.get("statusType"),
+            type=text_from_bitrix(bitrix_data["type"], is_required=True),
+            is_required=bool_from_bitrix(bitrix_data["isRequired"], is_required=True),
+            is_read_only=bool_from_bitrix(bitrix_data["isReadOnly"], is_required=True),
+            is_immutable=bool_from_bitrix(bitrix_data["isImmutable"], is_required=True),
+            is_multiple=bool_from_bitrix(bitrix_data["isMultiple"], is_required=True),
+            is_dynamic=bool_from_bitrix(bitrix_data["isDynamic"], is_required=True),
+            title=text_from_bitrix(bitrix_data["title"], is_required=True),
+            is_deprecated=bool_from_bitrix(bitrix_data.get("isDeprecated")),
+            status_type=text_from_bitrix(bitrix_data.get("statusType")),
             items=[CRMFieldItem.from_bitrix(item_data) for item_data in bitrix_data["items"]] if "items" in bitrix_data else None,
-            list_label=bitrix_data.get("listLabel"),
-            form_label=bitrix_data.get("formLabel"),
-            filer_label=bitrix_data.get("filerLabel"),
-            upper_name=bitrix_data.get("upperName"),
+            list_label=text_from_bitrix(bitrix_data.get("listLabel")),
+            form_label=text_from_bitrix(bitrix_data.get("formLabel")),
+            filer_label=text_from_bitrix(bitrix_data.get("filerLabel")),
+            upper_name=text_from_bitrix(bitrix_data.get("upperName")),
             settings=bitrix_data.get("settings"),
         )
 
@@ -142,35 +143,35 @@ class CRMField(BaseSchema[CRMFieldData]):
         """
 
         bitrix_data: CRMFieldData = {
-            "type": self.type,
-            "isRequired": self.is_required,
-            "isReadOnly": self.is_read_only,
-            "isImmutable": self.is_immutable,
-            "isMultiple": self.is_multiple,
-            "isDynamic": self.is_dynamic,
-            "title": self.title,
+            "type": text_to_bitrix(self.type, is_required=True),
+            "isRequired": bool_from_bitrix(self.is_required, is_required=True),
+            "isReadOnly": bool_from_bitrix(self.is_read_only, is_required=True),
+            "isImmutable": bool_from_bitrix(self.is_immutable, is_required=True),
+            "isMultiple": bool_from_bitrix(self.is_multiple, is_required=True),
+            "isDynamic": bool_from_bitrix(self.is_dynamic, is_required=True),
+            "title": text_to_bitrix(self.title, is_required=True),
         }
 
         if self.is_deprecated is not None:
-            bitrix_data["isDeprecated"] = self.is_deprecated
+            bitrix_data["isDeprecated"] = bool_from_bitrix(self.is_deprecated, is_required=True)
 
         if self.status_type is not None:
-            bitrix_data["statusType"] = self.status_type
+            bitrix_data["statusType"] = text_to_bitrix(self.status_type, is_required=True)
 
         if self.items is not None:
             bitrix_data["items"] = [item.to_bitrix() for item in self.items]
 
         if self.list_label is not None:
-            bitrix_data["listLabel"] = self.list_label
+            bitrix_data["listLabel"] = text_to_bitrix(self.list_label, is_required=True)
 
         if self.form_label is not None:
-            bitrix_data["formLabel"] = self.form_label
+            bitrix_data["formLabel"] = text_to_bitrix(self.form_label, is_required=True)
 
         if self.filer_label is not None:
-            bitrix_data["filerLabel"] = self.filer_label
+            bitrix_data["filerLabel"] = text_to_bitrix(self.filer_label, is_required=True)
 
         if self.upper_name is not None:
-            bitrix_data["upperName"] = self.upper_name
+            bitrix_data["upperName"] = text_to_bitrix(self.upper_name, is_required=True)
 
         if self.settings is not None:
             bitrix_data["settings"] = self.settings
@@ -182,8 +183,7 @@ class CRMFieldsDict(BaseSchemaDict[CRMField, CRMFieldData]):
     """
     CRM fields descriptions indexed by CRM field name.
     """
-    _ITEM_SCHEMA = CRMField
-    _WRAPPER = "fields"
+    _VALUE_SCHEMA = CRMField
 
 
 CRMFieldsData = Dict[Text, CRMFieldData]

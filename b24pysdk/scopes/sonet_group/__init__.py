@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Iterable, Literal, Optional, Text, Union
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import classproperty, type_checker
 from ...utils.types import B24BoolStrict, JSONDict, Timeout
@@ -35,21 +36,21 @@ class SonetGroup(BaseScope):
             self,
             name: Text,
             *,
-            description: Optional[Text] = None,
-            visible: Optional[Union[bool, B24BoolStrict]] = None,
-            opened: Optional[Union[bool, B24BoolStrict]] = None,
-            closed: Optional[Union[bool, B24BoolStrict]] = None,
-            keywords: Optional[Text] = None,
-            initiate_perms: Optional[Literal["A", "E", "K"]] = None,
-            project: Optional[Union[bool, B24BoolStrict]] = None,
-            project_date_start: Optional[Text] = None,
-            project_date_finish: Optional[Text] = None,
-            scrum_master_id: Optional[int] = None,
-            owner_id: Optional[int] = None,
-            image: Optional[Iterable[Text]] = None,
-            image_file_id: Optional[int] = None,
-            site_id: Optional[Iterable[Text]] = None,
-            subject_id: Optional[int] = None,
+            description: Optional[Text] = MISSING,
+            visible: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            opened: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            closed: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            keywords: Optional[Text] = MISSING,
+            initiate_perms: Optional[Literal["A", "E", "K"]] = MISSING,
+            project: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            project_date_start: Optional[Text] = MISSING,
+            project_date_finish: Optional[Text] = MISSING,
+            scrum_master_id: Optional[int] = MISSING,
+            owner_id: Optional[int] = MISSING,
+            image: Optional[Iterable[Text]] = MISSING,
+            image_file_id: Optional[int] = MISSING,
+            site_id: Optional[Iterable[Text]] = MISSING,
+            subject_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -58,55 +59,55 @@ class SonetGroup(BaseScope):
             "NAME": name,
         }
 
-        if description is not None:
+        if description is not MISSING:
             params["DESCRIPTION"] = description
 
-        if visible is not None:
+        if visible is not MISSING:
             params["VISIBLE"] = B24BoolStrict(visible).to_b24()
 
-        if opened is not None:
+        if opened is not MISSING:
             params["OPENED"] = B24BoolStrict(opened).to_b24()
 
-        if closed is not None:
+        if closed is not MISSING:
             params["CLOSED"] = B24BoolStrict(closed).to_b24()
 
-        if keywords is not None:
+        if keywords is not MISSING:
             params["KEYWORDS"] = keywords
 
-        if initiate_perms is not None:
+        if initiate_perms is not MISSING:
             params["INITIATE_PERMS"] = initiate_perms
 
-        if project is not None:
+        if project is not MISSING:
             params["PROJECT"] = B24BoolStrict(project).to_b24()
 
-        if project_date_start is not None:
+        if project_date_start is not MISSING:
             params["PROJECT_DATE_START"] = project_date_start
 
-        if project_date_finish is not None:
+        if project_date_finish is not MISSING:
             params["PROJECT_DATE_FINISH"] = project_date_finish
 
-        if scrum_master_id is not None:
+        if scrum_master_id is not MISSING:
             params["SCRUM_MASTER_ID"] = scrum_master_id
 
-        if owner_id is not None:
+        if owner_id is not MISSING:
             params["OWNER_ID"] = owner_id
 
-        if image is not None:
+        if image is not MISSING:
             if image.__class__ is not list:
                 image = list(image)
 
             params["IMAGE"] = image
 
-        if image_file_id is not None:
+        if image_file_id is not MISSING:
             params["IMAGE_FILE_ID"] = image_file_id
 
-        if site_id is not None:
+        if site_id is not MISSING:
             if site_id.__class__ is not list:
                 site_id = list(site_id)
 
             params["SITE_ID"] = site_id
 
-        if subject_id is not None:
+        if subject_id is not MISSING:
             params["SUBJECT_ID"] = subject_id
 
         return self._make_bitrix_api_request(
@@ -138,23 +139,27 @@ class SonetGroup(BaseScope):
     def get(
             self,
             *,
-            order: Optional[JSONDict] = None,
-            filter: Optional[JSONDict] = None,
-            is_admin: Optional[Union[bool, B24BoolStrict]] = None,
+            order: Optional[JSONDict] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            is_admin: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        params: JSONDict = {}
 
-        if order is not None:
+        if order is not MISSING:
             params["ORDER"] = order
 
-        if filter is not None:
+        if filter is not MISSING:
             params["FILTER"] = filter
 
-        if is_admin is not None:
+        if is_admin is not MISSING:
             params["IS_ADMIN"] = B24BoolStrict(is_admin).to_b24()
+
+        if start is not MISSING:
+            params["start"] = start
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,

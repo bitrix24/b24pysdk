@@ -24,6 +24,9 @@ from .constants.version import API_V3_METHODS
 from .log import AbstractLogger, NullLogger
 from .utils.types import DefaultTimeout, Number, Timeout
 
+if typing.TYPE_CHECKING:
+    from .client import ClientType
+
 __all__ = [
     "Config",
 ]
@@ -42,6 +45,7 @@ class _LocalConfig:
 
     __slots__ = (
         "api_v3_methods",
+        "default_client_factory",
         "default_connect_timeout",
         "default_initial_retry_delay",
         "default_max_retries",
@@ -52,7 +56,8 @@ class _LocalConfig:
         "tz",
     )
 
-    api_v3_methods: typing.Tuple[typing.Text, ...]
+    api_v3_methods: typing.Set[typing.Text]
+    default_client_factory: typing.Optional[typing.Callable[[], "ClientType"]]
     default_connect_timeout: typing.Optional[Number]
     default_read_timeout: Number
     default_initial_retry_delay: Number
@@ -64,6 +69,7 @@ class _LocalConfig:
 
     def __init__(self):
         self.api_v3_methods = API_V3_METHODS
+        self.default_client_factory = None
         self.default_connect_timeout = DEFAULT_CONNECT_TIMEOUT
         self.default_read_timeout = DEFAULT_READ_TIMEOUT
         self.default_initial_retry_delay = DEFAULT_INITIAL_RETRY_DELAY
@@ -133,6 +139,7 @@ class Config:
             self,
             *,
             api_v3_methods: typing.Optional[typing.Iterable[typing.Text]] = None,
+            default_client_factory: typing.Optional[typing.Callable[[], "ClientType"]] = None,
             default_initial_retry_delay: typing.Optional[Number] = None,
             default_max_retries: typing.Optional[int] = None,
             default_retry_delay_increment: typing.Optional[Number] = None,
@@ -153,7 +160,11 @@ class Config:
         Parameters
         ----------
         api_v3_methods : Iterable[str], optional
-            List of API method names that should be treated as Bitrix API v3 methods.
+            Collection of API method names that should be treated as Bitrix API v3 methods.
+
+        default_client_factory : Callable[[], ClientType], optional
+            Default factory used by the object layer when no explicit client or
+            client_factory is passed.
 
         default_initial_retry_delay : Number, optional
             Initial delay (in seconds) before the first retry attempt.
@@ -190,6 +201,9 @@ class Config:
         if api_v3_methods is not None:
             self.api_v3_methods = api_v3_methods
 
+        if default_client_factory is not None:
+            self.default_client_factory = default_client_factory
+
         if default_initial_retry_delay is not None:
             self.default_initial_retry_delay = default_initial_retry_delay
 
@@ -219,6 +233,20 @@ class Config:
 
         if tz is not None:
             self.tz = tz
+
+    @property
+    def default_client_factory(self) -> typing.Optional[typing.Callable[[], "ClientType"]]:
+        """Default client factory used by the object layer."""
+        return self._config.default_client_factory
+
+    @default_client_factory.setter
+    def default_client_factory(self, value: typing.Optional[typing.Callable[[], "ClientType"]]):
+        """Set default client factory used by the object layer."""
+
+        if value is not None and not callable(value):
+            raise TypeError("default_client_factory must be callable or None")
+
+        self._config.default_client_factory = value
 
     @property
     def default_initial_retry_delay(self) -> Number:
@@ -445,14 +473,14 @@ class Config:
         self._config.tz = value
 
     @property
-    def api_v3_methods(self) -> typing.Tuple[typing.Text, ...]:
-        """Tuple of API method names that should be treated as Bitrix API v3 methods."""
+    def api_v3_methods(self) -> typing.Set[typing.Text]:
+        """Set of API method names that should be treated as Bitrix API v3 methods."""
         return self._config.api_v3_methods
 
     @api_v3_methods.setter
     def api_v3_methods(self, value: typing.Iterable[typing.Text]):
         """
-        Set the list of API methods that use Bitrix REST API v3.
+        Set the collection of API methods that use Bitrix REST API v3.
 
         Parameters
         ----------
@@ -464,7 +492,7 @@ class Config:
         if isinstance(value, (str, bytes)) or not isinstance(value, typing.Iterable):
             raise TypeError("api_v3_methods must be an iterable of strings, not a string")
 
-        api_v3_methods = value if isinstance(value, tuple) else tuple(value)
+        api_v3_methods = set(value)
 
         if not all(isinstance(api_v3_method, str) for api_v3_method in api_v3_methods):
             raise TypeError("All api_v3_methods entries must be strings")

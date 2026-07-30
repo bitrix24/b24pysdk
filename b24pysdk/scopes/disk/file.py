@@ -1,5 +1,6 @@
 from typing import Optional, Sequence, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import B24File, JSONDict, Timeout
@@ -149,7 +150,7 @@ class File(BaseEntity):
             self,
             bitrix_id: int,
             *,
-            filter: Optional[JSONDict] = None,
+            filter: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -172,7 +173,7 @@ class File(BaseEntity):
             "id": bitrix_id,
         }
 
-        if filter is not None:
+        if filter is not MISSING:
             params["filter"] = filter
 
         return self._make_bitrix_api_request(

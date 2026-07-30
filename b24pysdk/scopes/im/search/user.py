@@ -1,5 +1,6 @@
 from typing import Optional, Text, Union
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import B24BoolStrict, JSONList, Timeout
@@ -18,10 +19,10 @@ class User(BaseEntity):
             self,
             find: Text,
             *,
-            business: Optional[Union[bool, B24BoolStrict]] = None,
-            avatar_hr: Optional[Union[bool, B24BoolStrict]] = None,
-            offset: Optional[int] = None,
-            limit: Optional[int] = None,
+            business: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            avatar_hr: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            offset: Optional[int] = MISSING,
+            limit: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONList]:
         """"""
@@ -30,16 +31,16 @@ class User(BaseEntity):
             FIND=find,
         )
 
-        if business is not None:
+        if business is not MISSING:
             params["BUSINESS"] = B24BoolStrict(business).to_b24()
 
-        if avatar_hr is not None:
+        if avatar_hr is not MISSING:
             params["AVATAR_HR"] = B24BoolStrict(avatar_hr).to_b24()
 
-        if offset is not None:
+        if offset is not MISSING:
             params["OFFSET"] = offset
 
-        if limit is not None:
+        if limit is not MISSING:
             params["LIMIT"] = limit
 
         return self._make_bitrix_api_request(

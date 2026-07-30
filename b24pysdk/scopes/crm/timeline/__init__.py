@@ -4,6 +4,8 @@ from .._base_crm import BaseCRM
 from ._images import Icon, Logo
 from .bindings import Bindings
 from .comment import Comment
+from .item import Item
+from .layout import Layout
 from .logmessage import Logmessage
 from .note import Note
 
@@ -31,6 +33,16 @@ class Timeline(BaseCRM):
         return Icon(self)
 
     @cached_property
+    def item(self) -> Item:
+        """"""
+        return Item(self)
+
+    @cached_property
+    def layout(self) -> Layout:
+        """"""
+        return Layout(self)
+
+    @cached_property
     def logmessage(self) -> Logmessage:
         """"""
         return Logmessage(self)
@@ -44,3 +56,4 @@ class Timeline(BaseCRM):
     def note(self) -> Note:
         """"""
         return Note(self)
+

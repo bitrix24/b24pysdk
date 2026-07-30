@@ -1,5 +1,6 @@
 from typing import Iterable, Optional, Text, Union
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import B24Bool, JSONDict, Timeout
@@ -20,12 +21,12 @@ class Document(BaseEntity):
     def add(
         self,
         template_id: int,
-        provider_class_name: Text,
         value: Text,
         *,
-        values: Optional[JSONDict] = None,
-        stamps_enabled: Optional[Union[bool, int]] = None,
-        fields: Optional[JSONDict] = None,
+        provider_class_name: Optional[Text] = MISSING,
+        values: Optional[JSONDict] = MISSING,
+        stamps_enabled: Optional[Union[bool, int]] = MISSING,
+        fields: Optional[JSONDict] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Create a new document
@@ -58,17 +59,19 @@ class Document(BaseEntity):
 
         params: JSONDict = {
             "templateId": template_id,
-            "providerClassName": provider_class_name,
             "value": value,
         }
 
-        if values is not None:
+        if provider_class_name is not MISSING:
+            params["providerClassName"] = provider_class_name
+
+        if values is not MISSING:
             params["values"] = values
 
-        if stamps_enabled is not None:
+        if stamps_enabled is not MISSING:
             params["stampsEnabled"] = B24Bool(stamps_enabled).to_b24()
 
-        if fields is not None:
+        if fields is not MISSING:
             params["fields"] = fields
 
         return self._make_bitrix_api_request(
@@ -181,6 +184,8 @@ class Document(BaseEntity):
     def getfields(
         self,
         *,
+        bitrix_id: Optional[int] = MISSING,
+        values: Optional[JSONDict] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get the list of fields for the document
@@ -196,8 +201,17 @@ class Document(BaseEntity):
             Instance of BitrixAPIRequest.
         """
 
+        params: JSONDict = {}
+
+        if bitrix_id is not MISSING:
+            params["id"] = bitrix_id
+
+        if values is not MISSING:
+            params["values"] = values
+
         return self._make_bitrix_api_request(
             api_wrapper=self.getfields,
+            params=params,
             timeout=timeout,
         )
 
@@ -205,10 +219,10 @@ class Document(BaseEntity):
     def list(
         self,
         *,
-        select: Optional[Iterable[Text]] = None,
-        order: Optional[JSONDict] = None,
-        filter: Optional[JSONDict] = None,
-        start: Optional[int] = None,
+        select: Optional[Iterable[Text]] = MISSING,
+        order: Optional[JSONDict] = MISSING,
+        filter: Optional[JSONDict] = MISSING,
+        start: Optional[int] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get the list of documents
@@ -256,18 +270,18 @@ class Document(BaseEntity):
 
         params: JSONDict = {}
 
-        if select is not None:
+        if select is not MISSING:
             if select.__class__ is not list:
                 select = list(select)
             params["select"] = select
 
-        if order is not None:
+        if order is not MISSING:
             params["order"] = order
 
-        if filter is not None:
+        if filter is not MISSING:
             params["filter"] = filter
 
-        if start is not None:
+        if start is not MISSING:
             params["start"] = start
 
         return self._make_bitrix_api_request(
@@ -281,9 +295,9 @@ class Document(BaseEntity):
         self,
         bitrix_id: int,
         *,
-        values: Optional[JSONDict] = None,
-        stamps_enabled: Optional[Union[bool, int]] = None,
-        fields: Optional[JSONDict] = None,
+        values: Optional[JSONDict] = MISSING,
+        stamps_enabled: Optional[Union[bool, int]] = MISSING,
+        fields: Optional[JSONDict] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update existing document
@@ -314,13 +328,13 @@ class Document(BaseEntity):
             "id": bitrix_id,
         }
 
-        if values is not None:
+        if values is not MISSING:
             params["values"] = values
 
-        if stamps_enabled is not None:
+        if stamps_enabled is not MISSING:
             params["stampsEnabled"] = B24Bool(stamps_enabled).to_b24()
 
-        if fields is not None:
+        if fields is not MISSING:
             params["fields"] = fields
 
         return self._make_bitrix_api_request(

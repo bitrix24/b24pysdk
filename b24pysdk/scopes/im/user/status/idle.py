@@ -1,8 +1,9 @@
 from typing import Optional
 
+from ....._constants import MISSING
 from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
-from .....utils.types import Timeout
+from .....utils.types import JSONDict, Timeout
 from ...._base_entity import BaseEntity
 
 __all__ = [
@@ -30,14 +31,14 @@ class Idle(BaseEntity):
     def start(
             self,
             *,
-            ago: Optional[int] = None,
+            ago: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """"""
 
-        params = dict()
+        params: JSONDict = {}
 
-        if ago is not None:
+        if ago is not MISSING:
             params["AGO"] = ago
 
         return self._make_bitrix_api_request(

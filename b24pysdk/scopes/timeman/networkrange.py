@@ -1,5 +1,6 @@
 from typing import Iterable, Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -17,14 +18,14 @@ class Networkrange(BaseEntity):
     def check(
             self,
             *,
-            ip: Optional[Text] = None,
+            ip: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
         params: JSONDict = {}
 
-        if ip is not None:
+        if ip is not MISSING:
             params["IP"] = ip
 
         return self._make_bitrix_api_request(

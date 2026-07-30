@@ -41,7 +41,7 @@ This also includes responses shaped as **one key wrapping one scalar value**:
 ```python
 {"id": 123}
 {"count": 5}
-{"result": True}
+{"success": True}
 ```
 
 Do not create schema classes for such responses. Use a `lambda` adapter instead:
@@ -123,12 +123,15 @@ Example raw result:
 ```python
 {
     "ID": 1,
-    "NAME": "Roman",
-    "LAST_NAME": "Ldokov"
+    "NAME": "Name",
+    "LAST_NAME": "Surname"
 }
 ```
 
 Schema example:
+
+Use converter functions inside `from_bitrix()` and `to_bitrix()` even when the raw value looks simple.
+This validates manually constructed schema instances and keeps Bitrix-to-Python normalization consistent.
 
 ```python
 class ProfileData(TypedDict):
@@ -146,16 +149,16 @@ class Profile(BaseSchema[ProfileData]):
     @classmethod
     def from_bitrix(cls, bitrix_data: ProfileData, /) -> "Profile":
         return cls(
-            bitrix_id=bitrix_data["ID"],
-            name=bitrix_data["NAME"],
-            last_name=bitrix_data["LAST_NAME"],
+            bitrix_id=int_from_bitrix(bitrix_data["ID"], is_required=True),
+            name=text_from_bitrix(bitrix_data["NAME"], is_required=True),
+            last_name=text_from_bitrix(bitrix_data["LAST_NAME"], is_required=True),
         )
 
     def to_bitrix(self) -> ProfileData:
         return {
-            "ID": self.bitrix_id,
-            "NAME": self.name,
-            "LAST_NAME": self.last_name,
+            "ID": int_to_bitrix(self.bitrix_id, is_required=True),
+            "NAME": text_to_bitrix(self.name, is_required=True),
+            "LAST_NAME": text_to_bitrix(self.last_name, is_required=True),
         }
 ```
 
@@ -229,14 +232,33 @@ If the API returns:
 }
 ```
 
-use `CRMFieldsDict`:
+use a `BaseSchemaDict` implementation whose value schema matches the field descriptor shape.
+
+If the descriptor matches the standard CRM field shape, use the existing `CRMFieldsDict`:
 
 ```python
 BitrixAPIValueRequest[CRMFieldsData, CRMFieldsDict]
 result_adapter=CRMFieldsDict.from_bitrix
 ```
 
-The user receives:
+If the descriptor shape differs, create a domain-specific dictionary schema instead of forcing `CRMFieldsDict`:
+
+```python
+class CRMUserfieldFieldsDict(BaseSchemaDict[CRMUserfieldField, CRMUserfieldFieldData]):
+    _VALUE_SCHEMA = CRMUserfieldField
+```
+
+Examples:
+
+```python
+crm.company.fields -> CRMFieldsDict
+crm.item.fields -> CRMFieldsDict
+crm.userfield.fields -> CRMUserfieldFieldsDict
+crm.userfield.enumeration.fields -> CRMUserfieldFieldsDict
+crm.userfield.settings.fields -> CRMUserfieldFieldsDict
+```
+
+The user receives a direct dictionary-like value:
 
 ```python
 request.value["TITLE"].title
@@ -268,13 +290,13 @@ or:
 }
 ```
 
-a separate result class is not needed if there is a reusable `BaseSchemaDict` / `CRMFieldsDict` implementation with `_WRAPPER`.
+a separate result class is not needed if there is a reusable `BaseSchemaDict` implementation with `_WRAPPER`.
 
 Example:
 
 ```python
 class CRMFieldsDict(BaseSchemaDict[CRMField, CRMFieldData]):
-    _ITEM_SCHEMA = CRMField
+    _VALUE_SCHEMA = CRMField
     _WRAPPER = "fields"
 ```
 
@@ -294,6 +316,8 @@ crm.type.fields -> CRMFieldsDict
 crm.item.productrow.fields -> CRMFieldsDict
 crm.orderentity.getFields -> OrderentityFieldsDict
 ```
+
+The concrete dictionary class should be chosen by the descriptor value shape, not by the method name alone.
 
 The user should still get a direct field dictionary:
 
@@ -399,7 +423,7 @@ If the name already clearly belongs to CRM or is a domain entity name such as
 do not add a schema class for it just because a method returns that shape.
 These names are reserved for future object/lifecycle classes.
 
-For entities that have, or naturally may have, lifecycle operations such as
+For top-level business entities that have, or naturally may have, lifecycle operations such as
 `add`, `update`, `delete`, `move`, `bind`, `unbind`, `get`, or `list`, do not
 create schema classes in `b24pysdk.schemas`. Start with the simplest safe
 typing in the scope method return type, for example:
@@ -408,6 +432,11 @@ typing in the scope method return type, for example:
 BitrixAPIRequest[JSONList]
 BitrixAPIRequest[JSONDict]
 ```
+
+This rule does not apply to auxiliary DTOs returned by relation, binding, link,
+configuration, settings, metadata, or fields methods. Such DTOs may still use
+`BaseSchema`, `BaseListableSchema`, or `BaseSchemaDict` when they do not
+represent independent lifecycle entities.
 
 Use `JSONList` for arrays of JSON objects instead of spelling
 `List[JSONDict]` directly. Keep `List[...]` only for primitive or explicitly
@@ -456,13 +485,13 @@ def get(...) -> BitrixAPIValueRequest[SomeData, SomeSchema]:
 ### List of schema objects
 
 ```python
-def list(...) -> BitrixAPIValuesRequest[SomeData, SomeSchema]:
+def list(...) -> BitrixAPIValuesRequest[SomeItemsData, SomeSchema]:
     return self._make_bitrix_api_request(
         api_wrapper=self.list,
         params=params,
         timeout=timeout,
         bitrix_api_request_type=BitrixAPIValuesRequest,
-        result_adapter=SomeSchema.from_bitrix,
+        result_adapter=SomeSchema.from_bitrix_result,
     )
 ```
 

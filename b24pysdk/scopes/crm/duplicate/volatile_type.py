@@ -1,5 +1,6 @@
 from typing import Annotated, Literal, Optional, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest, BitrixAPIValuesRequest
 from ....schemas.crm.duplicate.volatile_type import (
     CRMDuplicateVolatileType,
@@ -10,6 +11,7 @@ from ....schemas.crm.duplicate.volatile_type import (
 from ....schemas.results import IDResultData
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
+from ..._adapters import BitrixResultAdapter, BitrixSchemasAdapter
 from .._base_crm import BaseCRM
 
 __all__ = [
@@ -27,7 +29,7 @@ class VolatileType(BaseCRM):
     def fields(
             self,
             *,
-            entity_type_id: Optional[Annotated[int, Literal[1, 3, 4]]] = None,
+            entity_type_id: Optional[Annotated[int, Literal[1, 3, 4]]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIValuesRequest[CRMDuplicateVolatileTypeFieldsData, CRMDuplicateVolatileTypeField]:
         """Get a list of fields for duplicate search
@@ -53,7 +55,7 @@ class VolatileType(BaseCRM):
 
         params: JSONDict = {}
 
-        if entity_type_id is not None:
+        if entity_type_id is not MISSING:
             params["entityTypeId"] = entity_type_id
 
         return self._make_bitrix_api_request(
@@ -61,7 +63,7 @@ class VolatileType(BaseCRM):
             params=params,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValuesRequest,
-            result_adapter=CRMDuplicateVolatileTypeField.from_bitrix_result,
+            result_adapter=BitrixSchemasAdapter(CRMDuplicateVolatileTypeField),
         )
 
     @type_checker
@@ -86,7 +88,7 @@ class VolatileType(BaseCRM):
             api_wrapper=self.list,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValuesRequest,
-            result_adapter=CRMDuplicateVolatileType.from_bitrix_result,
+            result_adapter=BitrixSchemasAdapter(CRMDuplicateVolatileType),
         )
 
     @type_checker
@@ -130,7 +132,7 @@ class VolatileType(BaseCRM):
             params=params,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValueRequest,
-            result_adapter=lambda result: result["id"],
+            result_adapter=BitrixResultAdapter(int, wrapper="id"),
         )
 
     @type_checker

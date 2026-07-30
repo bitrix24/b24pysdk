@@ -1,10 +1,12 @@
 from functools import cached_property
 from typing import Annotated, Literal, Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest
 from ...schemas.results import CountResultData
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
+from .._adapters import BitrixResultAdapter
 from .._base_scope import BaseScope
 from .offline import Offline
 
@@ -27,10 +29,10 @@ class Event(BaseScope):
             event: Text,
             handler: Text,
             *,
-            auth_type: Optional[int] = None,
-            event_type: Optional[Annotated[Text, Literal["offline", "online"]]] = None,
-            auth_connector: Optional[Text] = None,
-            options: Optional[Text] = None,
+            auth_type: Optional[int] = MISSING,
+            event_type: Optional[Annotated[Text, Literal["offline", "online"]]] = MISSING,
+            auth_connector: Optional[Text] = MISSING,
+            options: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """"""
@@ -40,16 +42,16 @@ class Event(BaseScope):
             "handler": handler,
         }
 
-        if auth_type is not None:
+        if auth_type is not MISSING:
             params["auth_type"] = auth_type
 
-        if event_type is not None:
+        if event_type is not MISSING:
             params["event_type"] = event_type
 
-        if auth_connector is not None:
+        if auth_connector is not MISSING:
             params["auth_connector"] = auth_connector
 
-        if options is not None:
+        if options is not MISSING:
             params["options"] = options
 
         return self._make_bitrix_api_request(
@@ -76,8 +78,8 @@ class Event(BaseScope):
             event: Text,
             handler: Text,
             *,
-            auth_type: Optional[int] = None,
-            event_type: Optional[Annotated[Text, Literal["offline", "online"]]] = None,
+            auth_type: Optional[int] = MISSING,
+            event_type: Optional[Annotated[Text, Literal["offline", "online"]]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIValueRequest[CountResultData, int]:
         """"""
@@ -87,10 +89,10 @@ class Event(BaseScope):
             "handler": handler,
         }
 
-        if auth_type is not None:
+        if auth_type is not MISSING:
             params["auth_type"] = auth_type
 
-        if event_type is not None:
+        if event_type is not MISSING:
             params["event_type"] = event_type
 
         return self._make_bitrix_api_request(
@@ -98,5 +100,5 @@ class Event(BaseScope):
             params=params,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValueRequest,
-            result_adapter=lambda result: result["count"],
+            result_adapter=BitrixResultAdapter(int, wrapper="count"),
         )

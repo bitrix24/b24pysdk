@@ -1,5 +1,6 @@
 from typing import Annotated, Iterable, Literal, Optional, Text, Union
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import Timeout
@@ -98,7 +99,7 @@ class User(BaseEntity):
             group_id: int,
             user_id: Union[int, Iterable[int]],
             *,
-            message: Optional[Text] = None,
+            message: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -111,7 +112,7 @@ class User(BaseEntity):
             "USER_ID": user_id,
         }
 
-        if message is not None:
+        if message is not MISSING:
             params["MESSAGE"] = message
 
         return self._make_bitrix_api_request(
@@ -125,7 +126,7 @@ class User(BaseEntity):
             self,
             group_id: int,
             *,
-            message: Optional[Text] = None,
+            message: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -134,7 +135,7 @@ class User(BaseEntity):
             "GROUP_ID": group_id,
         }
 
-        if message is not None:
+        if message is not MISSING:
             params["MESSAGE"] = message
 
         return self._make_bitrix_api_request(

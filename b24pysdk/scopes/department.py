@@ -1,8 +1,11 @@
 from typing import Dict, Optional, Text
 
-from ..api.requests import BitrixAPIRequest
+from .._constants import MISSING
+from ..api.requests import BitrixAPIRequest, BitrixAPIValueRequest, BitrixAPIValuesRequest
+from ..objects.department import Department as DepartmentObject
 from ..utils.functional import type_checker
-from ..utils.types import JSONDict, Timeout
+from ..utils.types import JSONDict, JSONList, Timeout
+from ._adapters import BitrixObjectAdapter, BitrixObjectsAdapter
 from ._base_scope import BaseScope
 
 __all__ = [
@@ -46,10 +49,10 @@ class Department(BaseScope):
             name: Text,
             parent: int,
             *,
-            sort: Optional[int] = None,
-            uf_head: Optional[int] = None,
+            sort: Optional[int] = MISSING,
+            uf_head: Optional[int] = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest[int]:
+    ) -> BitrixAPIValueRequest[int, DepartmentObject]:
         """
         Add a new department.
 
@@ -77,31 +80,33 @@ class Department(BaseScope):
             "PARENT": parent,
         }
 
-        if sort is not None:
+        if sort is not MISSING:
             params["SORT"] = sort
 
-        if uf_head is not None:
+        if uf_head is not MISSING:
             params["UF_HEAD"] = uf_head
 
         return self._make_bitrix_api_request(
             api_wrapper=self.add,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=BitrixObjectAdapter(DepartmentObject, client=self._client),
         )
 
     @type_checker
     def get(
             self,
             *,
-            sort: Optional[Text] = None,
-            order: Optional[Text] = None,
-            bitrix_id: Optional[int] = None,
-            name: Optional[Text] = None,
-            parent: Optional[int] = None,
-            uf_head: Optional[int] = None,
-            start: Optional[int] = None,
+            sort: Optional[Text] = MISSING,
+            order: Optional[Text] = MISSING,
+            bitrix_id: Optional[int] = MISSING,
+            name: Optional[Text] = MISSING,
+            parent: Optional[int] = MISSING,
+            uf_head: Optional[int] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValuesRequest[JSONList, DepartmentObject]:
         """
         Get a list of departments with filtering.
 
@@ -132,31 +137,33 @@ class Department(BaseScope):
 
         params: JSONDict = {}
 
-        if sort is not None:
+        if sort is not MISSING:
             params["sort"] = sort
 
-        if order is not None:
+        if order is not MISSING:
             params["order"] = order
 
-        if bitrix_id is not None:
+        if bitrix_id is not MISSING:
             params["ID"] = bitrix_id
 
-        if name is not None:
+        if name is not MISSING:
             params["NAME"] = name
 
-        if parent is not None:
+        if parent is not MISSING:
             params["PARENT"] = parent
 
-        if uf_head is not None:
+        if uf_head is not MISSING:
             params["UF_HEAD"] = uf_head
 
-        if start is not None:
+        if start is not MISSING:
             params["START"] = start
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValuesRequest,
+            result_adapter=BitrixObjectsAdapter(DepartmentObject, client=self._client),
         )
 
     @type_checker
@@ -164,10 +171,10 @@ class Department(BaseScope):
             self,
             bitrix_id: int,
             *,
-            name: Optional[Text] = None,
-            sort: Optional[int] = None,
-            parent: Optional[int] = None,
-            uf_head: Optional[int] = None,
+            name: Optional[Text] = MISSING,
+            sort: Optional[int] = MISSING,
+            parent: Optional[int] = MISSING,
+            uf_head: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """
@@ -198,16 +205,16 @@ class Department(BaseScope):
             "ID": bitrix_id,
         }
 
-        if name is not None:
+        if name is not MISSING:
             params["NAME"] = name
 
-        if sort is not None:
+        if sort is not MISSING:
             params["SORT"] = sort
 
-        if parent is not None:
+        if parent is not MISSING:
             params["PARENT"] = parent
 
-        if uf_head is not None:
+        if uf_head is not MISSING:
             params["UF_HEAD"] = uf_head
 
         return self._make_bitrix_api_request(

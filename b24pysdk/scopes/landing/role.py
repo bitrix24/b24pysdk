@@ -1,5 +1,6 @@
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -85,12 +86,12 @@ class Role(BaseEntity):
             bitrix_id: int,
             rights: JSONDict,
             *,
-            additional: Optional[Iterable[str]] = None,
+            additional: Optional[Iterable[Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        if additional is not None and additional.__class__ is not list:
+        if additional is not MISSING and additional.__class__ is not list:
             additional = list(additional)
 
         params: JSONDict = {
@@ -98,7 +99,7 @@ class Role(BaseEntity):
             "rights": rights,
         }
 
-        if additional is not None:
+        if additional is not MISSING:
             params["additional"] = additional
 
         return self._make_bitrix_api_request(
@@ -111,19 +112,21 @@ class Role(BaseEntity):
     def set_access_codes(
             self,
             bitrix_id: int,
-            codes: Iterable[str],
             *,
+            codes: Optional[Iterable[Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        if codes.__class__ is not list:
-            codes = list(codes)
-
         params: JSONDict = {
             "id": bitrix_id,
-            "codes": codes,
         }
+
+        if codes is not MISSING:
+            if codes.__class__ is not list:
+                codes = list(codes)
+
+            params["codes"] = codes
 
         return self._make_bitrix_api_request(
             api_wrapper=self.set_access_codes,

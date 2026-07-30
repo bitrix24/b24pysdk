@@ -1,5 +1,6 @@
 from typing import Optional, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import classproperty, type_checker
 from ....utils.types import JSONDict, Timeout
@@ -23,7 +24,7 @@ class Im(BaseEntity):
             chat_id: int,
             im_message_vote_data: JSONDict,
             *,
-            template_id: Optional[Text] = None,
+            template_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -33,7 +34,7 @@ class Im(BaseEntity):
             "IM_MESSAGE_VOTE_DATA": im_message_vote_data,
         }
 
-        if template_id is not None:
+        if template_id is not MISSING:
             params["templateId"] = template_id
 
         return self._make_bitrix_api_request(

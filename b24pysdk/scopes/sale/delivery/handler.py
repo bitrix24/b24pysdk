@@ -1,5 +1,6 @@
 from typing import Optional, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, JSONList, Timeout
@@ -21,8 +22,8 @@ class Handler(BaseEntity):
         settings: JSONDict,
         profiles: JSONList,
         *,
-        sort: Optional[int] = None,
-        description: Optional[Text] = None,
+        sort: Optional[int] = MISSING,
+        description: Optional[Text] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -34,10 +35,10 @@ class Handler(BaseEntity):
             "PROFILES": profiles,
         }
 
-        if sort is not None:
+        if sort is not MISSING:
             params["SORT"] = sort
 
-        if description is not None:
+        if description is not MISSING:
             params["DESCRIPTION"] = description
 
         return self._make_bitrix_api_request(
@@ -51,12 +52,12 @@ class Handler(BaseEntity):
         self,
         bitrix_id: int,
         *,
-        code: Optional[Text] = None,
-        name: Optional[Text] = None,
-        sort: Optional[int] = None,
-        description: Optional[Text] = None,
-        settings: Optional[JSONDict] = None,
-        profiles: Optional[JSONList] = None,
+        code: Optional[Text] = MISSING,
+        name: Optional[Text] = MISSING,
+        sort: Optional[int] = MISSING,
+        description: Optional[Text] = MISSING,
+        settings: Optional[JSONDict] = MISSING,
+        profiles: Optional[JSONList] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -65,22 +66,22 @@ class Handler(BaseEntity):
             "ID": bitrix_id,
         }
 
-        if code is not None:
+        if code is not MISSING:
             params["CODE"] = code
 
-        if name is not None:
+        if name is not MISSING:
             params["NAME"] = name
 
-        if sort is not None:
+        if sort is not MISSING:
             params["SORT"] = sort
 
-        if description is not None:
+        if description is not MISSING:
             params["DESCRIPTION"] = description
 
-        if settings is not None:
+        if settings is not MISSING:
             params["SETTINGS"] = settings
 
-        if profiles is not None:
+        if profiles is not MISSING:
             params["PROFILES"] = profiles
 
         return self._make_bitrix_api_request(

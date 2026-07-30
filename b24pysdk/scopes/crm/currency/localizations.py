@@ -1,6 +1,7 @@
 from typing import Iterable, Text
 
 from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ....schemas.crm.currency import CurrencyLocalizationsData, CurrencyLocalizationsDict
 from ....schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
@@ -33,7 +34,7 @@ class Localizations(BaseCRM):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValueRequest
         """
         return self._fields(timeout=timeout)
 
@@ -43,7 +44,7 @@ class Localizations(BaseCRM):
             bitrix_id: Text,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[CurrencyLocalizationsData, CurrencyLocalizationsDict]:
         """Get currency localization.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/currency/localizations/crm-currency-localizations-get.html
@@ -56,10 +57,10 @@ class Localizations(BaseCRM):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValueRequest
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 
@@ -67,6 +68,8 @@ class Localizations(BaseCRM):
             api_wrapper=self.get,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=CurrencyLocalizationsDict.from_bitrix,
         )
 
     @type_checker
@@ -94,7 +97,7 @@ class Localizations(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "localizations": localizations,
         }
@@ -133,7 +136,7 @@ class Localizations(BaseCRM):
         if lids.__class__ is not list:
             lids = list(lids)
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "lids": lids,
         }

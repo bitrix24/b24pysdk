@@ -1,5 +1,6 @@
 from typing import Iterable, Optional, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
@@ -18,8 +19,8 @@ class Push(BaseEntity):
             self,
             user_id: Iterable[int],
             *,
-            text: Optional[Text] = None,
-            avatar: Optional[Text] = None,
+            text: Optional[Text] = MISSING,
+            avatar: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -31,10 +32,10 @@ class Push(BaseEntity):
             "USER_ID": user_id,
         }
 
-        if text is not None:
+        if text is not MISSING:
             params["TEXT"] = text
 
-        if avatar is not None:
+        if avatar is not MISSING:
             params["AVATAR"] = avatar
 
         return self._make_bitrix_api_request(

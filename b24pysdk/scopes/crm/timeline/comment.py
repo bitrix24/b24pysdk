@@ -1,5 +1,6 @@
 from typing import Iterable, Optional, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
 from ....schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ....utils.functional import type_checker
@@ -103,9 +104,9 @@ class Comment(BaseCRM):
             self,
             filter: JSONDict,
             *,
-            select: Optional[Iterable[Text]] = None,
-            order: Optional[JSONDict] = None,
-            start: Optional[int] = None,
+            select: Optional[Iterable[Text]] = MISSING,
+            order: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of comments.
@@ -164,8 +165,8 @@ class Comment(BaseCRM):
             bitrix_id: int,
             fields: JSONDict,
             *,
-            entity_type_id: Optional[int] = None,
-            entity_id: Optional[int] = None,
+            entity_type_id: Optional[int] = MISSING,
+            entity_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[int]:
         """Update comment.
@@ -203,10 +204,10 @@ class Comment(BaseCRM):
             "fields": fields,
         }
 
-        if entity_type_id is not None:
+        if entity_type_id is not MISSING:
             params["entityTypeId"] = entity_type_id
 
-        if entity_id is not None:
+        if entity_id is not MISSING:
             params["entityId"] = entity_id
 
         return self._make_bitrix_api_request(
@@ -220,8 +221,8 @@ class Comment(BaseCRM):
             self,
             bitrix_id: int,
             *,
-            owner_type_id: Optional[int] = None,
-            owner_id: Optional[int] = None,
+            owner_type_id: Optional[int] = MISSING,
+            owner_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Delete comment.
@@ -247,10 +248,10 @@ class Comment(BaseCRM):
             "id": bitrix_id,
         }
 
-        if owner_type_id is not None:
+        if owner_type_id is not MISSING:
             params["ownerTypeId"] = owner_type_id
 
-        if owner_id is not None:
+        if owner_id is not MISSING:
             params["ownerId"] = owner_id
 
         return self._make_bitrix_api_request(

@@ -1,5 +1,6 @@
 from typing import Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -11,26 +12,32 @@ __all__ = [
 
 
 class Numerator(BaseEntity):
-    """"""
+    """Class handles numbering rules.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/document-generator/numerators/index.html
+    """
 
     @type_checker
     def add(
         self,
-        name: Text,
-        template: Text,
+        fields: JSONDict,
         *,
-        settings: Optional[JSONDict] = None,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add document generator numerator
 
-        fields: JSONDict = {
-            "name": name,
-            "template": template,
-        }
+        Documentation: https://apidocs.bitrix24.com/api-reference/document-generator/numerators/document-generator-numerator-add.html
 
-        if settings is not None:
-            fields["settings"] = settings
+        The method creates a document numerator.
+
+        Args:
+            fields: Document generator numerator parameters;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "fields": fields,
@@ -49,7 +56,20 @@ class Numerator(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete the document generator numerator
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/document-generator/numerators/document-generator-numerator-delete.html
+
+        The method removes a numerator by its identifier.
+
+        Args:
+            bitrix_id: Identifier of the numerator;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -68,7 +88,20 @@ class Numerator(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get numerator by ID
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/document-generator/numerators/document-generator-numerator-get.html
+
+        The method returns the numerator data by its ID.
+
+        Args:
+            bitrix_id: The identifier of the numerator;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -84,14 +117,27 @@ class Numerator(BaseEntity):
     def list(
         self,
         *,
-        start: Optional[int] = None,
+        start: Optional[int] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the list of numerators
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/document-generator/numerators/document-generator-numerator-list.html
+
+        The method returns a list of numerators for the document generator.
+
+        Args:
+            start: This parameter is used for managing pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
 
         params: JSONDict = {}
 
-        if start is not None:
+        if start is not MISSING:
             params["start"] = start
 
         return self._make_bitrix_api_request(
@@ -105,23 +151,44 @@ class Numerator(BaseEntity):
         self,
         bitrix_id: int,
         *,
-        name: Optional[Text] = None,
-        template: Optional[Text] = None,
-        settings: Optional[JSONDict] = None,
+        fields: Optional[JSONDict] = MISSING,
+        name: Optional[Text] = MISSING,
+        template: Optional[Text] = MISSING,
+        settings: Optional[JSONDict] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update the numerator
 
-        fields: JSONDict = {}
+        Documentation: https://apidocs.bitrix24.com/api-reference/document-generator/numerators/document-generator-numerator-update.html
 
-        if name is not None:
-            fields["name"] = name
+        The method updates the numerator by its identifier.
 
-        if template is not None:
-            fields["template"] = template
+        Args:
+            bitrix_id: Identifier of the numerator;
 
-        if settings is not None:
-            fields["settings"] = settings
+            name: New name for the numerator;
+
+            template: New template for the numerator;
+
+            settings: New settings for the numerator;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest.
+        """
+
+        if fields is MISSING:
+            fields = {}
+
+            if name is not MISSING:
+                fields["name"] = name
+
+            if template is not MISSING:
+                fields["template"] = template
+
+            if settings is not MISSING:
+                fields["settings"] = settings
 
         params: JSONDict = {
             "id": bitrix_id,

@@ -1,5 +1,6 @@
 from typing import Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -19,7 +20,7 @@ class Repo(BaseEntity):
             code: Text,
             fields: JSONDict,
             *,
-            manifest: Optional[JSONDict] = None,
+            manifest: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -29,7 +30,7 @@ class Repo(BaseEntity):
             "fields": fields,
         }
 
-        if manifest is not None:
+        if manifest is not MISSING:
             params["manifest"] = manifest
 
         return self._make_bitrix_api_request(
@@ -61,15 +62,19 @@ class Repo(BaseEntity):
     def get_list(
             self,
             *,
-            params: Optional[JSONDict] = None,
+            params: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        api_params = dict()
+        api_params: JSONDict = {}
 
-        if params is not None:
+        if params is not MISSING:
             api_params["params"] = params
+
+        if start is not MISSING:
+            api_params["start"] = start
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get_list,
@@ -82,7 +87,7 @@ class Repo(BaseEntity):
             self,
             content: Text,
             *,
-            splitter: Optional[Text] = None,
+            splitter: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -91,7 +96,7 @@ class Repo(BaseEntity):
             "content": content,
         }
 
-        if splitter is not None:
+        if splitter is not MISSING:
             params["splitter"] = splitter
 
         return self._make_bitrix_api_request(

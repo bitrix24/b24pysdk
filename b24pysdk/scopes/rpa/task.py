@@ -1,8 +1,9 @@
 from typing import Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import Timeout
+from ...utils.types import JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -17,26 +18,26 @@ class Task(BaseEntity):
     def add_user(
             self,
             *,
-            type_id: Optional[int] = None,
-            stage_id: Optional[int] = None,
-            robot_name: Optional[Text] = None,
-            user_value: Optional[Text] = None,
+            type_id: Optional[int] = MISSING,
+            stage_id: Optional[int] = MISSING,
+            robot_name: Optional[Text] = MISSING,
+            user_value: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        params: JSONDict = {}
 
-        if type_id is not None:
+        if type_id is not MISSING:
             params["typeId"] = type_id
 
-        if stage_id is not None:
+        if stage_id is not MISSING:
             params["stageId"] = stage_id
 
-        if robot_name is not None:
+        if robot_name is not MISSING:
             params["robotName"] = robot_name
 
-        if user_value is not None:
+        if user_value is not MISSING:
             params["userValue"] = user_value
 
         return self._make_bitrix_api_request(

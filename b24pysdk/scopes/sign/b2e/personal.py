@@ -1,8 +1,9 @@
 from typing import Optional
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import Timeout
+from ....utils.types import JSONDict, Timeout
 from ..._base_entity import BaseEntity
 
 __all__ = [
@@ -17,18 +18,18 @@ class Personal(BaseEntity):
     def tail(
             self,
             *,
-            limit: Optional[int] = None,
-            offset: Optional[int] = None,
+            limit: Optional[int] = MISSING,
+            offset: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        params: JSONDict = {}
 
-        if limit is not None:
+        if limit is not MISSING:
             params["limit"] = limit
 
-        if offset is not None:
+        if offset is not MISSING:
             params["offset"] = offset
 
         return self._make_bitrix_api_request(

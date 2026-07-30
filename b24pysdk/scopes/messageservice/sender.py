@@ -1,5 +1,6 @@
 from typing import List, Optional, Text, Union
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -21,7 +22,7 @@ class Sender(BaseEntity):
             handler: Text,
             name: Union[Text, JSONDict],
             *,
-            description: Optional[Union[Text, JSONDict]] = None,
+            description: Optional[Union[Text, JSONDict]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """"""
@@ -33,7 +34,7 @@ class Sender(BaseEntity):
             "NAME": name,
         }
 
-        if description is not None:
+        if description is not MISSING:
             params["DESCRIPTION"] = description
 
         return self._make_bitrix_api_request(
@@ -79,9 +80,9 @@ class Sender(BaseEntity):
             self,
             code: Text,
             *,
-            handler: Optional[Text] = None,
-            name: Optional[Union[Text, JSONDict]] = None,
-            description: Optional[Union[Text, JSONDict]] = None,
+            handler: Optional[Text] = MISSING,
+            name: Optional[Union[Text, JSONDict]] = MISSING,
+            description: Optional[Union[Text, JSONDict]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """"""
@@ -90,13 +91,13 @@ class Sender(BaseEntity):
             "CODE": code,
         }
 
-        if handler is not None:
+        if handler is not MISSING:
             params["HANDLER"] = handler
 
-        if name is not None:
+        if name is not MISSING:
             params["NAME"] = name
 
-        if description is not None:
+        if description is not MISSING:
             params["DESCRIPTION"] = description
 
         return self._make_bitrix_api_request(

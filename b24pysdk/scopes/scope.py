@@ -1,5 +1,6 @@
 from typing import List, Optional, Text
 
+from .._constants import MISSING
 from ..api.requests import BitrixAPIRequest
 from ..utils.functional import type_checker
 from ..utils.types import JSONDict, Timeout
@@ -16,7 +17,7 @@ class Scope(BaseScope):
     @type_checker
     def __call__(
             self,
-            full: Optional[bool] = None,
+            full: Optional[bool] = MISSING,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[List[Text]]:
@@ -24,7 +25,7 @@ class Scope(BaseScope):
 
         params: JSONDict = {}
 
-        if full is not None:
+        if full is not MISSING:
             params["full"] = full
 
         return self._make_bitrix_api_request(

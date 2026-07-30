@@ -1,5 +1,6 @@
 from typing import Iterable, Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -18,7 +19,7 @@ class Fields(BaseEntity):
             self,
             type_id: int,
             *,
-            stage_id: Optional[int] = None,
+            stage_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -27,7 +28,7 @@ class Fields(BaseEntity):
             "typeId": type_id,
         }
 
-        if stage_id is not None:
+        if stage_id is not MISSING:
             params["stageId"] = stage_id
 
         return self._make_bitrix_api_request(
@@ -42,7 +43,7 @@ class Fields(BaseEntity):
             type_id: int,
             fields: JSONDict,
             *,
-            stage_id: Optional[int] = None,
+            stage_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -52,7 +53,7 @@ class Fields(BaseEntity):
             "fields": fields,
         }
 
-        if stage_id is not None:
+        if stage_id is not MISSING:
             params["stageId"] = stage_id
 
         return self._make_bitrix_api_request(
@@ -68,7 +69,7 @@ class Fields(BaseEntity):
             visibility: Text,
             fields: Iterable[Text],
             *,
-            stage_id: Optional[int] = None,
+            stage_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -82,7 +83,7 @@ class Fields(BaseEntity):
             "fields": fields,
         }
 
-        if stage_id is not None:
+        if stage_id is not MISSING:
             params["stageId"] = stage_id
 
         return self._make_bitrix_api_request(

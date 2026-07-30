@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from ._base_context import BaseContext
 
 if TYPE_CHECKING:
-    from ..client import BaseClient
+    from ..client import ClientType
 
     __all__ = [
         "BaseScope",
@@ -22,9 +22,9 @@ class BaseScope(BaseContext, ABC):
 
     __slots__ = ("_client",)
 
-    _client: "BaseClient"
+    _client: "ClientType"
 
-    def __init__(self, client: "BaseClient"):
+    def __init__(self, client: "ClientType"):
         """
         Initialize a scope with the root client.
 
@@ -37,7 +37,7 @@ class BaseScope(BaseContext, ABC):
         return f"scopes.{self.__class__.__name__}(client={self._client})"
 
     @property
-    def _context(self) -> "BaseClient":
+    def _context(self) -> "ClientType":
         """
         Return the root SDK client used as this scope context.
 

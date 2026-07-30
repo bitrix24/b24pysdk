@@ -17,8 +17,8 @@ class Status(BaseEntity):
     def update(
             self,
             code: Text,
-            message_id: int,
-            status: Annotated[Text, Literal["delivered", "failed", "undelivered"]],
+            message_id: Text,
+            status: Annotated[Text, Literal["queued", "sent", "delivered", "undelivered", "failed"]],
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:

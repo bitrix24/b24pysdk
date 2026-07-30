@@ -1,8 +1,10 @@
 from typing import Annotated, Literal, Optional, Text
 
-from ....api.requests import BitrixAPIRequest
+from ...._constants import MISSING
+from ....api.requests import BitrixAPIRequest, BitrixAPIValuesRequest
+from ....schemas.crm.details_configuration import CRMDetailsConfigurationSection, CRMDetailsConfigurationSectionsData
 from ....utils.functional import type_checker
-from ....utils.types import JSONDict, JSONList, Timeout
+from ....utils.types import JSONDict, Timeout
 from ..item.details.configuration.base_configuration import BaseConfiguration
 
 __all__ = [
@@ -27,11 +29,11 @@ class Configuration(BaseConfiguration):
     def get(
             self,
             *,
-            scope: Optional[Annotated[Text, Literal["C", "P"]]] = None,
-            user_id: Optional[int] = None,
-            extras: Optional[JSONDict] = None,
+            scope: Optional[Annotated[Text, Literal["C", "P"]]] = MISSING,
+            user_id: Optional[int] = MISSING,
+            extras: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValuesRequest[Optional[CRMDetailsConfigurationSectionsData], CRMDetailsConfigurationSection]:
         """Get parameters of CRM card configuration.
 
         Documentation:
@@ -59,7 +61,7 @@ class Configuration(BaseConfiguration):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Instance of BitrixAPIValuesRequest
         """
         return self._get(
             scope=scope,
@@ -71,11 +73,11 @@ class Configuration(BaseConfiguration):
     @type_checker
     def set(
             self,
-            data: JSONList,
+            data: CRMDetailsConfigurationSectionsData,
             *,
-            scope: Optional[Annotated[Text, Literal["C", "P"]]] = None,
-            user_id: Optional[int] = None,
-            extras: Optional[JSONDict] = None,
+            scope: Optional[Annotated[Text, Literal["C", "P"]]] = MISSING,
+            user_id: Optional[int] = MISSING,
+            extras: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Set parameters for the CRM detail card.
@@ -121,9 +123,9 @@ class Configuration(BaseConfiguration):
     def reset(
             self,
             *,
-            scope: Optional[Annotated[Text, Literal["C", "P"]]] = None,
-            user_id: Optional[int] = None,
-            extras: Optional[JSONDict] = None,
+            scope: Optional[Annotated[Text, Literal["C", "P"]]] = MISSING,
+            user_id: Optional[int] = MISSING,
+            extras: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """The method resets the settings of CRM cards.
@@ -164,7 +166,7 @@ class Configuration(BaseConfiguration):
     def force_common_scope_for_all(
             self,
             *,
-            extras: Optional[JSONDict] = None,
+            extras: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Set common CRM card.

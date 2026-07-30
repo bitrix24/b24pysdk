@@ -1,16 +1,17 @@
+import enum
 import typing
 
 if typing.TYPE_CHECKING:
     from ..api import requests as _requests
     from ..api import responses as _responses
-    from ..schemas._base_listable_schema import BaseListableSchema
+    from ..objects._base_object import BaseObject
     from ..schemas._base_schema import BaseSchema
     from ..schemas._base_schema_dict import BaseSchemaDict
     from . import types as _types
 
 __all__ = [
-    "BSDT",
-    "BSLT",
+    "BOPKT",
+    "BOT",
     "BST",
     "BABatchRequestsT",
     "BAListResponseT",
@@ -19,9 +20,12 @@ __all__ = [
     "BAResponseT",
     "BAResultT",
     "BAValueResponseT",
-    "BAValueT",
+    "BEnumT",
+    "BRawT",
+    "BResponseT",
     "BSDataT",
-    "ResponseT",
+    "BSDictT",
+    "BValueT",
 ]
 
 BABatchRequestsT = typing.TypeVar(
@@ -51,20 +55,29 @@ BAResultT = typing.TypeVar("BAResultT")
 BAValueResponseT = typing.TypeVar("BAValueResponseT", bound="_responses.AbstractBitrixAPIValueResponse")
 """Type variable for SDK responses that expose an adapted ``value`` or ``values`` property."""
 
-BAValueT = typing.TypeVar("BAValueT")
-"""Type variable for a value produced by a result adapter."""
+BRawT = typing.TypeVar("BRawT")
+"""Type variable for a raw Bitrix24 field value."""
 
 BSDataT = typing.TypeVar("BSDataT")
 """Type variable for raw data used to build SDK schema objects."""
 
-BSDT = typing.TypeVar("BSDT", bound="BaseSchemaDict")
+BSDictT = typing.TypeVar("BSDictT", bound="BaseSchemaDict")
 """Type variable for dictionary-like SDK schema classes."""
 
 BST = typing.TypeVar("BST", bound="BaseSchema")
 """Type variable for SDK schema classes."""
 
-BSLT = typing.TypeVar("BSLT", bound="BaseListableSchema")
-"""Type variable for SDK schema classes that can be used in list results."""
+BValueT = typing.TypeVar("BValueT")
+"""Type variable for a Python value exposed by an SDK field or produced by a result adapter."""
 
-ResponseT = typing.TypeVar("ResponseT")
+BOT = typing.TypeVar("BOT", bound="BaseObject")
+"""Type variable for SDK object classes."""
+
+BOPKT = typing.TypeVar("BOPKT", bound="typing.Hashable")
+"""Type variable for an SDK object primary-key value."""
+
+BResponseT = typing.TypeVar("BResponseT")
 """Type variable that preserves concrete return types across generic helper methods."""
+
+BEnumT = typing.TypeVar("BEnumT", bound=enum.Enum)
+"""Type variable for stdlib enum classes used by SDK fields."""

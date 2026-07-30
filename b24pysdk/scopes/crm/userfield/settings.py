@@ -1,9 +1,9 @@
-from typing import Text
+from typing import Annotated, Text
 
 from ....api.requests import BitrixAPIValueRequest
-from ....schemas.crm.field import CRMFieldsData, CRMFieldsDict
+from ....schemas.crm.userfield import CRMUserfieldFieldsData, CRMUserfieldFieldsDict
 from ....utils.functional import type_checker
-from ....utils.types import Timeout
+from ....utils.types import JSONDict, Timeout, UserTypeIDLiteral
 from .._base_crm import BaseCRM
 
 __all__ = [
@@ -17,10 +17,10 @@ class Settings(BaseCRM):
     @type_checker
     def fields(
             self,
+            type: Annotated[Text, UserTypeIDLiteral],
             *,
-            type: Text,
             timeout: Timeout = None,
-    ) -> BitrixAPIValueRequest[CRMFieldsData, CRMFieldsDict]:
+    ) -> BitrixAPIValueRequest[CRMUserfieldFieldsData, CRMUserfieldFieldsDict]:
         """Get the settings description.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/user-defined-fields/crm-userfield-settings-fields.html
@@ -36,7 +36,7 @@ class Settings(BaseCRM):
             Instance of BitrixAPIRequest
         """
 
-        params = {
+        params: JSONDict = {
             "type": type,
         }
 
@@ -45,5 +45,5 @@ class Settings(BaseCRM):
             params=params,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValueRequest,
-            result_adapter=CRMFieldsDict.from_bitrix,
+            result_adapter=CRMUserfieldFieldsDict.from_bitrix,
         )

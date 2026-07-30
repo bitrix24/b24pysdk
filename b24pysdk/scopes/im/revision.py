@@ -9,7 +9,9 @@ __all__ = [
 
 
 class Revision(BaseEntity):
-    """"""
+    """Method to check the compatibility of the client with the Bitrix24 server.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chats/im-revision-get.html"""
 
     @type_checker
     def get(
@@ -17,7 +19,18 @@ class Revision(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """"""
+        """Get API revision
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/im-revision-get.html
+
+        The method returns the API revision of the IM module for the current Bitrix24.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
             timeout=timeout,

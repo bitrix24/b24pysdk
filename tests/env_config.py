@@ -18,6 +18,7 @@ __all__ = [
 
 Config().configure(
     logger=StreamLogger(),
+    default_timeout=60,
 )
 
 

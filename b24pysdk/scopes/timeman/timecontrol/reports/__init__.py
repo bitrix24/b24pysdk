@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Optional
 
+from ....._constants import MISSING
 from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
 from .....utils.types import JSONDict, Timeout
@@ -33,8 +34,8 @@ class Reports(BaseEntity):
             month: int,
             year: int,
             *,
-            idle_minutes: Optional[int] = None,
-            workday_hours: Optional[int] = None,
+            idle_minutes: Optional[int] = MISSING,
+            workday_hours: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -45,10 +46,10 @@ class Reports(BaseEntity):
             "YEAR": year,
         }
 
-        if idle_minutes is not None:
+        if idle_minutes is not MISSING:
             params["IDLE_MINUTES"] = idle_minutes
 
-        if workday_hours is not None:
+        if workday_hours is not MISSING:
             params["WORKDAY_HOURS"] = workday_hours
 
         return self._make_bitrix_api_request(

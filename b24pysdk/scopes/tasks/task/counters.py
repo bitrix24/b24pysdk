@@ -1,8 +1,9 @@
 from typing import Annotated, Literal, Optional, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
-from ....utils.types import Timeout
+from ....utils.types import JSONDict, Timeout
 from ..._base_entity import BaseEntity
 
 __all__ = [
@@ -17,28 +18,28 @@ class Counters(BaseEntity):
     def get(
             self,
             *,
-            user_id: Optional[int] = None,
-            group_id: Optional[int] = None,
+            user_id: Optional[int] = MISSING,
+            group_id: Optional[int] = MISSING,
             type: Optional[Annotated[Text, Literal[
                 "view_all",
                 "view_role_responsible",
                 "view_role_accomplice",
                 "view_role_auditor",
                 "view_role_originator",
-            ]]] = None,
+            ]]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
-        params = dict()
+        params: JSONDict = {}
 
-        if user_id is not None:
+        if user_id is not MISSING:
             params["userId"] = user_id
 
-        if group_id is not None:
+        if group_id is not MISSING:
             params["groupId"] = group_id
 
-        if type is not None:
+        if type is not MISSING:
             params["type"] = type
 
         return self._make_bitrix_api_request(

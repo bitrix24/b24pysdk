@@ -8,7 +8,7 @@ __all__ = [
 ]
 
 # Bitrix REST methods available in API v3
-API_V3_METHODS: typing.Final[typing.Tuple[typing.Text, ...]] = (
+API_V3_METHODS: typing.Final[typing.Set[typing.Text]] = {
     "documentation",
     "humanresources.node.add",
     "humanresources.node.children",
@@ -70,8 +70,16 @@ API_V3_METHODS: typing.Final[typing.Tuple[typing.Text, ...]] = (
     "tasks.task.file.field.list",
     "tasks.task.get",
     "tasks.task.list",
+    "tasks.task.result.add",
+    "tasks.task.result.addfromchatmessage",
+    "tasks.task.result.delete",
+    "tasks.task.result.list",
+    "tasks.task.result.update",
     "tasks.task.update",
-)
+    "timeman.record.field.get",
+    "timeman.record.field.list",
+    "timeman.record.list",
+}
 
 
 class B24APIVersion(_enum.IntEnum):

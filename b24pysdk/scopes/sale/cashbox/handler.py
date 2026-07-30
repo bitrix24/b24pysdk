@@ -1,5 +1,6 @@
 from typing import Optional, Text, Union
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import B24BoolStrict, JSONDict, Timeout
@@ -20,8 +21,8 @@ class Handler(BaseEntity):
         name: Text,
         settings: JSONDict,
         *,
-        sort: Optional[int] = None,
-        supports_ffd105: Optional[Union[bool, B24BoolStrict]] = None,
+        sort: Optional[int] = MISSING,
+        supports_ffd105: Optional[Union[bool, B24BoolStrict]] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -32,10 +33,10 @@ class Handler(BaseEntity):
             "SETTINGS": settings,
         }
 
-        if sort is not None:
+        if sort is not MISSING:
             params["SORT"] = sort
 
-        if supports_ffd105 is not None:
+        if supports_ffd105 is not MISSING:
             params["SUPPORTS_FFD105"] = B24BoolStrict(supports_ffd105).to_b24()
 
         return self._make_bitrix_api_request(

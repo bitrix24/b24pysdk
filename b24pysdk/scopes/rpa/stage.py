@@ -1,5 +1,6 @@
 from typing import Optional
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -75,7 +76,7 @@ class Stage(BaseEntity):
             self,
             type_id: int,
             *,
-            start: Optional[int] = None,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -84,7 +85,7 @@ class Stage(BaseEntity):
             "typeId": type_id,
         }
 
-        if start is not None:
+        if start is not MISSING:
             params["start"] = start
 
         return self._make_bitrix_api_request(

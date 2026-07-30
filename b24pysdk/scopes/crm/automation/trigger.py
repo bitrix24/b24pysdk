@@ -1,5 +1,6 @@
 from typing import Dict, List, Optional, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
@@ -21,7 +22,7 @@ class Trigger(BaseCRM):
             self,
             *,
             target: Text,
-            code: Optional[Text] = None,
+            code: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Activate trigger.
@@ -45,7 +46,7 @@ class Trigger(BaseCRM):
             "target": target,
         }
 
-        if code is not None:
+        if code is not MISSING:
             params["code"] = code
 
         return self._make_bitrix_api_request(

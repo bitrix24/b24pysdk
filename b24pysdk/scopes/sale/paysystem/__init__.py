@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Annotated, Iterable, Literal, Optional, Text, Union
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import B24BoolStrict, JSONDict, Timeout
@@ -35,9 +36,10 @@ class Paysystem(BaseEntity):
     def list(
             self,
             *,
-            select: Optional[Iterable[Text]] = None,
-            filter: Optional[JSONDict] = None,
-            order: Optional[JSONDict] = None,
+            select: Optional[Iterable[Text]] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            order: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -56,19 +58,22 @@ class Paysystem(BaseEntity):
             Instance of BitrixAPIRequest.
         """
 
-        params = dict()
+        params: JSONDict = {}
 
-        if select is not None:
+        if select is not MISSING:
             if select.__class__ is not list:
                 select = list(select)
 
             params["SELECT"] = select
 
-        if filter is not None:
+        if filter is not MISSING:
             params["FILTER"] = filter
 
-        if order is not None:
+        if order is not MISSING:
             params["ORDER"] = order
+
+        if start is not MISSING:
+            params["start"] = start
 
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
@@ -111,7 +116,7 @@ class Paysystem(BaseEntity):
             self,
             bitrix_id: int,
             *,
-            fields: Optional[JSONDict] = None,
+            fields: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -134,7 +139,7 @@ class Paysystem(BaseEntity):
             "ID": bitrix_id,
         }
 
-        if fields is not None:
+        if fields is not MISSING:
             params["FIELDS"] = fields
 
         return self._make_bitrix_api_request(
@@ -151,12 +156,12 @@ class Paysystem(BaseEntity):
             bx_rest_handler: Text,
             entity_registry_type: Annotated[Text, Literal["ORDER", "CRM_INVOICE", "CRM_QUOTE"]],
             *,
-            settings: Optional[JSONDict] = None,
-            description: Optional[Text] = None,
-            active: Optional[Union[bool, B24BoolStrict]] = None,
-            logotype: Optional[Text] = None,
-            new_window: Optional[Union[bool, B24BoolStrict]] = None,
-            xml_id: Optional[Text] = None,
+            settings: Optional[JSONDict] = MISSING,
+            description: Optional[Text] = MISSING,
+            active: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            logotype: Optional[Text] = MISSING,
+            new_window: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            xml_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -202,22 +207,22 @@ class Paysystem(BaseEntity):
             "ENTITY_REGISTRY_TYPE": entity_registry_type,
         }
 
-        if settings is not None:
+        if settings is not MISSING:
             params["SETTINGS"] = settings
 
-        if new_window is not None:
+        if new_window is not MISSING:
             params["NEW_WINDOW"] = B24BoolStrict(new_window).to_b24()
 
-        if active is not None:
+        if active is not MISSING:
             params["ACTIVE"] = B24BoolStrict(active).to_b24()
 
-        if description is not None:
+        if description is not MISSING:
             params["DESCRIPTION"] = description
 
-        if logotype is not None:
+        if logotype is not MISSING:
             params["LOGOTYPE"] = logotype
 
-        if xml_id is not None:
+        if xml_id is not MISSING:
             params["XML_ID"] = xml_id
 
         return self._make_bitrix_api_request(

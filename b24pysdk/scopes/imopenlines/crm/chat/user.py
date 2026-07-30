@@ -1,5 +1,6 @@
 from typing import Optional, Text, Union
 
+from ....._constants import MISSING
 from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
 from .....utils.types import Timeout
@@ -20,7 +21,7 @@ class User(BaseEntity):
             crm_entity: Union[int, Text],
             user_id: Union[int, Text],
             *,
-            chat_id: Optional[Union[int, Text]] = None,
+            chat_id: Optional[Union[int, Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -31,7 +32,7 @@ class User(BaseEntity):
             USER_ID=user_id,
         )
 
-        if chat_id is not None:
+        if chat_id is not MISSING:
             params["CHAT_ID"] = chat_id
 
         return self._make_bitrix_api_request(
@@ -47,7 +48,7 @@ class User(BaseEntity):
             crm_entity: Union[int, Text],
             user_id: Union[int, Text],
             *,
-            chat_id: Optional[Union[int, Text]] = None,
+            chat_id: Optional[Union[int, Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -58,7 +59,7 @@ class User(BaseEntity):
             USER_ID=user_id,
         )
 
-        if chat_id is not None:
+        if chat_id is not MISSING:
             params["CHAT_ID"] = chat_id
 
         return self._make_bitrix_api_request(

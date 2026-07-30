@@ -1,8 +1,9 @@
 from typing import Iterable, Optional, Text, Union
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import B24BoolStrict, JSONDict, JSONList, Timeout
+from ...utils.types import B24BoolStrict, JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -14,70 +15,17 @@ class Command(BaseEntity):
     """"""
 
     @type_checker
-    def answer(
-            self,
-            message_id: int,
-            message: Text,
-            *,
-            command_id: Optional[int] = None,
-            command: Optional[Text] = None,
-            attach: Optional[JSONDict] = None,
-            keyboard: Optional[JSONDict] = None,
-            menu: Optional[JSONList] = None,
-            system: Optional[Text] = None,
-            url_preview: Optional[Text] = None,
-            client_id: Optional[Text] = None,
-            timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """"""
-
-        params = {
-            "MESSAGE_ID": message_id,
-            "MESSAGE": message,
-        }
-
-        if command_id is not None:
-            params["COMMAND_ID"] = command_id
-
-        if command is not None:
-            params["COMMAND"] = command
-
-        if attach is not None:
-            params["ATTACH"] = attach
-
-        if keyboard is not None:
-            params["KEYBOARD"] = keyboard
-
-        if menu is not None:
-            params["MENU"] = menu
-
-        if system is not None:
-            params["SYSTEM"] = system
-
-        if url_preview is not None:
-            params["URL_PREVIEW"] = url_preview
-
-        if client_id is not None:
-            params["CLIENT_ID"] = client_id
-
-        return self._make_bitrix_api_request(
-            api_wrapper=self.answer,
-            params=params,
-            timeout=timeout,
-        )
-
-    @type_checker
     def register(
             self,
             bot_id: int,
             command: Text,
             lang: Iterable[JSONDict],
             *,
-            common: Optional[Union[bool, B24BoolStrict]] = None,
-            hidden: Optional[Union[bool, B24BoolStrict]] = None,
-            extranet_support: Optional[Union[bool, B24BoolStrict]] = None,
-            client_id: Optional[Text] = None,
-            event_command_add: Optional[Text] = None,
+            common: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            hidden: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            extranet_support: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            client_id: Optional[Text] = MISSING,
+            event_command_add: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -91,19 +39,19 @@ class Command(BaseEntity):
             "LANG": lang,
         }
 
-        if common is not None:
+        if common is not MISSING:
             params["COMMON"] = B24BoolStrict(common).to_b24()
 
-        if hidden is not None:
+        if hidden is not MISSING:
             params["HIDDEN"] = B24BoolStrict(hidden).to_b24()
 
-        if extranet_support is not None:
+        if extranet_support is not MISSING:
             params["EXTRANET_SUPPORT"] = B24BoolStrict(extranet_support).to_b24()
 
-        if client_id is not None:
+        if client_id is not MISSING:
             params["CLIENT_ID"] = client_id
 
-        if event_command_add is not None:
+        if event_command_add is not MISSING:
             params["EVENT_COMMAND_ADD"] = event_command_add
 
         return self._make_bitrix_api_request(
@@ -138,7 +86,7 @@ class Command(BaseEntity):
             self,
             command_id: int,
             *,
-            client_id: Optional[Text] = None,
+            client_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -147,7 +95,7 @@ class Command(BaseEntity):
             "COMMAND_ID": command_id,
         }
 
-        if client_id is not None:
+        if client_id is not MISSING:
             params["CLIENT_ID"] = client_id
 
         return self._make_bitrix_api_request(

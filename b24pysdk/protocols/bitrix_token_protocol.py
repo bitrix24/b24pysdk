@@ -13,6 +13,8 @@ class BitrixTokenProtocol(Protocol):
     method.
     """
 
+    domain: Text
+
     def call_method(
         self,
         api_method: Text,

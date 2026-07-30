@@ -1,5 +1,6 @@
 from typing import Iterable, Optional, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
@@ -22,8 +23,8 @@ class Template(BaseCRM):
             bitrix_id: int,
             entity_type_id: int,
             *,
-            entity_id: Optional[int] = None,
-            values: Optional[JSONDict] = None,
+            entity_id: Optional[int] = MISSING,
+            values: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get document template fields.
@@ -52,10 +53,10 @@ class Template(BaseCRM):
             "entityTypeId": entity_type_id,
         }
 
-        if entity_id is not None:
+        if entity_id is not MISSING:
             params["entityId"] = entity_id
 
-        if values is not None:
+        if values is not MISSING:
             params["values"] = values
 
         return self._make_bitrix_api_request(
@@ -124,10 +125,10 @@ class Template(BaseCRM):
     def list(
             self,
             *,
-            select: Optional[Iterable[Text]] = None,
-            order: Optional[JSONDict] = None,
-            filter: Optional[JSONDict] = None,
-            start: Optional[int] = None,
+            select: Optional[Iterable[Text]] = MISSING,
+            order: Optional[JSONDict] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of document templates.

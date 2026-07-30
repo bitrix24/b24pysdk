@@ -49,7 +49,7 @@ class _MethodCaller(BaseCaller):
         )
 
     @property
-    def _dynamic_auth_token(self) -> Text:
+    def _effective_auth_token(self) -> Text:
         """
         Return the auth-token path fragment used by webhook URLs.
 
@@ -73,12 +73,12 @@ class _MethodCaller(BaseCaller):
         V3 calls use ``/rest/api/{auth}/{method}`` and do not append ``.json``.
         """
         if self._api_version == B24APIVersion.V3:
-            return f"{self._base_url}/api/{self._dynamic_auth_token}{self._api_method}"
+            return f"{self._base_url}/api/{self._effective_auth_token}{self._api_method}"
         else:
-            return f"{self._base_url}/{self._dynamic_auth_token}{self._api_method}.json"
+            return f"{self._base_url}/{self._effective_auth_token}{self._api_method}.json"
 
     @property
-    def _dynamic_params(self) -> JSONDict:
+    def _effective_params(self) -> JSONDict:
         """
         Return request parameters with OAuth auth injected when needed.
 
@@ -114,7 +114,7 @@ class _MethodCaller(BaseCaller):
 
         json_response = call(
             url=self._url,
-            params=self._dynamic_params,
+            params=self._effective_params,
             **self._kwargs,
         )
 

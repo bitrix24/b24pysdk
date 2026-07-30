@@ -1,6 +1,7 @@
 from functools import cached_property
 from typing import Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
@@ -45,9 +46,9 @@ class Lists(BaseScope):
             iblock_code: Text,
             fields: JSONDict,
             *,
-            socnet_group_id: Optional[int] = None,
-            messages: Optional[JSONDict] = None,
-            rights: Optional[JSONDict] = None,
+            socnet_group_id: Optional[int] = MISSING,
+            messages: Optional[JSONDict] = MISSING,
+            rights: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -58,13 +59,13 @@ class Lists(BaseScope):
             "FIELDS": fields,
         }
 
-        if socnet_group_id is not None:
+        if socnet_group_id is not MISSING:
             params["SOCNET_GROUP_ID"] = socnet_group_id
 
-        if messages is not None:
+        if messages is not MISSING:
             params["MESSAGES"] = messages
 
-        if rights is not None:
+        if rights is not MISSING:
             params["RIGHTS"] = rights
 
         return self._make_bitrix_api_request(
@@ -78,8 +79,8 @@ class Lists(BaseScope):
             self,
             iblock_type_id: Text,
             *,
-            iblock_id: Optional[int] = None,
-            iblock_code: Optional[Text] = None,
+            iblock_id: Optional[int] = MISSING,
+            iblock_code: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -88,10 +89,10 @@ class Lists(BaseScope):
             "IBLOCK_TYPE_ID": iblock_type_id,
         }
 
-        if iblock_id is not None:
+        if iblock_id is not MISSING:
             params["IBLOCK_ID"] = iblock_id
 
-        if iblock_code is not None:
+        if iblock_code is not MISSING:
             params["IBLOCK_CODE"] = iblock_code
 
         return self._make_bitrix_api_request(
@@ -106,11 +107,11 @@ class Lists(BaseScope):
             iblock_type_id: Text,
             fields: JSONDict,
             *,
-            iblock_id: Optional[int] = None,
-            iblock_code: Optional[Text] = None,
-            socnet_group_id: Optional[int] = None,
-            messages: Optional[JSONDict] = None,
-            rights: Optional[JSONDict] = None,
+            iblock_id: Optional[int] = MISSING,
+            iblock_code: Optional[Text] = MISSING,
+            socnet_group_id: Optional[int] = MISSING,
+            messages: Optional[JSONDict] = MISSING,
+            rights: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -120,19 +121,19 @@ class Lists(BaseScope):
             "FIELDS": fields,
         }
 
-        if iblock_id is not None:
+        if iblock_id is not MISSING:
             params["IBLOCK_ID"] = iblock_id
 
-        if iblock_code is not None:
+        if iblock_code is not MISSING:
             params["IBLOCK_CODE"] = iblock_code
 
-        if socnet_group_id is not None:
+        if socnet_group_id is not MISSING:
             params["SOCNET_GROUP_ID"] = socnet_group_id
 
-        if messages is not None:
+        if messages is not MISSING:
             params["MESSAGES"] = messages
 
-        if rights is not None:
+        if rights is not MISSING:
             params["RIGHTS"] = rights
 
         return self._make_bitrix_api_request(

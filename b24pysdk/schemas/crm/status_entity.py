@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import List, NoReturn, Optional, Text, TypedDict, Union
 
+from ...utils.converters import bool_from_bitrix, int_from_bitrix, int_to_bitrix, text_from_bitrix, text_to_bitrix
 from ...utils.dataclasses import frozen_dataclass_kwargs
-from .._base_listable_schema import BaseListableSchema
 from .._base_schema import BaseSchema
 
 __all__ = [
@@ -50,10 +50,10 @@ class CRMStatusEntitySemanticInfo(BaseSchema[CRMStatusEntitySemanticInfoData]):
             CRMStatusEntitySemanticInfo schema with Python-friendly field names.
         """
         return cls(
-            start_field=bitrix_data["START_FIELD"],
-            final_success_field=bitrix_data["FINAL_SUCCESS_FIELD"],
-            final_unsuccess_field=bitrix_data["FINAL_UNSUCCESS_FIELD"],
-            final_sort=bitrix_data["FINAL_SORT"],
+            start_field=text_from_bitrix(bitrix_data["START_FIELD"], is_required=True),
+            final_success_field=text_from_bitrix(bitrix_data["FINAL_SUCCESS_FIELD"], is_required=True),
+            final_unsuccess_field=text_from_bitrix(bitrix_data["FINAL_UNSUCCESS_FIELD"], is_required=True),
+            final_sort=int_from_bitrix(bitrix_data["FINAL_SORT"], is_required=True),
         )
 
     def to_bitrix(self) -> CRMStatusEntitySemanticInfoData:
@@ -64,10 +64,10 @@ class CRMStatusEntitySemanticInfo(BaseSchema[CRMStatusEntitySemanticInfoData]):
             Dictionary with Bitrix24 semantic information field names.
         """
         return {
-            "START_FIELD": self.start_field,
-            "FINAL_SUCCESS_FIELD": self.final_success_field,
-            "FINAL_UNSUCCESS_FIELD": self.final_unsuccess_field,
-            "FINAL_SORT": self.final_sort,
+            "START_FIELD": text_to_bitrix(self.start_field, is_required=True),
+            "FINAL_SUCCESS_FIELD": text_to_bitrix(self.final_success_field, is_required=True),
+            "FINAL_UNSUCCESS_FIELD": text_to_bitrix(self.final_unsuccess_field, is_required=True),
+            "FINAL_SORT": int_to_bitrix(self.final_sort, is_required=True),
         }
 
 
@@ -93,7 +93,7 @@ CRMStatusEntityTypesData = List[CRMStatusEntityTypeData]
 
 
 @dataclass(**frozen_dataclass_kwargs())
-class CRMStatusEntityType(BaseListableSchema[CRMStatusEntityTypeData]):
+class CRMStatusEntityType(BaseSchema[CRMStatusEntityTypeData]):
     """
     CRM status entity type returned by ``crm.status.entity.types``.
 
@@ -126,18 +126,18 @@ class CRMStatusEntityType(BaseListableSchema[CRMStatusEntityTypeData]):
             CRMStatusEntityType schema with Python-friendly field names.
         """
         return cls(
-            bitrix_id=bitrix_data["ID"],
-            name=bitrix_data["NAME"],
-            entity_type_id=bitrix_data.get("ENTITY_TYPE_ID"),
+            bitrix_id=text_from_bitrix(bitrix_data["ID"], is_required=True),
+            name=text_from_bitrix(bitrix_data["NAME"], is_required=True),
+            entity_type_id=int_from_bitrix(bitrix_data.get("ENTITY_TYPE_ID")),
             semantic_info=CRMStatusEntitySemanticInfo.from_bitrix(bitrix_data["SEMANTIC_INFO"]) if bitrix_data.get("SEMANTIC_INFO") else None,
-            prefix=bitrix_data.get("PREFIX"),
-            field_attribute_scope=bitrix_data.get("FIELD_ATTRIBUTE_SCOPE"),
-            is_enabled=bitrix_data.get("IS_ENABLED"),
-            category_id=int(bitrix_data["CATEGORY_ID"]) if "CATEGORY_ID" in bitrix_data else None,
-            parent_id=bitrix_data.get("PARENT_ID"),
-            category_name=bitrix_data.get("CATEGORY_NAME"),
-            category_sort=bitrix_data.get("CATEGORY_SORT"),
-            is_default_category=bitrix_data.get("IS_DEFAULT_CATEGORY"),
+            prefix=text_from_bitrix(bitrix_data.get("PREFIX")),
+            field_attribute_scope=text_from_bitrix(bitrix_data.get("FIELD_ATTRIBUTE_SCOPE")),
+            is_enabled=bool_from_bitrix(bitrix_data.get("IS_ENABLED")),
+            category_id=int_from_bitrix(bitrix_data.get("CATEGORY_ID")),
+            parent_id=text_from_bitrix(bitrix_data.get("PARENT_ID")),
+            category_name=text_from_bitrix(bitrix_data.get("CATEGORY_NAME")),
+            category_sort=int_from_bitrix(bitrix_data.get("CATEGORY_SORT")),
+            is_default_category=bool_from_bitrix(bitrix_data.get("IS_DEFAULT_CATEGORY")),
         )
 
     def to_bitrix(self) -> CRMStatusEntityTypeData:  # noqa: C901
@@ -149,12 +149,12 @@ class CRMStatusEntityType(BaseListableSchema[CRMStatusEntityTypeData]):
         """
 
         bitrix_data: CRMStatusEntityTypeData = {
-            "ID": self.bitrix_id,
-            "NAME": self.name,
+            "ID": text_to_bitrix(self.bitrix_id, is_required=True),
+            "NAME": text_to_bitrix(self.name, is_required=True),
         }
 
         if self.entity_type_id is not None:
-            bitrix_data["ENTITY_TYPE_ID"] = self.entity_type_id
+            bitrix_data["ENTITY_TYPE_ID"] = int_to_bitrix(self.entity_type_id, is_required=True)
 
         if self.semantic_info is not None:
             bitrix_data["SEMANTIC_INFO"] = self.semantic_info.to_bitrix()
@@ -162,28 +162,28 @@ class CRMStatusEntityType(BaseListableSchema[CRMStatusEntityTypeData]):
             bitrix_data["SEMANTIC_INFO"] = []
 
         if self.prefix is not None:
-            bitrix_data["PREFIX"] = self.prefix
+            bitrix_data["PREFIX"] = text_to_bitrix(self.prefix, is_required=True)
 
         if self.field_attribute_scope is not None:
-            bitrix_data["FIELD_ATTRIBUTE_SCOPE"] = self.field_attribute_scope
+            bitrix_data["FIELD_ATTRIBUTE_SCOPE"] = text_to_bitrix(self.field_attribute_scope, is_required=True)
 
         if self.is_enabled is not None:
-            bitrix_data["IS_ENABLED"] = self.is_enabled
+            bitrix_data["IS_ENABLED"] = bool_from_bitrix(self.is_enabled, is_required=True)
 
         if self.category_id is not None:
-            bitrix_data["CATEGORY_ID"] = self.category_id
+            bitrix_data["CATEGORY_ID"] = int_to_bitrix(self.category_id, is_required=True)
 
         if self.parent_id is not None:
-            bitrix_data["PARENT_ID"] = self.parent_id
+            bitrix_data["PARENT_ID"] = text_to_bitrix(self.parent_id, is_required=True)
 
         if self.category_name is not None:
-            bitrix_data["CATEGORY_NAME"] = self.category_name
+            bitrix_data["CATEGORY_NAME"] = text_to_bitrix(self.category_name, is_required=True)
 
         if self.category_sort is not None:
-            bitrix_data["CATEGORY_SORT"] = self.category_sort
+            bitrix_data["CATEGORY_SORT"] = int_to_bitrix(self.category_sort, is_required=True)
 
         if self.is_default_category is not None:
-            bitrix_data["IS_DEFAULT_CATEGORY"] = self.is_default_category
+            bitrix_data["IS_DEFAULT_CATEGORY"] = bool_from_bitrix(self.is_default_category, is_required=True)
 
         return bitrix_data
 
@@ -198,7 +198,7 @@ CRMStatusEntityItemsData = List[CRMStatusEntityItemData]
 
 
 @dataclass(**frozen_dataclass_kwargs())
-class CRMStatusEntityItem(BaseListableSchema[CRMStatusEntityItemData]):
+class CRMStatusEntityItem(BaseSchema[CRMStatusEntityItemData]):
     """
     CRM status entity item returned by ``crm.status.entity.items``.
 
@@ -221,9 +221,9 @@ class CRMStatusEntityItem(BaseListableSchema[CRMStatusEntityItemData]):
             CRMStatusEntityItem schema with Python-friendly field names.
         """
         return cls(
-            name=bitrix_data["NAME"],
-            sort=bitrix_data["SORT"],
-            status_id=bitrix_data["STATUS_ID"],
+            name=text_from_bitrix(bitrix_data["NAME"], is_required=True),
+            sort=int_from_bitrix(bitrix_data["SORT"], is_required=True),
+            status_id=text_from_bitrix(bitrix_data["STATUS_ID"], is_required=True),
         )
 
     def to_bitrix(self) -> CRMStatusEntityItemData:
@@ -234,7 +234,7 @@ class CRMStatusEntityItem(BaseListableSchema[CRMStatusEntityItemData]):
             Dictionary with Bitrix24 CRM status entity item field names.
         """
         return {
-            "NAME": self.name,
-            "SORT": self.sort,
-            "STATUS_ID": self.status_id,
+            "NAME": text_to_bitrix(self.name, is_required=True),
+            "SORT": int_to_bitrix(self.sort, is_required=True),
+            "STATUS_ID": text_to_bitrix(self.status_id, is_required=True),
         }

@@ -1,5 +1,6 @@
 from typing import Iterable, Optional, Text
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
@@ -18,7 +19,7 @@ class Trace(BaseCRM):
             self,
             trace: Text,
             *,
-            entities: Optional[Iterable[JSONDict]] = None,
+            entities: Optional[Iterable[JSONDict]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[int]:
         """"""
@@ -27,7 +28,7 @@ class Trace(BaseCRM):
             "TRACE": trace,
         }
 
-        if entities is not None:
+        if entities is not MISSING:
             if entities.__class__ is not list:
                 entities = list(entities)
 

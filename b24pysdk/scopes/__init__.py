@@ -2,7 +2,7 @@ from importlib import import_module
 from typing import TYPE_CHECKING, Any, Dict, Text
 
 if TYPE_CHECKING:
-    from . import v3 as v3
+    from . import _v3 as v3
     from .access import Access
     from .ai_admin import AI
     from .app import App
@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from .imopenlines import Imopenlines
     from .landing import Landing
     from .lists import Lists
+    from .log import Log
     from .mailservice import Mailservice
     from .messageservice import Messageservice
     from .method import Method
@@ -73,6 +74,7 @@ __all__ = [
     "Imopenlines",
     "Landing",
     "Lists",
+    "Log",
     "Mailservice",
     "Messageservice",
     "Method",
@@ -123,6 +125,7 @@ _SCOPE_MODULES: Dict[Text, Text] = {
     "Imopenlines": ".imopenlines",
     "Landing": ".landing",
     "Lists": ".lists",
+    "Log": ".log",
     "Mailservice": ".mailservice",
     "Messageservice": ".messageservice",
     "Method": ".method",
@@ -147,7 +150,7 @@ _SCOPE_MODULES: Dict[Text, Text] = {
     "Userfieldtype": ".userfieldtype",
     "Vote": ".vote",
     "Voximplant": ".voximplant",
-    "v3": ".v3",
+    "v3": "._v3",
 }
 
 

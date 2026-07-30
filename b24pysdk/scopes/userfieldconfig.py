@@ -1,5 +1,6 @@
 from typing import Optional, Text
 
+from .._constants import MISSING
 from ..api.requests import BitrixAPIRequest
 from ..utils.functional import type_checker
 from ..utils.types import JSONDict, Timeout
@@ -100,10 +101,10 @@ class Userfieldconfig(BaseScope):
             self,
             module_id: Text,
             *,
-            select: Optional[JSONDict] = None,
-            order: Optional[JSONDict] = None,
-            filter: Optional[JSONDict] = None,
-            start: Optional[int] = None,
+            select: Optional[JSONDict] = MISSING,
+            order: Optional[JSONDict] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -119,16 +120,16 @@ class Userfieldconfig(BaseScope):
             "start": start,
         }
 
-        if optional_params.get("select") is not None:
+        if optional_params.get("select") is not MISSING:
             params["select"] = optional_params.get("select")
 
-        if optional_params.get("order") is not None:
+        if optional_params.get("order") is not MISSING:
             params["order"] = optional_params.get("order")
 
-        if optional_params.get("filter") is not None:
+        if optional_params.get("filter") is not MISSING:
             params["filter"] = optional_params.get("filter")
 
-        if optional_params.get("start") is not None:
+        if optional_params.get("start") is not MISSING:
             params["start"] = optional_params.get("start")
 
         return self._make_bitrix_api_request(
@@ -143,7 +144,7 @@ class Userfieldconfig(BaseScope):
             module_id: Text,
             bitrix_id: int,
             *,
-            field: Optional[JSONDict] = None,
+            field: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -153,7 +154,7 @@ class Userfieldconfig(BaseScope):
             "id": bitrix_id,
         }
 
-        if field is not None:
+        if field is not MISSING:
             params["field"] = field
 
         return self._make_bitrix_api_request(

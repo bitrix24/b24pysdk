@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict, Optional, Text, TypedDict
 
+from ...utils.converters import bool_from_bitrix, text_from_bitrix, text_to_bitrix
 from ...utils.dataclasses import frozen_dataclass_kwargs
 from .._base_schema import BaseSchema
 from .._base_schema_dict import BaseSchemaDict
@@ -42,11 +43,11 @@ class VatField(BaseSchema[VatFieldData]):
         Create a VAT field schema from Bitrix24 data.
         """
         return cls(
-            type=bitrix_data["type"],
-            is_required=bitrix_data["isRequired"],
-            is_read_only=bitrix_data["isReadOnly"],
-            title=bitrix_data["title"],
-            size=bitrix_data.get("size"),
+            type=text_from_bitrix(bitrix_data["type"], is_required=True),
+            is_required=bool_from_bitrix(bitrix_data["isRequired"], is_required=True),
+            is_read_only=bool_from_bitrix(bitrix_data["isReadOnly"], is_required=True),
+            title=text_from_bitrix(bitrix_data["title"], is_required=True),
+            size=text_from_bitrix(bitrix_data.get("size")),
         )
 
     def to_bitrix(self) -> VatFieldData:
@@ -55,14 +56,14 @@ class VatField(BaseSchema[VatFieldData]):
         """
 
         bitrix_data: VatFieldData = {
-            "type": self.type,
-            "isRequired": self.is_required,
-            "isReadOnly": self.is_read_only,
-            "title": self.title,
+            "type": text_to_bitrix(self.type, is_required=True),
+            "isRequired": bool_from_bitrix(self.is_required, is_required=True),
+            "isReadOnly": bool_from_bitrix(self.is_read_only, is_required=True),
+            "title": text_to_bitrix(self.title, is_required=True),
         }
 
         if self.size is not None:
-            bitrix_data["size"] = self.size
+            bitrix_data["size"] = text_to_bitrix(self.size, is_required=True)
 
         return bitrix_data
 
@@ -74,4 +75,4 @@ class VatFieldsDict(BaseSchemaDict[VatField, VatFieldData]):
     """
     VAT field descriptions indexed by VAT field name.
     """
-    _ITEM_SCHEMA = VatField
+    _VALUE_SCHEMA = VatField

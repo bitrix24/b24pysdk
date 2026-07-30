@@ -4,6 +4,7 @@ from ....api.requests import BitrixAPIValuesRequest
 from ....schemas.crm.status_entity import CRMStatusEntityItem, CRMStatusEntityItemsData, CRMStatusEntityType, CRMStatusEntityTypesData
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
+from ..._adapters import BitrixSchemasAdapter
 from .._base_crm import BaseCRM
 
 __all__ = [
@@ -45,7 +46,7 @@ class Entity(BaseCRM):
             params=params,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValuesRequest,
-            result_adapter=CRMStatusEntityItem.from_bitrix_result,
+            result_adapter=BitrixSchemasAdapter(CRMStatusEntityItem),
         )
 
     @type_checker
@@ -70,5 +71,5 @@ class Entity(BaseCRM):
             api_wrapper=self.types,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValuesRequest,
-            result_adapter=CRMStatusEntityType.from_bitrix_result,
+            result_adapter=BitrixSchemasAdapter(CRMStatusEntityType),
         )

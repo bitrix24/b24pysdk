@@ -3,6 +3,7 @@ from ....schemas.crm.enum import CRMEnumItem, CRMEnumItemsData
 from ....scopes.crm._base_crm import BaseCRM
 from ....utils.functional import type_checker
 from ....utils.types import Timeout
+from ..._adapters import BitrixSchemasAdapter
 
 __all__ = [
     "Settings",
@@ -34,5 +35,5 @@ class Settings(BaseCRM):
             api_wrapper=self.mode,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValuesRequest,
-            result_adapter=CRMEnumItem.from_bitrix_result,
+            result_adapter=BitrixSchemasAdapter(CRMEnumItem),
         )

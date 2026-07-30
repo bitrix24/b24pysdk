@@ -1,5 +1,6 @@
 from typing import Iterable, Optional, Text, Union
 
+from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
 from ....utils.functional import type_checker
 from ....utils.types import B24BoolStrict, JSONDict, JSONList, Timeout
@@ -18,7 +19,7 @@ class List(BaseEntity):
             self,
             *,
             bitrix_id: Iterable[Union[int, Text]],
-            avatar_hr: Optional[Union[bool, B24BoolStrict]] = None,
+            avatar_hr: Optional[Union[bool, B24BoolStrict]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[Union[JSONDict, JSONList]]:
         """"""
@@ -30,7 +31,7 @@ class List(BaseEntity):
             "ID": bitrix_id,
         }
 
-        if avatar_hr is not None:
+        if avatar_hr is not MISSING:
             params["AVATAR_HR"] = B24BoolStrict(avatar_hr).to_b24()
 
         return self._make_bitrix_api_request(

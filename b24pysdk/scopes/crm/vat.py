@@ -1,9 +1,11 @@
 from typing import Iterable, Optional, Text
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest
 from ...schemas.crm.vat import VatFieldsData, VatFieldsDict
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
+from .._adapters import BitrixSchemaDictAdapter
 from ._base_crm import BaseCRM
 
 __all__ = [
@@ -37,7 +39,7 @@ class Vat(BaseCRM):
         """
         return self._fields(
             timeout=timeout,
-            value_type=VatFieldsDict,
+            result_adapter=BitrixSchemaDictAdapter(VatFieldsDict),
         )
 
     @type_checker
@@ -96,9 +98,9 @@ class Vat(BaseCRM):
     def list(
             self,
             *,
-            order: Optional[JSONDict] = None,
-            filter: Optional[JSONDict] = None,
-            select: Optional[Iterable[Text]] = None,
+            order: Optional[JSONDict] = MISSING,
+            filter: Optional[JSONDict] = MISSING,
+            select: Optional[Iterable[Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of VAT rates by filter.

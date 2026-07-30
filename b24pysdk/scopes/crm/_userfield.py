@@ -1,5 +1,6 @@
 from typing import Optional
 
+from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, JSONList, Timeout
@@ -37,8 +38,8 @@ class Userfield(BaseCRM):
     def list(
             self,
             *,
-            filter: Optional[JSONDict] = None,
-            order: Optional[JSONDict] = None,
+            filter: Optional[JSONDict] = MISSING,
+            order: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -54,7 +55,7 @@ class Userfield(BaseCRM):
             bitrix_id: int,
             fields: JSONDict,
             *,
-            list: Optional[JSONList] = None,
+            list: Optional[JSONList] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """"""
@@ -64,7 +65,7 @@ class Userfield(BaseCRM):
             "fields": fields,
         }
 
-        if list is not None:
+        if list is not MISSING:
             params["LIST"] = list
 
         return self._make_bitrix_api_request(

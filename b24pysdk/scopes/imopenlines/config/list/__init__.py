@@ -1,5 +1,6 @@
 from typing import Optional
 
+from ....._constants import MISSING
 from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
 from .....utils.types import JSONDict, Timeout
@@ -17,18 +18,18 @@ class List(BaseEntity):
     def get(
             self,
             *,
-            params: Optional[JSONDict] = None,
-            options: Optional[JSONDict] = None,
+            params: Optional[JSONDict] = MISSING,
+            options: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
 
         payload = dict()
 
-        if params is not None:
+        if params is not MISSING:
             payload["PARAMS"] = params
 
-        if options is not None:
+        if options is not MISSING:
             payload["OPTIONS"] = options
 
         return self._make_bitrix_api_request(

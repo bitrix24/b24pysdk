@@ -3,7 +3,7 @@ from typing import Callable, Generator, Generic, List, Optional, Text, Union
 
 from ...protocols import BitrixTokenFullProtocol
 from ...schemas.api import ListFastResponseData, ListResponseData, ResponseData
-from ...utils.type_vars import BAResultT, BAValueResponseT, BAValueT
+from ...utils.type_vars import BAResultT, BAValueResponseT, BValueT
 from ...utils.types import JSONDict, JSONGenerator, JSONList
 from ..responses import (
     BitrixAPIValueResponse,
@@ -22,7 +22,7 @@ __all__ = [
 ]
 
 
-class BitrixAPIBaseValueRequest(BitrixAPIBaseRequest[BAValueResponseT, BAResultT], ABC, Generic[BAValueResponseT, BAResultT, BAValueT]):
+class BitrixAPIBaseValueRequest(BitrixAPIBaseRequest[BAValueResponseT, BAResultT], ABC, Generic[BAValueResponseT, BAResultT, BValueT]):
     """
     Base request for Python-friendly views over raw Bitrix24 ``result``.
 
@@ -32,7 +32,7 @@ class BitrixAPIBaseValueRequest(BitrixAPIBaseRequest[BAValueResponseT, BAResultT
 
     __slots__ = ("_result_adapter",)
 
-    _result_adapter: Callable[[BAResultT], Union[BAValueT, List[BAValueT], Generator[BAValueT, None, None]]]
+    _result_adapter: Callable[[BAResultT], Union[BValueT, List[BValueT], Generator[BValueT, None, None]]]
 
     def __init__(
             self,
@@ -40,7 +40,7 @@ class BitrixAPIBaseValueRequest(BitrixAPIBaseRequest[BAValueResponseT, BAResultT
             bitrix_token: BitrixTokenFullProtocol,
             api_method: Text,
             params: Optional[JSONDict] = None,
-            result_adapter: Callable[[BAResultT], Union[BAValueT, List[BAValueT], Generator[BAValueT, None, None]]],
+            result_adapter: Callable[[BAResultT], Union[BValueT, List[BValueT], Generator[BValueT, None, None]]],
             **kwargs: JSONDict,
     ):
         """
@@ -63,7 +63,7 @@ class BitrixAPIBaseValueRequest(BitrixAPIBaseRequest[BAValueResponseT, BAResultT
         self._result_adapter = result_adapter
 
 
-class BitrixAPIValueRequest(BitrixAPIBaseValueRequest[BitrixAPIValueResponse[BAResultT, BAValueT], BAResultT, BAValueT], Generic[BAResultT, BAValueT]):
+class BitrixAPIValueRequest(BitrixAPIBaseValueRequest[BitrixAPIValueResponse[BAResultT, BValueT], BAResultT, BValueT], Generic[BAResultT, BValueT]):
     """
     Lazy request object that exposes an adapted ``value``.
 
@@ -75,7 +75,7 @@ class BitrixAPIValueRequest(BitrixAPIBaseValueRequest[BitrixAPIValueResponse[BAR
     __slots__ = ()
 
     @property
-    def value(self) -> BAValueT:
+    def value(self) -> BValueT:
         """
         Return adapted Python value from the response.
 
@@ -83,7 +83,7 @@ class BitrixAPIValueRequest(BitrixAPIBaseValueRequest[BitrixAPIValueResponse[BAR
         """
         return self.response.value
 
-    def _convert_response(self, json_response: ResponseData) -> BitrixAPIValueResponse[BAResultT, BAValueT]:
+    def _convert_response(self, json_response: ResponseData) -> BitrixAPIValueResponse[BAResultT, BValueT]:
         """
         Convert raw JSON response into ``BitrixAPIValueResponse``.
 
@@ -96,7 +96,7 @@ class BitrixAPIValueRequest(BitrixAPIBaseValueRequest[BitrixAPIValueResponse[BAR
         return BitrixAPIValueResponse.from_dict(json_response, result_adapter=self._result_adapter)
 
 
-class BitrixAPIValuesRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesResponse[BAResultT, BAValueT], BAResultT, List[BAValueT]], Generic[BAResultT, BAValueT]):
+class BitrixAPIValuesRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesResponse[BAResultT, BValueT], BAResultT, BValueT], Generic[BAResultT, BValueT]):
     """
     Lazy request object that exposes adapted ``values``.
 
@@ -108,7 +108,7 @@ class BitrixAPIValuesRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesResponse[B
     __slots__ = ()
 
     @property
-    def values(self) -> List[BAValueT]:
+    def values(self) -> List[BValueT]:
         """
         Return adapted Python values from the response.
 
@@ -119,7 +119,7 @@ class BitrixAPIValuesRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesResponse[B
     def as_list(
             self,
             limit: Optional[int] = None,
-    ) -> "BitrixAPIValuesListRequest[BAValueT]":
+    ) -> "BitrixAPIValuesListRequest[BValueT]":
         """
         Create a paginated list request from this values request.
 
@@ -143,7 +143,7 @@ class BitrixAPIValuesRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesResponse[B
             self,
             descending: bool = False,
             limit: Optional[int] = None,
-    ) -> "BitrixAPIValuesListFastRequest[BAValueT]":
+    ) -> "BitrixAPIValuesListFastRequest[BValueT]":
         """
         Create a fast paginated list request from this values request.
 
@@ -166,7 +166,7 @@ class BitrixAPIValuesRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesResponse[B
             **self._kwargs,
         )
 
-    def _convert_response(self, json_response: ResponseData) -> BitrixAPIValuesResponse[BAResultT, BAValueT]:
+    def _convert_response(self, json_response: ResponseData) -> BitrixAPIValuesResponse[BAResultT, BValueT]:
         """
         Convert raw JSON response into ``BitrixAPIValuesResponse``.
 
@@ -179,7 +179,7 @@ class BitrixAPIValuesRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesResponse[B
         return BitrixAPIValuesResponse.from_dict(json_response, result_adapter=self._result_adapter)
 
 
-class BitrixAPIValuesListRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesListResponse[BAValueT], JSONList, List[BAValueT]], Generic[BAValueT]):
+class BitrixAPIValuesListRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesListResponse[BValueT], JSONList, BValueT], Generic[BValueT]):
     """
     Lazy list request that exposes adapted ``values``.
 
@@ -194,7 +194,7 @@ class BitrixAPIValuesListRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesListRe
     def __init__(
             self,
             *,
-            bitrix_api_values_request: BitrixAPIValuesRequest[BAResultT, BAValueT],
+            bitrix_api_values_request: BitrixAPIValuesRequest[BAResultT, BValueT],
             limit: Optional[int] = None,
             **kwargs: JSONDict,
     ):
@@ -227,7 +227,7 @@ class BitrixAPIValuesListRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesListRe
         )
 
     @property
-    def values(self) -> List[BAValueT]:
+    def values(self) -> List[BValueT]:
         """
         Return adapted Python values from the list response.
 
@@ -235,7 +235,7 @@ class BitrixAPIValuesListRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesListRe
         """
         return self.response.values
 
-    def _convert_response(self, json_response: ListResponseData) -> BitrixAPIValuesListResponse[BAValueT]:
+    def _convert_response(self, json_response: ListResponseData) -> BitrixAPIValuesListResponse[BValueT]:
         """
         Convert raw JSON response into ``BitrixAPIValuesListResponse``.
 
@@ -262,7 +262,7 @@ class BitrixAPIValuesListRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesListRe
         )
 
 
-class BitrixAPIValuesListFastRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesListFastResponse[BAValueT], JSONGenerator, Generator[BAValueT, None, None]], Generic[BAValueT]):
+class BitrixAPIValuesListFastRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesListFastResponse[BValueT], JSONGenerator, BValueT], Generic[BValueT]):
     """
     Lazy fast list request that exposes adapted ``values``.
 
@@ -278,7 +278,7 @@ class BitrixAPIValuesListFastRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesLi
     def __init__(
             self,
             *,
-            bitrix_api_values_request: BitrixAPIValuesRequest[BAResultT, BAValueT],
+            bitrix_api_values_request: BitrixAPIValuesRequest[BAResultT, BValueT],
             descending: bool = False,
             limit: Optional[int] = None,
             **kwargs: JSONDict,
@@ -315,7 +315,7 @@ class BitrixAPIValuesListFastRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesLi
         )
 
     @property
-    def values(self) -> Generator[BAValueT, None, None]:
+    def values(self) -> Generator[BValueT, None, None]:
         """
         Return adapted Python values from the fast list response.
 
@@ -323,7 +323,7 @@ class BitrixAPIValuesListFastRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesLi
         """
         return self.response.values
 
-    def _convert_response(self, json_response: ListFastResponseData) -> BitrixAPIValuesListFastResponse[BAValueT]:
+    def _convert_response(self, json_response: ListFastResponseData) -> BitrixAPIValuesListFastResponse[BValueT]:
         """
         Convert raw JSON response into ``BitrixAPIValuesListFastResponse``.
 

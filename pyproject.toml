@@ -18,7 +18,10 @@ keywords = ["bitrix24", "rest", "api"]
 classifiers = []
 
 dependencies = [
+    "python-dateutil>=2.9.0,<3",
     "requests>=2.31.0,<3",
+    "tzdata>=2020.1,<2026.4",
+    "typing-extensions>=4.0.0; python_version < '3.11'",
     "uuid6>=2021.11.29; python_version < '3.14'",
 ]
 
@@ -41,7 +44,7 @@ flask = [
 ]
 dev = [
     "pre-commit",
-    "ruff==0.15.20",
+    "ruff==0.15.22",
 ]
 test = [
     "environs>=11.0.0",
