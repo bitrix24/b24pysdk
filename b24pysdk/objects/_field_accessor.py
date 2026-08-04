@@ -4,7 +4,7 @@ from ..utils.type_vars import BRawT, BValueT
 
 if TYPE_CHECKING:
     from ._base_object import BaseObject
-    from .fields.base_field import BaseField
+    from ._fields.base_field import BaseField
 
 __all__ = [
     "FieldAccessor",

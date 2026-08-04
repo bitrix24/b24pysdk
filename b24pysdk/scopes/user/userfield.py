@@ -2,7 +2,7 @@ from typing import Optional
 
 from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest, BitrixAPIValuesRequest
-from ...objects.user.user_userfield import UserUserfield as UserUserfieldObject
+from ...objects.user.userfield import UserUserfield as UserUserfieldObject
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, JSONList, Timeout
 from .._adapters import BitrixObjectAdapter, BitrixObjectsAdapter
@@ -51,7 +51,7 @@ class Userfield(BaseEntity):
             params=params,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValueRequest,
-            result_adapter=BitrixObjectAdapter(UserUserfieldObject, client=self._client),
+            result_adapter=BitrixObjectAdapter("user.userfield", client=self._client),
         )
 
     @type_checker
@@ -93,7 +93,7 @@ class Userfield(BaseEntity):
             params=params,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValuesRequest,
-            result_adapter=BitrixObjectsAdapter(UserUserfieldObject, client=self._client),
+            result_adapter=BitrixObjectsAdapter("user.userfield", client=self._client),
         )
 
     @type_checker

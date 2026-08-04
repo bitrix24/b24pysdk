@@ -1,12 +1,12 @@
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, Dict, Iterable, Optional, Text
+from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, Iterable, Optional, Text, TypeVar
 
 from .._constants import MISSING
 from ..schemas.api import BitrixObjectBatchWriteResponse
-from ..utils.types import JSONDict, JSONList, Timeout
+from ..utils.types import JSONDict, JSONList, Self, Timeout
 from ._base_object import BaseObject
+from ._fields import IntField, ObjectField, TextField
 from ._managers import BaseFieldManager, BaseObjectManager
 from .errors import BitrixObjectError
-from .fields import IntField, ObjectField, TextField
 
 if TYPE_CHECKING:
     from ..api.requests import BitrixAPIRequest, BitrixAPIValueRequest, BitrixAPIValuesRequest
@@ -24,19 +24,20 @@ __all__ = [
 class Department(BaseObject[int]):
     """Bitrix24 company department."""
 
+    _OBJECT_KEY = "department"
     _PK_TYPE = int
     _UPDATE_KEY = None
 
-    fields: ClassVar["DepartmentFieldManager"]
-    objects: ClassVar["DepartmentManager"]
+    fields: "DepartmentFieldManager[Self]"
+    objects: "DepartmentManager[Self]"
 
     bitrix_id = IntField("ID", is_pk=True)
     name = TextField("NAME", is_required=True)
     sort = IntField("SORT", is_required=True)
     parent_id = IntField("PARENT", is_missing_allowed=True)
-    parent: Optional["Department"] = ObjectField(parent_id, object_class="self")
+    parent: Optional[Self] = ObjectField(parent_id, object_class="department")
     uf_head_id = IntField("UF_HEAD", is_missing_allowed=True)
-    uf_head: Optional["User"] = ObjectField(uf_head_id, object_class=".user.User")
+    uf_head: Optional["User"] = ObjectField(uf_head_id, object_class="user")
 
     def _get_bitrix_data(self) -> JSONDict:
         """Load raw department data from Bitrix24."""
@@ -59,7 +60,7 @@ class Department(BaseObject[int]):
             name: Optional[Text] = MISSING,
             sort: Optional[int] = MISSING,
             parent_id: Optional[int] = MISSING,
-            parent: Optional["Department"] = MISSING,
+            parent: Optional[Self] = MISSING,
             head_id: Optional[int] = MISSING,
             uf_head: Optional["User"] = MISSING,
             timeout: Timeout = None,
@@ -116,7 +117,10 @@ class Department(BaseObject[int]):
         return client.department.delete
 
 
-class DepartmentFieldManager(BaseFieldManager[Department]):
+_DepartmentT = TypeVar("_DepartmentT", bound=Department)
+
+
+class DepartmentFieldManager(BaseFieldManager[_DepartmentT], Generic[_DepartmentT]):
     """Field metadata manager for Bitrix24 departments."""
 
     __slots__ = ()
@@ -130,7 +134,7 @@ class DepartmentFieldManager(BaseFieldManager[Department]):
         return self._client.department.fields(timeout=timeout).result
 
 
-class DepartmentManager(BaseObjectManager[Department]):
+class DepartmentManager(BaseObjectManager[_DepartmentT], Generic[_DepartmentT]):
     """Query manager for Bitrix24 departments."""
 
     _ADD_KEY = None
@@ -139,15 +143,15 @@ class DepartmentManager(BaseObjectManager[Department]):
 
     __slots__ = ()
 
-    def _get_api_wrapper(self, client: "ClientType") -> Callable[..., "BitrixAPIValuesRequest[JSONList, Department]"]:
+    def _get_api_wrapper(self, client: "ClientType") -> Callable[..., "BitrixAPIValuesRequest[JSONList, _DepartmentT]"]:
         """Return the load API method resolved from the supplied client."""
         return client.department.get
 
-    def filter(self, **filters: Any) -> "DepartmentManager":
+    def filter(self, **filters: Any) -> Self:
         """Return departments filtered by SDK object attribute names."""
         return self._filter(**filters)
 
-    def order(self, *fields: Text) -> "DepartmentManager":
+    def order(self, *fields: Text) -> Self:
         """Return departments ordered by SDK object attribute names."""
         return self._order(*fields)
 
@@ -170,7 +174,7 @@ class DepartmentManager(BaseObjectManager[Department]):
         params["sort"] = sort
         params["order"] = order
 
-    def start(self, start: Optional[int]) -> "DepartmentManager":
+    def start(self, start: Optional[int]) -> Self:
         """Return departments with a custom Bitrix24 pagination start offset."""
         return self._start(start)
 
@@ -179,12 +183,12 @@ class DepartmentManager(BaseObjectManager[Department]):
             *,
             name: Text,
             parent_id: Optional[int] = MISSING,
-            parent: Optional[Department] = MISSING,
+            parent: Optional[_DepartmentT] = MISSING,
             sort: Optional[int] = MISSING,
             head_id: Optional[int] = MISSING,
             uf_head: Optional["User"] = MISSING,
             timeout: Timeout = None,
-    ) -> Department:
+    ) -> _DepartmentT:
         """Create a Bitrix24 department."""
 
         if parent_id is MISSING and parent is MISSING:
@@ -217,7 +221,7 @@ class DepartmentManager(BaseObjectManager[Department]):
 
         return self._add(**fields, timeout=timeout)
 
-    def _get_add_api_wrapper(self, client: "ClientType") -> Callable[..., "BitrixAPIValueRequest[int, Department]"]:
+    def _get_add_api_wrapper(self, client: "ClientType") -> Callable[..., "BitrixAPIValueRequest[int, _DepartmentT]"]:
         """Return the add API method resolved from the supplied client."""
         return client.department.add
 
@@ -227,7 +231,7 @@ class DepartmentManager(BaseObjectManager[Department]):
             *,
             ignore_errors: bool = False,
             timeout: Timeout = None,
-    ) -> "BitrixObjectList[Department]":
+    ) -> "BitrixObjectList[_DepartmentT]":
         """Create many Bitrix24 departments from SDK field dictionaries."""
         return self._add_many(
             items,
@@ -241,7 +245,7 @@ class DepartmentManager(BaseObjectManager[Department]):
             name: Optional[Text] = MISSING,
             sort: Optional[int] = MISSING,
             parent_id: Optional[int] = MISSING,
-            parent: Optional[Department] = MISSING,
+            parent: Optional[_DepartmentT] = MISSING,
             head_id: Optional[int] = MISSING,
             uf_head: Optional["User"] = MISSING,
             timeout: Timeout = None,

@@ -15,7 +15,7 @@ Each client exposes Bitrix API scopes as attributes (e.g. ``crm``, ``user``,
 import inspect
 from abc import ABC
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Literal, Mapping, Optional, Sequence, Text, Type, Union, overload
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, Hashable, List, Literal, Mapping, Optional, Sequence, Text, Type, Union, overload
 
 from . import scopes
 from ._constants import MISSING
@@ -39,18 +39,20 @@ __all__ = [
 ]
 
 
-_ClientCacheKey = Literal["fields"]
+_ClientCacheKey = Literal["bitrix_fields", "bitrix_objects"]
 
 
 class _ClientCache:
     """Internal lazily initialized cache owned by one client instance."""
 
-    __slots__ = ("_fields",)
+    __slots__ = ("_bitrix_fields", "_bitrix_objects")
 
-    _fields: Optional[Dict[Type["BaseObject"], Any]]
+    _bitrix_fields: Optional[Dict[Type["BaseObject"], Dict[Text, Any]]]
+    _bitrix_objects: Optional[Dict[Type["BaseObject"], Dict[Hashable, "BaseObject"]]]
 
     def __init__(self):
-        self._fields = None
+        self._bitrix_fields = None
+        self._bitrix_objects = None
 
     def get(self, key: _ClientCacheKey) -> Dict[Any, Any]:
         """Return one cache section, creating it on first access."""
@@ -63,22 +65,6 @@ class _ClientCache:
             setattr(self, attr_name, cache)
 
         return cache
-
-    def set(
-            self,
-            key: _ClientCacheKey,
-            cache: Mapping[Any, Any],
-    ):
-        """Replace one cache section."""
-        setattr(self, f"_{key}", dict(cache))
-
-    def update(
-            self,
-            key: _ClientCacheKey,
-            cache: Mapping[Any, Any],
-    ):
-        """Update one cache section."""
-        self.get(key).update(cache)
 
     def clear(self, key: Optional[_ClientCacheKey] = None):
         """Clear one cache section or all client cache data."""
@@ -164,30 +150,6 @@ class BaseClient(ABC):
             return {}
 
         return self._cache.get(key)
-
-    def set_cache(
-            self,
-            key: _ClientCacheKey,
-            cache: Mapping[Any, Any],
-    ):
-        """Replace the selected client cache section."""
-
-        if not self._enable_cache:
-            return
-
-        self._cache.set(key, cache)
-
-    def update_cache(
-            self,
-            key: _ClientCacheKey,
-            cache: Mapping[Any, Any],
-    ):
-        """Update the selected client cache section."""
-
-        if not self._enable_cache:
-            return
-
-        self._cache.update(key, cache)
 
     def clear_cache(self, key: Optional[_ClientCacheKey] = None):
         """Clear one cache section or all client cache data."""

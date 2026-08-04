@@ -53,7 +53,7 @@ class BitrixObjectList(list[BOT], Generic[BOT]):
 
     def copy(self) -> Self:
         """Return a shallow copy preserving the object-list type."""
-        return self.__class__(super().copy(), client_provider=self._client_provider)
+        return self.__class__(self, client_provider=self._client_provider)
 
     @property
     def _client(self) -> "ClientType":

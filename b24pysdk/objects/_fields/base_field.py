@@ -1,6 +1,5 @@
 import re
 from abc import ABC, abstractmethod
-from contextlib import suppress
 from typing import TYPE_CHECKING, Any, Generic, Iterable, List, Optional, Text, Type, Union
 
 from ...utils.type_vars import BRawT, BValueT
@@ -171,8 +170,7 @@ class BaseField(ABC, Generic[BRawT, BValueT]):
 
     def delete_private_attr(self, instance: "BaseObject"):
         """Delete this field private instance attribute, if it exists."""
-        with suppress(AttributeError):
-            delattr(instance, self.get_private_attr_name(instance.__class__))
+        instance.__dict__.pop(self.get_private_attr_name(instance.__class__), None)
 
     def from_bitrix_value(self, value: Union[Optional[BRawT], List[BRawT]]) -> Union[Optional[BValueT], List[BValueT]]:
         """Convert a raw Bitrix24 field value to a public Python value."""

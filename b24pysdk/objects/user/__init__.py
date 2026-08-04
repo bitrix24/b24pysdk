@@ -1,12 +1,12 @@
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, Iterable, Optional, Text
+from typing import TYPE_CHECKING, Any, Callable, Generic, Iterable, Optional, Text, TypeVar
 
 from ..._constants import MISSING
 from ...constants.user import PersonalGender, UserType
 from ...schemas.api import BitrixObjectBatchWriteResponse
 from ...utils.types import JSONDict, JSONList, Self, Timeout
 from .._base_object import BaseObject
+from .._fields import BoolField, DateField, DateTimeField, EnumField, IntField, ObjectField, TextField, TimeZoneField, URLField
 from .._managers import BaseFieldManager, BaseObjectManager
-from ..fields import BoolField, DateField, DateTimeField, EnumField, IntField, ObjectField, TextField, TimeZoneField, URLField
 
 if TYPE_CHECKING:
     from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest, BitrixAPIValuesRequest
@@ -18,20 +18,19 @@ __all__ = [
     "User",
     "UserFieldManager",
     "UserManager",
-    "UserUserfield",
-    "UserUserfieldManager",
 ]
 
 
 class User(BaseObject[int]):
     """Bitrix24 portal user."""
 
+    _OBJECT_KEY = "user"
     _PK_TYPE = int
     _UPDATE_KEY = None
     _USERFIELD_AVAILABLE = True
 
-    fields: ClassVar["UserFieldManager"]
-    objects: ClassVar["UserManager"]
+    fields: "UserFieldManager[Self]"
+    objects: "UserManager[Self]"
 
     bitrix_id = IntField("ID", is_pk=True)
     xml_id = IntField("XML_ID", is_missing_allowed=True)
@@ -85,7 +84,7 @@ class User(BaseObject[int]):
     uf_employment_date = DateField("UF_EMPLOYMENT_DATE")
     uf_timeman = TextField("UF_TIMEMAN", is_missing_allowed=True)
     uf_department_ids = IntField("UF_DEPARTMENT", is_multiple=True, is_missing_allowed=True)
-    uf_departments: Optional["BitrixObjectList[Department]"] = ObjectField(uf_department_ids, object_class="..department.Department")
+    uf_departments: Optional["BitrixObjectList[Department]"] = ObjectField(uf_department_ids, object_class="department")
     uf_interests = TextField("UF_INTERESTS", is_missing_allowed=True)
     uf_skills = TextField("UF_SKILLS", is_missing_allowed=True)
     uf_web_sites = TextField("UF_WEB_SITES", is_missing_allowed=True)
@@ -135,7 +134,10 @@ class User(BaseObject[int]):
         return self._save(update_fields=update_fields, timeout=timeout)
 
 
-class UserFieldManager(BaseFieldManager[User]):
+_UserT = TypeVar("_UserT", bound=User)
+
+
+class UserFieldManager(BaseFieldManager[_UserT], Generic[_UserT]):
     """Field metadata manager for Bitrix24 users."""
 
     __slots__ = ()
@@ -149,14 +151,14 @@ class UserFieldManager(BaseFieldManager[User]):
         return self._client.user.fields(timeout=timeout).result
 
 
-class UserManager(BaseObjectManager[User]):
+class UserManager(BaseObjectManager[_UserT], Generic[_UserT]):
     """Query manager for Bitrix24 users."""
 
     _ORDER_KEY = None
 
     __slots__ = ()
 
-    def _get_api_wrapper(self, client: "ClientType") -> Callable[..., "BitrixAPIValuesRequest[JSONList, User]"]:
+    def _get_api_wrapper(self, client: "ClientType") -> Callable[..., "BitrixAPIValuesRequest[JSONList, _UserT]"]:
         """Return the load API method resolved from the supplied client."""
         return client.user.get
 
@@ -196,11 +198,11 @@ class UserManager(BaseObjectManager[User]):
             *,
             timeout: Timeout = None,
             **fields: Any,
-    ) -> User:
+    ) -> _UserT:
         """Create a Bitrix24 user."""
         return self._add(**fields, timeout=timeout)
 
-    def _get_add_api_wrapper(self, client: "ClientType") -> Callable[..., "BitrixAPIValueRequest[int, User]"]:
+    def _get_add_api_wrapper(self, client: "ClientType") -> Callable[..., "BitrixAPIValueRequest[int, _UserT]"]:
         """Return the add API method resolved from the supplied client."""
         return client.user.add
 
@@ -210,7 +212,7 @@ class UserManager(BaseObjectManager[User]):
             *,
             ignore_errors: bool = False,
             timeout: Timeout = None,
-    ) -> "BitrixObjectList[User]":
+    ) -> "BitrixObjectList[_UserT]":
         """Create many Bitrix24 users from SDK field dictionaries."""
         return self._add_many(
             items,
@@ -231,7 +233,7 @@ class UserManager(BaseObjectManager[User]):
         """Return users query with the ``ADMIN_MODE`` request parameter."""
         return self._with_params(admin_mode=admin_mode)
 
-    def current(self, *, timeout: Timeout = None) -> User:
+    def current(self, *, timeout: Timeout = None) -> _UserT:
         """Return the current Bitrix24 user."""
         return self._client.user.current(timeout=timeout).response.value
 
@@ -283,6 +285,3 @@ class UserManager(BaseObjectManager[User]):
 
 User.fields = UserFieldManager()
 User.objects = UserManager()
-
-
-from .user_userfield import UserUserfield, UserUserfieldManager  # noqa: E402

@@ -1,10 +1,10 @@
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, Iterable, Optional, Text
+from typing import TYPE_CHECKING, Any, Callable, Generic, Iterable, Optional, Text, TypeVar
 
 from ...schemas.api import BitrixObjectBatchWriteResponse
 from ...utils.types import JSONDict, JSONList, Self, Timeout
 from .._base_object import BaseObject
+from .._fields import BoolField, DictField, IntField, TextField
 from .._managers import BaseObjectManager
-from ..fields import BoolField, DictField, IntField, TextField
 
 if TYPE_CHECKING:
     from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest, BitrixAPIValuesRequest
@@ -20,9 +20,10 @@ __all__ = [
 class UserUserfield(BaseObject[int]):
     """Bitrix24 user custom field definition."""
 
+    _OBJECT_KEY = "user.userfield"
     _PK_TYPE = int
 
-    objects: ClassVar["UserUserfieldManager"]
+    objects: "UserUserfieldManager[Self]"
 
     bitrix_id = IntField("ID", is_pk=True)
     entity_id = TextField("ENTITY_ID")
@@ -37,7 +38,7 @@ class UserUserfield(BaseObject[int]):
     edit_in_list = BoolField("EDIT_IN_LIST")
     is_searchable = BoolField("IS_SEARCHABLE")
     settings = DictField("SETTINGS")
-    enum_values = DictField("LIST", is_multiple=True, is_missing_allowed=True)
+    list = DictField("LIST", is_multiple=True, is_missing_allowed=True)
 
     def _get_bitrix_data(self) -> JSONDict:
         """Load raw user custom field data from Bitrix24."""
@@ -80,12 +81,15 @@ class UserUserfield(BaseObject[int]):
         return client.user.userfield.delete
 
 
-class UserUserfieldManager(BaseObjectManager[UserUserfield]):
+_UserUserfieldT = TypeVar("_UserUserfieldT", bound=UserUserfield)
+
+
+class UserUserfieldManager(BaseObjectManager[_UserUserfieldT], Generic[_UserUserfieldT]):
     """Query manager for Bitrix24 user custom fields."""
 
     __slots__ = ()
 
-    def _get_api_wrapper(self, client: "ClientType") -> Callable[..., "BitrixAPIValuesRequest[JSONList, UserUserfield]"]:
+    def _get_api_wrapper(self, client: "ClientType") -> Callable[..., "BitrixAPIValuesRequest[JSONList, _UserUserfieldT]"]:
         """Return the load API method resolved from the supplied client."""
         return client.user.userfield.list
 
@@ -106,11 +110,11 @@ class UserUserfieldManager(BaseObjectManager[UserUserfield]):
             *,
             timeout: Timeout = None,
             **fields: Any,
-    ) -> UserUserfield:
+    ) -> _UserUserfieldT:
         """Create a Bitrix24 user custom field."""
         return self._add(**fields, timeout=timeout)
 
-    def _get_add_api_wrapper(self, client: "ClientType") -> Callable[..., "BitrixAPIValueRequest[int, UserUserfield]"]:
+    def _get_add_api_wrapper(self, client: "ClientType") -> Callable[..., "BitrixAPIValueRequest[int, _UserUserfieldT]"]:
         """Return the add API method resolved from the supplied client."""
         return client.user.userfield.add
 
@@ -120,7 +124,7 @@ class UserUserfieldManager(BaseObjectManager[UserUserfield]):
             *,
             ignore_errors: bool = False,
             timeout: Timeout = None,
-    ) -> "BitrixObjectList[UserUserfield]":
+    ) -> "BitrixObjectList[_UserUserfieldT]":
         """Create many Bitrix24 user custom fields from SDK field dictionaries."""
         return self._add_many(
             items,

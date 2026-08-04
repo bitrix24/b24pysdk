@@ -86,9 +86,9 @@ class BaseManager(ABC, Generic[BOT]):
         return self._object_class
 
     @property
-    def _meta(self) -> "ObjectMetadata":
+    def _meta(self) -> "ObjectMetadata[BOT]":
         """Return metadata of the SDK object class bound to this manager."""
-        return self._get_object_class()._meta
+        return self._get_object_class().get_meta()
 
     @abstractmethod
     def _clone(

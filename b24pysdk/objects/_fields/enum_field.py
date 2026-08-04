@@ -39,7 +39,7 @@ class EnumField(BaseField[Any, BEnumT], Generic[BEnumT]):
     def _convert_from_bitrix(self, value: Optional[Any]) -> Optional[BEnumT]:
         """Convert a raw Bitrix24 value to an enum member."""
 
-        if not value:
+        if value is None or value == "":
             if self.is_required:
                 raise ValueError(f"Field {self.attr_name!r} is required.")
 
@@ -50,7 +50,7 @@ class EnumField(BaseField[Any, BEnumT], Generic[BEnumT]):
     def _convert_to_bitrix(self, value: Optional[BEnumT]) -> Optional[Any]:
         """Convert an enum member to a Bitrix24 value."""
 
-        if not value:
+        if value is None:
             if self.is_required:
                 raise ValueError(f"Field {self.attr_name!r} is required.")
 

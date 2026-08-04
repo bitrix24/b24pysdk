@@ -91,7 +91,7 @@ class Department(BaseScope):
             params=params,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValueRequest,
-            result_adapter=BitrixObjectAdapter(DepartmentObject, client=self._client),
+            result_adapter=BitrixObjectAdapter("department", client=self._client),
         )
 
     @type_checker
@@ -163,7 +163,7 @@ class Department(BaseScope):
             params=params,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValuesRequest,
-            result_adapter=BitrixObjectsAdapter(DepartmentObject, client=self._client),
+            result_adapter=BitrixObjectsAdapter("department", client=self._client),
         )
 
     @type_checker

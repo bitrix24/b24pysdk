@@ -54,7 +54,7 @@ class User(BaseScope):
             params=fields,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValueRequest,
-            result_adapter=BitrixObjectAdapter(UserObject, client=self._client),
+            result_adapter=BitrixObjectAdapter("user", client=self._client),
         )
 
     @type_checker
@@ -92,7 +92,7 @@ class User(BaseScope):
             params=params,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValuesRequest,
-            result_adapter=BitrixObjectsAdapter(UserObject, client=self._client),
+            result_adapter=BitrixObjectsAdapter("user", client=self._client),
         )
 
     @type_checker
@@ -144,7 +144,7 @@ class User(BaseScope):
             params=params,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValuesRequest,
-            result_adapter=BitrixObjectsAdapter(UserObject, client=self._client),
+            result_adapter=BitrixObjectsAdapter("user", client=self._client),
         )
 
     @type_checker
@@ -158,7 +158,7 @@ class User(BaseScope):
             api_wrapper=self.current,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValueRequest,
-            result_adapter=BitrixObjectAdapter(UserObject, client=self._client),
+            result_adapter=BitrixObjectAdapter("user", client=self._client),
         )
 
     @type_checker

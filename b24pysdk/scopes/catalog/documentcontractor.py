@@ -32,7 +32,7 @@ class Documentcontractor(BaseEntity):
 
         Documentation: https://apidocs.bitrix24.com/api-reference/catalog/documentcontractor/catalog-documentcontractor-add.html
 
-        This method creates a link between a CRM contractor and a store document of type "Receipt".
+        The method creates a binding of a vendor, contact, or company to an inventory document.
 
         Args:
             fields: Object format:
@@ -43,7 +43,7 @@ class Documentcontractor(BaseEntity):
 
                     "entityId": <integer>,
                 }, where
-                - documentId — Identifier of the inventory management document of type "Receipt" A; obtainable via catalog.document.list;
+                - documentId — Identifier of the inventory management document of type "Incoming" A; obtainable via catalog.document.list;
                 - entityTypeId — CRM object type: 3 — contact; 4 — company;
                 - entityId — Identifier of the CRM element (contact or company) from the "Supplier" category;
 

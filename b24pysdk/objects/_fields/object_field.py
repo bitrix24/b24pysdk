@@ -1,6 +1,6 @@
-import importlib
-from typing import TYPE_CHECKING, Any, Generic, Iterable, List, Literal, Optional, Text, Type, Union
+from typing import TYPE_CHECKING, Any, Generic, Iterable, List, Optional, Text, Type, Union
 
+from ..._config import Config
 from ..._constants import MISSING
 from ...utils.type_vars import BOT
 from .._bitrix_object_list import BitrixObjectList
@@ -21,27 +21,25 @@ class ObjectField(BaseField[Any, BOT], Generic[BOT]):
     ``source_field`` is the real SDK field that stores the related object's primary
     key. It can be passed directly as a ``BaseField`` instance.
 
-    ``object_class`` can be either a concrete SDK object class, ``"self"``,
-    or a dotted import path. ``"self"`` refers to the object class on which this
-    field is declared. Absolute paths are imported as-is. Paths starting with a
-    dot are resolved relative to the package of the declaring module. String
-    references are resolved lazily to avoid cyclic imports.
+    ``object_class`` can be either a concrete SDK object class or its registered
+    object key. Object keys are resolved lazily through ``Config`` to avoid cyclic
+    imports and to use the most recently registered object subclass. A concrete
+    class is used directly and is not resolved again through the registry.
 
     ``request_name`` belongs to the object field itself. If omitted, it defaults
     to this descriptor's attribute name rather than the source field name.
     """
 
-    __slots__ = ("_object_class", "_owner_class", "_source_field")
+    __slots__ = ("_object_class", "source_field")
 
-    _owner_class: Type["BaseObject"]
-    _source_field: BaseField[Any, Any]
-    _object_class: Union[Literal["self"], Text, Type[BOT]]
+    _object_class: Union[Text, Type[BOT]]
+    source_field: BaseField[Any, Any]
 
     def __init__(
             self,
             source_field: BaseField[Any, Any],
             *,
-            object_class: Union[Literal["self"], Text, Type[BOT]],
+            object_class: Union[Text, Type[BOT]],
     ):
         if isinstance(source_field, ObjectField):
             raise TypeError("ObjectField source cannot be another ObjectField.")
@@ -55,12 +53,8 @@ class ObjectField(BaseField[Any, BOT], Generic[BOT]):
             is_missing_allowed=source_field.is_missing_allowed,
         )
 
-        self._source_field = source_field
+        self.source_field = source_field
         self._object_class = object_class
-
-    def __set_name__(self, owner: Type["BaseObject"], name: Text):
-        super().__set_name__(owner, name)
-        self._owner_class = owner
 
     if TYPE_CHECKING:
         def __get__(
@@ -104,7 +98,7 @@ class ObjectField(BaseField[Any, BOT], Generic[BOT]):
             if not self._is_iterable(value):
                 raise TypeError(f"Field {self.attr_name!r} expects an iterable value.")
 
-            value = BitrixObjectList(value, client_provider=instance._client_provider)
+            value = BitrixObjectList(value, client_provider=getattr(instance, "_client_provider"))
 
         instance[self.bitrix_code] = self.to_bitrix_value(value)
 
@@ -114,71 +108,29 @@ class ObjectField(BaseField[Any, BOT], Generic[BOT]):
             self._set_cached_value(instance, value)
 
     def __delete__(self, instance: Optional["BaseObject"]):
-        self._source_field.__delete__(instance)
+        self.source_field.__delete__(instance)
 
     @property
     def object_class(self) -> Type[BOT]:
-        """Return and validate the related SDK object class."""
+        """Return the related SDK object class."""
 
         object_class_reference = self._object_class
 
         if isinstance(object_class_reference, str):
-            if object_class_reference == "self":
-                try:
-                    object_class = self._owner_class
-                except AttributeError:
-                    raise RuntimeError(
-                        'Object class reference "self" can be resolved only after '
-                        "ObjectField is assigned to an object class.",
-                    ) from None
-            else:
-                try:
-                    module_path, class_name = object_class_reference.rsplit(".", maxsplit=1)
-                except ValueError:
-                    raise ValueError(
-                        f"Object class path {object_class_reference!r} must include a module and class name.",
-                    ) from None
+            if not object_class_reference:
+                raise ValueError("Object class key must be a non-empty string.")
 
-                if not module_path or not class_name:
-                    raise ValueError(
-                        f"Object class path {object_class_reference!r} must include a module and class name.",
-                    )
-
-                package = None
-
-                if module_path.startswith("."):
-                    try:
-                        owner_module_path = self._owner_class.__module__
-                    except AttributeError:
-                        raise RuntimeError(
-                            "Relative object class path can be resolved only after "
-                            "ObjectField is assigned to an object class.",
-                        ) from None
-
-                    owner_module = importlib.import_module(owner_module_path)
-                    package = owner_module.__package__
-
-                    if not package:
-                        raise ImportError(
-                            f"Cannot resolve relative object class path {object_class_reference!r}: "
-                            f"module {owner_module_path!r} has no package.",
-                        )
-
-                module = importlib.import_module(module_path, package=package)
-                object_class = getattr(module, class_name)
-        else:
-            object_class = object_class_reference
+            return Config.get_object_class(object_key=object_class_reference)
 
         from .._base_object import BaseObject  # noqa: PLC0415
 
-        if not isinstance(object_class, type) or not issubclass(object_class, BaseObject):
+        if not issubclass(object_class_reference, BaseObject):
             raise TypeError(
-                f"Object class reference {object_class_reference!r} must resolve "
-                "to a BaseObject subclass.",
+                f"Object class reference {object_class_reference!r} must be "
+                "a BaseObject subclass or a registered object key.",
             )
 
-        self._object_class = object_class
-        return object_class
+        return object_class_reference
 
     def from_bitrix_value(
             self,
@@ -198,15 +150,14 @@ class ObjectField(BaseField[Any, BOT], Generic[BOT]):
             if not self._is_iterable(value):
                 raise TypeError(f"Field {self.attr_name!r} expects an iterable value.")
 
-            bitrix_objects = []
+            def iter_bitrix_objects():
+                for bitrix_pk in value:
+                    if bitrix_pk is None:
+                        raise ValueError(f"Field {self.attr_name!r} does not allow None items.")
 
-            for bitrix_pk in value:
-                if bitrix_pk is None:
-                    raise ValueError(f"Field {self.attr_name!r} does not allow None items.")
+                    yield self._convert_from_bitrix(bitrix_pk, instance=instance)
 
-                bitrix_objects.append(self._convert_from_bitrix(bitrix_pk, instance=instance))
-
-            return BitrixObjectList(bitrix_objects, client_provider=instance._client_provider)
+            return BitrixObjectList(iter_bitrix_objects(), client_provider=getattr(instance, "_client_provider"))
 
         return self._convert_from_bitrix(value, instance=instance)
 
@@ -218,7 +169,7 @@ class ObjectField(BaseField[Any, BOT], Generic[BOT]):
     ) -> Optional[BOT]:
         """Convert one related primary key to an SDK object."""
 
-        source_value = self._source_field._convert_from_bitrix(value)
+        source_value = self.source_field._convert_from_bitrix(value)
 
         if source_value is None:
             return None
@@ -228,7 +179,7 @@ class ObjectField(BaseField[Any, BOT], Generic[BOT]):
     def _convert_to_bitrix(self, value: Optional[BOT]) -> Any:
         """Convert one related SDK object to its raw primary-key value."""
         source_value = None if value is None else self._get_bitrix_pk(value)
-        return self._source_field._convert_to_bitrix(source_value)
+        return self.source_field._convert_to_bitrix(source_value)
 
     def _get_bitrix_pk(self, bitrix_object: BOT) -> Any:
         """Return primary key from a related SDK object."""
@@ -244,17 +195,17 @@ class ObjectField(BaseField[Any, BOT], Generic[BOT]):
         return bitrix_object.bitrix_pk
 
     def _get_cache_attr_name(self, instance: "BaseObject") -> Text:
-        """Return the source field private attribute name used for related-object cache."""
-        return self._source_field.get_private_attr_name(instance.__class__)
+        """Return the private attribute name used for this object-field cache."""
+        return self.get_private_attr_name(instance.__class__)
 
     def _get_cached_value(self, instance: "BaseObject") -> Union[Optional[BOT], BitrixObjectList[BOT]]:
-        """Return a cached related object from the source field private attribute."""
+        """Return the cached related object for this object field."""
         return getattr(instance, self._get_cache_attr_name(instance), None)
 
     def _delete_cached_value(self, instance: "BaseObject"):
-        """Delete the cached related object, if it exists."""
-        self._source_field.delete_private_attr(instance)
+        """Delete the cached related object for this object field, if it exists."""
+        self.delete_private_attr(instance)
 
     def _set_cached_value(self, instance: "BaseObject", value: Union[Optional[BOT], BitrixObjectList[BOT]]):
-        """Cache a related object under the source field private attribute."""
+        """Cache a related object under this object field's private attribute."""
         setattr(instance, self._get_cache_attr_name(instance), value)

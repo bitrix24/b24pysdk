@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
-from dataclasses import asdict, is_dataclass
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, Generic, Iterable, Optional, Text, Tuple, Type, overload
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, Dict, Generic, Iterable, Optional, Text, Type, overload
 
 from .._config import Config
-from ..utils.type_vars import BOPKT, BOT
-from ..utils.types import JSONDict, Timeout, cast
+from .._constants import MISSING
+from ..utils.type_vars import BOPKT
+from ..utils.types import JSONDict, Self, Timeout, cast
 from ._client_provider import ClientProvider
 from ._field_accessor import FieldAccessor
+from ._fields.base_field import BaseField
 from ._object_metadata import ObjectMetadata
 from .errors import (
     BitrixObjectDoesNotExist,
@@ -15,7 +16,6 @@ from .errors import (
     BitrixObjectFieldReadOnlyError,
     BitrixObjectMultipleObjectsReturned,
 )
-from .fields.base_field import BaseField
 
 if TYPE_CHECKING:
     from ..api.requests import BitrixAPIRequest
@@ -41,19 +41,21 @@ class BaseObject(ABC, Generic[BOPKT]):
 
     The constructor accepts either ``bitrix_pk`` for lazy loading or
     ``bitrix_data`` for an already loaded object. Fields declared with
-    ``is_pk=True`` are treated as read-only SDK fields. ``_get_bitrix_pk_from_data``
-    returns a converted primary-key object or raises an error if Bitrix24 data
+    ``is_pk=True`` are treated as read-only SDK fields. Object metadata
+    builds a converted primary-key object or raises an error if Bitrix24 data
     does not contain all primary-key fields.
     """
 
+    _OBJECT_KEY: ClassVar[Text]
     _PK_TYPE: Type[BOPKT]
+
     _UPDATE_KEY: ClassVar[Optional[Text]] = "fields"
     _USERFIELD_AVAILABLE: ClassVar[bool] = False
 
     DoesNotExist: ClassVar[Type[BitrixObjectDoesNotExist]]
     MultipleObjectsReturned: ClassVar[Type[BitrixObjectMultipleObjectsReturned]]
 
-    _meta: ClassVar[ObjectMetadata]
+    _meta: ClassVar[ObjectMetadata[Self]]
 
     _bitrix_data: Optional[JSONDict]
     _bitrix_pk: BOPKT
@@ -101,7 +103,7 @@ class BaseObject(ABC, Generic[BOPKT]):
         self._local_data = {}
 
         if bitrix_pk is None:
-            self._bitrix_pk = self._get_bitrix_pk_from_data(self._bitrix_data)
+            self._bitrix_pk = self._meta.get_bitrix_pk_from_data(self._bitrix_data)
         else:
             self._bitrix_pk = self._meta.build_bitrix_pk(bitrix_pk)
 
@@ -129,6 +131,16 @@ class BaseObject(ABC, Generic[BOPKT]):
     def __delitem__(self, bitrix_code: Text):
         self.delete_field_value(bitrix_code)
 
+    @classmethod
+    def get_meta(cls) -> ObjectMetadata[Self]:
+        """Return metadata registered for this SDK object class."""
+        return cls._meta
+
+    @classmethod
+    def get_discriminator(cls) -> Optional[int]:
+        """Return the entity discriminator used by the object registry."""
+        return None
+
     @property
     def bitrix_pk(self) -> BOPKT:
         """Return the object primary key, if it is known."""
@@ -153,58 +165,18 @@ class BaseObject(ABC, Generic[BOPKT]):
         """Return the base URL of the Bitrix24 portal."""
         return f"https://{self.client.get_token().domain}"
 
-    def get_fields(
-            self,
-            *,
-            timeout: Timeout = None,
-    ) -> Any:
-        """Return all field metadata cached by the current client."""
-
-        object_class = self.__class__
-        field_manager = getattr(object_class, "fields", None)
-
-        if field_manager is None:
-            raise BitrixObjectFieldError(
-                f"{object_class.__name__} has no FieldManager. "
-                "Declare a 'fields' class attribute with a BaseFieldManager instance.",
-            )
-
-        fields_cache = self.client.get_cache("fields")
-
-        try:
-            return fields_cache[object_class]
-        except KeyError:
-            fields = field_manager.using(client=self.client).list(timeout=timeout)
-            self.client.set_cache("fields", {object_class: fields})
-            return fields
-
-    def get_field(
-            self,
-            bitrix_code: Text,
-            *,
-            timeout: Timeout = None,
-    ) -> Any:
-        """Return cached field metadata by Bitrix24 field code."""
-
-        try:
-            return self.get_fields(timeout=timeout)[bitrix_code]
-        except (KeyError, TypeError):
-            raise BitrixObjectFieldError(
-                f"{self.__class__.__name__} has no field metadata for {bitrix_code!r}.",
-            ) from None
+    @overload
+    def using(self, *, client: "ClientType", client_factory: None = None) -> Self: ...
 
     @overload
-    def using(self: BOT, *, client: "ClientType", client_factory: None = None) -> BOT: ...
-
-    @overload
-    def using(self: BOT, *, client: None = None, client_factory: Callable[[], "ClientType"]) -> BOT: ...
+    def using(self, *, client: None = None, client_factory: Callable[[], "ClientType"]) -> Self: ...
 
     def using(
-            self: BOT,
+            self,
             *,
             client: Optional["ClientType"] = None,
             client_factory: Optional[Callable[[], "ClientType"]] = None,
-    ) -> BOT:
+    ) -> Self:
         """Replace the client source for this object and return itself."""
 
         if client is None and client_factory is None:
@@ -221,6 +193,40 @@ class BaseObject(ABC, Generic[BOPKT]):
     def _get_bitrix_data(self) -> JSONDict:
         """Load raw object data from Bitrix24."""
         raise NotImplementedError
+
+    @classmethod
+    def _register_object_errors(cls):
+        """Create object-specific lookup errors for this SDK object class."""
+
+        if "DoesNotExist" not in cls.__dict__:
+            does_not_exist_error = cast(
+                Type[BitrixObjectDoesNotExist],
+                type(
+                    "DoesNotExist",
+                    (BitrixObjectDoesNotExist,),
+                    {
+                        "__module__": cls.__module__,
+                        "__qualname__": f"{cls.__qualname__}.DoesNotExist",
+                    },
+                ),
+            )
+
+            cls.DoesNotExist = does_not_exist_error
+
+        if "MultipleObjectsReturned" not in cls.__dict__:
+            multiple_objects_returned_error = cast(
+                Type[BitrixObjectMultipleObjectsReturned],
+                type(
+                    "MultipleObjectsReturned",
+                    (BitrixObjectMultipleObjectsReturned,),
+                    {
+                        "__module__": cls.__module__,
+                        "__qualname__": f"{cls.__qualname__}.MultipleObjectsReturned",
+                    },
+                ),
+            )
+
+            cls.MultipleObjectsReturned = multiple_objects_returned_error
 
     def _update(self, *, timeout: Timeout = None, **fields: Any) -> bool:
         """Update object fields from SDK attribute names and Python values."""
@@ -251,9 +257,9 @@ class BaseObject(ABC, Generic[BOPKT]):
         use_bitrix_codes = self._USERFIELD_AVAILABLE and not has_update_key
 
         pk_params = dict(
-            self._get_bitrix_pk_items(
+            self._meta.get_bitrix_pk_items(
                 self.bitrix_pk,
-                has_key=use_bitrix_codes,
+                use_bitrix_codes=use_bitrix_codes,
             ),
         )
 
@@ -327,123 +333,13 @@ class BaseObject(ABC, Generic[BOPKT]):
         """Create a lazy delete request without executing it."""
         return self._get_delete_api_wrapper(self.client)(self.bitrix_pk, timeout=timeout)
 
-    def field(self, name: Text) -> FieldAccessor:
-        """Return a field accessor by object attribute name."""
-        return FieldAccessor(self, self._meta.get_field(name))
-
-    @classmethod
-    def _get_bitrix_pk_from_data(cls, bitrix_data: JSONDict) -> BOPKT:
-        """Return a primary-key object built from Bitrix24 data."""
-
-        if not cls._meta.pk_fields:
-            raise BitrixObjectFieldError(f"{cls.__name__} has no primary-key fields.")
-
-        bitrix_pk_values = []
-
-        for bitrix_field in cls._meta.pk_fields:
-            bitrix_code = bitrix_field.bitrix_code
-
-            if bitrix_code not in bitrix_data:
-                raise BitrixObjectFieldNotLoadedError(
-                    f"Primary-key Bitrix field {bitrix_code!r} is not present "
-                    f"in {cls.__name__} Bitrix data.",
-                )
-
-            bitrix_pk_values.append(bitrix_data[bitrix_code])
-
-        return cls._meta.build_bitrix_pk(*bitrix_pk_values)
-
-    @classmethod
-    def _get_bitrix_pk_items(cls, bitrix_pk: Any, has_key: bool) -> Iterable[Tuple[Text, Any]]:
-        """Yield filter items for a primary-key value."""
-
-        pk_fields = cls._meta.pk_fields
-
-        if not pk_fields:
-            raise BitrixObjectFieldError(f"{cls.__name__} has no primary-key fields.")
-
-        if len(pk_fields) == 1:
-            bitrix_field = pk_fields[0]
-            filter_key = bitrix_field.bitrix_code if has_key else bitrix_field.request_name
-            yield filter_key, bitrix_field.to_bitrix_value(bitrix_pk)
-            return
-
-        to_bitrix = getattr(bitrix_pk, "to_bitrix", None)
-
-        if not (is_dataclass(bitrix_pk) and callable(to_bitrix)):
-            raise BitrixObjectFieldError(
-                f"Composite primary key filter for {cls.__name__} must be a BaseSchema dataclass "
-                f"with a to_bitrix() method.",
-            )
-
-        if not has_key:
-            bitrix_pk_data = asdict(bitrix_pk)
-            expected_filter_keys = {bitrix_field.attr_name for bitrix_field in pk_fields}
-        else:
-            bitrix_pk_data = to_bitrix()
-            expected_filter_keys = {bitrix_field.bitrix_code for bitrix_field in pk_fields}
-
-        if not isinstance(bitrix_pk_data, dict):
-            raise BitrixObjectFieldError(
-                f"Composite primary key filter data for {cls.__name__} must be a dictionary.",
-            )
-
-        filter_keys = set(bitrix_pk_data)
-        unknown_filter_keys = filter_keys - expected_filter_keys
-        missing_filter_keys = expected_filter_keys - filter_keys
-
-        if unknown_filter_keys:
-            raise BitrixObjectFieldError(
-                f"Composite primary key filter for {cls.__name__} contains unknown keys: "
-                f"{sorted(unknown_filter_keys)!r}.",
-            )
-
-        if missing_filter_keys:
-            raise BitrixObjectFieldError(
-                f"Composite primary key filter for {cls.__name__} does not contain keys: "
-                f"{sorted(missing_filter_keys)!r}.",
-            )
-
-        for filter_key, bitrix_value in bitrix_pk_data.items():
-            yield filter_key, bitrix_value
-
-    @classmethod
-    def _register_object_errors(cls):
-        """Create object-specific lookup errors for this SDK object class."""
-
-        if "DoesNotExist" not in cls.__dict__:
-            does_not_exist_error = cast(
-                Type[BitrixObjectDoesNotExist],
-                type(
-                    "DoesNotExist",
-                    (BitrixObjectDoesNotExist,),
-                    {
-                        "__module__": cls.__module__,
-                        "__qualname__": f"{cls.__qualname__}.DoesNotExist",
-                    },
-                ),
-            )
-
-            cls.DoesNotExist = does_not_exist_error
-
-        if "MultipleObjectsReturned" not in cls.__dict__:
-            multiple_objects_returned_error = cast(
-                Type[BitrixObjectMultipleObjectsReturned],
-                type(
-                    "MultipleObjectsReturned",
-                    (BitrixObjectMultipleObjectsReturned,),
-                    {
-                        "__module__": cls.__module__,
-                        "__qualname__": f"{cls.__qualname__}.MultipleObjectsReturned",
-                    },
-                ),
-            )
-
-            cls.MultipleObjectsReturned = multiple_objects_returned_error
-
     def _delete_bitrix_field_private_attr(self, bitrix_field: BaseField[Any, Any]):
-        """Delete a private field cache for one registered Bitrix field."""
+        """Delete caches for one source field and all dependent object fields."""
+
         bitrix_field.delete_private_attr(self)
+
+        for object_field in self._meta.get_object_fields_by_source_field(bitrix_field):
+            object_field.delete_private_attr(self)
 
     def _clear_bitrix_field_private_attrs(self):
         """Delete private field caches for all registered Bitrix fields."""
@@ -469,7 +365,7 @@ class BaseObject(ABC, Generic[BOPKT]):
         """Load fresh raw Bitrix24 data and store it separately from local data."""
         self._update_bitrix_data(self._get_bitrix_data())
 
-    def refresh(self: BOT, *, clear_local_data: bool = True) -> BOT:
+    def refresh(self, *, clear_local_data: bool = True) -> Self:
         """Reload object data from Bitrix24 and return this object.
 
         By default, local unsaved changes are discarded because fresh Bitrix24
@@ -492,6 +388,58 @@ class BaseObject(ABC, Generic[BOPKT]):
 
         return self._bitrix_data
 
+    def field(self, name: Text) -> FieldAccessor:
+        """Return a field accessor by object attribute name."""
+        return FieldAccessor(self, self._meta.get_field(name))
+
+    def get_fields(
+            self,
+            *,
+            timeout: Timeout = None,
+    ) -> Dict[Text, Any]:
+        """Return all field metadata cached by the current client."""
+
+        object_class = self.__class__
+        field_manager = getattr(object_class, "fields", None)
+
+        if field_manager is None:
+            raise BitrixObjectFieldError(
+                f"{object_class.__name__} has no FieldManager. "
+                "Declare a 'fields' class attribute with a BaseFieldManager instance.",
+            )
+
+        fields_cache = self.client.get_cache("bitrix_fields")
+
+        try:
+            return fields_cache[object_class]
+        except KeyError:
+            fields = field_manager.using(client=self.client).list(timeout=timeout)
+            fields_cache[object_class] = fields
+            return fields
+
+    def get_field(
+            self,
+            bitrix_code: Text,
+            *,
+            timeout: Timeout = None,
+    ) -> Any:
+        """Return cached field metadata by Bitrix24 field code."""
+        try:
+            return self.get_fields(timeout=timeout)[bitrix_code]
+        except (KeyError, TypeError):
+            raise BitrixObjectFieldError(
+                f"{self.__class__.__name__} has no field metadata for {bitrix_code!r}.",
+            ) from None
+
+    def get_field_items(
+            self,
+            bitrix_code: Text,
+            *,
+            timeout: Timeout = None,
+    ) -> Any:
+        """Return possible list values for a field by Bitrix24 field code."""
+        raise NotImplementedError(f"{self.__class__.__name__} does not support list fields.")
+
     def get_field_value(self, bitrix_code: Text) -> Any:
         """Return a raw field value by Bitrix24 field code."""
 
@@ -503,10 +451,10 @@ class BaseObject(ABC, Generic[BOPKT]):
 
             return getattr(self._bitrix_pk, bitrix_field.attr_name)
 
-        try:
-            return self._local_data[bitrix_code]
-        except KeyError:
-            pass
+        value = self._local_data.get(bitrix_code, MISSING)
+
+        if value is not MISSING:
+            return value
 
         bitrix_data = self._bitrix_data
         was_loaded = bitrix_data is not None

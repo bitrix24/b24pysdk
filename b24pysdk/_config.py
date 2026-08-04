@@ -1,7 +1,7 @@
 """
 SDK runtime configuration.
 
-This module provides a thread-local configuration object used to control
+This module provides thread-local runtime configuration used to control
 the behavior of the Bitrix SDK. Configuration options include:
 
 - retry strategy
@@ -10,6 +10,9 @@ the behavior of the Bitrix SDK. Configuration options include:
 - sensitive data masking
 - timezone handling
 - API version detection
+
+The module also provides a process-wide registry that maps SDK object keys
+and optional discriminators to Python object classes.
 
 Each thread maintains its own configuration instance, allowing different
 threads to use different SDK settings without interfering with each other.
@@ -26,6 +29,7 @@ from .utils.types import DefaultTimeout, Number, Timeout
 
 if typing.TYPE_CHECKING:
     from .client import ClientType
+    from .objects._base_object import BaseObject
 
 __all__ = [
     "Config",
@@ -117,8 +121,9 @@ class Config:
     by the SDK, such as timeouts, retry policies, logging, and timezone
     handling.
 
-    Each thread receives its own configuration instance to avoid
-    cross-thread interference.
+    Each thread receives its own runtime configuration instance to avoid
+    cross-thread interference. Object class registrations are process-wide
+    because they describe imported Python classes rather than runtime settings.
     """
 
     __slots__ = ("_config",)
@@ -126,6 +131,12 @@ class Config:
     _config: _LocalConfig
 
     _local_thread: threading.local = threading.local()
+    _object_classes: typing.ClassVar[
+        typing.Dict[
+            typing.Tuple[typing.Text, typing.Optional[int]],
+            typing.Type["BaseObject"],
+        ]
+    ] = {}
 
     def __init__(self):
         local_thread = type(self)._local_thread
@@ -574,3 +585,88 @@ class Config:
             dt = dt.astimezone(tz=tz)
 
         return dt
+
+    @classmethod
+    def register_object_class(
+            cls,
+            *,
+            object_key: typing.Text,
+            discriminator: typing.Optional[int],
+            object_class: typing.Type["BaseObject"],
+    ):
+        """
+        Register a Python object class for an SDK object key.
+
+        A registration is identified by the pair ``(object_key, discriminator)``.
+        Registering the same pair again replaces the previously registered class,
+        provided that the new class inherits from the currently registered class.
+
+        When registering a discriminator-specific class for the first time, the
+        default ``(object_key, None)`` class is used as the required base class.
+
+        Parameters
+        ----------
+        object_key : Text
+            Stable SDK object key, for example ``"department"`` or ``"crm.item"``.
+
+        object_class : type
+            Python class used to represent the object.
+
+        discriminator : int, optional
+            Entity discriminator, such as ``LIST_ID`` or
+            ``ENTITY_TYPE_ID``. ``None`` registers the default class for the key.
+
+        Raises
+        ------
+        TypeError
+            If ``object_class`` does not inherit from the
+            previously registered class for the same entity.
+        """
+
+        registry_key = object_key, discriminator
+        registered_class = cls._object_classes.get(registry_key)
+
+        if registered_class is None and discriminator is not None:
+            registered_class = cls._object_classes.get((object_key, None))
+
+        if registered_class is not None and not issubclass(object_class, registered_class):
+            raise TypeError(
+                f"{object_class.__name__} must inherit from "
+                f"{registered_class.__name__} for object_key={object_key!r}, "
+                f"discriminator={discriminator!r}",
+            )
+
+        cls._object_classes[registry_key] = object_class
+
+    @classmethod
+    def get_object_class(
+            cls,
+            *,
+            object_key: typing.Text,
+            discriminator: typing.Optional[int] = None,
+    ) -> typing.Type["BaseObject"]:
+        """
+        Return the registered Python class for an SDK object key.
+
+        The exact ``(object_key, discriminator)`` registration is preferred.
+        If it is absent and a discriminator was supplied, the method falls back
+        to the default ``(object_key, None)`` registration.
+
+        Raises
+        ------
+        KeyError
+            If neither an exact nor a default registration exists.
+        """
+
+        object_class = cls._object_classes.get((object_key, discriminator))
+
+        if object_class is None and discriminator is not None:
+            object_class = cls._object_classes.get((object_key, None))
+
+        if object_class is None:
+            raise KeyError(
+                f"No object class registered for object_key={object_key!r}, "
+                f"discriminator={discriminator!r}.",
+            )
+
+        return object_class

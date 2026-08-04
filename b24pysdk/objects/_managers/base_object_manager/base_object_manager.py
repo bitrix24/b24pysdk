@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, Generator, Generic, Iterable, Iterator, List, Optional, Sequence, Text, Tuple, Type, Union
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, Generator, Generic, Iterable, Iterator, List, Optional, Text, Tuple, Type, Union
 
 from ....schemas.api import BitrixObjectBatchWriteResponse
 from ....utils.type_vars import BOT
@@ -214,11 +214,6 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
         skipped and the method returns only successfully created objects.
         """
 
-        items = list(items) if not isinstance(items, Sequence) else items
-
-        if not items:
-            return BitrixObjectList(client_provider=self._client_provider)
-
         batch_requests = {}
 
         for counter, fields in enumerate(items, start=1):
@@ -226,6 +221,9 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
                 self._get_add_params(fields),
                 timeout=timeout,
             )
+
+        if not batch_requests:
+            return BitrixObjectList(client_provider=self._client_provider)
 
         batch_result = self._client.call_batches(
             batch_requests,
@@ -246,61 +244,36 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
         return bitrix_objects
 
     def _make_object_from_add_result(self, bitrix_result: Union[JSONDict, Text, int], /) -> BOT:
-        """Build an SDK object from a scalar, object payload, PK payload, or wrapper."""
+        """Build an SDK object from an optionally wrapped add result."""
 
-        object_class = self._get_object_class()
-        pk_bitrix_codes = self._get_pk_bitrix_codes()
+        object_meta = self._meta
 
-        if isinstance(bitrix_result, dict):
-            if set(pk_bitrix_codes).issubset(bitrix_result):
-                bitrix_pk_values = tuple(bitrix_result[bitrix_code] for bitrix_code in pk_bitrix_codes)
-
-                if any(value is None for value in bitrix_pk_values):
-                    raise BitrixObjectError(
-                        f"Cannot build {object_class.__name__}: "
-                        "primary-key Bitrix fields cannot contain None.",
-                    )
-
-                bitrix_pk = self._meta.build_bitrix_pk(*bitrix_pk_values)
-                bitrix_data = None if set(bitrix_result) == set(pk_bitrix_codes) else dict(bitrix_result)
-
-                return object_class(
-                    bitrix_pk=bitrix_pk,
-                    bitrix_data=bitrix_data,
-                    client=self._client,
-                )
-
-            if len(bitrix_result) == 1:
-                return self._make_object_from_add_result(next(iter(bitrix_result.values())))
-
-            raise BitrixObjectError(
-                f"Cannot build {object_class.__name__}: expected all primary-key "
-                "Bitrix fields or exactly one wrapper key.",
-            )
-
-        if isinstance(bitrix_result, (str, int)) and not isinstance(bitrix_result, bool):
-            if len(pk_bitrix_codes) != 1:
+        if isinstance(bitrix_result, dict) and not object_meta.has_bitrix_pk_data(bitrix_result):
+            if len(bitrix_result) != 1:
                 raise BitrixObjectError(
-                    f"Cannot build {object_class.__name__} with a composite primary key "
-                    "from a scalar Bitrix24 add result.",
+                    f"Cannot build {object_meta.object_class.__name__}: expected all "
+                    "primary-key Bitrix fields or exactly one wrapper key.",
                 )
 
-            return object_class(bitrix_pk=bitrix_result, client=self._client)
+            bitrix_result = next(iter(bitrix_result.values()))
 
-        raise BitrixObjectError(
-            f"Cannot build {object_class.__name__} from Bitrix24 add result "
-            f"of type {type(bitrix_result).__name__}.",
-        )
+        try:
+            return object_meta.make_object_from_bitrix_data_or_pk(bitrix_result, client=self._client)
+        except (TypeError, ValueError, BitrixObjectFieldError) as error:
+            raise BitrixObjectError(
+                f"Cannot build {object_meta.object_class.__name__} from "
+                f"Bitrix24 add result: {error}",
+            ) from error
 
     def _get_objects_for_write(self) -> BitrixObjectList[BOT]:
         """Load objects for update or delete, selecting only primary keys when supported."""
 
         if hasattr(self, "select"):
             return self._clone(
-                query_state=self._query_state.with_select_param(self._get_pk_bitrix_codes()),
+                query_state=self._query_state.with_select_param(self._meta.pk_bitrix_codes),
             ).to_list()
 
-        return self._clone().to_list()
+        return self.to_list()
 
     def _update(
             self,
@@ -403,6 +376,28 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
             query_state=self._query_state.with_filter_param(filter_param),
         )
 
+    def _get_filter_items(
+            self,
+            attr_name: Text,
+            value: Any,
+    ) -> Iterable[Tuple[Text, Any]]:
+        """Return Bitrix24 filter items for an SDK object attribute."""
+
+        use_bitrix_codes = self._FILTER_KEY is not None
+
+        if attr_name == "bitrix_pk":
+            return self._meta.get_bitrix_pk_items(
+                value,
+                use_bitrix_codes=use_bitrix_codes,
+            )
+
+        bitrix_field = self._meta.get_field(attr_name)
+        filter_key = bitrix_field.bitrix_code if use_bitrix_codes else bitrix_field.request_name
+
+        return (
+            (filter_key, bitrix_field.to_bitrix_value(value)),
+        )
+
     def _order(self, *fields: Text) -> Self:
         """Return a manager copy with additional ordering parameters."""
 
@@ -422,7 +417,7 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
             if not clean_field_name:
                 raise BitrixObjectFieldError("Order field name cannot be empty.")
 
-            for bitrix_code in self._get_bitrix_codes_by_attr_name(clean_field_name):
+            for bitrix_code in self._meta.get_bitrix_codes_by_attr_name(clean_field_name):
                 order_param.pop(bitrix_code, None)
                 order_param[bitrix_code] = direction
 
@@ -442,7 +437,7 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
             if not attr_name:
                 raise BitrixObjectFieldError("Select field name cannot be empty.")
 
-            for bitrix_code in self._get_bitrix_codes_by_attr_name(attr_name):
+            for bitrix_code in self._meta.get_bitrix_codes_by_attr_name(attr_name):
                 if bitrix_code not in select_param:
                     select_param.append(bitrix_code)
 
@@ -524,37 +519,6 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
             query_state=self._query_state if query_state is None else query_state,
         )
 
-    def _get_pk_bitrix_codes(self) -> Tuple[Text, ...]:
-        """Return primary-key Bitrix24 field codes."""
-
-        pk_fields = self._meta.pk_fields
-
-        if not pk_fields:
-            raise BitrixObjectFieldError(f"{self._get_object_class().__name__} has no primary-key fields.")
-
-        return tuple(bitrix_field.bitrix_code for bitrix_field in pk_fields)
-
-    def _get_filter_items(self, attr_name: Text, value: Any) -> Iterator[Tuple[Text, Any]]:
-        """Yield Bitrix24 filter items for an object attribute name."""
-
-        if attr_name == "bitrix_pk":
-            yield from self._get_object_class()._get_bitrix_pk_items(value, has_key=bool(self._FILTER_KEY))
-            return
-
-        bitrix_field = self._meta.get_field(attr_name)
-        filter_key = bitrix_field.request_name if self._FILTER_KEY is None else bitrix_field.bitrix_code
-
-        yield filter_key, bitrix_field.to_bitrix_value(value)
-
-    def _get_bitrix_codes_by_attr_name(self, attr_name: Text) -> Iterator[Text]:
-        """Yield Bitrix24 field codes for an object attribute name."""
-
-        if attr_name == "bitrix_pk":
-            yield from self._get_pk_bitrix_codes()
-            return
-
-        yield self._meta.get_field(attr_name).bitrix_code
-
     def _get_order_param(self) -> Optional[JSONDict]:
         """Return ordering parameters with ``reverse()`` applied."""
 
@@ -562,7 +526,7 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
             return self._order_param
 
         if not self._order_param:
-            return dict.fromkeys(self._get_pk_bitrix_codes(), "DESC")
+            return dict.fromkeys(self._meta.pk_bitrix_codes, "DESC")
 
         return {
             bitrix_code: "ASC" if direction == "DESC" else "DESC"
@@ -578,7 +542,7 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
         if not order_param:
             return False
 
-        pk_bitrix_codes = set(self._get_pk_bitrix_codes())
+        pk_bitrix_codes = set(self._meta.pk_bitrix_codes)
 
         if set(order_param) != pk_bitrix_codes:
             raise BitrixObjectError("Fast list loading supports ordering only by primary key.")
@@ -640,7 +604,7 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
 
         select_param = list(self._select_param)
 
-        for bitrix_code in self._get_pk_bitrix_codes():
+        for bitrix_code in self._meta.pk_bitrix_codes:
             if bitrix_code not in select_param:
                 select_param.append(bitrix_code)
 

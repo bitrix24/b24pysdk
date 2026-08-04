@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Generic, Optional, Text, Type
+from typing import Any, Dict, Generic, Optional, Text, Type
 
 from ...utils.type_vars import BOT
 from ...utils.types import Self, Timeout
@@ -29,7 +29,7 @@ class BaseFieldManager(BaseManager[BOT], ABC, Generic[BOT]):
             self,
             *,
             timeout: Timeout = None,
-    ) -> Any:
+    ) -> Dict[Text, Any]:
         """Return all Bitrix24 field metadata immediately."""
         raise NotImplementedError
 
