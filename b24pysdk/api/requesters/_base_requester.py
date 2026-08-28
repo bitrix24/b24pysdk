@@ -87,10 +87,9 @@ class BaseRequester(ABC):
         self._retry_delay_increment = retry_delay_increment or self._config.default_retry_delay_increment
 
     @property
-    @abstractmethod
     def _headers(self) -> Dict:
         """Return headers used for the concrete request type."""
-        raise NotImplementedError
+        return self._get_default_headers()
 
     def _get_default_headers(self) -> Dict[Text, Text]:
         """
@@ -140,7 +139,7 @@ class BaseRequester(ABC):
         Returns:
             Number of seconds to sleep before the next request attempt.
         """
-        return self._initial_retry_delay + self._used_retries * self._retry_delay_increment
+        return self._initial_retry_delay + (self._used_retries - 1) * self._retry_delay_increment
 
     def _request_with_retries(self, *args, **kwargs) -> requests.Response:
         """

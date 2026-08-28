@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Repo(BaseEntity):
-    """"""
+    """Methods for working with custom blocks.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/landing/user-blocks/index.html
+    """
 
     @type_checker
     def register(
@@ -23,7 +26,24 @@ class Repo(BaseEntity):
             manifest: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add a custom nlock to repository
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/user-blocks/landing-repo-register.html
+
+        The method adds a new custom block to the repository.
+
+        Args:
+            code: Unique block code;
+
+            fields: Block fields;
+
+            manifest: Block manifest;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "code": code,
@@ -46,7 +66,20 @@ class Repo(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete user block
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/user-blocks/landing-repo-unregister.html
+
+        The method deletes a user block by its code.
+
+        Args:
+            code: Unique block code;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "code": code,
@@ -63,22 +96,47 @@ class Repo(BaseEntity):
             self,
             *,
             params: Optional[JSONDict] = MISSING,
-            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of custom blocks
 
-        api_params: JSONDict = {}
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/user-blocks/landing-repo-get-list.html
+
+        The method retrieves a list of custom blocks.
+
+        Args:
+            params: Object format:
+
+                {
+                    select: value_1,
+
+                    filter: value_2,
+
+                    order: value_3,
+
+                    group: value_4,
+
+                    limit: value_5,
+
+                    offset: value_6
+                },
+
+                where value_n — value of the corresponding selection parameter;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+
+        _params: JSONDict = {}
 
         if params is not MISSING:
-            api_params["params"] = params
-
-        if start is not MISSING:
-            api_params["start"] = start
+            _params["params"] = params
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get_list,
-            params=api_params or None,
+            params=_params or None,
             timeout=timeout,
         )
 
@@ -90,7 +148,22 @@ class Repo(BaseEntity):
             splitter: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Check content for dangerous substrings
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/user-blocks/landing-repo-check-content.html
+
+        The method checks content through a sanitizer.
+
+        Args:
+            content: Content to be checked;
+
+            splitter: A delimiter that marks dangerous fragments in content;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "content": content,

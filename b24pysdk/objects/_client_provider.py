@@ -16,7 +16,9 @@ class ClientProvider:
 
     ``client`` and ``client_factory`` are mutually exclusive. If neither is
     passed, the provider tries the SDK-level default client factory when the
-    client is first requested.
+    client is first requested. The SDK-level default factory is intended only
+    for applications that work with a single Bitrix24 portal; multi-portal
+    applications should provide an explicit client source.
     """
 
     __slots__ = ("_client", "_client_factory")

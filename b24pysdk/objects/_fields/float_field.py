@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, List, Optional, Text, Type, Union
 
 from ...utils.converters import float_from_bitrix, float_to_bitrix
+from .._filter_lookups import ORDERED_FILTER_OPERATORS
 from .base_field import BaseField
 
 if TYPE_CHECKING:
@@ -13,6 +14,8 @@ __all__ = [
 
 class FloatField(BaseField[Union[int, float, Text], float]):
     """Field that exposes a Bitrix24 float-like value as ``float``."""
+
+    _FILTER_OPERATORS = ORDERED_FILTER_OPERATORS
 
     __slots__ = ()
 

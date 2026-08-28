@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Optional, Type, Union
 
 from ...utils.converters import dict_from_bitrix, dict_to_bitrix
 from ...utils.types import JSONDict, JSONList
+from .._filter_lookups import NO_FILTER_OPERATORS
 from .base_field import BaseField
 
 if TYPE_CHECKING:
@@ -14,6 +15,8 @@ __all__ = [
 
 class DictField(BaseField[JSONDict, JSONDict]):
     """Field that exposes a Bitrix24 dictionary value as ``dict``."""
+
+    _FILTER_OPERATORS = NO_FILTER_OPERATORS
 
     __slots__ = ()
 

@@ -1,4 +1,4 @@
-from typing import Annotated, Any, Dict, List, Text, TypedDict, Union
+from typing import Annotated, Dict, List, Text, TypedDict, Union
 
 from ..utils.types import B24APIResult, B24AppStatusLiteral, JSONDict, JSONGenerator, JSONList
 
@@ -8,7 +8,6 @@ __all__ = [
     "BatchResponseData",
     "BatchResultData",
     "BitrixAppInfoResponseData",
-    "BitrixObjectBatchWriteResponse",
     "ListFastResponseData",
     "ListResponseData",
     "ResponseData",
@@ -61,11 +60,6 @@ class BatchResultData(TypedDict):
 class BatchResponseData(TypedDict):
     result: BatchResultData
     time: TimeResponseData
-
-
-class BitrixObjectBatchWriteResponse(TypedDict):
-    results: Dict[Any, B24APIResult]
-    errors: Dict[Any, B24APIResult]
 
 
 class B24AppInfoInstallData(TypedDict):

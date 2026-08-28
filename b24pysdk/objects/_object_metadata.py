@@ -5,12 +5,13 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, Hashable, Iterab
 from .._config import Config
 from ..utils.type_vars import BOT
 from ..utils.types import JSONDict, cast
+from ._fields.base_cached_field import BaseCachedField
 from ._fields.base_field import BaseField
 from ._fields.object_field import ObjectField
 from .errors import BitrixObjectError, BitrixObjectFieldError, BitrixObjectFieldNotLoadedError
 
 if TYPE_CHECKING:
-    from ..client import ClientType
+    from ._client_provider import ClientProvider
 
 __all__ = [
     "ObjectMetadata",
@@ -21,9 +22,10 @@ class ObjectMetadata(Generic[BOT]):
     """Immutable field metadata for an SDK object class."""
 
     __slots__ = (
+        "_cached_fields",
+        "_cached_fields_by_bitrix_code",
         "_fields_by_attr_name",
         "_fields_by_bitrix_code",
-        "_object_fields_by_source_field",
         "_pk_bitrix_codes",
         "_pk_fields",
         "discriminator",
@@ -39,11 +41,12 @@ class ObjectMetadata(Generic[BOT]):
 
     _fields_by_attr_name: Mapping[Text, BaseField[Any, Any]]
     _fields_by_bitrix_code: Mapping[Text, BaseField[Any, Any]]
-    _object_fields_by_source_field: Mapping[BaseField[Any, Any], Tuple[ObjectField[Any], ...]]
+    _cached_fields: Tuple[BaseCachedField[Any, Any], ...]
+    _cached_fields_by_bitrix_code: Mapping[Text, Tuple[BaseCachedField[Any, Any], ...]]
     _pk_bitrix_codes: Tuple[Text, ...]
     _pk_fields: Tuple[BaseField[Any, Any], ...]
 
-    def __init__(self, object_class: Type[BOT], /):  # noqa: C901, PLR0912, PLR0915
+    def __init__(self, object_class: Type[BOT], /):  # noqa: C901, PLR0912
         self.object_class = object_class
 
         try:
@@ -95,17 +98,27 @@ class ObjectMetadata(Generic[BOT]):
         for base_class in reversed(cast(Tuple[Type], object_class.__mro__)):
             for attr_name, attribute in base_class.__dict__.items():
                 if isinstance(attribute, BaseField):
+                    if "__" in attr_name:
+                        raise BitrixObjectFieldError(
+                            f"Field attribute {attr_name!r} on {object_class.__name__} cannot contain '__' "
+                            "because double underscores are reserved for filter lookups.",
+                        )
+
                     fields_by_attr_name[attr_name] = attribute
                 else:
                     fields_by_attr_name.pop(attr_name, None)
 
         fields_by_bitrix_code: Dict[Text, BaseField[Any, Any]] = {}
-        object_fields_by_attr_name: Dict[Text, ObjectField[Any]] = {}
+        cached_fields: List[BaseCachedField[Any, Any]] = []
+        cached_fields_by_bitrix_code: Dict[Text, List[BaseCachedField[Any, Any]]] = {}
         pk_fields: List[BaseField[Any, Any]] = []
 
-        for attr_name, field in fields_by_attr_name.items():
+        for field in fields_by_attr_name.values():
+            if isinstance(field, BaseCachedField):
+                cached_fields.append(field)
+                cached_fields_by_bitrix_code.setdefault(field.bitrix_code, []).append(field)
+
             if isinstance(field, ObjectField):
-                object_fields_by_attr_name[attr_name] = field
                 continue
 
             existing_field = fields_by_bitrix_code.get(field.bitrix_code)
@@ -121,32 +134,12 @@ class ObjectMetadata(Generic[BOT]):
             if field.is_pk:
                 pk_fields.append(field)
 
-        object_fields_by_source_field: Dict[BaseField[Any, Any], List[ObjectField[Any]]] = {}
-
-        for attr_name, object_field in object_fields_by_attr_name.items():
-            source_field = object_field.source_field
-            registered_source_field = fields_by_bitrix_code.get(source_field.bitrix_code)
-
-            if registered_source_field is None:
-                raise BitrixObjectFieldError(
-                    f"Object field {attr_name!r} uses unregistered source field "
-                    f"{source_field.bitrix_code!r} on {object_class.__name__}.",
-                )
-
-            if registered_source_field is not source_field:
-                raise BitrixObjectFieldError(
-                    f"Object field {attr_name!r} uses source field "
-                    f"{source_field.bitrix_code!r} that was overridden "
-                    f"on {object_class.__name__}.",
-                )
-
-            object_fields_by_source_field.setdefault(source_field, []).append(object_field)
-
         self._fields_by_attr_name = MappingProxyType(fields_by_attr_name)
         self._fields_by_bitrix_code = MappingProxyType(fields_by_bitrix_code)
-        self._object_fields_by_source_field = MappingProxyType({
-            source_field: tuple(object_fields)
-            for source_field, object_fields in object_fields_by_source_field.items()
+        self._cached_fields = tuple(cached_fields)
+        self._cached_fields_by_bitrix_code = MappingProxyType({
+            bitrix_code: tuple(fields)
+            for bitrix_code, fields in cached_fields_by_bitrix_code.items()
         })
         self._pk_fields = tuple(pk_fields)
         self._pk_bitrix_codes = tuple(field.bitrix_code for field in pk_fields)
@@ -165,9 +158,14 @@ class ObjectMetadata(Generic[BOT]):
         """Return concrete fields indexed by Bitrix24 field code."""
         return self._fields_by_bitrix_code
 
-    def get_object_fields_by_source_field(self, source_field: BaseField[Any, Any], /) -> Tuple[ObjectField[Any], ...]:
-        """Return object fields whose related primary key is stored in the source field."""
-        return self._object_fields_by_source_field.get(source_field, ())
+    @property
+    def cached_fields(self) -> Tuple[BaseCachedField[Any, Any], ...]:
+        """Return cached fields registered on the object class."""
+        return self._cached_fields
+
+    def get_cached_fields_by_bitrix_code(self, bitrix_code: Text, /) -> Tuple[BaseCachedField[Any, Any], ...]:
+        """Return cached fields associated with the supplied Bitrix24 field code."""
+        return self._cached_fields_by_bitrix_code.get(bitrix_code, ())
 
     @property
     def pk_fields(self) -> Tuple[BaseField[Any, Any], ...]:
@@ -219,7 +217,7 @@ class ObjectMetadata(Generic[BOT]):
 
         return self.build_bitrix_pk(*bitrix_pk_values)
 
-    def has_bitrix_pk_data(self, bitrix_data: Mapping[Text, Any], /) -> bool:
+    def has_bitrix_pk_data(self, bitrix_data: JSONDict, /) -> bool:
         """Return whether raw Bitrix24 data contains every primary-key field."""
         return bool(self._pk_bitrix_codes) and all(
             bitrix_code in bitrix_data
@@ -231,7 +229,7 @@ class ObjectMetadata(Generic[BOT]):
             bitrix_data_or_pk: Union[JSONDict, Text, int],
             /,
             *,
-            client: "ClientType",
+            client_provider: "ClientProvider",
     ) -> BOT:
         """Build an SDK object from full Bitrix24 data or primary-key data."""
 
@@ -245,11 +243,15 @@ class ObjectMetadata(Generic[BOT]):
             bitrix_pk = self.get_bitrix_pk_from_data(bitrix_data_or_pk)
             object_data = None if len(bitrix_data_or_pk) == len(self._pk_bitrix_codes) else bitrix_data_or_pk
 
-            return self.object_class(
+            bitrix_object = self.object_class(
                 bitrix_pk=bitrix_pk,
-                bitrix_data=object_data,
-                client=client,
+                client_provider=client_provider,
             )
+
+            if object_data is not None:
+                bitrix_object.set_bitrix_data(object_data, copy_data=False)
+
+            return bitrix_object
 
         if isinstance(bitrix_data_or_pk, (str, int)) and not isinstance(bitrix_data_or_pk, bool):
             if len(self._pk_bitrix_codes) != 1:
@@ -258,7 +260,7 @@ class ObjectMetadata(Generic[BOT]):
                     "with a composite primary key.",
                 )
 
-            return self.object_class(bitrix_pk=bitrix_data_or_pk, client=client)
+            return self.object_class(bitrix_pk=bitrix_data_or_pk, client_provider=client_provider)
 
         raise TypeError(
             "Expected Bitrix24 object data to be a dict, str, or int, "

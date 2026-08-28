@@ -1,10 +1,11 @@
 import re
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Generic, Iterable, List, Optional, Text, Type, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Generic, Iterable, List, Mapping, Optional, Text, Type, Union
 
 from ...utils.type_vars import BRawT, BValueT
 from ...utils.types import Self
-from ..errors import BitrixObjectFieldReadOnlyError
+from .._filter_lookups import BASIC_FILTER_OPERATORS, BaseFilterOperator, FilterLookup
+from ..errors import BitrixObjectFieldReadOnlyError, BitrixObjectFilterError
 
 if TYPE_CHECKING:
     from .._base_object import BaseObject
@@ -57,6 +58,10 @@ class BaseField(ABC, Generic[BRawT, BValueT]):
     the field is not required. ``None`` items inside a multiple-value list are
     not allowed. An empty list is a valid value even for required multiple
     fields.
+
+    ``_FILTER_OPERATORS`` maps explicit lookup names to their operator implementations for
+    this field type. Plain equality is always available and is not registered as
+    a lookup.
     """
 
     __slots__ = (
@@ -77,6 +82,8 @@ class BaseField(ABC, Generic[BRawT, BValueT]):
     is_read_only: bool
     is_required: bool
     request_name: Text
+
+    _FILTER_OPERATORS: ClassVar[Mapping[FilterLookup, Type[BaseFilterOperator]]] = BASIC_FILTER_OPERATORS
 
     def __init__(
             self,
@@ -124,7 +131,7 @@ class BaseField(ABC, Generic[BRawT, BValueT]):
         if instance is None:
             return self
 
-        return self.from_bitrix_value(instance[self.bitrix_code])
+        return self.from_bitrix_value(instance.get_field_value(self.bitrix_code, bitrix_field=self))
 
     def __set__(self, instance: Optional["BaseObject"], value: Union[Optional[BValueT], List[BValueT]]):
         if instance is None:
@@ -133,15 +140,13 @@ class BaseField(ABC, Generic[BRawT, BValueT]):
         if self.is_read_only:
             raise BitrixObjectFieldReadOnlyError(f"Field {self.attr_name!r} is read-only.")
 
-        instance[self.bitrix_code] = self.to_bitrix_value(value)
-        self.delete_private_attr(instance)
+        instance.set_field_value(self.bitrix_code, self.to_bitrix_value(value), bitrix_field=self)
 
     def __delete__(self, instance: Optional["BaseObject"]):
         if instance is None:
             raise AttributeError(f"Field {self!r} cannot be deleted from the object class.")
 
-        del instance[self.bitrix_code]
-        self.delete_private_attr(instance)
+        instance.delete_field_value(self.bitrix_code, bitrix_field=self)
 
     @staticmethod
     def _get_request_name(bitrix_code: Text) -> Text:
@@ -156,7 +161,7 @@ class BaseField(ABC, Generic[BRawT, BValueT]):
         return request_name.lower()
 
     @staticmethod
-    def _is_iterable(value: Any) -> bool:
+    def is_iterable(value: Any) -> bool:
         """Return whether a value can be treated as a multiple field container."""
 
         if isinstance(value, (str, bytes, bytearray, dict)) or value is None:
@@ -164,13 +169,15 @@ class BaseField(ABC, Generic[BRawT, BValueT]):
 
         return isinstance(value, Iterable)
 
-    def get_private_attr_name(self, owner: Type["BaseObject"]) -> Text:
-        """Return a private instance attribute name reserved for this field."""
-        return f"_{owner.__name__}__{self.attr_name}"
-
-    def delete_private_attr(self, instance: "BaseObject"):
-        """Delete this field private instance attribute, if it exists."""
-        instance.__dict__.pop(self.get_private_attr_name(instance.__class__), None)
+    def get_filter_operator(self, lookup: FilterLookup, /) -> Type[BaseFilterOperator]:
+        """Return the filter operator implementation supported by this field type."""
+        try:
+            return self._FILTER_OPERATORS[lookup]
+        except KeyError:
+            raise BitrixObjectFilterError(
+                f"Field {self.attr_name!r} ({self.__class__.__name__}) does not support "
+                f"filter lookup {lookup.value!r}.",
+            ) from None
 
     def from_bitrix_value(self, value: Union[Optional[BRawT], List[BRawT]]) -> Union[Optional[BValueT], List[BValueT]]:
         """Convert a raw Bitrix24 field value to a public Python value."""
@@ -182,7 +189,7 @@ class BaseField(ABC, Generic[BRawT, BValueT]):
 
                 return None
 
-            if not self._is_iterable(value):
+            if not self.is_iterable(value):
                 raise TypeError(f"Field {self.attr_name!r} expects an iterable value.")
 
             converted_values = []
@@ -207,7 +214,7 @@ class BaseField(ABC, Generic[BRawT, BValueT]):
 
                 return None
 
-            if not self._is_iterable(value):
+            if not self.is_iterable(value):
                 raise TypeError(f"Field {self.attr_name!r} expects an iterable value.")
 
             converted_values = []

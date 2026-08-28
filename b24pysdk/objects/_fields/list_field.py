@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, List, Optional, Type, Union
 
+from .._filter_lookups import ORDERED_FILTER_OPERATORS
 from .int_field import IntField
 
 if TYPE_CHECKING:
@@ -12,6 +13,8 @@ __all__ = [
 
 class ListField(IntField):
     """Bitrix24 list field that exposes selected item ID as ``int``."""
+
+    _FILTER_OPERATORS = ORDERED_FILTER_OPERATORS
 
     __slots__ = ()
 

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, Dict, Generic, Iterable, Optional, Text, Type, overload
+from copy import deepcopy
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, Dict, FrozenSet, Generic, Iterable, Optional, Text, Type, overload
 
 from .._config import Config
 from .._constants import MISSING
@@ -8,6 +9,8 @@ from ..utils.types import JSONDict, Self, Timeout, cast
 from ._client_provider import ClientProvider
 from ._field_accessor import FieldAccessor
 from ._fields.base_field import BaseField
+from ._fields.file_field import FileField
+from ._filter_lookups import FilterLookup
 from ._object_metadata import ObjectMetadata
 from .errors import (
     BitrixObjectDoesNotExist,
@@ -44,6 +47,10 @@ class BaseObject(ABC, Generic[BOPKT]):
     ``is_pk=True`` are treated as read-only SDK fields. Object metadata
     builds a converted primary-key object or raises an error if Bitrix24 data
     does not contain all primary-key fields.
+
+    ``_FILTER_LOOKUPS`` contains explicit Django-style filter lookups supported
+    by the entity REST API. Plain equality does not require a lookup and is
+    always handled separately.
     """
 
     _OBJECT_KEY: ClassVar[Text]
@@ -51,6 +58,7 @@ class BaseObject(ABC, Generic[BOPKT]):
 
     _UPDATE_KEY: ClassVar[Optional[Text]] = "fields"
     _USERFIELD_AVAILABLE: ClassVar[bool] = False
+    _FILTER_LOOKUPS: ClassVar[FrozenSet[FilterLookup]] = frozenset(FilterLookup.__members__.values())
 
     DoesNotExist: ClassVar[Type[BitrixObjectDoesNotExist]]
     MultipleObjectsReturned: ClassVar[Type[BitrixObjectMultipleObjectsReturned]]
@@ -60,7 +68,7 @@ class BaseObject(ABC, Generic[BOPKT]):
     _bitrix_data: Optional[JSONDict]
     _bitrix_pk: BOPKT
     _client_provider: ClientProvider
-    _local_data: JSONDict
+    _local_data: Optional[JSONDict]
 
     def __init_subclass__(cls, *args: Any, **kwargs: Any):
         super().__init_subclass__(*args, **kwargs)
@@ -75,6 +83,7 @@ class BaseObject(ABC, Generic[BOPKT]):
             bitrix_data: Optional[JSONDict] = None,
             client: Optional["ClientType"] = None,
             client_factory: Optional[Callable[[], "ClientType"]] = None,
+            client_provider: Optional[ClientProvider] = None,
     ): ...
 
     @overload
@@ -85,6 +94,7 @@ class BaseObject(ABC, Generic[BOPKT]):
             bitrix_data: JSONDict,
             client: Optional["ClientType"] = None,
             client_factory: Optional[Callable[[], "ClientType"]] = None,
+            client_provider: Optional[ClientProvider] = None,
     ): ...
 
     def __init__(
@@ -94,13 +104,18 @@ class BaseObject(ABC, Generic[BOPKT]):
             bitrix_data: Optional[JSONDict] = None,
             client: Optional["ClientType"] = None,
             client_factory: Optional[Callable[[], "ClientType"]] = None,
+            client_provider: Optional[ClientProvider] = None,
     ):
         if bitrix_pk is None and bitrix_data is None:
             raise ValueError("Pass either bitrix_pk or bitrix_data.")
 
-        self._bitrix_data = dict(bitrix_data) if bitrix_data is not None else None
-        self._client_provider = ClientProvider(client=client, client_factory=client_factory)
-        self._local_data = {}
+        self._bitrix_data = deepcopy(bitrix_data) if bitrix_data is not None else None
+        self._client_provider = (
+            ClientProvider(client=client, client_factory=client_factory)
+            if client_provider is None
+            else client_provider
+        )
+        self._local_data = None
 
         if bitrix_pk is None:
             self._bitrix_pk = self._meta.get_bitrix_pk_from_data(self._bitrix_data)
@@ -141,6 +156,16 @@ class BaseObject(ABC, Generic[BOPKT]):
         """Return the entity discriminator used by the object registry."""
         return None
 
+    @classmethod
+    def get_filter_lookups(cls) -> FrozenSet[FilterLookup]:
+        """Return explicit filter lookups supported by the entity REST API."""
+        return cls._FILTER_LOOKUPS
+
+    @classmethod
+    def supports_filter_lookup(cls, filter_lookup: FilterLookup, /) -> bool:
+        """Return whether the entity REST API supports an explicit filter lookup."""
+        return filter_lookup in cls.get_filter_lookups()
+
     @property
     def bitrix_pk(self) -> BOPKT:
         """Return the object primary key, if it is known."""
@@ -148,12 +173,20 @@ class BaseObject(ABC, Generic[BOPKT]):
 
     @property
     def bitrix_data(self) -> JSONDict:
-        """Return Bitrix24 data merged with local unsaved changes."""
+        """Return an independent copy of Bitrix24 data merged with local changes."""
 
-        bitrix_data = dict(self._get_loaded_bitrix_data())
-        bitrix_data.update(self._local_data)
+        bitrix_data = deepcopy(self._get_loaded_bitrix_data())
+
+        if self._local_data is not None:
+            for bitrix_code, value in self._local_data.items():
+                bitrix_data[bitrix_code] = deepcopy(value)
 
         return bitrix_data
+
+    @property
+    def local_data(self) -> JSONDict:
+        """Return an independent copy of local unsaved changes."""
+        return {} if self._local_data is None else deepcopy(self._local_data)
 
     @property
     def client(self) -> "ClientType":
@@ -177,7 +210,11 @@ class BaseObject(ABC, Generic[BOPKT]):
             client: Optional["ClientType"] = None,
             client_factory: Optional[Callable[[], "ClientType"]] = None,
     ) -> Self:
-        """Replace the client source for this object and return itself."""
+        """Replace the client source for this object and return itself.
+
+        The new client source applies only to this object. It is not propagated
+        to related objects that were already created and cached by object fields.
+        """
 
         if client is None and client_factory is None:
             raise ValueError("Pass either client or client_factory.")
@@ -287,10 +324,6 @@ class BaseObject(ABC, Generic[BOPKT]):
             **fields_params,
         }
 
-    def _get_local_data(self) -> JSONDict:
-        """Return a copy of local unsaved changes."""
-        return dict(self._local_data)
-
     def _make_update_request(
             self,
             updated_data: JSONDict,
@@ -333,37 +366,44 @@ class BaseObject(ABC, Generic[BOPKT]):
         """Create a lazy delete request without executing it."""
         return self._get_delete_api_wrapper(self.client)(self.bitrix_pk, timeout=timeout)
 
-    def _delete_bitrix_field_private_attr(self, bitrix_field: BaseField[Any, Any]):
-        """Delete caches for one source field and all dependent object fields."""
+    def _delete_bitrix_field_cache(self, bitrix_field: BaseField[Any, Any]):
+        """Delete cached values associated with the supplied Bitrix24 field."""
+        for cached_field in self._meta.get_cached_fields_by_bitrix_code(bitrix_field.bitrix_code):
+            cached_field.delete_cached_value(self)
 
-        bitrix_field.delete_private_attr(self)
+    def _clear_bitrix_field_caches(self):
+        """Delete all cached field values."""
+        for cached_field in self._meta.cached_fields:
+            cached_field.delete_cached_value(self)
 
-        for object_field in self._meta.get_object_fields_by_source_field(bitrix_field):
-            object_field.delete_private_attr(self)
-
-    def _clear_bitrix_field_private_attrs(self):
-        """Delete private field caches for all registered Bitrix fields."""
-        for bitrix_field in self._meta.fields_by_bitrix_code.values():
-            self._delete_bitrix_field_private_attr(bitrix_field)
-
-    def _update_bitrix_data(
+    def set_bitrix_data(
             self,
             bitrix_data: JSONDict,
             *,
-            clear_local_data: bool = False,
-    ):
-        """Replace loaded raw Bitrix24 data."""
+            clear_local_data: bool = True,
+            copy_data: bool = True,
+    ) -> Self:
+        """Replace loaded raw Bitrix24 data and return this object.
 
-        self._bitrix_data = dict(bitrix_data)
+        Publicly supplied data is deep-copied by default so subsequent mutations
+        of the source dictionary or its nested mutable values cannot change the
+        object's internal Bitrix24 state. Internal SDK loading paths may pass
+        ``copy_data=False`` when ownership of a fresh API response is transferred
+        directly to the object.
+        """
+
+        self._bitrix_data = deepcopy(bitrix_data) if copy_data else bitrix_data
 
         if clear_local_data:
-            self._local_data.clear()
+            self._local_data = None
 
-        self._clear_bitrix_field_private_attrs()
+        self._clear_bitrix_field_caches()
+
+        return self
 
     def _reload_bitrix_data(self):
         """Load fresh raw Bitrix24 data and store it separately from local data."""
-        self._update_bitrix_data(self._get_bitrix_data())
+        self.set_bitrix_data(self._get_bitrix_data(), clear_local_data=False, copy_data=False)
 
     def refresh(self, *, clear_local_data: bool = True) -> Self:
         """Reload object data from Bitrix24 and return this object.
@@ -373,9 +413,10 @@ class BaseObject(ABC, Generic[BOPKT]):
         keep local changes over the reloaded Bitrix24 data.
         """
 
-        self._update_bitrix_data(
+        self.set_bitrix_data(
             self._get_bitrix_data(),
             clear_local_data=clear_local_data,
+            copy_data=False,
         )
 
         return self
@@ -440,10 +481,16 @@ class BaseObject(ABC, Generic[BOPKT]):
         """Return possible list values for a field by Bitrix24 field code."""
         raise NotImplementedError(f"{self.__class__.__name__} does not support list fields.")
 
-    def get_field_value(self, bitrix_code: Text) -> Any:
+    def get_field_value(
+            self,
+            bitrix_code: Text,
+            *,
+            bitrix_field: Optional[BaseField[Any, Any]] = None,
+    ) -> Any:
         """Return a raw field value by Bitrix24 field code."""
 
-        bitrix_field = self._meta.get_field_by_bitrix_code(bitrix_code)
+        if bitrix_field is None:
+            bitrix_field = self._meta.get_field_by_bitrix_code(bitrix_code)
 
         if bitrix_field.is_pk:
             if self._meta.pk_field is not None:
@@ -451,7 +498,8 @@ class BaseObject(ABC, Generic[BOPKT]):
 
             return getattr(self._bitrix_pk, bitrix_field.attr_name)
 
-        value = self._local_data.get(bitrix_code, MISSING)
+        local_data = self._local_data
+        value = MISSING if local_data is None else local_data.get(bitrix_code, MISSING)
 
         if value is not MISSING:
             return value
@@ -498,28 +546,48 @@ class BaseObject(ABC, Generic[BOPKT]):
 
         return value
 
-    def set_field_value(self, bitrix_code: Text, value: Any):
+    def set_field_value(
+            self,
+            bitrix_code: Text,
+            value: Any,
+            *,
+            bitrix_field: Optional[BaseField[Any, Any]] = None,
+    ):
         """Store raw field value by Bitrix24 field code as a local change."""
 
-        bitrix_field = self._meta.get_field_by_bitrix_code(bitrix_code)
+        if bitrix_field is None:
+            bitrix_field = self._meta.get_field_by_bitrix_code(bitrix_code)
 
         if bitrix_field.is_read_only:
             raise BitrixObjectFieldReadOnlyError(f"Field {bitrix_field.attr_name!r} is read-only.")
+
+        if self._local_data is None:
+            self._local_data = {}
 
         self._local_data[bitrix_code] = value
-        self._delete_bitrix_field_private_attr(bitrix_field)
+        self._delete_bitrix_field_cache(bitrix_field)
 
-    def delete_field_value(self, bitrix_code: Text):
+    def delete_field_value(
+            self,
+            bitrix_code: Text,
+            *,
+            bitrix_field: Optional[BaseField[Any, Any]] = None,
+    ):
         """Remove a local unsaved field value by Bitrix24 field code."""
 
-        bitrix_field = self._meta.get_field_by_bitrix_code(bitrix_code)
+        if bitrix_field is None:
+            bitrix_field = self._meta.get_field_by_bitrix_code(bitrix_code)
 
         if bitrix_field.is_read_only:
             raise BitrixObjectFieldReadOnlyError(f"Field {bitrix_field.attr_name!r} is read-only.")
 
-        if bitrix_code in self._local_data:
+        if self._local_data is not None and bitrix_code in self._local_data:
             del self._local_data[bitrix_code]
-            self._delete_bitrix_field_private_attr(bitrix_field)
+
+            if not self._local_data:
+                self._local_data = None
+
+            self._delete_bitrix_field_cache(bitrix_field)
 
     def _apply_updated_data(self, updated_data: JSONDict):
         """Merge successfully updated values into Bitrix24 data and mark them clean."""
@@ -527,15 +595,24 @@ class BaseObject(ABC, Generic[BOPKT]):
         if self._bitrix_data is None:
             self._bitrix_data = {}
 
-        self._bitrix_data.update(updated_data)
+        local_data = self._local_data
 
-        for bitrix_code in updated_data:
-            self._local_data.pop(bitrix_code, None)
+        for bitrix_code, value in updated_data.items():
+            if local_data is not None:
+                local_data.pop(bitrix_code, None)
 
             bitrix_field = self._meta.fields_by_bitrix_code.get(bitrix_code)
 
+            if isinstance(bitrix_field, FileField):
+                self._bitrix_data.pop(bitrix_code, None)
+            else:
+                self._bitrix_data[bitrix_code] = value
+
             if bitrix_field is not None:
-                self._delete_bitrix_field_private_attr(bitrix_field)
+                self._delete_bitrix_field_cache(bitrix_field)
+
+        if local_data is not None and not local_data:
+            self._local_data = None
 
     def _save(
             self,
@@ -543,31 +620,29 @@ class BaseObject(ABC, Generic[BOPKT]):
             *,
             timeout: Timeout = None,
     ) -> bool:
-        """Save local changes through the subclass ``_update`` implementation.
+        """Save object field values through the subclass update implementation.
 
-        ``update_fields`` contains SDK object attribute names, not Bitrix field
-        codes. Object fields are resolved to their source Bitrix field code.
+        If ``update_fields`` is ``None``, only local unsaved changes are sent.
+        Otherwise, it contains SDK object attribute names, not Bitrix field codes,
+        and every selected field is sent using its current raw value: a local
+        unsaved value takes precedence over the loaded Bitrix24 value. Object
+        fields are resolved to their source Bitrix field code.
         """
 
         if update_fields is None:
-            local_data = dict(self._local_data)
+            updated_data = self.local_data
         else:
-            update_fields = tuple(update_fields)
+            updated_data: JSONDict = {}
 
-            if not update_fields:
-                raise ValueError(
-                    "Pass at least one update field or None to save all local changes.",
-                )
+            for attr_name in update_fields:
+                bitrix_field = self._meta.get_field(attr_name)
 
-            update_bitrix_codes = (
-                self._meta.get_field(attr_name).bitrix_code
-                for attr_name in update_fields
-            )
+                if bitrix_field.is_read_only:
+                    raise BitrixObjectFieldReadOnlyError(f"Field {bitrix_field.attr_name!r} is read-only.")
 
-            local_data = {
-                bitrix_code: self._local_data[bitrix_code]
-                for bitrix_code in update_bitrix_codes
-                if bitrix_code in self._local_data
-            }
+                updated_data[bitrix_field.bitrix_code] = self.get_field_value(bitrix_field.bitrix_code, bitrix_field=bitrix_field)
 
-        return self._send_update(local_data, timeout=timeout)
+            if not updated_data:
+                raise ValueError("Pass at least one update field or None to save all local changes.")
+
+        return self._send_update(updated_data, timeout=timeout)

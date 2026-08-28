@@ -70,6 +70,7 @@ __all__ = [
     "BitrixAPIUnauthorized",
     "BitrixAPIUserAccessError",
     "BitrixAPIWrongAuthType",
+    "BitrixFileDownloadError",
     "BitrixRequestError",
     "BitrixRequestTimeout",
     "BitrixResponse302JSONDecodeError",
@@ -183,6 +184,21 @@ class BitrixResponseError(BitrixSDKException, HTTPResponse):
     def __init__(self, message: typing.Text, response: requests.Response):
         super().__init__(message, response)
         self.response = response
+
+
+class BitrixFileDownloadError(BitrixResponseError):
+    """Raised when an HTTP response does not contain a downloadable file.
+
+    The original response is available through ``response`` so callers can
+    inspect the status code and headers without treating the body as a REST API
+    JSON payload.
+    """
+
+    __slots__ = ()
+
+    def __init__(self, response: requests.Response):
+        message = f"{self.__class__.__name__}: failed to download file ({response.status_code})"
+        super().__init__(message, response)
 
 
 class BitrixResponseJSONDecodeError(BitrixResponseError):

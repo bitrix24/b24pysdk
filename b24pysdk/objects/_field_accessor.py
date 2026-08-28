@@ -33,15 +33,15 @@ class FieldAccessor(Generic[BRawT, BValueT]):
     @property
     def raw_value(self) -> Union[Optional[BRawT], List[BRawT]]:
         """Return the raw Bitrix24 field value."""
-        return self._instance[self._field.bitrix_code]
+        return self._instance.get_field_value(self._field.bitrix_code, bitrix_field=self._field)
 
     @raw_value.setter
     def raw_value(self, value: Union[Optional[BRawT], List[BRawT]]):
-        self._instance[self._field.bitrix_code] = value
+        self._instance.set_field_value(self._field.bitrix_code, value, bitrix_field=self._field)
 
     @raw_value.deleter
     def raw_value(self):
-        del self._instance[self._field.bitrix_code]
+        self._instance.delete_field_value(self._field.bitrix_code, bitrix_field=self._field)
 
     @property
     def value(self) -> Union[Optional[BValueT], List[BValueT]]:

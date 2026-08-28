@@ -44,7 +44,7 @@ flask = [
 ]
 dev = [
     "pre-commit",
-    "ruff==0.15.22",
+    "ruff==0.16.3",
 ]
 test = [
     "environs>=11.0.0",
@@ -132,6 +132,9 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101"]
+
+[tool.ruff.lint.pylint]
+max-positional-args = 8
 
 [tool.ruff.format]
 quote-style = "double"

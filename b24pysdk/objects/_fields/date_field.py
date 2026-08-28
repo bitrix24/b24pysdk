@@ -2,6 +2,7 @@ from datetime import date
 from typing import TYPE_CHECKING, List, Optional, Text, Type, Union
 
 from ...utils.converters import date_from_bitrix, date_to_bitrix
+from .._filter_lookups import ORDERED_FILTER_OPERATORS
 from .base_field import BaseField
 
 if TYPE_CHECKING:
@@ -14,6 +15,8 @@ __all__ = [
 
 class DateField(BaseField[Text, date]):
     """Field that exposes a Bitrix24 date value as ``date``."""
+
+    _FILTER_OPERATORS = ORDERED_FILTER_OPERATORS
 
     __slots__ = ()
 

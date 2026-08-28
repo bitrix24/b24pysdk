@@ -36,7 +36,7 @@ __all__ = [
 _T = typing.TypeVar("_T")
 
 
-def cast(_: typing.Type[_T], value: typing.Any) -> _T:
+def cast(_: typing.Type[_T], /, value: typing.Any) -> _T:
     """Cast value to the requested target type when it cannot be inferred statically."""
     return typing.cast("_T", value)
 

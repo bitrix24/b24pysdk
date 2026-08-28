@@ -12,29 +12,39 @@ __all__ = [
 
 
 class Template(BaseEntity):
-    """"""
+    """Methods for working with a structure that Bitrix24 uses to assemble a website page.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/landing/template/index.html"""
 
     @type_checker
     def getlist(
             self,
             *,
             params: Optional[JSONDict] = MISSING,
-            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of view templates
 
-        api_params: JSONDict = {}
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/template/landing-template-get-list.html
+
+        The method retrieves a list of view templates for the current account based on the selection parameters.
+
+        Args:
+            params: An object containing the selection parameters for view templates;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+
+        _params: JSONDict = {}
 
         if params is not MISSING:
-            api_params["params"] = params
-
-        if start is not MISSING:
-            api_params["start"] = start
-
+            _params["params"] = params
         return self._make_bitrix_api_request(
             api_wrapper=self.getlist,
-            params=api_params or None,
+            params=_params or None,
             timeout=timeout,
         )
 
@@ -42,9 +52,23 @@ class Template(BaseEntity):
     def get_landing_ref(
             self,
             bitrix_id: int,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of included areas for the page
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/template/landing-template-get-landing-ref.html
+
+        The method retrieves a list of included areas associated with the page.
+
+        Args:
+            bitrix_id: The identifier of the page;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -60,9 +84,23 @@ class Template(BaseEntity):
     def get_site_ref(
             self,
             bitrix_id: int,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of included areas for the site
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/template/landing-template-get-site-ref.html
+
+        The method retrieves a list of included areas associated with the site.
+
+        Args:
+            bitrix_id: Identifier of the site;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -82,7 +120,22 @@ class Template(BaseEntity):
             data: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Set included areas for page
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/template/landing-template-set-landing-ref.html
+
+        The method sets the bindings of included areas for the page.
+
+        Args:
+            bitrix_id: Identifier of the page;
+
+            data: Set of bindings for the included areas of the page;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -105,7 +158,22 @@ class Template(BaseEntity):
             data: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Set included areas for the site
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/template/landing-template-set-site-ref.html
+
+        The method saves the bindings of included areas for the site.
+
+        Args:
+            bitrix_id: Identifier of the site;
+
+            data: A set of bindings for the included areas of the site;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

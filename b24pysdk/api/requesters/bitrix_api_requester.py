@@ -66,7 +66,7 @@ class BitrixAPIRequester(BaseRequester):
     @property
     def _headers(self) -> Dict:
         """Return default SDK headers extended with JSON content type."""
-        return self._get_default_headers() | self._HEADERS
+        return super()._headers | self._HEADERS
 
     def _get_url_for_log(self, url: Text) -> Text:
         """Return Bitrix24 REST URL prepared for logging."""

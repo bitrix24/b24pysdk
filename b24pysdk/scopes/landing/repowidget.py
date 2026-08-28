@@ -12,7 +12,10 @@ __all__ = [
 
 
 class RepoWidget(BaseEntity):
-    """"""
+    """Class helps managing widgets on start page.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/vibe/index.html
+    """
 
     @type_checker
     def register(
@@ -22,7 +25,22 @@ class RepoWidget(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add widget to start page
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/vibe/landing-repowidget-register.html
+
+        The method adds a widget for the Start page: the Vibe.
+
+        Args:
+            code: Unique code for the widget;
+
+            fields: Field values for creating the widget;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "code": code,
@@ -42,7 +60,20 @@ class RepoWidget(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Unregister widget for Vibe
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/vibe/landing-repowidget-unregister.html
+
+        The method removes the widget for Start page: the Vibe.
+
+        Args:
+            code: Unique code for the widget;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "code": code,
@@ -61,7 +92,20 @@ class RepoWidget(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the list of widgets
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/vibe/landing-repowidget-get-list.html
+
+        The method returns a list of widgets for the current application, filtered by the specified criteria.
+
+        Args:
+            params: Array of fields to retrieve the list of widgets;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         api_params: JSONDict = {
             "params": params,
@@ -80,7 +124,20 @@ class RepoWidget(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Enable debug mode
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/vibe/landing-repowidget-debug.html
+
+        The method enables debug mode for all widgets of the current application
+
+        Args:
+            enable: Debug mode activation flag;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "enable": bool_to_bitrix(enable, is_required=True),

@@ -1,4 +1,3 @@
-import enum
 import typing
 
 if typing.TYPE_CHECKING:
@@ -20,7 +19,6 @@ __all__ = [
     "BAResponseT",
     "BAResultT",
     "BAValueResponseT",
-    "BEnumT",
     "BRawT",
     "BResponseT",
     "BSDataT",
@@ -78,6 +76,3 @@ BOPKT = typing.TypeVar("BOPKT", bound="typing.Hashable")
 
 BResponseT = typing.TypeVar("BResponseT")
 """Type variable that preserves concrete return types across generic helper methods."""
-
-BEnumT = typing.TypeVar("BEnumT", bound=enum.Enum)
-"""Type variable for stdlib enum classes used by SDK fields."""

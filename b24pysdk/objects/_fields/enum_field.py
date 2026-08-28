@@ -1,31 +1,36 @@
-from typing import Any, Generic, Optional, Text, Type
+from enum import Enum
+from typing import Any, Generic, Optional, Text, Type, TypeVar
 
-from ...utils.type_vars import BEnumT
 from .base_field import BaseField
 
 __all__ = [
     "EnumField",
 ]
 
+_BEnumT = TypeVar("_BEnumT", bound=Enum)
 
-class EnumField(BaseField[Any, BEnumT], Generic[BEnumT]):
+
+class EnumField(BaseField[Any, _BEnumT], Generic[_BEnumT]):
     """Field that exposes a Bitrix24 raw value as a stdlib ``Enum`` member."""
 
     __slots__ = ("_enum_class",)
 
-    _enum_class: Type[BEnumT]
+    _enum_class: Type[_BEnumT]
 
     def __init__(
             self,
             bitrix_code: Text,
             *,
-            enum_class: Type[BEnumT],
+            enum_class: Type[_BEnumT],
             is_pk: bool = False,
             is_required: bool = False,
             is_multiple: bool = False,
             is_read_only: bool = False,
             is_missing_allowed: bool = False,
     ):
+        if not issubclass(enum_class, Enum):
+            raise TypeError("enum_class must be a Enum subclass.")
+
         super().__init__(
             bitrix_code=bitrix_code,
             is_pk=is_pk,
@@ -36,7 +41,7 @@ class EnumField(BaseField[Any, BEnumT], Generic[BEnumT]):
         )
         self._enum_class = enum_class
 
-    def _convert_from_bitrix(self, value: Optional[Any]) -> Optional[BEnumT]:
+    def _convert_from_bitrix(self, value: Optional[Any]) -> Optional[_BEnumT]:
         """Convert a raw Bitrix24 value to an enum member."""
 
         if value is None or value == "":
@@ -47,7 +52,7 @@ class EnumField(BaseField[Any, BEnumT], Generic[BEnumT]):
 
         return self._enum_class(value)
 
-    def _convert_to_bitrix(self, value: Optional[BEnumT]) -> Optional[Any]:
+    def _convert_to_bitrix(self, value: Optional[_BEnumT]) -> Optional[Any]:
         """Convert an enum member to a Bitrix24 value."""
 
         if value is None:

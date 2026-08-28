@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Sender(BaseEntity):
-    """"""
+    """Class provides methods for working with message providers.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/messageservice/index.html
+    """
 
     @type_checker
     def add(
@@ -25,7 +28,28 @@ class Sender(BaseEntity):
             description: Optional[Union[Text, JSONDict]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Register an SMS provider
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/messageservice/messageservice-sender-add.html
+
+        The method registers a new message provider.
+
+        Args:
+            code: Provider code;
+
+            type: Provider type;
+
+            handler: Application handler URL that is called when sending a message;
+
+            name: Provider name;
+
+            description: Provider description;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "CODE": code,
@@ -50,7 +74,20 @@ class Sender(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Delete SMS provider
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/messageservice/messageservice-sender-delete.html
+
+        The method removes a previously registered message provider for the current application.
+
+        Args:
+            code: Provider code;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "CODE": code,
@@ -68,7 +105,18 @@ class Sender(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[List[Text]]:
-        """"""
+        """Get a list of SMS providers
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/messageservice/messageservice-sender-list.html
+
+        The method returns a list of provider codes registered with the current application.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
@@ -85,7 +133,24 @@ class Sender(BaseEntity):
             description: Optional[Union[Text, JSONDict]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Updates an SMS provider
+
+        The method updates an existing message provider.
+
+        Args:
+            code: Provider code;
+
+            handler: Application handler URL that is called when sending a message;
+
+            name: Provider name;
+
+            description: Provider description;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "CODE": code,

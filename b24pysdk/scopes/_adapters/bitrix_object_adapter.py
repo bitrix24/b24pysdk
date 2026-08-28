@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Generator, Generic, List, NoReturn, Optional, Text, Type, Union, overload
 
 from ..._config import Config
-from ...objects import BitrixObjectList
+from ...objects import BitrixObjectList, ClientProvider
 from ...utils.type_vars import BOT
 from ...utils.types import JSONDict, JSONList
 
@@ -17,9 +17,9 @@ __all__ = [
 class BitrixObjectAdapter(Generic[BOT]):
     """Adapter converting one Bitrix24 object result to an SDK object."""
 
-    __slots__ = ("_client", "_discriminator", "_object_key", "_wrapper")
+    __slots__ = ("_client_provider", "_discriminator", "_object_key", "_wrapper")
 
-    _client: "ClientType"
+    _client_provider: ClientProvider
     _discriminator: Optional[int]
     _object_key: Text
     _wrapper: Optional[Text]
@@ -33,7 +33,7 @@ class BitrixObjectAdapter(Generic[BOT]):
             wrapper: Optional[Text] = None,
     ):
         self._object_key = object_key
-        self._client = client
+        self._client_provider = ClientProvider(client=client)
         self._discriminator = discriminator
         self._wrapper = wrapper
 
@@ -69,7 +69,7 @@ class BitrixObjectAdapter(Generic[BOT]):
         """Convert Bitrix24 object data or primary key to an SDK object."""
         return self._get_object_class().get_meta().make_object_from_bitrix_data_or_pk(
             bitrix_data_or_pk,
-            client=self._client,
+            client_provider=self._client_provider,
         )
 
     def _unwrap_result(self, bitrix_result: JSONDict, /) -> Union[JSONDict, JSONList, Text, int]:
@@ -114,17 +114,32 @@ class BitrixObjectsAdapter(BitrixObjectAdapter[BOT], Generic[BOT]):
         """Convert a list-like Bitrix24 result to SDK objects."""
 
         if bitrix_result is None:
-            return BitrixObjectList().using(client=self._client)
+            return BitrixObjectList(client_provider=self._client_provider)
 
         make_object = self._get_object_class().get_meta().make_object_from_bitrix_data_or_pk
 
         if isinstance(bitrix_result, list):
-            return BitrixObjectList(make_object(bitrix_data, client=self._client) for bitrix_data in bitrix_result).using(client=self._client)
+            return BitrixObjectList(
+                (
+                    make_object(bitrix_data, client_provider=self._client_provider)
+                    for bitrix_data in bitrix_result
+                ),
+                client_provider=self._client_provider,
+            )
 
         if isinstance(bitrix_result, dict):
-            return BitrixObjectList(make_object(bitrix_data, client=self._client) for bitrix_data in self._unwrap_list_result(bitrix_result)).using(client=self._client)
+            return BitrixObjectList(
+                (
+                    make_object(bitrix_data, client_provider=self._client_provider)
+                    for bitrix_data in self._unwrap_list_result(bitrix_result)
+                ),
+                client_provider=self._client_provider,
+            )
 
-        return (make_object(bitrix_data, client=self._client) for bitrix_data in bitrix_result)
+        return (
+            make_object(bitrix_data, client_provider=self._client_provider)
+            for bitrix_data in bitrix_result
+        )
 
     def _unwrap_list_result(self, bitrix_result: JSONDict, /) -> List[JSONDict]:
         """Extract a list from a wrapped Bitrix24 result."""

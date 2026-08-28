@@ -1,17 +1,16 @@
-from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, Iterable, Optional, Text, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, Hashable, Iterable, Mapping, Optional, Sequence, Text, TypeVar, Union
 
 from .._constants import MISSING
-from ..schemas.api import BitrixObjectBatchWriteResponse
 from ..utils.types import JSONDict, JSONList, Self, Timeout
 from ._base_object import BaseObject
 from ._fields import IntField, ObjectField, TextField
 from ._managers import BaseFieldManager, BaseObjectManager
+from ._object_results import BitrixObjectBatchAddResult, BitrixObjectBatchWriteResult
 from .errors import BitrixObjectError
 
 if TYPE_CHECKING:
     from ..api.requests import BitrixAPIRequest, BitrixAPIValueRequest, BitrixAPIValuesRequest
     from ..client import ClientType
-    from ._bitrix_object_list import BitrixObjectList
     from .user import User
 
 __all__ = [
@@ -105,7 +104,7 @@ class Department(BaseObject[int]):
             *,
             timeout: Timeout = None,
     ) -> bool:
-        """Save local department field changes to Bitrix24."""
+        """Save local changes or selected current department fields to Bitrix24."""
         return self._save(update_fields=update_fields, timeout=timeout)
 
     def delete(self, *, timeout: Timeout = None) -> bool:
@@ -227,17 +226,12 @@ class DepartmentManager(BaseObjectManager[_DepartmentT], Generic[_DepartmentT]):
 
     def add_many(
             self,
-            items: Iterable[JSONDict],
+            objects_data: Union[Sequence[JSONDict], Mapping[Hashable, JSONDict]],
             *,
-            ignore_errors: bool = False,
             timeout: Timeout = None,
-    ) -> "BitrixObjectList[_DepartmentT]":
+    ) -> BitrixObjectBatchAddResult[_DepartmentT]:
         """Create many Bitrix24 departments from SDK field dictionaries."""
-        return self._add_many(
-            items,
-            ignore_errors=ignore_errors,
-            timeout=timeout,
-        )
+        return self._add_many(objects_data, timeout=timeout)
 
     def update(
             self,
@@ -249,7 +243,7 @@ class DepartmentManager(BaseObjectManager[_DepartmentT], Generic[_DepartmentT]):
             head_id: Optional[int] = MISSING,
             uf_head: Optional["User"] = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixObjectBatchWriteResponse:
+    ) -> BitrixObjectBatchWriteResult[_DepartmentT]:
         """Update departments matching the current query in batches."""
 
         if parent_id is not MISSING and parent is not MISSING:
@@ -280,7 +274,7 @@ class DepartmentManager(BaseObjectManager[_DepartmentT], Generic[_DepartmentT]):
 
         return self._update(**fields, timeout=timeout)
 
-    def delete(self, *, timeout: Timeout = None) -> BitrixObjectBatchWriteResponse:
+    def delete(self, *, timeout: Timeout = None) -> BitrixObjectBatchWriteResult[_DepartmentT]:
         """Delete departments matching the current query in batches."""
         return self._delete(timeout=timeout)
 

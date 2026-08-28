@@ -175,7 +175,9 @@ class Config:
 
         default_client_factory : Callable[[], ClientType], optional
             Default factory used by the object layer when no explicit client or
-            client_factory is passed.
+            client_factory is passed. Configure it only for applications that
+            work with a single Bitrix24 portal. Multi-portal applications should
+            pass an explicit client or client_factory for each object operation.
 
         default_initial_retry_delay : Number, optional
             Initial delay (in seconds) before the first retry attempt.
@@ -247,12 +249,22 @@ class Config:
 
     @property
     def default_client_factory(self) -> typing.Optional[typing.Callable[[], "ClientType"]]:
-        """Default client factory used by the object layer."""
+        """Return the default object-layer client factory.
+
+        Configure this setting only when the application works with a single
+        Bitrix24 portal. Multi-portal applications should supply an explicit
+        client or client_factory for each object operation instead.
+        """
         return self._config.default_client_factory
 
     @default_client_factory.setter
     def default_client_factory(self, value: typing.Optional[typing.Callable[[], "ClientType"]]):
-        """Set default client factory used by the object layer."""
+        """Set the default object-layer client factory.
+
+        Configure this setting only when the application works with a single
+        Bitrix24 portal. For multi-portal applications, keep it unset and pass an
+        explicit client or client_factory for each object operation.
+        """
 
         if value is not None and not callable(value):
             raise TypeError("default_client_factory must be callable or None")

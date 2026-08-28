@@ -21,6 +21,7 @@ class _MethodCaller(BaseCaller):
 
     def __init__(
             self,
+            *,
             domain: Text,
             auth_token: Text,
             is_webhook: bool,

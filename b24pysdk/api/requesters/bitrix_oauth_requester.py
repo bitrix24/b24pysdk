@@ -69,7 +69,7 @@ class BitrixOAuthRequester(BaseRequester):
     @property
     def _headers(self) -> Dict:
         """Return default SDK headers extended with form content type."""
-        return self._get_default_headers() | self._HEADERS
+        return super()._headers | self._HEADERS
 
     def _request(self, url: Text, params: JSONDict) -> requests.Response:
         """

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, replace
-from typing import Iterable, Optional, Text, Tuple
+from typing import Dict, Iterable, Mapping, Optional, Text, Tuple
 
 from ....utils.dataclasses import frozen_dataclass_kwargs
 from ....utils.types import DefaultTimeout, JSONDict, Timeout
@@ -9,13 +9,15 @@ __all__ = [
 ]
 
 
-@dataclass(**frozen_dataclass_kwargs())
+@dataclass(**frozen_dataclass_kwargs(eq=False))
 class ObjectQueryState:
     """Immutable configuration of one object-manager query."""
 
     filter_param: Optional[JSONDict] = None
     order_param: Optional[JSONDict] = None
     select_param: Optional[Tuple[Text, ...]] = None
+    select_field_param: Optional[Dict[Text, Tuple[Text, ...]]] = None
+    select_related_param: Optional[Dict[Text, Tuple[Text, ...]]] = None
     kwargs: Optional[JSONDict] = None
     limit_param: Optional[int] = None
     start_param: Optional[int] = None
@@ -23,21 +25,6 @@ class ObjectQueryState:
     is_fast: bool = False
     is_reversed: bool = False
     is_result_query: bool = False
-
-    def __post_init__(self):
-        """Copy mutable query parameters stored in the frozen state."""
-
-        if self.filter_param is not None:
-            object.__setattr__(self, "filter_param", dict(self.filter_param))
-
-        if self.order_param is not None:
-            object.__setattr__(self, "order_param", dict(self.order_param))
-
-        if self.select_param is not None:
-            object.__setattr__(self, "select_param", tuple(self.select_param))
-
-        if self.kwargs is not None:
-            object.__setattr__(self, "kwargs", dict(self.kwargs))
 
     def with_filter_param(self, filter_param: Optional[JSONDict]) -> "ObjectQueryState":
         """Return a copy with filtering parameters replaced."""
@@ -55,11 +42,30 @@ class ObjectQueryState:
             is_result_query=True,
         )
 
-    def with_select_param(self, select_param: Optional[Iterable[Text]]) -> "ObjectQueryState":
+    def with_select_param(
+            self,
+            select_param: Optional[Iterable[Text]],
+            select_field_param: Optional[Mapping[Text, Iterable[Text]]],
+    ) -> "ObjectQueryState":
         """Return a copy with selected field codes replaced."""
         return replace(
             self,
             select_param=tuple(select_param) if select_param is not None else None,
+            select_field_param={
+                attr_name: tuple(nested_fields)
+                for attr_name, nested_fields in select_field_param.items()
+            } if select_field_param is not None else None,
+            is_result_query=True,
+        )
+
+    def with_select_related_param(self, select_related_param: Optional[Mapping[Text, Iterable[Text]]]) -> "ObjectQueryState":
+        """Return a copy with related object fields replaced."""
+        return replace(
+            self,
+            select_related_param={
+                attr_name: tuple(nested_paths)
+                for attr_name, nested_paths in select_related_param.items()
+            } if select_related_param is not None else None,
             is_result_query=True,
         )
 

@@ -13,7 +13,10 @@ __all__ = [
 
 
 class Landing(BaseEntity):
-    """"""
+    """Class for working with pages.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/methods/index.html
+    """
 
     @type_checker
     def add(
@@ -23,7 +26,22 @@ class Landing(BaseEntity):
             scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add page or folder
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/methods/landing-landing-add.html
+
+        The method adds a page or folder to the specified site and returns the identifier of the created object.
+
+        Args:
+            fields: Set of fields for the new page or folder;
+
+            scope: Internal scope of the landing;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "fields": fields,
@@ -48,7 +66,26 @@ class Landing(BaseEntity):
             fields: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add page by template
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/methods/landing-landing-add-by-template.html
+
+        The method creates a page in the specified site based on the template code and returns the identifier of the created page.
+
+        Args:
+            site_id: Identifier of the site where the page needs to be created;
+
+            code: Template code for the page;
+
+            scope: Internal scope of landings;
+
+            fields: Additional parameters for creating the page;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "siteId": site_id,
@@ -77,7 +114,26 @@ class Landing(BaseEntity):
             prevent_history: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add block to page
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/block-methods/landing-landing-add-block.html
+
+        The method adds a new block to the page and returns the identifier of the created block.
+
+        Args:
+            lid: Page identifier;
+
+            fields: Set of parameters for the new block;
+
+            scope: Internal scope of landings;
+
+            prevent_history: If true, the method does not add the action to the page change history;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "lid": lid,
@@ -107,7 +163,28 @@ class Landing(BaseEntity):
             skip_system: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Copy page
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/methods/landing-landing-copy.html
+
+        The method copies a page and returns the identifier of the new page.
+
+        Args:
+            lid: Identifier of the source page;
+
+            scope: Internal scope of landings;
+
+            to_site_id: Identifier of the target site;
+
+            to_folder_id: Identifier of the target folder;
+
+            skip_system: Flag for copying the system attribute of the page;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "lid": lid,
@@ -141,7 +218,26 @@ class Landing(BaseEntity):
             params: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Copy block to page
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/block-methods/landing-landing-copy-block.html
+
+        The method copies a block to the specified page and returns the identifier of the created copy of the block.
+
+        Args:
+            lid: Identifier of the source page;
+
+            block: Block identifier;
+
+            scope: Internal scope of landings;
+
+            params: Additional copy parameters;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         api_params: JSONDict = {
             "lid": lid,
@@ -168,7 +264,22 @@ class Landing(BaseEntity):
             scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete page
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/methods/landing-landing-delete.html
+
+        The method removes a page along with its blocks and associated files.
+
+        Args:
+            lid: Identifier of the source page;
+
+            scope: Internal scope of landings;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "lid": lid,
@@ -192,7 +303,24 @@ class Landing(BaseEntity):
             scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete block
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/block-methods/landing-landing-delete-block.html
+
+        The method landing.landing.deleteblock completely removes a block from the page.
+
+        Args:
+            lid: Identifier of the source page;
+
+            block: Identifier of the block in the editable version of the page;
+
+            scope: Internal scope of landings;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "lid": lid,
@@ -218,7 +346,26 @@ class Landing(BaseEntity):
             prevent_history: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Move block down
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/block-methods/landing-landing-down-block.html
+
+        The method moves a block one position down in the page draft.
+
+        Args:
+            lid: Identifier of the source page;
+
+            block: Identifier of the block in the editable version of the page;
+
+            scope: Internal scope of landings;
+
+            prevent_history: If true, the method does not add the action to the page change history;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "lid": lid,
@@ -247,7 +394,26 @@ class Landing(BaseEntity):
             meta: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Save to the list of blocks
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/block-methods/landing-landing-favorite-block.html
+
+        The method creates a copy of a page block and saves it to the block list as a template.
+
+        Args:
+            lid: Identifier of the source page;
+
+            block: Identifier of the block in the editable version of the page;
+
+            scope: Internal scope of landings;
+
+            meta: Parameters of the saved block;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "lid": lid,
@@ -274,7 +440,22 @@ class Landing(BaseEntity):
             scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get additional fields of the page
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/methods/landing-landing-get-additional-fields.html
+
+        The method retrieves additional fields of the page.
+
+        Args:
+            lid: Identifier of the source page;
+
+            scope: Internal scope of landings;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "lid": lid,
@@ -298,7 +479,22 @@ class Landing(BaseEntity):
             start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of pages
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/methods/landing-landing-get-list.html
+
+        The method retrieves a list of pages based on the selection parameters.
+
+        Args:
+            scope: Internal scope of the landings;
+
+            params: Parameters for selecting pages;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         api_params: JSONDict = {}
 
@@ -325,7 +521,22 @@ class Landing(BaseEntity):
             scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the URL of the preview
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/methods/landing-landing-get-preview.html
+
+        The method returns the URL or relative path to the preview image of the page.
+
+        Args:
+            lid: Identifier of the source page;
+
+            scope: Internal scope of the landings;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "lid": lid,
@@ -348,7 +559,22 @@ class Landing(BaseEntity):
             scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get public URL of the page
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/methods/landing-landing-get-public-url.html
+
+        The method returns the complete public URL of the page.
+
+        Args:
+            lid: Identifier of the source page;
+
+            scope: Internal scope of the landings;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "lid": lid,
@@ -372,7 +598,24 @@ class Landing(BaseEntity):
             scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Hide block on page
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/block-methods/landing-landing-hide-block.html
+
+        The method hides a block on the page.
+
+        Args:
+            lid: Identifier of the source page;
+
+            block: Identifier of the block in the editable version of the page;
+
+            scope: Internal scope of landings;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "lid": lid,
@@ -395,7 +638,20 @@ class Landing(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Mark page as deleted
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/methods/landing-landing-mark-delete.html
+
+        The method landing.landing.markDelete marks the page as deleted, moves it to the trash, and unpublishes it.
+
+        Args:
+            lid: Identifier of the source page;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "lid": lid,
@@ -418,7 +674,28 @@ class Landing(BaseEntity):
             prevent_history: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Mark block as deleted
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/block-methods/landing-landing-mark-deleted-block.html
+
+        The method  marks a page block as deleted but does not remove it from the database.
+
+        Args:
+            lid: Identifier of the source page;
+
+            block: Identifier of the block in the editable version of the page;
+
+            scope: Internal scope of landings;
+
+            mark: Indicator for marking the block as deleted;
+
+            prevent_history: If true, the method does not add the action to the page change history;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "lid": lid,
@@ -447,7 +724,20 @@ class Landing(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Restore page from recycle bin
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/methods/landing-landing-mark-undelete.html
+
+        The method restores a page from the recycle bin and removes the deletion flag.
+
+        Args:
+            lid: Identifier of the source page;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "lid": lid,
@@ -468,7 +758,24 @@ class Landing(BaseEntity):
             scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Remove the deletion mark from block
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/block-methods/landing-landing-mark-undeleted-block.html
+
+        The method removes the deletion mark from the block.
+
+        Args:
+            lid: Identifier of the source page;
+
+            block: Identifier of the block in the editable version of the page;
+
+            scope: Internal scope of landings;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "lid": lid,
@@ -494,7 +801,26 @@ class Landing(BaseEntity):
             to_folder_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Move page
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/methods/landing-landing-move.html
+
+        The method moves a page to another site or folder.
+
+        Args:
+            lid: Identifier of the source page;
+
+            scope: Internal scope of landings;
+
+            to_site_id: Identifier of the target site;
+
+            to_folder_id: Identifier of the target folder;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "lid": lid,
@@ -525,7 +851,26 @@ class Landing(BaseEntity):
             params: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Move block to page
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/block-methods/landing-landing-move-block.html
+
+        The method moves a block to the specified page and returns the identifier of the moved block.
+
+        Args:
+            lid: Identifier of the source page;
+
+            block: Identifier of the block in the editable version of the page;
+
+            scope: Internal scope of landings;
+
+            params: Additional parameters for the move;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         api_params: JSONDict = {
             "lid": lid,
@@ -552,7 +897,22 @@ class Landing(BaseEntity):
             scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Publish the landing page
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/methods/landing-landing-publication.html
+
+        The method publishes the page and makes it active.
+
+        Args:
+            lid: Identifier of the source page;
+
+            scope: Internal scope of landings;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "lid": lid,
@@ -575,7 +935,22 @@ class Landing(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Remove blocks and clear image file bindings on page
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/methods/landing-landing-remove-entities.html
+
+        The method removes specified blocks and their associated images from the page.
+
+        Args:
+            lid: Identifier of the source page;
+
+            data: Set of objects to be deleted;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "lid": lid,
@@ -596,7 +971,22 @@ class Landing(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get page ID by public URL
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/methods/landing-landing-resolve-id-by-public-url.html
+
+        The method returns the page ID based on its public URL within the specified site.
+
+        Args:
+            landing_url: Relative public URL of the page within the site siteId;
+
+            site_id: The ID of the site within which to find the page;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "landingUrl": landing_url,
@@ -618,7 +1008,24 @@ class Landing(BaseEntity):
             scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Show block on page
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/block-methods/landing-landing-show-block.html
+
+        The method displays a block on the page that was previously hidden.
+
+        Args:
+            lid: Identifier of the source page;
+
+            block: Identifier of the block in the editable version of the page;
+
+            scope: Internal scope of landings;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "lid": lid,
@@ -641,7 +1048,20 @@ class Landing(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Remove from the saved list of blocks
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/block-methods/landing-landing-unfavorite-block.html
+
+        The method removes the saved copy of a block.
+
+        Args:
+            block_id: Identifier of the saved copy of the block;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "blockId": block_id,
@@ -661,7 +1081,22 @@ class Landing(BaseEntity):
             scope: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Unpublishing the page
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/methods/landing-landing-unpublic.html
+
+        The method unpublishes a page.
+
+        Args:
+            lid: Identifier of the source page;
+
+            scope: Internal scope of landings;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "lid": lid,
@@ -684,7 +1119,22 @@ class Landing(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update page
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/methods/landing-landing-update.html
+
+        The method updates the parameters of the page.
+
+        Args:
+            lid: Identifier of the source page;
+
+            fields: A set of fields for the page to be updated;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "lid": lid,
@@ -707,7 +1157,26 @@ class Landing(BaseEntity):
             prevent_history: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Move block up
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/page/block-methods/landing-landing-up-block.html
+
+        The method moves a block one position up in the draft of the page.
+
+        Args:
+            lid: Identifier of the source page;
+
+            block: Identifier of the block in the editable version of the page;
+
+            scope: Internal scope of landings;
+
+            prevent_history: If true, the method does not add the action to the page change history;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "lid": lid,

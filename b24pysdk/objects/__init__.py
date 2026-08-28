@@ -1,30 +1,42 @@
-from ._bitrix_object_list import BitrixObjectList
+from ._client_provider import ClientProvider
 from ._fields import (
+    AddressField,
+    BitrixSchemaField,
     BoolField,
     DateField,
     DateTimeField,
     DictField,
     EnumField,
+    FileField,
     FloatField,
     IntField,
     ListField,
+    MoneyField,
     ObjectField,
     TextField,
     TimeField,
     TimeZoneField,
     URLField,
 )
+from ._object_results import BitrixObjectBatchAddResult, BitrixObjectBatchWriteResult, BitrixObjectList
 
 __all__ = [
+    "AddressField",
+    "BitrixObjectBatchAddResult",
+    "BitrixObjectBatchWriteResult",
     "BitrixObjectList",
+    "BitrixSchemaField",
     "BoolField",
+    "ClientProvider",
     "DateField",
     "DateTimeField",
     "DictField",
     "EnumField",
+    "FileField",
     "FloatField",
     "IntField",
     "ListField",
+    "MoneyField",
     "ObjectField",
     "TextField",
     "TimeField",

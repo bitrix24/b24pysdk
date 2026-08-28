@@ -2,6 +2,7 @@ import re
 from typing import TYPE_CHECKING, ClassVar, List, Optional, Pattern, Text, Type, Union
 
 from ...utils.converters import text_from_bitrix, text_to_bitrix
+from .._filter_lookups import TEXT_FILTER_OPERATORS
 from .base_field import BaseField
 
 if TYPE_CHECKING:
@@ -15,6 +16,8 @@ __all__ = [
 
 class TextField(BaseField[Text, Text]):
     """Field that exposes a Bitrix24 text value as ``str``."""
+
+    _FILTER_OPERATORS = TEXT_FILTER_OPERATORS
 
     __slots__ = ()
 

@@ -3,8 +3,9 @@ from typing import TYPE_CHECKING, Any, Generic, Iterable, List, Optional, Text, 
 from ..._config import Config
 from ..._constants import MISSING
 from ...utils.type_vars import BOT
-from .._bitrix_object_list import BitrixObjectList
+from .._object_results import BitrixObjectList
 from ..errors import BitrixObjectFieldReadOnlyError
+from .base_cached_field import BaseCachedField
 from .base_field import BaseField
 
 if TYPE_CHECKING:
@@ -15,7 +16,7 @@ __all__ = [
 ]
 
 
-class ObjectField(BaseField[Any, BOT], Generic[BOT]):
+class ObjectField(BaseCachedField[Any, BOT], Generic[BOT]):
     """Field that exposes a related Bitrix24 object through a source field.
 
     ``source_field`` is the real SDK field that stores the related object's primary
@@ -71,15 +72,20 @@ class ObjectField(BaseField[Any, BOT], Generic[BOT]):
             if instance is None:
                 return self
 
-            cached_value = self._get_cached_value(instance)
+            cached_value = self.get_cached_value(instance)
 
-            if cached_value is not None:
+            if cached_value is not MISSING:
                 return cached_value
 
-            converted_value = self.from_bitrix_value(instance[self.bitrix_code], instance=instance)
+            converted_value = self.from_bitrix_value(
+                instance.get_field_value(
+                    self.bitrix_code,
+                    bitrix_field=self.source_field,
+                ),
+                instance=instance,
+            )
 
-            if converted_value is not None:
-                self._set_cached_value(instance, converted_value)
+            self.set_cached_value(instance, converted_value)
 
             return converted_value
 
@@ -95,17 +101,21 @@ class ObjectField(BaseField[Any, BOT], Generic[BOT]):
             raise BitrixObjectFieldReadOnlyError(f"Field {self.attr_name!r} is read-only.")
 
         if self.is_multiple and value is not None:
-            if not self._is_iterable(value):
+            if not self.is_iterable(value):
                 raise TypeError(f"Field {self.attr_name!r} expects an iterable value.")
 
             value = BitrixObjectList(value, client_provider=getattr(instance, "_client_provider"))
 
-        instance[self.bitrix_code] = self.to_bitrix_value(value)
+        instance.set_field_value(
+            self.bitrix_code,
+            self.to_bitrix_value(value),
+            bitrix_field=self.source_field,
+        )
 
         if value is None:
-            self._delete_cached_value(instance)
+            self.delete_cached_value(instance)
         else:
-            self._set_cached_value(instance, value)
+            self.set_cached_value(instance, value)
 
     def __delete__(self, instance: Optional["BaseObject"]):
         self.source_field.__delete__(instance)
@@ -147,7 +157,7 @@ class ObjectField(BaseField[Any, BOT], Generic[BOT]):
 
                 return None
 
-            if not self._is_iterable(value):
+            if not self.is_iterable(value):
                 raise TypeError(f"Field {self.attr_name!r} expects an iterable value.")
 
             def iter_bitrix_objects():
@@ -174,7 +184,7 @@ class ObjectField(BaseField[Any, BOT], Generic[BOT]):
         if source_value is None:
             return None
 
-        return self.object_class(source_value, client=instance.client)
+        return self.object_class(source_value, client_provider=getattr(instance, "_client_provider"))
 
     def _convert_to_bitrix(self, value: Optional[BOT]) -> Any:
         """Convert one related SDK object to its raw primary-key value."""
@@ -193,19 +203,3 @@ class ObjectField(BaseField[Any, BOT], Generic[BOT]):
             )
 
         return bitrix_object.bitrix_pk
-
-    def _get_cache_attr_name(self, instance: "BaseObject") -> Text:
-        """Return the private attribute name used for this object-field cache."""
-        return self.get_private_attr_name(instance.__class__)
-
-    def _get_cached_value(self, instance: "BaseObject") -> Union[Optional[BOT], BitrixObjectList[BOT]]:
-        """Return the cached related object for this object field."""
-        return getattr(instance, self._get_cache_attr_name(instance), None)
-
-    def _delete_cached_value(self, instance: "BaseObject"):
-        """Delete the cached related object for this object field, if it exists."""
-        self.delete_private_attr(instance)
-
-    def _set_cached_value(self, instance: "BaseObject", value: Union[Optional[BOT], BitrixObjectList[BOT]]):
-        """Cache a related object under this object field's private attribute."""
-        setattr(instance, self._get_cache_attr_name(instance), value)

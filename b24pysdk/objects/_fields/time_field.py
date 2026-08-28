@@ -2,6 +2,7 @@ from datetime import time
 from typing import TYPE_CHECKING, List, Optional, Text, Type, Union
 
 from ...utils.converters import time_from_bitrix, time_to_bitrix
+from .._filter_lookups import ORDERED_FILTER_OPERATORS
 from .base_field import BaseField
 
 if TYPE_CHECKING:
@@ -14,6 +15,8 @@ __all__ = [
 
 class TimeField(BaseField[Text, time]):
     """Field that exposes a Bitrix24 time value as ``time``."""
+
+    _FILTER_OPERATORS = ORDERED_FILTER_OPERATORS
 
     __slots__ = ()
 

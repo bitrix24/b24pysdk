@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Status(BaseEntity):
-    """"""
+    """Class provides methods for working with message statuses.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/messageservice/index.html
+    """
 
     @type_checker
     def update(

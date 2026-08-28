@@ -26,6 +26,11 @@ class BitrixObjectFieldError(BitrixObjectError):
     __slots__ = ()
 
 
+class BitrixObjectFilterError(BitrixObjectFieldError):
+    """Raised when an SDK object filter or filter lookup is invalid."""
+    __slots__ = ()
+
+
 class BitrixObjectFieldReadOnlyError(BitrixObjectFieldError):
     """Raised when a read-only object field is modified."""
     __slots__ = ()

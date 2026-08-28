@@ -14,7 +14,10 @@ __all__ = [
 
 
 class Blogpost(BaseEntity):
-    """"""
+    """Class for working with the corporate news feed
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/log/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -45,7 +48,44 @@ class Blogpost(BaseEntity):
             user_fields: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add a message to the news feed
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/log/log-blogpost-add.html
+
+        The method adds a message to the News Feed.
+
+        Args:
+            post_message: Message text;
+
+            post_title: Message title;
+
+            dest: List of recipients who will have permission to view the message;
+
+            sperm: Deprecated equivalent of dest;
+
+            files: Array of files;
+
+            important: Indicator of an important message;
+
+            important_date_end: Date and time in ISO 8601 format until which message will be considered important;
+
+            site_id: Site identifier;
+
+            user_id: Identifier of the users on behalf of message is published;
+
+            tags: Message tags;
+
+            background_code: Background code of the message;
+
+            parse_preview: Automatic addition of a link preview from the message text;
+
+            user_fields: User fields to include in the message;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "POST_MESSAGE": post_message,
@@ -100,7 +140,20 @@ class Blogpost(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete news feed message
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/log/log-blogpost-delete.html
+
+        The method removes a message from the News Feed.
+
+        Args:
+            post_id: Identifier of the message;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "POST_ID": post_id,
@@ -121,7 +174,24 @@ class Blogpost(BaseEntity):
             start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Access available user messages from the news feed
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/log/log-blogpost-get.html
+
+        The method returns messages from the News Feed that are accessible to the current user.
+
+        Args:
+            post_id: Filter by message ID;
+
+            log_rights: Filter by recipients who have the rights to the view message;
+
+            start: The parameter is used dor pagination control;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -149,7 +219,24 @@ class Blogpost(BaseEntity):
             user_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add recipients to news feed message
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/log/log-blogpost-share.html
+
+        The method adds new recipients to a news feed message.
+
+        Args:
+            post_id: Identifier of the message;
+
+            dest: List of recipients who will have permission to view the message;
+
+            user_id: Identifier of the users on behalf of message is edited;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "POST_ID": post_id,
@@ -182,7 +269,40 @@ class Blogpost(BaseEntity):
             user_fields: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update news feed message
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/log/log-blogpost-update.html
+
+        The method updates a message in the News Feed.
+
+        Args:
+            post_id: Identifier of the message;
+
+            post_message: New message text;
+
+            post_title: New message title;
+
+            dest: New list of recipients who will have permission to view the message;
+
+            sperm: Deprecated equivalent of dest;
+
+            files: Array of files;
+
+            important: Indicator of an important message;
+
+            important_date_end: Date and time in ISO 8601 format until which message will be considered important;
+
+            site_id: Site identifier;
+
+            user_id: Identifier of the users on behalf of message is published;
+
+            user_fields: User fields to include in the message;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "POST_ID": post_id,

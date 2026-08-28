@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, List, Optional, Text, Type, Union
 
 from ...utils.converters import int_from_bitrix, int_to_bitrix
+from .._filter_lookups import ORDERED_FILTER_OPERATORS
 from .base_field import BaseField
 
 if TYPE_CHECKING:
@@ -13,6 +14,8 @@ __all__ = [
 
 class IntField(BaseField[Union[int, Text], int]):
     """Field that exposes a Bitrix24 int-like value as ``int``."""
+
+    _FILTER_OPERATORS = ORDERED_FILTER_OPERATORS
 
     __slots__ = ()
 
