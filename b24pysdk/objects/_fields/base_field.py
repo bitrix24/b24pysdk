@@ -36,16 +36,21 @@ class BaseField(ABC, Generic[BRawT, BValueT]):
 
         deal.title = "New title"
 
-    ``request_name`` is generated from ``bitrix_code`` in ``snake_case``.
-    The special Bitrix24 primary-key codes ``ID`` and ``id`` are mapped to
-    ``bitrix_id``.
+    ``request_name`` may be supplied explicitly when an API wrapper uses a
+    parameter name that cannot be derived from the Bitrix24 field code.
+    Otherwise, it is generated from ``bitrix_code`` in ``snake_case``. The
+    special primary-key codes ``ID`` and ``id`` are mapped to ``bitrix_id``.
 
-    If ``is_pk=True`` is set, the field is treated as required and read-only
-    automatically.
+    If ``is_pk=True`` is set, the field is treated as required by default and
+    read-only automatically. A nullable component of a composite key may opt
+    out explicitly with ``is_required=False``. Read-only fields are also never
+    updatable. Setting ``is_updatable=False`` without making a field read-only
+    creates an add-only field: managers may pass it during object creation, but
+    existing objects and manager queries cannot update it.
 
-    If Bitrix24 may omit an optional field from the response, set
-    ``is_missing_allowed=True``. In that case a missing registered field is
-    treated as raw ``None`` instead of a field-loading error.
+    When complete Bitrix24 object data omits a non-required field, the object
+    treats that field as raw ``None``. Missing fields in partial responses are
+    resolved by loading complete object data first.
 
     Required and multiple flags affect the public value as follows:
 
@@ -67,20 +72,20 @@ class BaseField(ABC, Generic[BRawT, BValueT]):
     __slots__ = (
         "attr_name",
         "bitrix_code",
-        "is_missing_allowed",
         "is_multiple",
         "is_pk",
         "is_read_only",
         "is_required",
+        "is_updatable",
         "request_name",
     )
     attr_name: Text
     bitrix_code: Text
-    is_missing_allowed: bool
     is_multiple: bool
     is_pk: bool
     is_read_only: bool
     is_required: bool
+    is_updatable: bool
     request_name: Text
 
     _FILTER_OPERATORS: ClassVar[Mapping[FilterLookup, Type[BaseFilterOperator]]] = BASIC_FILTER_OPERATORS
@@ -90,23 +95,21 @@ class BaseField(ABC, Generic[BRawT, BValueT]):
             bitrix_code: Text,
             *,
             is_pk: bool = False,
-            is_required: bool = False,
+            is_required: Optional[bool] = None,
             is_multiple: bool = False,
             is_read_only: bool = False,
-            is_missing_allowed: bool = False,
+            is_updatable: bool = True,
+            request_name: Optional[Text] = None,
     ):
-        effective_is_required = is_required or is_pk
-
-        if effective_is_required and is_missing_allowed:
-            raise ValueError("Required field cannot allow missing Bitrix24 value.")
+        effective_is_required = is_pk if is_required is None else is_required
 
         self.bitrix_code = bitrix_code
         self.is_pk = is_pk
         self.is_required = effective_is_required
         self.is_multiple = is_multiple
         self.is_read_only = is_read_only or is_pk
-        self.is_missing_allowed = is_missing_allowed
-        self.request_name = self._get_request_name(bitrix_code)
+        self.is_updatable = is_updatable and not self.is_read_only
+        self.request_name = self._get_request_name(bitrix_code) if request_name is None else request_name
 
     def __repr__(self) -> Text:
         if hasattr(self, "attr_name"):
@@ -128,17 +131,42 @@ class BaseField(ABC, Generic[BRawT, BValueT]):
             instance: Optional["BaseObject"],
             owner: Type["BaseObject"],
     ) -> Union[Self, Optional[BValueT], List[BValueT]]:
+        """Return the descriptor on a class or a converted value on an object.
+
+        Instance access asks the object for the raw value, allowing local data,
+        lazy loading, and primary-key handling to remain centralized in
+        ``BaseObject``. Primary-key values are already normalized when the key
+        is constructed and are returned directly. Other values are converted
+        on every read; cached field subclasses override this behavior when
+        conversion creates richer objects.
+        """
+
         if instance is None:
             return self
 
-        return self.from_bitrix_value(instance.get_field_value(self.bitrix_code, bitrix_field=self))
+        value = instance.get_field_value(self.bitrix_code, bitrix_field=self)
 
-    def __set__(self, instance: Optional["BaseObject"], value: Union[Optional[BValueT], List[BValueT]]):
+        if self.is_pk:
+            return value
+
+        return self.from_bitrix_value(value)
+
+    def __set__(
+            self,
+            instance: Optional["BaseObject"],
+            value: Union[Optional[BValueT], Iterable[BValueT]],
+    ):
+        """Convert and store a public value as an unsaved raw field value.
+
+        No remote request is made. ``BaseObject.set_field_value()`` records the
+        converted value in local state and invalidates cached projections backed
+        by the same Bitrix24 code.
+        """
+
         if instance is None:
             raise AttributeError(f"Field {self!r} cannot be set on the object class.")
 
-        if self.is_read_only:
-            raise BitrixObjectFieldReadOnlyError(f"Field {self.attr_name!r} is read-only.")
+        self.check_is_updatable()
 
         instance.set_field_value(self.bitrix_code, self.to_bitrix_value(value), bitrix_field=self)
 
@@ -147,6 +175,24 @@ class BaseField(ABC, Generic[BRawT, BValueT]):
             raise AttributeError(f"Field {self!r} cannot be deleted from the object class.")
 
         instance.delete_field_value(self.bitrix_code, bitrix_field=self)
+
+    def check_is_updatable(self):
+        """Raise when this field cannot be changed on an existing object.
+
+        Read-only fields cannot participate in either creation or updates.
+        Non-updatable fields may still be supplied when an object is created,
+        but become immutable afterward.
+        """
+
+        if self.is_updatable:
+            return
+
+        if self.is_read_only:
+            raise BitrixObjectFieldReadOnlyError(f"Field {self.attr_name!r} is read-only.")
+
+        raise BitrixObjectFieldReadOnlyError(
+            f"Field {self.attr_name!r} cannot be updated after object creation.",
+        )
 
     @staticmethod
     def _get_request_name(bitrix_code: Text) -> Text:
@@ -162,9 +208,15 @@ class BaseField(ABC, Generic[BRawT, BValueT]):
 
     @staticmethod
     def is_iterable(value: Any) -> bool:
-        """Return whether a value can be treated as a multiple field container."""
+        """Return whether a value is a supported multiple-field container.
 
-        if isinstance(value, (str, bytes, bytearray, dict)) or value is None:
+        Strings and byte sequences are scalar field values even though Python
+        considers them iterable. Dictionaries are rejected because iterating
+        their keys is almost never the caller's intent. General iterables,
+        including generators, are accepted and consumed once by conversion.
+        """
+
+        if isinstance(value, (Mapping, bytes, bytearray, str)) or value is None:
             return False
 
         return isinstance(value, Iterable)
@@ -180,7 +232,15 @@ class BaseField(ABC, Generic[BRawT, BValueT]):
             ) from None
 
     def from_bitrix_value(self, value: Union[Optional[BRawT], List[BRawT]]) -> Union[Optional[BValueT], List[BValueT]]:
-        """Convert a raw Bitrix24 field value to a public Python value."""
+        """Convert a raw Bitrix24 field value to its public representation.
+
+        Multiple fields accept any supported iterable and eagerly return a new
+        list, ensuring one-pass API iterables do not leak into object state.
+        ``None`` may represent the whole field only when it is not required;
+        individual ``None`` items are always rejected. Empty iterables remain
+        valid. Scalar conversion is delegated directly to the concrete field so
+        it can enforce its own empty-value semantics.
+        """
 
         if self.is_multiple:
             if value is None:
@@ -198,14 +258,25 @@ class BaseField(ABC, Generic[BRawT, BValueT]):
                 if item is None:
                     raise ValueError(f"Field {self.attr_name!r} does not allow None items.")
 
-                converted_values.append(self._convert_from_bitrix(item))
+                converted_value = self._convert_from_bitrix(item)
+
+                if converted_value is not None:
+                    converted_values.append(converted_value)
 
             return converted_values
 
         return self._convert_from_bitrix(value)
 
-    def to_bitrix_value(self, value: Union[Optional[BValueT], List[BValueT]]) -> Union[Optional[BRawT], List[BRawT]]:
-        """Convert a public Python field value to a raw Bitrix24 value."""
+    def to_bitrix_value(self, value: Union[Optional[BValueT], Iterable[BValueT]]) -> Union[Optional[BRawT], List[BRawT]]:
+        """Convert a public field value to its raw Bitrix24 representation.
+
+        Multiple inputs are validated and consumed eagerly into a new list.
+        Appending, removing, or reordering items in the caller's container then
+        cannot change the converted container, and generators have deterministic
+        one-pass behavior. Whole-value and per-item ``None`` rules mirror
+        ``from_bitrix_value()``. Scalar conversion is delegated to the concrete
+        field implementation.
+        """
 
         if self.is_multiple:
             if value is None:

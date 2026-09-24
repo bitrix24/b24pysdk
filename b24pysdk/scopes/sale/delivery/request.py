@@ -1,9 +1,10 @@
-from typing import Optional, Text, Union
+from typing import Optional, Text
 
 from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
+from ....utils.converters import bool_to_bitrix
 from ....utils.functional import type_checker
-from ....utils.types import B24BoolStrict, JSONDict, JSONList, Timeout
+from ....utils.types import JSONDict, JSONList, Timeout
 from ..._base_entity import BaseEntity
 
 __all__ = [
@@ -20,10 +21,10 @@ class Request(BaseEntity):
         delivery_id: int,
         request_id: Text,
         *,
-        finalize: Optional[Union[bool, B24BoolStrict]] = MISSING,
+        finalize: Optional[bool] = MISSING,
         status: Optional[JSONDict] = MISSING,
         properties: Optional[JSONList] = MISSING,
-        overwrite_properties: Optional[Union[bool, B24BoolStrict]] = MISSING,
+        overwrite_properties: Optional[bool] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -34,7 +35,7 @@ class Request(BaseEntity):
         }
 
         if finalize is not MISSING:
-            params["FINALIZE"] = B24BoolStrict(finalize).to_b24()
+            params["FINALIZE"] = bool_to_bitrix(finalize, is_required=True)
 
         if status is not MISSING:
             params["STATUS"] = status
@@ -43,7 +44,7 @@ class Request(BaseEntity):
             params["PROPERTIES"] = properties
 
         if overwrite_properties is not MISSING:
-            params["OVERWRITE_PROPERTIES"] = B24BoolStrict(overwrite_properties).to_b24()
+            params["OVERWRITE_PROPERTIES"] = bool_to_bitrix(overwrite_properties, is_required=True)
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,

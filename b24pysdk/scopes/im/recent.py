@@ -1,9 +1,10 @@
-from typing import Optional, Text, Union
+from typing import Optional, Text
 
 from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
+from ...utils.converters import bool_to_bitrix
 from ...utils.functional import type_checker
-from ...utils.types import B24BoolStrict, JSONDict, JSONList, Timeout
+from ...utils.types import JSONDict, JSONList, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -21,11 +22,11 @@ class Recent(BaseEntity):
     def get(
             self,
             *,
-            skip_openlines: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            skip_chat: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            skip_dialog: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            skip_openlines: Optional[bool] = MISSING,
+            skip_chat: Optional[bool] = MISSING,
+            skip_dialog: Optional[bool] = MISSING,
             last_update: Optional[Text] = MISSING,
-            only_openlines: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            only_openlines: Optional[bool] = MISSING,
             last_sync_date: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONList]:
@@ -57,19 +58,19 @@ class Recent(BaseEntity):
         params: JSONDict = {}
 
         if skip_openlines is not MISSING:
-            params["SKIP_OPENLINES"] = B24BoolStrict(skip_openlines).to_b24()
+            params["SKIP_OPENLINES"] = bool_to_bitrix(skip_openlines, is_required=True)
 
         if skip_chat is not MISSING:
-            params["SKIP_CHAT"] = B24BoolStrict(skip_chat).to_b24()
+            params["SKIP_CHAT"] = bool_to_bitrix(skip_chat, is_required=True)
 
         if skip_dialog is not MISSING:
-            params["SKIP_DIALOG"] = B24BoolStrict(skip_dialog).to_b24()
+            params["SKIP_DIALOG"] = bool_to_bitrix(skip_dialog, is_required=True)
 
         if last_update is not MISSING:
             params["LAST_UPDATE"] = last_update
 
         if only_openlines is not MISSING:
-            params["ONLY_OPENLINES"] = B24BoolStrict(only_openlines).to_b24()
+            params["ONLY_OPENLINES"] = bool_to_bitrix(only_openlines, is_required=True)
 
         if last_sync_date is not MISSING:
             params["LAST_SYNC_DATE"] = last_sync_date
@@ -84,17 +85,17 @@ class Recent(BaseEntity):
     def list(  # noqa: C901, PLR0912
             self,
             *,
-            skip_openlines: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            skip_dialog: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            skip_chat: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            skip_openlines: Optional[bool] = MISSING,
+            skip_dialog: Optional[bool] = MISSING,
+            skip_chat: Optional[bool] = MISSING,
             last_message_date: Optional[Text] = MISSING,
-            unread_only: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            parse_text: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            get_original_text: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            skip_undistributed_openlines: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            only_copilot: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            only_channel: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            can_manage_messages: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            unread_only: Optional[bool] = MISSING,
+            parse_text: Optional[bool] = MISSING,
+            get_original_text: Optional[bool] = MISSING,
+            skip_undistributed_openlines: Optional[bool] = MISSING,
+            only_copilot: Optional[bool] = MISSING,
+            only_channel: Optional[bool] = MISSING,
+            can_manage_messages: Optional[bool] = MISSING,
             offset: Optional[int] = MISSING,
             limit: Optional[int] = MISSING,
             timeout: Timeout = None,
@@ -123,37 +124,37 @@ class Recent(BaseEntity):
         params: JSONDict = {}
 
         if skip_openlines is not MISSING:
-            params["SKIP_OPENLINES"] = B24BoolStrict(skip_openlines).to_b24()
+            params["SKIP_OPENLINES"] = bool_to_bitrix(skip_openlines, is_required=True)
 
         if skip_dialog is not MISSING:
-            params["SKIP_DIALOG"] = B24BoolStrict(skip_dialog).to_b24()
+            params["SKIP_DIALOG"] = bool_to_bitrix(skip_dialog, is_required=True)
 
         if skip_chat is not MISSING:
-            params["SKIP_CHAT"] = B24BoolStrict(skip_chat).to_b24()
+            params["SKIP_CHAT"] = bool_to_bitrix(skip_chat, is_required=True)
 
         if last_message_date is not MISSING:
             params["LAST_MESSAGE_DATE"] = last_message_date
 
         if unread_only is not MISSING:
-            params["UNREAD_ONLY"] = B24BoolStrict(unread_only).to_b24()
+            params["UNREAD_ONLY"] = bool_to_bitrix(unread_only, is_required=True)
 
         if parse_text is not MISSING:
-            params["PARSE_TEXT"] = B24BoolStrict(parse_text).to_b24()
+            params["PARSE_TEXT"] = bool_to_bitrix(parse_text, is_required=True)
 
         if get_original_text is not MISSING:
-            params["GET_ORIGINAL_TEXT"] = B24BoolStrict(get_original_text).to_b24()
+            params["GET_ORIGINAL_TEXT"] = bool_to_bitrix(get_original_text, is_required=True)
 
         if skip_undistributed_openlines is not MISSING:
-            params["SKIP_UNDISTRIBUTED_OPENLINES"] = B24BoolStrict(skip_undistributed_openlines).to_b24()
+            params["SKIP_UNDISTRIBUTED_OPENLINES"] = bool_to_bitrix(skip_undistributed_openlines, is_required=True)
 
         if only_copilot is not MISSING:
-            params["ONLY_COPILOT"] = B24BoolStrict(only_copilot).to_b24()
+            params["ONLY_COPILOT"] = bool_to_bitrix(only_copilot, is_required=True)
 
         if only_channel is not MISSING:
-            params["ONLY_CHANNEL"] = B24BoolStrict(only_channel).to_b24()
+            params["ONLY_CHANNEL"] = bool_to_bitrix(only_channel, is_required=True)
 
         if can_manage_messages is not MISSING:
-            params["CAN_MANAGE_MESSAGES"] = B24BoolStrict(can_manage_messages).to_b24()
+            params["CAN_MANAGE_MESSAGES"] = bool_to_bitrix(can_manage_messages, is_required=True)
 
         if offset is not MISSING:
             params["OFFSET"] = offset
@@ -203,7 +204,7 @@ class Recent(BaseEntity):
     def pin(
             self,
             dialog_id: Text,
-            pin: Union[bool, B24BoolStrict],
+            pin: bool,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
@@ -226,7 +227,7 @@ class Recent(BaseEntity):
 
         params = dict(
             DIALOG_ID=dialog_id,
-            PIN=B24BoolStrict(pin).to_b24(),
+            PIN=bool_to_bitrix(pin, is_required=True),
         )
 
         return self._make_bitrix_api_request(
@@ -239,7 +240,7 @@ class Recent(BaseEntity):
     def unread(
             self,
             dialog_id: Text,
-            action: Union[bool, B24BoolStrict],
+            action: bool,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
@@ -262,7 +263,7 @@ class Recent(BaseEntity):
 
         params = dict(
             DIALOG_ID=dialog_id,
-            ACTION=B24BoolStrict(action).to_b24(),
+            ACTION=bool_to_bitrix(action, is_required=True),
         )
 
         return self._make_bitrix_api_request(

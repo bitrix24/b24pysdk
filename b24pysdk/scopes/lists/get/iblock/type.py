@@ -1,9 +1,11 @@
 from typing import Optional, Text
 
 from ....._constants import MISSING
-from .....api.requests import BitrixAPIRequest
+from .....api.requests import BitrixAPIValueRequest
+from .....constants.list import ListIBlockType, ListIBlockTypeLiteral
 from .....utils.functional import type_checker
 from .....utils.types import JSONDict, Timeout
+from ...._adapters import BitrixResultAdapter
 from ...._base_entity import BaseEntity
 
 __all__ = [
@@ -21,7 +23,7 @@ class Type(BaseEntity):
             iblock_id: Optional[int] = MISSING,
             iblock_code: Optional[Text] = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[ListIBlockTypeLiteral, ListIBlockType]:
         """"""
 
         params: JSONDict = {}
@@ -39,4 +41,6 @@ class Type(BaseEntity):
             api_wrapper=self.id,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=BitrixResultAdapter(ListIBlockType),
         )

@@ -1,4 +1,4 @@
-from typing import Optional, Sequence, Text
+from typing import Literal, Optional, Sequence, Text
 
 from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
@@ -18,7 +18,7 @@ class File(BaseEntity):
     """
 
     @type_checker
-    def copyto(
+    def copy_to(
             self,
             bitrix_id: int,
             target_folder_id: int,
@@ -47,7 +47,7 @@ class File(BaseEntity):
         }
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.copyto,
+            api_wrapper=self.copy_to,
             params=params,
             timeout=timeout,
         )
@@ -183,7 +183,7 @@ class File(BaseEntity):
         )
 
     @type_checker
-    def getfields(
+    def get_fields(
             self,
             *,
             timeout: Timeout = None,
@@ -201,12 +201,12 @@ class File(BaseEntity):
         """
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.getfields,
+            api_wrapper=self.get_fields,
             timeout=timeout,
         )
 
     @type_checker
-    def markdeleted(
+    def mark_deleted(
             self,
             bitrix_id: int,
             *,
@@ -231,13 +231,13 @@ class File(BaseEntity):
         }
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.markdeleted,
+            api_wrapper=self.mark_deleted,
             params=params,
             timeout=timeout,
         )
 
     @type_checker
-    def moveto(
+    def move_to(
             self,
             bitrix_id: int,
             target_folder_id: int,
@@ -266,7 +266,7 @@ class File(BaseEntity):
         }
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.moveto,
+            api_wrapper=self.move_to,
             params=params,
             timeout=timeout,
         )
@@ -373,7 +373,38 @@ class File(BaseEntity):
         )
 
     @type_checker
-    def uploadversion(
+    def search(
+            self,
+            query: Text,
+            *,
+            type: Literal["file", "folder", "all"] = MISSING,
+            filter: JSONDict = MISSING,
+            start: int = MISSING,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params: JSONDict = {
+            "QUERY": query,
+        }
+
+        if type is not MISSING:
+            params["TYPE"] = type
+
+        if filter is not MISSING:
+            params["FILTER"] = filter
+
+        if start is not MISSING:
+            params["start"] = start
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.search,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def upload_version(
             self,
             bitrix_id: int,
             file_content: Sequence[Text],
@@ -403,7 +434,7 @@ class File(BaseEntity):
         }
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.uploadversion,
+            api_wrapper=self.upload_version,
             params=params,
             timeout=timeout,
         )

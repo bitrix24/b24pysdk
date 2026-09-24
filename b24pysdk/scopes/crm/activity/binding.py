@@ -20,9 +20,9 @@ class Binding(BaseCRM):
     def add(
             self,
             activity_id: int,
-            *,
             entity_type_id: int,
             entity_id: int,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Add a deal binding to a CRM entity.
@@ -60,11 +60,11 @@ class Binding(BaseCRM):
     def move(
             self,
             activity_id: int,
-            *,
             source_entity_type_id: int,
             source_entity_id: int,
             target_entity_type_id: int,
             target_entity_id: int,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Update the deal's connection with the CRM entity.
@@ -141,9 +141,9 @@ class Binding(BaseCRM):
     def delete(
             self,
             activity_id: int,
-            *,
             entity_type_id: int,
             entity_id: int,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Delete the connection of the activity with the CRM entity.

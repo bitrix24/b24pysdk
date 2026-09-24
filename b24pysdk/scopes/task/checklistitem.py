@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Checklistitem(BaseEntity):
-    """"""
+    """Class for working with checklists in tasks.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/tasks/checklist-item/index.html
+    """
 
     @type_checker
     def add(
@@ -22,7 +25,22 @@ class Checklistitem(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add checklist item
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/checklist-item/task-checklist-item-add.html
+
+        The method adds a new checklist item to a task.
+
+        Args:
+            task_id: Task identifier;
+
+            fields: Object with checklist item fields;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "TASKID": task_id,
@@ -43,7 +61,22 @@ class Checklistitem(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Mark a checklist item as completed
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/checklist-item/task-checklist-item-complete.html
+
+        The method marks a checklist item as completed.
+
+        Args:
+            task_id: Task identifier;
+
+            item_id: Checklist item identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "TASKID": task_id,
@@ -64,7 +97,22 @@ class Checklistitem(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete checklist item
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/checklist-item/task-checklist-item-delete.html
+
+        The method removes a checklist item from a task.
+
+        Args:
+            task_id: Task identifier;
+
+            item_id: Checklist item identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "TASKID": task_id,
@@ -85,7 +133,22 @@ class Checklistitem(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get checklist item
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/checklist-item/task-checklist-item-get.html
+
+        The method retrieves the description of a checklist item by its identifier.
+
+        Args:
+            task_id: Task identifier;
+
+            item_id: Checklist item identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "TASKID": task_id,
@@ -106,7 +169,22 @@ class Checklistitem(BaseEntity):
             order: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the list of checklist items
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/checklist-item/task-checklist-item-get-list.html
+
+        The method retrieves a list of checklist items in a task.
+
+        Args:
+            task_id: Task identifier;
+
+            order: An object for sorting the selected records, where the key is the field and the value is asc or desc;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "TASKID": task_id,
@@ -127,7 +205,18 @@ class Checklistitem(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the list of methods and their description
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/checklist-item/task-checklist-item-get-manifest.html
+
+        The method retrieves information about methods for working with task checklist items.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
         return self._make_bitrix_api_request(
             api_wrapper=self.getmanifest,
             timeout=timeout,
@@ -142,7 +231,24 @@ class Checklistitem(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Check action permission
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/checklist-item/task-checklist-item-is-action-allowed.html
+
+        The method checks whether an action is permitted for a checklist item in a task.
+
+        Args:
+            task_id: Task identifier;
+
+            item_id: Checklist item identifier;
+
+            action_id: Identifier of the action being checked;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "TASKID": task_id,
@@ -165,7 +271,24 @@ class Checklistitem(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Move checklist item
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/checklist-item/task-checklist-item-move-after-item.html
+
+        The method moves the checklist item itemId to a position after the element afterItemId.
+
+        Args:
+            task_id: Task identifier;
+
+            item_id: Checklist item identifier;
+
+            after_item_id: Identifier of the checklist item after which the moving item should be placed;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "TASKID": task_id,
@@ -187,7 +310,22 @@ class Checklistitem(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Mark a checklist item as incomplete
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/checklist-item/task-checklist-item-renew.html
+
+        The method marks a completed checklist item as incomplete.
+
+        Args:
+            task_id: Task identifier;
+
+            item_id: Checklist item identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "TASKID": task_id,
@@ -209,7 +347,24 @@ class Checklistitem(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update checklist item
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/checklist-item/task-checklist-item-update.html
+
+        The method modifies an existing checklist item.
+
+        Args:
+            task_id: Task identifier;
+
+            item_id: Checklist item identifier;
+
+            fields: Fields to update;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "TASKID": task_id,

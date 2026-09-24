@@ -1,14 +1,13 @@
 from abc import ABC
-from typing import Callable, Iterable, Optional, Text
+from typing import Iterable, Optional, Text
 
 from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest, BitrixAPIValueRequest
-from ....schemas.crm.field import CRMFieldsDict
 from ....utils.converters import bool_to_bitrix
-from ....utils.type_vars import BAResultT, BSDictT
+from ....utils.type_vars import BSDataT, BSDictT
 from ....utils.types import JSONDict, Timeout
 from ..._adapters import BitrixSchemaDictAdapter
-from .._base_crm import BaseCRM
+from .._base_crm import CRM_FIELDS_DICT_ADAPTER, BaseCRM
 
 __all__ = [
     "BaseItem",
@@ -28,8 +27,8 @@ class BaseItem(BaseCRM, ABC):
             entity_type_id: Optional[int] = MISSING,
             use_original_uf_names: Optional[bool] = MISSING,
             timeout: Timeout = None,
-            result_adapter: Callable[[BAResultT], BSDictT] = BitrixSchemaDictAdapter(CRMFieldsDict),
-    ) -> BitrixAPIValueRequest[BAResultT, BSDictT]:
+            result_adapter: BitrixSchemaDictAdapter[BSDataT, BSDictT] = CRM_FIELDS_DICT_ADAPTER,
+    ) -> BitrixAPIValueRequest[BSDataT, BSDictT]:
         """Get fields of CRM item.
 
         This method retrieves a list of fields and their configuration for items of type entityTypeId.

@@ -12,7 +12,9 @@ __all__ = [
 
 
 class Personal(BaseEntity):
-    """"""
+    """Class for retrieving signed documents for the user.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sign/index.html"""
 
     @type_checker
     def tail(
@@ -22,7 +24,22 @@ class Personal(BaseEntity):
             offset: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of signed documents for the user
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sign/sign-b2e-personal-tail.html
+
+        The method returns a list of signed documents for the user from the e-Signature for HR section.
+
+        Args:
+            limit: Number of records per page;
+
+            offset: This parameter is used to manage pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

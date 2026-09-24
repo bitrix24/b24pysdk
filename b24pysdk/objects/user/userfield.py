@@ -21,26 +21,26 @@ __all__ = [
 class UserUserfield(BaseObject[int]):
     """Bitrix24 user custom field definition."""
 
-    _OBJECT_KEY = "user.userfield"
-    _PK_TYPE = int
+    OBJECT_KEY = "user.userfield"
+    PK = int
 
     objects: "UserUserfieldManager[Self]"
 
     bitrix_id = IntField("ID", is_pk=True)
-    entity_id = TextField("ENTITY_ID")
-    field_name = TextField("FIELD_NAME", is_required=True)
-    user_type_id = TextField("USER_TYPE_ID", is_required=True)
+    entity_id = TextField("ENTITY_ID", is_required=True, is_read_only=True)
+    field_name = TextField("FIELD_NAME", is_required=True, is_updatable=False)
+    user_type_id = TextField("USER_TYPE_ID", is_required=True, is_updatable=False)
     xml_id = TextField("XML_ID")
-    sort = IntField("SORT")
-    multiple = BoolField("MULTIPLE")
-    mandatory = BoolField("MANDATORY")
-    show_filter = TextField("SHOW_FILTER")
-    show_in_list = BoolField("SHOW_IN_LIST")
-    edit_in_list = BoolField("EDIT_IN_LIST")
-    is_searchable = BoolField("IS_SEARCHABLE")
-    settings = DictField("SETTINGS")
-    user_type_owner = TextField("USER_TYPE_OWNER", is_read_only=True, is_missing_allowed=True)
-    list = BitrixSchemaField("LIST", schema_class=UserUserfieldListItem, is_multiple=True, is_missing_allowed=True)
+    sort = IntField("SORT", is_required=True)
+    multiple = BoolField("MULTIPLE", is_required=True, is_updatable=False)
+    mandatory = BoolField("MANDATORY", is_required=True)
+    show_filter = BoolField("SHOW_FILTER", is_required=True)
+    show_in_list = BoolField("SHOW_IN_LIST", is_required=True)
+    edit_in_list = BoolField("EDIT_IN_LIST", is_required=True)
+    is_searchable = BoolField("IS_SEARCHABLE", is_required=True)
+    settings = DictField("SETTINGS", is_required=True)
+    user_type_owner = TextField("USER_TYPE_OWNER", is_read_only=True)
+    list = BitrixSchemaField[UserUserfieldListItem]("LIST", schema_class=UserUserfieldListItem, is_multiple=True)
 
     def _get_bitrix_data(self) -> JSONDict:
         """Load raw user custom field data from Bitrix24."""
@@ -61,14 +61,14 @@ class UserUserfield(BaseObject[int]):
             self,
             *,
             xml_id: Optional[Text] = MISSING,
-            sort: Optional[int] = MISSING,
-            mandatory: Optional[bool] = MISSING,
-            show_filter: Optional[Text] = MISSING,
-            show_in_list: Optional[bool] = MISSING,
-            edit_in_list: Optional[bool] = MISSING,
-            is_searchable: Optional[bool] = MISSING,
-            settings: Optional[JSONDict] = MISSING,
-            list: Optional[List[UserUserfieldListItem]] = MISSING,
+            sort: int = MISSING,
+            mandatory: bool = MISSING,
+            show_filter: bool = MISSING,
+            show_in_list: bool = MISSING,
+            edit_in_list: bool = MISSING,
+            is_searchable: bool = MISSING,
+            settings: JSONDict = MISSING,
+            list: List[UserUserfieldListItem] = MISSING,
             timeout: Timeout = None,
     ) -> bool:
         """Update this user custom field in Bitrix24."""
@@ -142,7 +142,7 @@ class UserUserfieldManager(BaseObjectManager[_UserUserfieldT], Generic[_UserUser
         """Return user custom fields filtered by SDK object attribute names."""
         return self._filter(**filters)
 
-    def from_pks(self, bitrix_pks: Iterable[Hashable]) -> Self:
+    def from_pks(self, bitrix_pks: Iterable[int]) -> Self:
         """Return user custom fields filtered by Bitrix24 primary keys."""
         return self._from_pks(bitrix_pks)
 
@@ -150,25 +150,21 @@ class UserUserfieldManager(BaseObjectManager[_UserUserfieldT], Generic[_UserUser
         """Return user custom fields ordered by SDK object attribute names."""
         return self._order(*fields)
 
-    def start(self, start: Optional[int]) -> Self:
-        """Return user custom fields with a custom Bitrix24 pagination start offset."""
-        return self._start(start)
-
     def add(  # noqa: C901
             self,
             *,
             field_name: Text,
             user_type_id: Text,
             xml_id: Optional[Text] = MISSING,
-            sort: Optional[int] = MISSING,
-            multiple: Optional[bool] = MISSING,
-            mandatory: Optional[bool] = MISSING,
-            show_filter: Optional[Text] = MISSING,
-            show_in_list: Optional[bool] = MISSING,
-            edit_in_list: Optional[bool] = MISSING,
-            is_searchable: Optional[bool] = MISSING,
-            settings: Optional[JSONDict] = MISSING,
-            list: Optional[List[UserUserfieldListItem]] = MISSING,
+            sort: int = MISSING,
+            multiple: bool = MISSING,
+            mandatory: bool = MISSING,
+            show_filter: bool = MISSING,
+            show_in_list: bool = MISSING,
+            edit_in_list: bool = MISSING,
+            is_searchable: bool = MISSING,
+            settings: JSONDict = MISSING,
+            list: List[UserUserfieldListItem] = MISSING,
             timeout: Timeout = None,
     ) -> _UserUserfieldT:
         """Create a Bitrix24 user custom field."""
@@ -227,14 +223,14 @@ class UserUserfieldManager(BaseObjectManager[_UserUserfieldT], Generic[_UserUser
             self,
             *,
             xml_id: Optional[Text] = MISSING,
-            sort: Optional[int] = MISSING,
-            mandatory: Optional[bool] = MISSING,
-            show_filter: Optional[Text] = MISSING,
-            show_in_list: Optional[bool] = MISSING,
-            edit_in_list: Optional[bool] = MISSING,
-            is_searchable: Optional[bool] = MISSING,
-            settings: Optional[JSONDict] = MISSING,
-            list: Optional[List[UserUserfieldListItem]] = MISSING,
+            sort: int = MISSING,
+            mandatory: bool = MISSING,
+            show_filter: bool = MISSING,
+            show_in_list: bool = MISSING,
+            edit_in_list: bool = MISSING,
+            is_searchable: bool = MISSING,
+            settings: JSONDict = MISSING,
+            list: List[UserUserfieldListItem] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixObjectBatchWriteResult[_UserUserfieldT]:
         """Update user custom fields matching the current query in batches."""

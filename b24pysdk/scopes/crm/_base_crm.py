@@ -1,17 +1,20 @@
 from abc import ABC
-from typing import Callable, Iterable, Optional, Text
+from typing import Iterable, Optional, Text
 
 from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest
 from ...schemas.crm.field import CRMFieldsDict
-from ...utils.type_vars import BAResultT, BSDictT
+from ...utils.type_vars import BSDataT, BSDictT
 from ...utils.types import JSONDict, Timeout
 from .._adapters import BitrixSchemaDictAdapter
 from .._base_entity import BaseEntity
 
 __all__ = [
+    "CRM_FIELDS_DICT_ADAPTER",
     "BaseCRM",
 ]
+
+CRM_FIELDS_DICT_ADAPTER = BitrixSchemaDictAdapter(CRMFieldsDict)
 
 
 class BaseCRM(BaseEntity, ABC):
@@ -22,8 +25,8 @@ class BaseCRM(BaseEntity, ABC):
             *,
             params: Optional[JSONDict] = None,
             timeout: Timeout = None,
-            result_adapter: Callable[[BAResultT], BSDictT] = BitrixSchemaDictAdapter(CRMFieldsDict),
-    ) -> BitrixAPIValueRequest[BAResultT, BSDictT]:
+            result_adapter: BitrixSchemaDictAdapter[BSDataT, BSDictT] = CRM_FIELDS_DICT_ADAPTER,
+    ) -> BitrixAPIValueRequest[BSDataT, BSDictT]:
         """"""
         return self._make_bitrix_api_request(
             api_wrapper=self._fields,

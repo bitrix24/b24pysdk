@@ -58,7 +58,7 @@ _START: int = 0
 def test_disk_storage_getfields(bitrix_client: BaseClient):
     """"""
 
-    bitrix_response = bitrix_client.disk.storage.getfields().response
+    bitrix_response = bitrix_client.disk.storage.get_fields().response
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
@@ -92,7 +92,7 @@ def test_disk_storage_get(bitrix_client: BaseClient):
 def test_disk_storage_gettypes(bitrix_client: BaseClient):
     """"""
 
-    bitrix_response = bitrix_client.disk.storage.gettypes().response
+    bitrix_response = bitrix_client.disk.storage.get_types().response
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, list)
@@ -110,7 +110,7 @@ def test_disk_storage_gettypes(bitrix_client: BaseClient):
 def test_disk_storage_gettypes_as_list(bitrix_client: BaseClient):
     """"""
 
-    bitrix_response = bitrix_client.disk.storage.gettypes().as_list().response
+    bitrix_response = bitrix_client.disk.storage.get_types().as_list().response
 
     assert isinstance(bitrix_response, BitrixAPIListResponse)
     assert isinstance(bitrix_response.result, list)
@@ -128,7 +128,7 @@ def test_disk_storage_gettypes_as_list(bitrix_client: BaseClient):
 def test_disk_storage_getforapp(bitrix_client: BaseClient, cache: Cache):
     """"""
 
-    bitrix_response = bitrix_client.disk.storage.getforapp().response
+    bitrix_response = bitrix_client.disk.storage.get_for_app().response
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
@@ -145,7 +145,7 @@ def test_disk_storage_getforapp(bitrix_client: BaseClient, cache: Cache):
 def test_disk_storage_getlist(bitrix_client: BaseClient):
     """"""
 
-    bitrix_response = bitrix_client.disk.storage.getlist(
+    bitrix_response = bitrix_client.disk.storage.get_list(
         filter=_FILTER,
         start=_START,
     ).response
@@ -169,7 +169,7 @@ def test_disk_storage_getlist(bitrix_client: BaseClient):
 def test_disk_storage_getlist_as_list(bitrix_client: BaseClient):
     """"""
 
-    bitrix_response = bitrix_client.disk.storage.getlist().as_list().response
+    bitrix_response = bitrix_client.disk.storage.get_list().as_list().response
 
     assert isinstance(bitrix_response, BitrixAPIListResponse)
     assert isinstance(bitrix_response.result, list)
@@ -184,7 +184,7 @@ def test_disk_storage_getlist_as_list(bitrix_client: BaseClient):
 def test_disk_storage_getlist_as_list_fast(bitrix_client: BaseClient):
     """"""
 
-    bitrix_response = bitrix_client.disk.storage.getlist().as_list_fast(descending=True).response
+    bitrix_response = bitrix_client.disk.storage.get_list().as_list_fast(descending=True).response
 
     assert isinstance(bitrix_response, BitrixAPIListFastResponse)
 
@@ -209,7 +209,7 @@ def test_disk_storage_getlist_as_list_fast(bitrix_client: BaseClient):
 def test_disk_storage_getchildren(bitrix_client: BaseClient):
     """"""
 
-    bitrix_response = bitrix_client.disk.storage.getchildren(
+    bitrix_response = bitrix_client.disk.storage.get_children(
         bitrix_id=_STORAGE_ID,
     ).response
 
@@ -229,7 +229,7 @@ def test_disk_storage_getchildren(bitrix_client: BaseClient):
 def test_disk_storage_getchildren_as_list(bitrix_client: BaseClient):
     """"""
 
-    bitrix_response = bitrix_client.disk.storage.getchildren(bitrix_id=_STORAGE_ID).as_list().response
+    bitrix_response = bitrix_client.disk.storage.get_children(bitrix_id=_STORAGE_ID).as_list().response
 
     assert isinstance(bitrix_response, BitrixAPIListResponse)
     assert isinstance(bitrix_response.result, list)
@@ -244,7 +244,7 @@ def test_disk_storage_getchildren_as_list(bitrix_client: BaseClient):
 def test_disk_storage_getchildren_as_list_fast(bitrix_client: BaseClient):
     """"""
 
-    bitrix_response = bitrix_client.disk.storage.getchildren(bitrix_id=_STORAGE_ID).as_list_fast(descending=True).response
+    bitrix_response = bitrix_client.disk.storage.get_children(bitrix_id=_STORAGE_ID).as_list_fast(descending=True).response
 
     assert isinstance(bitrix_response, BitrixAPIListFastResponse)
 
@@ -271,7 +271,7 @@ def test_disk_storage_addfolder(bitrix_client: BaseClient):
 
     unique_name = f"{_NAME}_{int(Config().get_local_datetime().timestamp() * (10 ** 6))}"
 
-    bitrix_response = bitrix_client.disk.storage.addfolder(
+    bitrix_response = bitrix_client.disk.storage.add_folder(
         bitrix_id=_STORAGE_ID,
         data={"NAME": unique_name},
     ).response
@@ -295,7 +295,7 @@ def test_disk_storage_uploadfile(bitrix_client: BaseClient):
 
     unique_file_name = f"{_FILE_NAME}_{int(Config().get_local_datetime().timestamp() * (10 ** 6))}"
 
-    bitrix_response = bitrix_client.disk.storage.uploadfile(
+    bitrix_response = bitrix_client.disk.storage.upload_file(
         bitrix_id=_STORAGE_ID,
         file_content=_FILE_CONTENT,
         data={"NAME": unique_file_name},

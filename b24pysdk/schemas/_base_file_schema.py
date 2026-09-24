@@ -5,13 +5,15 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from io import BytesIO
 from pathlib import Path
-from typing import Any, BinaryIO, Optional, Text, Union
+from typing import TYPE_CHECKING, Any, BinaryIO, Optional, Text, Union
 
 from ..api.requesters import BitrixFileRequester
 from ..utils.dataclasses import frozen_dataclass_kwargs
 from ..utils.types import Self, Timeout
 from ._base_schema import BaseSchema
-from .file import BitrixFileResponseData
+
+if TYPE_CHECKING:
+    from .file import BitrixFileResponseData
 
 __all__ = [
     "BaseFileSchema",
@@ -212,7 +214,7 @@ class BaseFileSchema(BaseSchema[Any], ABC):
         """Return the absolute URL used to download the remote file."""
         raise NotImplementedError
 
-    def _download(self, *, timeout: Timeout = None) -> BitrixFileResponseData:
+    def _download(self, *, timeout: Timeout = None) -> "BitrixFileResponseData":
         """Download remote file data without consulting the content cache."""
         return BitrixFileRequester(
             url=self.download_url,

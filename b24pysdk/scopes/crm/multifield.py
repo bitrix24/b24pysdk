@@ -10,7 +10,10 @@ __all__ = [
 
 
 class Multifield(BaseCRM):
-    """"""
+    """Class for retrieving multifield description.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/crm/auxiliary/multifield/index.html
+    """
 
     @type_checker
     def fields(

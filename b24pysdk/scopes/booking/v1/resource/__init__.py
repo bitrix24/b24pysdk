@@ -14,7 +14,10 @@ __all__ = [
 
 
 class Resource(BaseEntity):
-    """"""
+    """Class for managing objects that can be reserved.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/booking/resource/index.html
+    """
 
     @cached_property
     def slots(self) -> Slots:
@@ -28,7 +31,20 @@ class Resource(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add a new resource
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/resource/booking-v1-resource-add.html
+
+        The method adds a new resource.
+
+        Args:
+            fields: An object containing field values for creating a resource;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "fields": fields,
@@ -47,7 +63,20 @@ class Resource(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete resource
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/resource/booking-v1-resource-delete.html
+
+        The method removes a resource.
+
+        Args:
+            bitrix_id: Resource identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "id": bitrix_id,
@@ -66,7 +95,20 @@ class Resource(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get resource
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/resource/booking-v1-resource-get.html
+
+        The method returns information about a resource by its identifier.
+
+        Args:
+             bitrix_id: Resource identifier;
+
+             timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "id": bitrix_id,
@@ -84,9 +126,27 @@ class Resource(BaseEntity):
             *,
             filter: Optional[JSONDict] = MISSING,
             order: Optional[JSONDict] = MISSING,
+            start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the list of resources
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/resource/booking-v1-resource-list.html
+
+        The method return a lisr of resources based on a filter.
+
+        Args:
+            filter: An object for filtering the list of resources;
+
+            order: An object for sorting the list of the resources;
+
+            start: A parameter for managing pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -95,6 +155,9 @@ class Resource(BaseEntity):
 
         if order is not MISSING:
             params["order"] = order
+
+        if start is not MISSING:
+            params["start"] = start
 
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
@@ -110,7 +173,22 @@ class Resource(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update resource
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/resource/booking-v1-resource-update.html
+
+        The method updates an existing resource.
+
+        Args:
+            bitrix_id: Resource identifier;
+
+            fields: An object containing field values for updating a resource;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "id": bitrix_id,

@@ -20,11 +20,11 @@ class Configurable(BaseCRM):
     @type_checker
     def add(
             self,
-            *,
             owner_type_id: int,
             owner_id: int,
             fields: JSONDict,
             layout: JSONDict,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIValueRequest[Optional[ConfigurableActivityResultData], Optional[int]]:
         """Add configurable activity.

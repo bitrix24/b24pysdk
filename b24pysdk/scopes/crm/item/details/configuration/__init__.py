@@ -21,8 +21,8 @@ class Configuration(BaseConfiguration):
     @type_checker
     def get(
             self,
-            *,
             entity_type_id: int,
+            *,
             user_id: Optional[int] = MISSING,
             scope: Optional[Text] = MISSING,
             extras: Optional[JSONDict] = MISSING,
@@ -64,9 +64,9 @@ class Configuration(BaseConfiguration):
     @type_checker
     def set(
             self,
-            *,
             entity_type_id: int,
             data: CRMDetailsConfigurationSectionsData,
+            *,
             user_id: Optional[int] = MISSING,
             scope: Optional[str] = MISSING,
             extras: Optional[JSONDict] = MISSING,
@@ -111,9 +111,9 @@ class Configuration(BaseConfiguration):
     @type_checker
     def reset(
             self,
-            *,
             entity_type_id: int,
-            user_id: Optional[int],
+            *,
+            user_id: int = MISSING,
             scope: Optional[str] = MISSING,
             extras: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
@@ -154,8 +154,8 @@ class Configuration(BaseConfiguration):
     @type_checker
     def force_common_scope_for_all(
             self,
-            *,
             entity_type_id: int,
+            *,
             extras: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:

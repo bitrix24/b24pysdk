@@ -2,8 +2,9 @@ from typing import Optional, Text, Union
 
 from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
+from ....utils.converters import bool_to_bitrix
 from ....utils.functional import type_checker
-from ....utils.types import B24BoolStrict, JSONDict, Timeout
+from ....utils.types import JSONDict, Timeout
 from ..._base_entity import BaseEntity
 
 __all__ = [
@@ -23,7 +24,7 @@ class Message(BaseEntity):
             *,
             attach: Optional[JSONDict] = MISSING,
             keyboard: Optional[JSONDict] = MISSING,
-            url_preview: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            url_preview: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -41,7 +42,7 @@ class Message(BaseEntity):
             params["KEYBOARD"] = keyboard
 
         if url_preview is not MISSING:
-            params["URL_PREVIEW"] = B24BoolStrict(url_preview).to_b24()
+            params["URL_PREVIEW"] = bool_to_bitrix(url_preview, is_required=True)
 
         return self._make_bitrix_api_request(
             api_wrapper=self.add,

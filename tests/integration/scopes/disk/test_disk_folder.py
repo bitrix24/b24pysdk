@@ -81,7 +81,7 @@ _START: int = 0
 def test_disk_folder_getfields(bitrix_client: BaseClient):
     """"""
 
-    bitrix_response = bitrix_client.disk.folder.getfields().response
+    bitrix_response = bitrix_client.disk.folder.get_fields().response
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
     assert isinstance(bitrix_response.result, dict)
@@ -116,7 +116,7 @@ def test_disk_folder_get(bitrix_client: BaseClient):
 def test_disk_folder_getchildren(bitrix_client: BaseClient):
     """"""
 
-    bitrix_response = bitrix_client.disk.folder.getchildren(
+    bitrix_response = bitrix_client.disk.folder.get_children(
         bitrix_id=_FOLDER_ID,
         filter=_FILTER,
         start=_START,
@@ -141,7 +141,7 @@ def test_disk_folder_getchildren(bitrix_client: BaseClient):
 def test_disk_folder_getchildren_as_list(bitrix_client: BaseClient):
     """"""
 
-    bitrix_response = bitrix_client.disk.folder.getchildren(bitrix_id=_FOLDER_ID).as_list().response
+    bitrix_response = bitrix_client.disk.folder.get_children(bitrix_id=_FOLDER_ID).as_list().response
 
     assert isinstance(bitrix_response, BitrixAPIListResponse)
     assert isinstance(bitrix_response.result, list)
@@ -156,7 +156,7 @@ def test_disk_folder_getchildren_as_list(bitrix_client: BaseClient):
 def test_disk_folder_getchildren_as_list_fast(bitrix_client: BaseClient):
     """"""
 
-    bitrix_response = bitrix_client.disk.folder.getchildren(bitrix_id=_FOLDER_ID).as_list_fast(descending=True).response
+    bitrix_response = bitrix_client.disk.folder.get_children(bitrix_id=_FOLDER_ID).as_list_fast(descending=True).response
 
     assert isinstance(bitrix_response, BitrixAPIListFastResponse)
 
@@ -183,7 +183,7 @@ def test_disk_folder_addsubfolder(bitrix_client: BaseClient, cache: Cache):
 
     unique_name = f"{_NAME}_{int(Config().get_local_datetime().timestamp() * (10 ** 6))}"
 
-    bitrix_response = bitrix_client.disk.folder.addsubfolder(
+    bitrix_response = bitrix_client.disk.folder.add_sub_folder(
         bitrix_id=_FOLDER_ID,
         data={"NAME": unique_name},
     ).response
@@ -235,7 +235,7 @@ def test_disk_folder_copyto(bitrix_client: BaseClient, cache: Cache):
 
     target_folder_name = f"{SDK_NAME}_copy_target_{int(Config().get_local_datetime().timestamp() * (10 ** 6))}"
 
-    target_response = bitrix_client.disk.folder.addsubfolder(
+    target_response = bitrix_client.disk.folder.add_sub_folder(
         bitrix_id=_FOLDER_ID,
         data={"NAME": target_folder_name},
     ).response
@@ -244,7 +244,7 @@ def test_disk_folder_copyto(bitrix_client: BaseClient, cache: Cache):
     target_folder = target_response.result
     target_folder_id = int(target_folder["ID"])
 
-    bitrix_response = bitrix_client.disk.folder.copyto(
+    bitrix_response = bitrix_client.disk.folder.copy_to(
         bitrix_id=folder_id,
         target_folder_id=target_folder_id,
     ).response
@@ -266,7 +266,7 @@ def test_disk_folder_moveto(bitrix_client: BaseClient, cache: Cache):
 
     temp_folder_name = f"{SDK_NAME}_temp_{int(Config().get_local_datetime().timestamp() * (10 ** 6))}"
 
-    bitrix_response = bitrix_client.disk.folder.addsubfolder(
+    bitrix_response = bitrix_client.disk.folder.add_sub_folder(
         bitrix_id=_FOLDER_ID,
         data={"NAME": temp_folder_name},
     ).response
@@ -277,7 +277,7 @@ def test_disk_folder_moveto(bitrix_client: BaseClient, cache: Cache):
 
     assert folder_id != temp_folder_id, "Cannot move folder to itself"
 
-    bitrix_response = bitrix_client.disk.folder.moveto(
+    bitrix_response = bitrix_client.disk.folder.move_to(
         bitrix_id=folder_id,
         target_folder_id=temp_folder_id,
     ).response
@@ -300,7 +300,7 @@ def test_disk_folder_uploadfile(bitrix_client: BaseClient, cache: Cache):
 
     unique_file_name = f"{_FILE_NAME}_{int(Config().get_local_datetime().timestamp() * (10 ** 6))}"
 
-    bitrix_response = bitrix_client.disk.folder.uploadfile(
+    bitrix_response = bitrix_client.disk.folder.upload_file(
         bitrix_id=folder_id,
         file_content=_FILE_CONTENT,
         data={"NAME": unique_file_name},
@@ -343,7 +343,7 @@ def test_disk_folder_markdeleted(bitrix_client: BaseClient, cache: Cache):
     folder_id = cache.get("created_folder_id", None)
     assert isinstance(folder_id, int), "Created folder ID should be cached"
 
-    bitrix_response = bitrix_client.disk.folder.markdeleted(
+    bitrix_response = bitrix_client.disk.folder.mark_deleted(
         bitrix_id=folder_id,
     ).response
 
@@ -381,7 +381,7 @@ def test_disk_folder_deletetree(bitrix_client: BaseClient, cache: Cache):
     folder_id = cache.get("created_folder_id", None)
     assert isinstance(folder_id, int), "Created folder ID should be cached"
 
-    bitrix_response = bitrix_client.disk.folder.deletetree(
+    bitrix_response = bitrix_client.disk.folder.delete_tree(
         bitrix_id=folder_id,
     ).response
 

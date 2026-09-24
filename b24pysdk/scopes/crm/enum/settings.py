@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Settings(BaseCRM):
-    """"""
+    """Class for retrieving CRM operating modes descriptions.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/crm/auxiliary/enum/index.html
+    """
 
     @type_checker
     def mode(
@@ -19,7 +22,7 @@ class Settings(BaseCRM):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIValuesRequest[CRMEnumItemsData, CRMEnumItem]:
-        """Get description of CRM operation modes.
+        """Get description of CRM operation modes
 
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/auxiliary/enum/crm-enum-settings-mode.html
 

@@ -9,7 +9,10 @@ __all__ = [
 
 
 class Favorite(BaseEntity):
-    """"""
+    """Class for managing tasks in Favorites.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/tasks/index.html
+    """
 
     @type_checker
     def add(
@@ -18,7 +21,20 @@ class Favorite(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add task to Favorites
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/user-actions/tasks-task-favorite-add.html
+
+        The method adds a task to Favorites.
+
+        Args:
+            task_id: Task identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "taskId": task_id,
@@ -37,7 +53,20 @@ class Favorite(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Remove task from Favorites
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/user-actions/tasks-task-favorite-remove.html
+
+        The method removes a task from Favorites.
+
+        Args:
+            task_id: Task identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "taskId": task_id,

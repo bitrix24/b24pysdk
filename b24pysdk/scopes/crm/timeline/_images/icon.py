@@ -19,9 +19,9 @@ class Icon(BaseImage):
     @type_checker
     def add(
             self,
-            *,
             code: Text,
             file_content: Text,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Add icon.
@@ -55,8 +55,8 @@ class Icon(BaseImage):
     @type_checker
     def get(
             self,
-            *,
             code: Text,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get information about the icon.
@@ -98,8 +98,8 @@ class Icon(BaseImage):
     @type_checker
     def delete(
             self,
-            *,
             code: Text,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[Optional[bool]]:
         """Delete icon

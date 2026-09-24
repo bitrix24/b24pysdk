@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Statistic(BaseEntity):
-    """"""
+    """Class for retrieving call statistics
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/telephony/voximplant/index.html
+    """
 
     @type_checker
     def get(
@@ -23,7 +26,24 @@ class Statistic(BaseEntity):
             order: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get call history list
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/telephony/voximplant/voximplant-statistic-get.html
+
+        The method returns a list of calls from telephony statistics.
+
+        Args:
+            filter: An object for filtering;
+
+            sort: Sorting field;
+
+            order: Sorting direction;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

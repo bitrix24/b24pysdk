@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Document(BaseEntity):
-    """"""
+    """Methods for working with documents in e-Signature.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sign/index.html
+    """
 
     @type_checker
     def get(
@@ -22,7 +25,22 @@ class Document(BaseEntity):
             language: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get document
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sign/sign-b2e-document-get.html
+
+        The method returns information about the document and signing participants.
+
+        Args:
+            uid: Unique identifier of the document;
+
+            language: Language for localizing statuses in the response;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "uid": uid,
@@ -45,7 +63,22 @@ class Document(BaseEntity):
             language: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Send document for signing
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sign/sign-b2e-document-send.html
+
+        The method sends a document for signing on behalf of the company.
+
+        Args:
+            fields: Parameters for sending the document for signing;
+
+            language: Language for localizing statuses in the response;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "fields": fields,

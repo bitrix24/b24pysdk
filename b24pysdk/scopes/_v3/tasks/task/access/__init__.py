@@ -4,7 +4,7 @@ from ......api.requests import BitrixAPIRequest
 from ......utils.functional import type_checker
 from ......utils.types import Timeout
 from ....._base_entity import BaseEntity
-from .field import Field
+from ...._field import Field
 
 __all__ = [
     "Access",
@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Access(BaseEntity):
-    """"""
+    """Class for checking access permissions.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/tasks/index.html
+    """
 
     @cached_property
     def field(self) -> Field:
@@ -26,7 +29,20 @@ class Access(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Check access permissions
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/tasks-task-access-get.html
+
+        The method checks the available actions a user can perform on a task.
+
+        Args:
+            bitrix_id: Task identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "id": bitrix_id,

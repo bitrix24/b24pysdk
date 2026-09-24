@@ -1,12 +1,26 @@
-from typing import TYPE_CHECKING, Generator, Generic, List, NoReturn, Optional, Text, Type, Union, overload
+from typing import (
+    TYPE_CHECKING,
+    FrozenSet,
+    Generator,
+    Generic,
+    Iterable,
+    List,
+    NoReturn,
+    Optional,
+    Text,
+    Type,
+    Union,
+    overload,
+)
 
 from ..._config import Config
 from ...objects import BitrixObjectList, ClientProvider
 from ...utils.type_vars import BOT
-from ...utils.types import JSONDict, JSONList
+from ...utils.types import JSONDict, JSONList, ObjectDiscriminator
 
 if TYPE_CHECKING:
     from ...client import ClientType
+    from ...objects._object_metadata import ObjectMetadata
 
 __all__ = [
     "BitrixObjectAdapter",
@@ -17,11 +31,18 @@ __all__ = [
 class BitrixObjectAdapter(Generic[BOT]):
     """Adapter converting one Bitrix24 object result to an SDK object."""
 
-    __slots__ = ("_client_provider", "_discriminator", "_object_key", "_wrapper")
+    __slots__ = (
+        "_client_provider",
+        "_discriminator",
+        "_object_key",
+        "_select",
+        "_wrapper",
+    )
 
     _client_provider: ClientProvider
-    _discriminator: Optional[int]
+    _discriminator: ObjectDiscriminator
     _object_key: Text
+    _select: Optional[FrozenSet[Text]]
     _wrapper: Optional[Text]
 
     def __init__(
@@ -29,13 +50,22 @@ class BitrixObjectAdapter(Generic[BOT]):
             object_key: Text,
             *,
             client: "ClientType",
-            discriminator: Optional[int] = None,
+            select: Optional[Iterable[Text]] = None,
+            discriminator: ObjectDiscriminator = None,
             wrapper: Optional[Text] = None,
     ):
+        """Initialize an adapter with the effective Bitrix24 field selection.
+
+        When ``select`` is ``None``, completeness is determined by the object
+        metadata flag copied from ``_IS_COMPLETE_WITHOUT_SELECT``. Otherwise,
+        the iterable must contain the effective Bitrix24 field codes returned
+        by the API. The selection is materialized once for all adapted values.
+        """
         self._object_key = object_key
         self._client_provider = ClientProvider(client=client)
         self._discriminator = discriminator
         self._wrapper = wrapper
+        self._select = None if select is None else frozenset(select)
 
     @overload
     def __call__(self, bitrix_result: None) -> None: ...
@@ -67,10 +97,22 @@ class BitrixObjectAdapter(Generic[BOT]):
 
     def _make_object(self, bitrix_data_or_pk: Union[JSONDict, Text, int]) -> BOT:
         """Convert Bitrix24 object data or primary key to an SDK object."""
-        return self._get_object_class().get_meta().make_object_from_bitrix_data_or_pk(
+
+        object_meta = self._get_object_class().get_meta()
+
+        return object_meta.make_object_from_bitrix_data_or_pk(
             bitrix_data_or_pk,
             client_provider=self._client_provider,
+            bitrix_data_is_complete=self._is_bitrix_data_complete(object_meta),
         )
+
+    def _is_bitrix_data_complete(self, object_meta: "ObjectMetadata[BOT]") -> bool:
+        """Return whether the effective selection covers every object field."""
+
+        if self._select is None:
+            return object_meta.is_complete_without_select
+
+        return object_meta.contains_all_fields(self._select)
 
     def _unwrap_result(self, bitrix_result: JSONDict, /) -> Union[JSONDict, JSONList, Text, int]:
         """Extract value stored under the explicitly configured wrapper key."""
@@ -116,28 +158,43 @@ class BitrixObjectsAdapter(BitrixObjectAdapter[BOT], Generic[BOT]):
         if bitrix_result is None:
             return BitrixObjectList(client_provider=self._client_provider)
 
-        make_object = self._get_object_class().get_meta().make_object_from_bitrix_data_or_pk
+        object_meta = self._get_object_class().get_meta()
+        make_object = object_meta.make_object_from_bitrix_data_or_pk
+        client_provider = self._client_provider
+        bitrix_data_is_complete = self._is_bitrix_data_complete(object_meta)
 
         if isinstance(bitrix_result, list):
             return BitrixObjectList(
                 (
-                    make_object(bitrix_data, client_provider=self._client_provider)
+                    make_object(
+                        bitrix_data,
+                        client_provider=client_provider,
+                        bitrix_data_is_complete=bitrix_data_is_complete,
+                    )
                     for bitrix_data in bitrix_result
                 ),
-                client_provider=self._client_provider,
+                client_provider=client_provider,
             )
 
         if isinstance(bitrix_result, dict):
             return BitrixObjectList(
                 (
-                    make_object(bitrix_data, client_provider=self._client_provider)
+                    make_object(
+                        bitrix_data,
+                        client_provider=client_provider,
+                        bitrix_data_is_complete=bitrix_data_is_complete,
+                    )
                     for bitrix_data in self._unwrap_list_result(bitrix_result)
                 ),
-                client_provider=self._client_provider,
+                client_provider=client_provider,
             )
 
         return (
-            make_object(bitrix_data, client_provider=self._client_provider)
+            make_object(
+                bitrix_data,
+                client_provider=client_provider,
+                bitrix_data_is_complete=bitrix_data_is_complete,
+            )
             for bitrix_data in bitrix_result
         )
 

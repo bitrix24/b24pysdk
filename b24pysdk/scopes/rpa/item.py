@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Item(BaseEntity):
-    """"""
+    """A set of methods for working with workflow elements.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/item/index.html
+    """
 
     @type_checker
     def add(
@@ -22,7 +25,22 @@ class Item(BaseEntity):
             fields: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add process element
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/item/rpa-item-add.html
+
+        This method adds a new process element with the identifier typeId.
+
+        Args:
+            type_id: Identifier of the process;
+
+            fields: Values of the custom fields of the element;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "typeId": type_id,
@@ -45,7 +63,22 @@ class Item(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete element
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/item/rpa-item-delete.html
+
+        This method deletes an element.
+
+        Args:
+            type_id: Identifier of the process;
+
+            bitrix_id: Identifier of the element;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "typeId": type_id,
@@ -66,7 +99,22 @@ class Item(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get information about the element
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/item/rpa-item-get.html
+
+        This method retrieves information about the element with the identifier id of the process with the identifier typeId.
+
+        Args:
+            type_id: Identifier of the process;
+
+            bitrix_id: Identifier of the element;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "typeId": type_id,
@@ -87,7 +135,22 @@ class Item(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get data on current tasks of the element
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/item/rpa-item-get-tasks.html
+
+        This method retrieves data on the current tasks of the element with the identifier id for the process with the identifier typeId.
+
+        Args:
+            type_id: Identifier of the process;
+
+            bitrix_id: Identifier of the element;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "typeId": type_id,
@@ -110,7 +173,26 @@ class Item(BaseEntity):
             start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Retrieve an array of process elements
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/item/rpa-item-list.html
+
+        This method retrieves a list of process elements with the identifier typeId.
+
+        Args:
+            type_id: Identifier of the process;
+
+            order: List for sorting, where the key is the field and the value is ASC or DESC;
+
+            filter: List for filtering;
+
+            start: Offset for pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "typeId": type_id,
@@ -140,7 +222,24 @@ class Item(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update process element
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/item/rpa-item-update.html
+
+        This method updates the element with the identifier id in the process with the identifier typeId.
+
+        Args:
+            type_id: Identifier of the process;
+
+            bitrix_id: Identifier of the element;
+
+            fields: Object containing values for custom fields of the element;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "typeId": type_id,

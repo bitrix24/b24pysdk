@@ -29,9 +29,9 @@ class Calllist(BaseCRM):
     @type_checker
     def add(
             self,
-            *,
             entity_type: Annotated[Text, Literal["CONTACT", "COMPANY"]],
             entities: Iterable[int],
+            *,
             webform_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[int]:
@@ -204,10 +204,10 @@ class Calllist(BaseCRM):
     @type_checker
     def update(
             self,
-            *,
             list_id: int,
             entity_type: Annotated[Text, Literal["CONTACT", "COMPANY"]],
             entities: Iterable[int],
+            *,
             webform_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:

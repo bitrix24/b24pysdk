@@ -9,6 +9,7 @@ from ....utils.types import JSONDict, Timeout
 from .._base_crm import BaseCRM
 from .badge import Badge
 from .binding import Binding
+from .call import Call
 from .communication import Communication
 from .configurable import Configurable
 from .layout import Layout
@@ -35,6 +36,11 @@ class Activity(BaseCRM):
     def binding(self) -> Binding:
         """"""
         return Binding(self)
+
+    @cached_property
+    def call(self) -> Call:
+        """"""
+        return Call(self)
 
     @cached_property
     def communication(self) -> Communication:

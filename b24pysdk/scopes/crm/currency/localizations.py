@@ -76,8 +76,8 @@ class Localizations(BaseCRM):
     def set(
             self,
             bitrix_id: Text,
-            *,
             localizations: JSONDict,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Set localization for currency.
@@ -112,8 +112,8 @@ class Localizations(BaseCRM):
     def delete(
             self,
             bitrix_id: Text,
-            *,
             lids: Iterable[Text],
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Delete currency localization.

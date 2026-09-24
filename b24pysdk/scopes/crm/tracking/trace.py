@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Trace(BaseCRM):
-    """"""
+    """Class for managing sales intelligence in CRM.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/crm/tracking/index.html
+    """
 
     @type_checker
     def add(
@@ -22,7 +25,22 @@ class Trace(BaseCRM):
             entities: Optional[Iterable[JSONDict]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[int]:
-        """"""
+        """Create a sales intelligence trace
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/tracking/crm-tracking-trace-add.html
+
+        The method creates a sales intelligence trace and returns its identifier.
+
+        Args:
+            trace: JSON string containing trace data;
+
+            entities: Array of objects to be linked with the trace;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIValuesRequest
+        """
 
         params: JSONDict = {
             "TRACE": trace,
@@ -47,5 +65,18 @@ class Trace(BaseCRM):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[None]:
-        """"""
+        """Delete sales intelligence trace
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/tracking/crm-tracking-trace-delete.html
+
+        The method removes a sales intelligence trace.
+
+        Args:
+            bitrix_id: Identifier of the sales intelligence trace;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIValuesRequest
+        """
         return self._delete(bitrix_id, timeout=timeout)

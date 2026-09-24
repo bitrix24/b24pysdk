@@ -1,7 +1,8 @@
-from typing import Optional, Text
+from typing import Annotated, List, Optional, Text
 
 from ....._constants import MISSING
 from .....api.requests import BitrixAPIRequest
+from .....constants.list import ListIBlockTypeLiteral
 from .....utils.functional import type_checker
 from .....utils.types import JSONDict, Timeout
 from ...._base_entity import BaseEntity
@@ -12,12 +13,12 @@ __all__ = [
 
 
 class File(BaseEntity):
-    """"""
+    """Methods for file properties of Bitrix24 list elements."""
 
     @type_checker
     def url(
             self,
-            iblock_type_id: Text,
+            iblock_type_id: Annotated[Text, ListIBlockTypeLiteral],
             field_id: int,
             *,
             iblock_id: Optional[int] = MISSING,
@@ -25,8 +26,14 @@ class File(BaseEntity):
             element_id: Optional[int] = MISSING,
             element_code: Optional[Text] = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """"""
+    ) -> BitrixAPIRequest[List[Text]]:
+        """Return download paths for one element file property."""
+
+        if iblock_id is MISSING and iblock_code is MISSING:
+            raise ValueError("Pass iblock_id or iblock_code.")
+
+        if element_id is MISSING and element_code is MISSING:
+            raise ValueError("Pass element_id or element_code.")
 
         params: JSONDict = {
             "IBLOCK_TYPE_ID": iblock_type_id,

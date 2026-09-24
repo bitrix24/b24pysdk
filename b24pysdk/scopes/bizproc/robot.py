@@ -2,8 +2,9 @@ from typing import Optional, Sequence, Text, Union
 
 from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
+from ...utils.converters import bool_to_bitrix
 from ...utils.functional import type_checker
-from ...utils.types import B24BoolStrict, DocumentType, JSONDict, Timeout
+from ...utils.types import DocumentType, JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -25,13 +26,13 @@ class Robot(BaseEntity):
             name: Union[Text, JSONDict],
             *,
             auth_user_id: Optional[int] = MISSING,
-            use_subscription: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            use_subscription: Optional[bool] = MISSING,
             description: Optional[Union[Text, JSONDict]] = MISSING,
             properties: Optional[JSONDict] = MISSING,
             return_properties: Optional[JSONDict] = MISSING,
             document_type: Optional[Sequence[Text]] = MISSING,
             filter: Optional[JSONDict] = MISSING,
-            use_placement: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            use_placement: Optional[bool] = MISSING,
             placement_handler: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
@@ -93,7 +94,7 @@ class Robot(BaseEntity):
             params["AUTH_USER_ID"] = auth_user_id
 
         if use_subscription is not MISSING:
-            params["USE_SUBSCRIPTION"] = B24BoolStrict(use_subscription).to_b24()
+            params["USE_SUBSCRIPTION"] = bool_to_bitrix(use_subscription, is_required=True)
 
         if description is not MISSING:
             params["DESCRIPTION"] = description
@@ -111,7 +112,7 @@ class Robot(BaseEntity):
             params["FILTER"] = filter
 
         if use_placement is not MISSING:
-            params["USE_PLACEMENT"] = B24BoolStrict(use_placement).to_b24()
+            params["USE_PLACEMENT"] = bool_to_bitrix(use_placement, is_required=True)
 
         if placement_handler is not MISSING:
             params["PLACEMENT_HANDLER"] = placement_handler

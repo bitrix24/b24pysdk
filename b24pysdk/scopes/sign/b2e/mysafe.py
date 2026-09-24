@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Mysafe(BaseEntity):
-    """"""
+    """Class for retrieving signed documents in the company's safe.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sign/index.html
+    """
 
     @type_checker
     def tail(
@@ -22,7 +25,22 @@ class Mysafe(BaseEntity):
             offset: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of signed documents in the company's safe
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sign/sign-b2e-mysafe-tail.html
+
+        The method returns a list of signed documents in the company's safe.
+
+        Args:
+            limit: Number of records per page;
+
+            offset: This parameter is used to manage pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

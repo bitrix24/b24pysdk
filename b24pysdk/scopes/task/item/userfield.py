@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Userfield(BaseEntity):
-    """"""
+    """A set of methods for managing custom fields in tasks.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/tasks/user-field/index.html
+    """
 
     @type_checker
     def add(
@@ -21,7 +24,20 @@ class Userfield(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add custom field
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/user-field/task-item-user-field-add.html
+
+        The method creates a custom field for a task.
+
+        Args:
+            params: Set of parameters for the created field;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "PARAMS": params,
@@ -40,7 +56,20 @@ class Userfield(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete user field
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/user-field/task-item-user-field-delete.html
+
+        The method removes a custom field from a task.
+
+        Args:
+            bitrix_id: Identifier of the custom field;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "ID": bitrix_id,
@@ -59,7 +88,20 @@ class Userfield(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get custom task field by ID
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/user-field/task-item-user-field-get.html
+
+        The method retrieves the description of a custom task field by its ID.
+
+        Args:
+            bitrix_id: Identifier of the custom field;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "ID": bitrix_id,
@@ -77,7 +119,18 @@ class Userfield(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get user field fields
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/user-field/task-item-user-field-get-fields.html
+
+        The method retrieves a list of fields for task custom fields.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
         return self._make_bitrix_api_request(
             api_wrapper=self.getfields,
             timeout=timeout,
@@ -91,7 +144,22 @@ class Userfield(BaseEntity):
             filter: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of custom fields
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/user-field/task-item-user-field-get-list.html
+
+        The method retrieves a list of custom fields for tasks.
+
+        Args:
+            order: An object for sorting the selected records, where the key is the field and the value is asc or desc;
+
+            filter: Object for filtering the result;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -113,7 +181,18 @@ class Userfield(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of available data types
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/user-field/task-item-user-field-get-types.html
+
+        The method retrieves the available types of custom fields.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
         return self._make_bitrix_api_request(
             api_wrapper=self.gettypes,
             timeout=timeout,
@@ -127,7 +206,22 @@ class Userfield(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update user field
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/user-field/task-item-user-field-update.html
+
+        The method updates the parameters of a task's user field.
+
+        Args:
+            bitrix_id: Identifier of the user field;
+
+            data: Set of parameters to be updated for the field;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "ID": bitrix_id,

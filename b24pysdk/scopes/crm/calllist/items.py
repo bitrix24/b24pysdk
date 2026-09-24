@@ -20,8 +20,8 @@ class Items(BaseCRM):
     @type_checker
     def get(
             self,
-            *,
             list_id: int,
+            *,
             filter: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONList]:

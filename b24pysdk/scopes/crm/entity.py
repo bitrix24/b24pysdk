@@ -18,8 +18,8 @@ class Entity(BaseCRM):
     @type_checker
     def merge_batch(
             self,
-            *,
             params: JSONDict,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIValueRequest[CRMEntityMergeBatchData, CRMEntityMergeBatch]:
         """Merge duplicates

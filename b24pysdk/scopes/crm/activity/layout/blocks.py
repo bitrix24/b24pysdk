@@ -19,10 +19,10 @@ class Blocks(BaseCRM):
     @type_checker
     def get(
             self,
-            *,
             entity_type_id: int,
             entity_id: int,
             activity_id: int,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
         """Get a set of additional content blocks in the activity.
@@ -60,11 +60,11 @@ class Blocks(BaseCRM):
     @type_checker
     def set(
             self,
-            *,
             entity_type_id: int,
             entity_id: int,
             activity_id: int,
             layout: JSONDict,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Set a set of additional content blocks in the activity.
@@ -104,10 +104,10 @@ class Blocks(BaseCRM):
     @type_checker
     def delete(
             self,
-            *,
             entity_type_id: int,
             entity_id: int,
             activity_id: int,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[Optional[bool]]:
         """Delete a set of additional content blocks in CRM activity.

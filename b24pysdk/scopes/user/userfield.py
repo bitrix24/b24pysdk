@@ -1,5 +1,3 @@
-from typing import Optional
-
 from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest, BitrixAPIValuesRequest
 from ...objects.user.userfield import UserUserfield as UserUserfieldObject
@@ -58,8 +56,8 @@ class Userfield(BaseEntity):
     def list(
             self,
             *,
-            order: Optional[JSONDict] = MISSING,
-            filter: Optional[JSONDict] = MISSING,
+            order: JSONDict = MISSING,
+            filter: JSONDict = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIValuesRequest[JSONList, UserUserfieldObject]:
         """

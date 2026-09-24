@@ -3,7 +3,7 @@ from typing import Iterable, Optional, Text, Union
 from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import JSONDict, Timeout
+from ...utils.types import JSONDict, JSONList, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -409,8 +409,8 @@ class Site(BaseEntity):
     def set_rights(
             self,
             bitrix_id: Union[int, Text],
-            rights: Optional[JSONDict] = MISSING,
             *,
+            rights: Union[JSONDict, JSONList] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Set access permissions

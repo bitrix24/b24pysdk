@@ -1,6 +1,6 @@
-from typing import Dict, Final, List, Literal, Mapping, Optional, Sequence, Text, Tuple, Union, overload
+from itertools import islice
+from typing import Dict, Final, Iterator, List, Literal, Mapping, Optional, Sequence, Text, Tuple, Union, overload
 
-from ..._constants import MAX_BATCH_SIZE
 from ...constants.version import B24APIVersion
 from ...protocols import BitrixTokenProtocol
 from ...schemas.api import BatchResponseData, BatchResultData, TimeResponseData
@@ -34,7 +34,6 @@ class _BatchesCaller(BaseCaller):
 
     _API_METHOD: Final[Text] = "batch"
     _BATCH_RESULT_FIELDS: Final[Tuple[_BatchResultFieldLiteral, ...]] = ("result", "result_error", "result_total", "result_next", "result_time")
-    _MAX_BATCH_SIZE: Final[int] = MAX_BATCH_SIZE
 
     __slots__ = ("_halt", "_methods")
 
@@ -93,17 +92,18 @@ class _BatchesCaller(BaseCaller):
             **self._kwargs,
         )
 
-    def _get_flat_methods(self) -> List[Tuple[Key, B24RequestTuple]]:
-        """
-        Return methods as ``(result_key, request_tuple)`` pairs.
+    def _iter_method_chunks(self) -> Iterator[Dict[Key, B24RequestTuple]]:
+        """Yield batch-sized command mappings without copying the whole collection."""
 
-        Mapping input keeps caller-provided keys. Sequence input receives
-        numeric indexes so merged results can still be addressed consistently.
-        """
+        methods_iterator: Iterator[Tuple[Key, B24RequestTuple]]
+
         if isinstance(self._methods, Mapping):
-            return list(self._methods.items())
+            methods_iterator = iter(self._methods.items())
         else:
-            return list(enumerate(self._methods))
+            methods_iterator = enumerate(self._methods)
+
+        while methods_chunk := dict(islice(methods_iterator, self._MAX_BATCH_SIZE)):
+            yield methods_chunk
 
     @staticmethod
     def _force_dict(collection: Union[Dict[Text, BAResultT], List[BAResultT]]) -> Dict[Text, BAResultT]:
@@ -123,18 +123,11 @@ class _BatchesCaller(BaseCaller):
                 for index, element in enumerate(collection)
             }
 
-    def _combine_responses(self, responses: List[BatchResponseData]) -> BatchResponseData:
-        """
-        Merge several classic batch responses into a single batch-like response.
+    @staticmethod
+    def _make_combined_response(first_response: BatchResponseData) -> BatchResponseData:
+        """Create an empty combined response using the first batch start time."""
 
-        Command result sections are normalized to dictionaries and combined by
-        key. Timing fields are aggregated so the final response describes the
-        whole multi-batch operation.
-        """
-
-        first_response, last_response = responses[0], responses[-1]
-
-        combined_response: BatchResponseData = {
+        return {
             "result": {
                 "result": {},
                 "result_error": {},
@@ -144,42 +137,44 @@ class _BatchesCaller(BaseCaller):
             },
             "time": {
                 "start": first_response["time"]["start"],
-                "finish": last_response["time"]["finish"],
+                "finish": first_response["time"]["finish"],
                 "duration": 0,
                 "processing": 0,
                 "date_start": first_response["time"]["date_start"],
-                "date_finish": last_response["time"]["date_finish"],
+                "date_finish": first_response["time"]["date_finish"],
             },
         }
 
+    def _merge_response(self, combined_response: BatchResponseData, response: BatchResponseData) -> None:
+        """Merge one batch response into the accumulated response in place."""
+
         combined_result: BatchResultData = combined_response["result"]
         combined_time: TimeResponseData = combined_response["time"]
+        result = response["result"]
+        time = response["time"]
 
-        operating_reset_at = last_response["time"].get("operating_reset_at")
+        for key in self._BATCH_RESULT_FIELDS:
+            value = result[key]
 
-        if operating_reset_at is not None:
+            if value:
+                combined_result[key].update(self._force_dict(value))
+
+        combined_time["finish"] = time["finish"]
+        combined_time["duration"] += time["duration"]
+        combined_time["processing"] += time["processing"]
+        combined_time["date_finish"] = time["date_finish"]
+
+        operating_reset_at = time.get("operating_reset_at")
+
+        if operating_reset_at is None:
+            combined_time.pop("operating_reset_at", None)
+        else:
             combined_time["operating_reset_at"] = operating_reset_at
 
-        for response in responses:
-            result = response["result"]
-            time = response["time"]
+        operating = time.get("operating")
 
-            for key in self._BATCH_RESULT_FIELDS:
-                value = result[key]
-
-                if value:
-                    combined_result[key].update(self._force_dict(value))
-
-            combined_time["duration"] += time["duration"]
-            combined_time["processing"] += time["processing"]
-
-            operating = time.get("operating")
-
-            if operating is not None:
-                combined_time["operating"] = combined_time.get("operating", 0) + operating
-
-        return combined_response
-
+        if operating is not None:
+            combined_time["operating"] = combined_time.get("operating", 0) + operating
 
     def call(self) -> BatchResponseData:
         """
@@ -198,19 +193,23 @@ class _BatchesCaller(BaseCaller):
             if total_methods <= self._MAX_BATCH_SIZE:
                 return self._fetch_batch_response(methods=self._methods)
 
-            flat_methods: List[Tuple[Key, B24RequestTuple]] = self._get_flat_methods()
+            combined_response: Optional[BatchResponseData] = None
 
-            batch_responses: List[BatchResponseData] = []
-
-            for index in range(0, total_methods, self._MAX_BATCH_SIZE):
-                methods_chunk = dict(flat_methods[index:index + self._MAX_BATCH_SIZE])
+            for methods_chunk in self._iter_method_chunks():
                 batch_response = self._fetch_batch_response(methods=methods_chunk)
-                batch_responses.append(batch_response)
+
+                if combined_response is None:
+                    combined_response = self._make_combined_response(batch_response)
+
+                self._merge_response(combined_response, batch_response)
 
                 if self._halt and batch_response["result"]["result_error"]:
                     break
 
-            return self._combine_responses(batch_responses)
+            if combined_response is None:
+                raise RuntimeError("No batch responses received.")
+
+            return combined_response
 
         finally:
             self._config.logger.debug("finish call_batches")

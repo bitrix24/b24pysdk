@@ -165,8 +165,8 @@ class Comment(BaseCRM):
             bitrix_id: int,
             fields: JSONDict,
             *,
-            entity_type_id: Optional[int] = MISSING,
-            entity_id: Optional[int] = MISSING,
+            owner_type_id: Optional[int] = MISSING,
+            owner_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[int]:
         """Update comment.
@@ -189,9 +189,9 @@ class Comment(BaseCRM):
                         ]
                 };
 
-            entity_type_id: Optional CRM entity type identifier to narrow the comment binding context;
+            owner_type_id: Optional CRM entity type identifier to narrow the comment binding context;
 
-            entity_id: Optional CRM entity identifier to narrow the comment binding context;
+            owner_id: Optional CRM entity identifier to narrow the comment binding context;
 
             timeout: Timeout in seconds.
 
@@ -204,11 +204,11 @@ class Comment(BaseCRM):
             "fields": fields,
         }
 
-        if entity_type_id is not MISSING:
-            params["entityTypeId"] = entity_type_id
+        if owner_type_id is not MISSING:
+            params["ownerTypeId"] = owner_type_id
 
-        if entity_id is not MISSING:
-            params["entityId"] = entity_id
+        if owner_id is not MISSING:
+            params["ownerId"] = owner_id
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,

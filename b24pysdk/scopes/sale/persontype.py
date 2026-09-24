@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Persontype(BaseEntity):
-    """"""
+    """Methods for managing payer types in an online store.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sale/person-type/index.html
+    """
 
     @type_checker
     def add(
@@ -21,7 +24,20 @@ class Persontype(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add payer type
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/person-type/sale-person-type-add.html
+
+        The method adds a new payer type.
+
+        Args:
+            fields: Field values for creating a new payer type;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "fields": fields,
@@ -40,7 +56,20 @@ class Persontype(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete payer type
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/person-type/sale-person-type-delete.html
+
+        The method deletes a payer type.
+
+        Args:
+            bitrix_id: Identifier of the payer type;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -59,7 +88,20 @@ class Persontype(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the payer type by ID
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/person-type/sale-person-type-get.html
+
+        The method is used to access the fields of the payer type by its Id.
+
+        Args:
+            bitrix_id: Identifier of the payer type;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -72,15 +114,26 @@ class Persontype(BaseEntity):
         )
 
     @type_checker
-    def getfields(
+    def get_fields(
         self,
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get fields of the payer type
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/person-type/sale-person-type-get-fields.html
+
+        The method retrieves fields of the payer type.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.getfields,
+            api_wrapper=self.get_fields,
             timeout=timeout,
         )
 
@@ -94,7 +147,26 @@ class Persontype(BaseEntity):
         start: Optional[int] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of payer types
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/person-type/sale-person-type-list.html
+
+        The method retrieves a list of payer types.
+
+        Args:
+            select: An array of fields to be selected;
+
+            filter: An object for filtering the selected records;
+
+            order: An object for sorting the selected records, where the key is the field and the value is asc or desc;
+
+            start: This parameter is used to manage pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -126,7 +198,22 @@ class Persontype(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Change the payer type
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/person-type/sale-person-type-update.html
+
+        The method modifies the fields of the payer type.
+
+        Args:
+            bitrix_id: Identifier of the payer type;
+
+            fields: Field values for updating the payer type;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

@@ -10,6 +10,7 @@ from .network import Network
 from .operator import Operator
 from .revision import Revision
 from .session import Session
+from .v2 import V2
 
 __all__ = [
     "Imopenlines",
@@ -63,3 +64,8 @@ class Imopenlines(BaseScope):
     def session(self) -> Session:
         """"""
         return Session(self)
+
+    @cached_property
+    def v2(self) -> V2:
+        """"""
+        return V2(self)

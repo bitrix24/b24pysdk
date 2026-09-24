@@ -2,8 +2,9 @@ from typing import Optional, Text, Union
 
 from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
+from ...utils.converters import bool_to_bitrix
 from ...utils.functional import type_checker
-from ...utils.types import B24BoolStrict, JSONDict, Timeout
+from ...utils.types import JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -24,9 +25,9 @@ class Message(BaseEntity):
             *,
             message: Optional[Text] = MISSING,
             reply_id: Optional[int] = MISSING,
-            system: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            system: Optional[bool] = MISSING,
             attach: Optional[Union[JSONDict, Text]] = MISSING,
-            url_preview: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            url_preview: Optional[bool] = MISSING,
             keyboard: Optional[Union[JSONDict, Text]] = MISSING,
             menu: Optional[Union[JSONDict, Text]] = MISSING,
             timeout: Timeout = None,
@@ -77,13 +78,13 @@ class Message(BaseEntity):
             params["REPLY_ID"] = reply_id
 
         if system is not MISSING:
-            params["SYSTEM"] = B24BoolStrict(system).to_b24()
+            params["SYSTEM"] = bool_to_bitrix(system, is_required=True)
 
         if attach is not MISSING:
             params["ATTACH"] = attach
 
         if url_preview is not MISSING:
-            params["URL_PREVIEW"] = B24BoolStrict(url_preview).to_b24()
+            params["URL_PREVIEW"] = bool_to_bitrix(url_preview, is_required=True)
 
         if keyboard is not MISSING:
             params["KEYBOARD"] = keyboard
@@ -266,7 +267,7 @@ class Message(BaseEntity):
             *,
             message: Optional[Text] = MISSING,
             attach: Optional[JSONDict] = MISSING,
-            url_preview: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            url_preview: Optional[bool] = MISSING,
             keyboard: Optional[JSONDict] = MISSING,
             menu: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
@@ -307,7 +308,7 @@ class Message(BaseEntity):
             params["ATTACH"] = attach
 
         if url_preview is not MISSING:
-            params["URL_PREVIEW"] = B24BoolStrict(url_preview).to_b24()
+            params["URL_PREVIEW"] = bool_to_bitrix(url_preview, is_required=True)
 
         if keyboard is not MISSING:
             params["KEYBOARD"] = keyboard

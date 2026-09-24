@@ -123,7 +123,7 @@ class Slots(BaseEntity):
         """
 
         params = {
-            "resourceID": resource_id,
+            "resourceId": resource_id,
         }
 
         return self._make_bitrix_api_request(

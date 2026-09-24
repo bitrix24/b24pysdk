@@ -15,7 +15,7 @@ Each client exposes Bitrix API scopes as attributes (e.g. ``crm``, ``user``,
 import inspect
 from abc import ABC
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, ClassVar, Dict, Hashable, List, Literal, Mapping, Optional, Sequence, Text, Type, Union, overload
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, Hashable, List, Literal, Mapping, Optional, Sequence, Text, Tuple, Union, overload
 
 from . import scopes
 from ._constants import MISSING
@@ -23,7 +23,8 @@ from .api.requests import BitrixAPIBatchesRequest, BitrixAPIBatchRequest
 from .constants.version import B24APIVersion
 from .protocols import BitrixTokenFullProtocol
 from .scopes._base_context import BaseContext
-from .utils.types import B24APIVersionLiteral, JSONDict, Key, Number, Timeout
+from .utils.case import snake_to_camel
+from .utils.types import B24APIVersionLiteral, JSONDict, Key, Number, ObjectDiscriminator, Timeout
 
 if TYPE_CHECKING:
     from .api.requests import BitrixAPIRequest
@@ -40,6 +41,7 @@ __all__ = [
 
 
 _ClientCacheKey = Literal["bitrix_fields", "bitrix_objects"]
+_ObjectCacheKey = Tuple[Text, ObjectDiscriminator]
 
 
 class _ClientCache:
@@ -47,8 +49,8 @@ class _ClientCache:
 
     __slots__ = ("_bitrix_fields", "_bitrix_objects")
 
-    _bitrix_fields: Optional[Dict[Type["BaseObject"], Dict[Text, Any]]]
-    _bitrix_objects: Optional[Dict[Type["BaseObject"], Dict[Hashable, "BaseObject"]]]
+    _bitrix_fields: Optional[Dict[_ObjectCacheKey, Dict[Hashable, Any]]]
+    _bitrix_objects: Optional[Dict[_ObjectCacheKey, Dict[Hashable, "BaseObject"]]]
 
     def __init__(self):
         self._bitrix_fields = None
@@ -218,6 +220,10 @@ class BaseClient(ABC):
     @cached_property
     def feature(self) -> "scopes.Feature":
         return scopes.Feature(self)
+
+    @cached_property
+    def humanresources(self) -> "scopes.Humanresources":
+        return scopes.Humanresources(self)
 
     @cached_property
     def im(self) -> "scopes.Im":
@@ -523,7 +529,7 @@ class BaseClient(ABC):
                 api_methods.extend(self.__collect_api_methods(value))
 
             elif not isinstance(context, self.__class__):
-                api_methods.append(f"{context}.{BaseContext._snake_to_camel(attr_name)}")
+                api_methods.append(f"{context}.{snake_to_camel(attr_name)}")
 
         return api_methods
 
@@ -618,6 +624,10 @@ class ClientV3(BaseClient):
     VERSION = B24APIVersion.V3
 
     @cached_property
+    def call(self) -> "scopes.v3.Call":
+        return scopes.v3.Call(self)
+
+    @cached_property
     def documentation(self) -> "scopes.v3.Documentation":
         return scopes.v3.Documentation(self)
 
@@ -632,6 +642,10 @@ class ClientV3(BaseClient):
     @cached_property
     def main(self) -> "scopes.v3.Main":
         return scopes.v3.Main(self)
+
+    @cached_property
+    def note(self) -> "scopes.v3.Note":
+        return scopes.v3.Note(self)
 
     @cached_property
     def rest(self) -> "scopes.v3.Rest":

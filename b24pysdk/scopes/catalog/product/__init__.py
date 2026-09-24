@@ -16,7 +16,10 @@ __all__ = [
 
 
 class Product(BaseEntity):
-    """"""
+    """Class for managing products in the trade catalog.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/index.html
+    """
 
     @cached_property
     def offer(self) -> Offer:
@@ -40,7 +43,20 @@ class Product(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add product
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/catalog-product-add.html
+
+        The method adds a product to the trading catalog.
+
+        Args:
+            fields: Field values for adding a new product as a structure;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "fields": fields,
@@ -59,7 +75,20 @@ class Product(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete product
+
+        Documentatoin: https://apidocs.bitrix24.com/api-reference/catalog/product/catalog-product-delete.html
+
+        The method removes a product from the trade catalog.
+
+        Args:
+            bitrix_id: Product identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -78,7 +107,20 @@ class Product(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Download product files
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/catalog-product-download.html
+
+        The method downloads product files from the trade catalog based on the provided parameters.
+
+        Args:
+            fields: Field values for downloading product files;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "fields": fields,
@@ -97,7 +139,20 @@ class Product(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get product by ID
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/catalog-product-get.html
+
+        The method retrieves information about a product in the trade catalog by its ID.
+
+        Args:
+            bitrix_id: Identifier of the product;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -116,7 +171,20 @@ class Product(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get product fields by filter
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/catalog-product-get-fields-by-filter.html
+
+        The method retrieves product fields based on a filter.
+
+        Args:
+            filter: Filter to retrieve all product fields;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "filter": filter,
@@ -138,7 +206,26 @@ class Product(BaseEntity):
             start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of products by filter
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/catalog-product-list.html
+
+        The method retrieves a list of products from the trade catalog based on filter.
+
+        Args:
+            select: An array containing a list of fields that need to be selected;
+
+            filter: An object for filtering selected products;
+
+            order: Object for sorting selected products;
+
+            start: The parameter is used to control pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if select.__class__ is not list:
             select = list(select)
@@ -168,7 +255,22 @@ class Product(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update product
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/product/catalog-product-update.html
+
+        The method updates a product in the trade catalog.
+
+        Args:
+            bitrix_id: Product identifier;
+
+            fields: Field values for updating the product;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

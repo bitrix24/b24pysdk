@@ -9,7 +9,10 @@ __all__ = [
 
 
 class Dependence(BaseEntity):
-    """"""
+    """Class for managing dependencies between tasks.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/tasks/index.html
+    """
 
     @type_checker
     def add(
@@ -20,7 +23,24 @@ class Dependence(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Create a link between tasks
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/task-dependence-add.html
+
+        This method creates a dependency of one task on another.
+
+        Args:
+            task_id_from: Identifier of the task from which the dependency is created;
+
+            task_id_to: Identifier of the task for which the dependency is created;
+
+            link_type: Type of dependency;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "taskIdFrom": task_id_from,
@@ -42,7 +62,22 @@ class Dependence(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Remove dependency between tasks
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/task-dependence-delete.html
+
+        This method removes the dependency of one task on another.
+
+        Args:
+            task_id_from: Identifier of the task from which the dependency is removed;
+
+            task_id_to: Identifier of the task for which the dependency is removed;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "taskIdFrom": task_id_from,

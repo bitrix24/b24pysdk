@@ -1,10 +1,11 @@
 from functools import cached_property
-from typing import Iterable, Optional, Text, Union
+from typing import Iterable, Optional, Text
 
 from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
+from ....utils.converters import bool_to_bitrix
 from ....utils.functional import type_checker
-from ....utils.types import B24BoolStrict, JSONDict, Timeout
+from ....utils.types import JSONDict, Timeout
 from ..._base_entity import BaseEntity
 from .check import Check
 from .handler import Handler
@@ -37,9 +38,9 @@ class Cashbox(BaseEntity):
         ofd: Optional[Text] = MISSING,
         ofd_settings: Optional[JSONDict] = MISSING,
         number_kkm: Optional[Text] = MISSING,
-        active: Optional[Union[bool, B24BoolStrict]] = MISSING,
+        active: Optional[bool] = MISSING,
         sort: Optional[int] = MISSING,
-        use_offline: Optional[Union[bool, B24BoolStrict]] = MISSING,
+        use_offline: Optional[bool] = MISSING,
         settings: Optional[JSONDict] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
@@ -61,13 +62,13 @@ class Cashbox(BaseEntity):
             params["NUMBER_KKM"] = number_kkm
 
         if active is not MISSING:
-            params["ACTIVE"] = B24BoolStrict(active).to_b24()
+            params["ACTIVE"] = bool_to_bitrix(active, is_required=True)
 
         if sort is not MISSING:
             params["SORT"] = sort
 
         if use_offline is not MISSING:
-            params["USE_OFFLINE"] = B24BoolStrict(use_offline).to_b24()
+            params["USE_OFFLINE"] = bool_to_bitrix(use_offline, is_required=True)
 
         if settings is not MISSING:
             params["SETTINGS"] = settings

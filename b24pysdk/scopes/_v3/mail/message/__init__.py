@@ -14,7 +14,10 @@ __all__ = [
 
 
 class Message(BaseEntity):
-    """"""
+    """Methods for working with e-mails in mail.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/mail/message/index.html
+    """
 
     @cached_property
     def field(self) -> Field:
@@ -32,7 +35,28 @@ class Message(BaseEntity):
             description: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Create a calendar event from an e-mail
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/mail/message/mail-message-createcalendarevent.html
+
+        The method creates a calendar event from an e-mail.
+
+        Args:
+            message_id: E-mail identifier;
+
+            date_from: Event start date and time in Y-m-d H:i:s format;
+
+            date_to: Event end date and time in Y-m-d H:i:s format;
+
+            name: Event name;
+
+            description: Event description;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "messageId": message_id,
@@ -59,7 +83,20 @@ class Message(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Create a chat from e-mail
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/mail/message/mail-message-createchat.html
+
+        The method
+
+        Args:
+            message_id: E-mail identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "messageId": message_id,
@@ -78,7 +115,20 @@ class Message(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Create a CRM activity from an e-mail
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/mail/message/mail-message-createcrmactivity.html
+
+        The method creates a CRM activity from an e-mail.
+
+        Args:
+            message_id: E-mail identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "messageId": message_id,
@@ -98,7 +148,22 @@ class Message(BaseEntity):
             title: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Create a news feed message from e-mail
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/mail/message/mail-message-createfeedpost.html
+
+        The method creates a news feed message from an e-mail.
+
+        Args:
+            message_id: E-mail identifier;
+
+            title: Message subject;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "messageId": message_id,
@@ -123,7 +188,26 @@ class Message(BaseEntity):
             description: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Create a task from an e-mail
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/mail/message/mail-message-createtask.html
+
+        The method creates a task from an e-mail.
+
+        Args:
+            message_id: E-mail identifier;
+
+            title: Task name;
+
+            responsible_id: Responsible person identifier;
+
+            description: Task description;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "messageId": message_id,
@@ -157,7 +241,32 @@ class Message(BaseEntity):
             bcc: Optional[Iterable[Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Forward e-mail
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/mail/message/mail-message-forward.html
+
+        The method forwards an e-mail.
+
+        Args:
+            forward_message_id: E-mail identifier to be forwarded;
+
+            from_: Message sender identifier;
+
+            to: An array of recipient e-mail addresses;
+
+            subject: E-mail subject;
+
+            body: E-mail text: plain text or basic HTML;
+
+            cc: An array of CC recipient e-mail addresses;
+
+            bcc: An array of BCC recipient e-mail addresses;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if to.__class__ is not list:
             to = list(to)
@@ -196,7 +305,22 @@ class Message(BaseEntity):
             select: Optional[Iterable[Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Geet e-mail
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/mail/message/mail-message-get.html
+
+        The method retrieves an e-mail by its identifier.
+
+        Args:
+            bitrix_id: E-mail identifier;
+
+            select: List of e-mail fields to be returned;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "id": bitrix_id,
@@ -228,7 +352,34 @@ class Message(BaseEntity):
             pagination: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of e-mails
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/mail/message/mail-message-list.html
+
+        The method returns a list of e-mails based on specified conditions.
+
+        Args:
+            mailbox_id: Mailbox identifier;
+
+            search_query: A string for searching e-mails by content and e-mail metadata;
+
+            date_from: Date from which e-mails should be fetched;
+
+            date_to: Date to which e-mails should be fetched;
+
+            is_seen: Filter by e-mail read status;
+
+            has_attachments: Filter by attachment presence;
+
+            folder: Mail folder name or path;
+
+            pagination: Pagination parameters;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "mailboxId": mailbox_id,
@@ -270,7 +421,24 @@ class Message(BaseEntity):
             folder: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Move e-mails to folder
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/mail/message/mail-message-movetofolder.html
+
+        The method moves e-mails to a folder, spam, or the trash.
+
+        Args:
+            message_ids: An array of e-mail IDs;
+
+            action: Action for e-mails;
+
+            folder: The name or path of an existing folder in the mailbox;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if message_ids.__class__ is not list:
             message_ids = list(message_ids)
@@ -296,7 +464,20 @@ class Message(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Remove CRM activity
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/mail/message/mail-message-removecrmactivity.html
+
+        The method removes the link between an e-mail and a CRM deal.
+
+        Args:
+            message_id: E-mail identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "messageId": message_id,
@@ -321,7 +502,32 @@ class Message(BaseEntity):
             bcc: Optional[Iterable[Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Reply to e-mail
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/mail/message/mail-message-reply.html
+
+        The method sends a reply to an e-mail.
+
+        Args:
+            reply_to_message_id: The e-mail identifier that needs to be replied to;
+
+            from_: Sender's e-mail;
+
+            to: An array of recipient e-mail addresses;
+
+            subject: The e-mail subject;
+
+            body: The e-mail body;
+
+            cc: An array of CC recipient e-mail addresses;
+
+            bcc: An array of BCC recipient e-mail addresses;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if to.__class__ is not list:
             to = list(to)
@@ -364,7 +570,30 @@ class Message(BaseEntity):
             bcc: Optional[Iterable[Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Send an e-mail
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/mail/message/mail-message-send.html
+
+        The method sends a new e-mail on behalf of an available sender.
+
+        Args:
+            from_: Sender's e-mail;
+
+            to: An array of recipient e-mail addresses;
+
+            subject: The e-mail subject;
+
+            body: E-mail body;
+
+            cc: An array of CC recipient e-mail addresses;
+
+            bcc: An array of BCC recipient e-mail addresses;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if to.__class__ is not list:
             to = list(to)
@@ -402,7 +631,22 @@ class Message(BaseEntity):
             limit: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get e-mail thread
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/mail/message/mail-message-thread.html
+
+        The method returns an e-mail thread by their identifier of a single e-mail.
+
+        Args:
+            bitrix_id: The identifier of any e-mail from the thread;
+
+            limit: The maximum number of e-mails to return;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "id": bitrix_id,

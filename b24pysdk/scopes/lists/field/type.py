@@ -1,7 +1,8 @@
-from typing import Optional, Text
+from typing import Annotated, Optional, Text
 
 from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
+from ....constants.list import ListIBlockTypeLiteral
 from ....utils.functional import type_checker
 from ....utils.types import JSONDict, Timeout
 from ..._base_entity import BaseEntity
@@ -12,19 +13,19 @@ __all__ = [
 
 
 class Type(BaseEntity):
-    """"""
+    """Methods for available Bitrix24 list field types."""
 
     @type_checker
     def get(
             self,
-            iblock_type_id: Text,
+            iblock_type_id: Annotated[Text, ListIBlockTypeLiteral],
             *,
             iblock_id: Optional[int] = MISSING,
             iblock_code: Optional[Text] = MISSING,
             field_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """"""
+    ) -> BitrixAPIRequest[JSONDict]:
+        """Return field types available for the selected list or field."""
 
         params: JSONDict = {
             "IBLOCK_TYPE_ID": iblock_type_id,

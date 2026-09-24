@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Type(BaseEntity):
-    """"""
+    """Methods for working with processes.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/type/index.html
+    """
 
     @type_checker
     def add(
@@ -21,7 +24,20 @@ class Type(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Create process
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/type/rpa-type-add.html
+
+        This method creates a new process.
+
+        Args:
+            fields: A list of process fields;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "fields": fields,
@@ -40,7 +56,20 @@ class Type(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete process
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/type/rpa-type-delete.html
+
+        This method deletes a process.
+
+        Args:
+            bitrix_id: The ID of the process;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -59,7 +88,20 @@ class Type(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get process information by ID
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/type/rpa-type-get.html
+
+        This method retrieves information about a process by its id.
+
+        Args:
+            bitrix_id: The ID of the process;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -81,7 +123,26 @@ class Type(BaseEntity):
             start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Retrieve a list of process with their fields
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/type/rpa-type-list.html
+
+        The method will return an array of processes with their fields.
+
+        Args:
+            select: Array of fields to output;
+
+            order: List for sorting, where the key is the field and the value is ASC or DESC;
+
+            filter: List for filtering;
+
+            start: This parameter is used to manage pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -114,7 +175,22 @@ class Type(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update the process
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/type/rpa-type-update.html
+
+        This method updates the process by its id.
+
+        Args:
+            bitrix_id: Identifier of the process;
+
+            fields: List of process fields;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

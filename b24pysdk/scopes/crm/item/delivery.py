@@ -43,9 +43,9 @@ class Delivery(BaseCRM):
     @type_checker
     def list(
             self,
-            *,
             entity_type_id: int,
             entity_id: int,
+            *,
             filter: Optional[JSONDict] = MISSING,
             order: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,

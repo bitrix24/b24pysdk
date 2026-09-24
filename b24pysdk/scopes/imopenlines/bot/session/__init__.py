@@ -3,8 +3,9 @@ from typing import Optional, Text, Union
 
 from ....._constants import MISSING
 from .....api.requests import BitrixAPIRequest
+from .....utils.converters import bool_to_bitrix
 from .....utils.functional import type_checker
-from .....utils.types import B24BoolStrict, Timeout
+from .....utils.types import Timeout
 from ...._base_entity import BaseEntity
 from .message import Message
 
@@ -63,7 +64,7 @@ class Session(BaseEntity):
     def transfer(
             self,
             chat_id: Union[int, Text],
-            leave: Union[bool, B24BoolStrict],
+            leave: bool,
             *,
             user_id: Optional[Union[int, Text]] = MISSING,
             queue_id: Optional[Union[int, Text]] = MISSING,
@@ -79,7 +80,7 @@ class Session(BaseEntity):
 
         params = dict(
             CHAT_ID=chat_id,
-            LEAVE=B24BoolStrict(leave).to_b24(),
+            LEAVE=bool_to_bitrix(leave, is_required=True),
         )
 
         if user_id is not MISSING:

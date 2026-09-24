@@ -9,7 +9,10 @@ __all__ = [
 
 
 class Task(BaseEntity):
-    """"""
+    """Class for managing Scrum tasks.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sonet-group/scrum/task/index.html
+    """
 
     @type_checker
     def get(
@@ -18,7 +21,20 @@ class Task(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get Scrum task
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sonet-group/scrum/task/tasks-api-scrum-task-get.html
+
+        This method retrieves the values of the Scrum task fields by its identifier id.
+
+        Args:
+            bitrix_id: Task identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -36,7 +52,18 @@ class Task(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get Scrum task fields
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sonet-group/scrum/task/tasks-api-scrum-task-get-fields.html
+
+        The method retrieves the available fields of a Scrum task.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get_fields,
@@ -51,7 +78,22 @@ class Task(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Create or update Scrum task
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sonet-group/scrum/task/tasks-api-scrum-task-update.html
+
+        This method creates or updates a Scrum task.
+
+        Args:
+            bitrix_id: Task identifier;
+
+            fields: An object containing records about the Scrum task;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

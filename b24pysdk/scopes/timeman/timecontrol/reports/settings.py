@@ -9,7 +9,10 @@ __all__ = [
 
 
 class Settings(BaseEntity):
-    """"""
+    """Class for retrieving settings of the time tracking tool.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/timeman/timecontrol/index.html
+    """
 
     @type_checker
     def get(
@@ -17,7 +20,18 @@ class Settings(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get report settings
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/timeman/timecontrol/timeman-timecontrol-reports-settings-get.html
+
+        The method retrieves report settings for building the report interface of the time control tool.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
             timeout=timeout,

@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Any, Optional, Text, Union
+from typing import Any, Final, Optional, Text, Union
 
 from ..._config import Config
+from ..._constants import MAX_BATCH_SIZE
 from ...constants.version import B24APIVersion
 from ...protocols import BitrixTokenProtocol
 from ...utils.types import B24APIVersionLiteral, JSONDict
@@ -21,6 +22,8 @@ class BaseCaller(ABC):
     concrete transport pattern, for example a single method call, batch call, or
     paginated list call.
     """
+
+    _MAX_BATCH_SIZE: Final[int] = MAX_BATCH_SIZE
 
     __slots__ = (
         "_api_method",

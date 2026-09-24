@@ -22,10 +22,16 @@ import threading
 import typing
 from datetime import date, datetime, timezone, tzinfo
 
-from .constants import DEFAULT_CONNECT_TIMEOUT, DEFAULT_INITIAL_RETRY_DELAY, DEFAULT_MAX_RETRIES, DEFAULT_READ_TIMEOUT, DEFAULT_RETRY_DELAY_INCREMENT
+from .constants import (
+    DEFAULT_CONNECT_TIMEOUT,
+    DEFAULT_INITIAL_RETRY_DELAY,
+    DEFAULT_MAX_RETRIES,
+    DEFAULT_READ_TIMEOUT,
+    DEFAULT_RETRY_DELAY_INCREMENT,
+)
 from .constants.version import API_V3_METHODS
 from .log import AbstractLogger, NullLogger
-from .utils.types import DefaultTimeout, Number, Timeout
+from .utils.types import DefaultTimeout, Number, ObjectDiscriminator, Timeout
 
 if typing.TYPE_CHECKING:
     from .client import ClientType
@@ -133,7 +139,7 @@ class Config:
     _local_thread: threading.local = threading.local()
     _object_classes: typing.ClassVar[
         typing.Dict[
-            typing.Tuple[typing.Text, typing.Optional[int]],
+            typing.Tuple[typing.Text, ObjectDiscriminator],
             typing.Type["BaseObject"],
         ]
     ] = {}
@@ -603,7 +609,7 @@ class Config:
             cls,
             *,
             object_key: typing.Text,
-            discriminator: typing.Optional[int],
+            discriminator: ObjectDiscriminator,
             object_class: typing.Type["BaseObject"],
     ):
         """
@@ -624,9 +630,9 @@ class Config:
         object_class : type
             Python class used to represent the object.
 
-        discriminator : int, optional
-            Entity discriminator, such as ``LIST_ID`` or
-            ``ENTITY_TYPE_ID``. ``None`` registers the default class for the key.
+        discriminator : ObjectDiscriminator
+            Hashable entity discriminator. Tuple discriminators are resolved
+            from the most specific value to progressively broader defaults.
 
         Raises
         ------
@@ -638,8 +644,15 @@ class Config:
         registry_key = object_key, discriminator
         registered_class = cls._object_classes.get(registry_key)
 
-        if registered_class is None and discriminator is not None:
-            registered_class = cls._object_classes.get((object_key, None))
+        if registered_class is None:
+            candidates = cls._get_discriminator_candidates(discriminator)
+            next(candidates)
+
+            for candidate in candidates:
+                registered_class = cls._object_classes.get((object_key, candidate))
+
+                if registered_class is not None:
+                    break
 
         if registered_class is not None and not issubclass(object_class, registered_class):
             raise TypeError(
@@ -655,14 +668,15 @@ class Config:
             cls,
             *,
             object_key: typing.Text,
-            discriminator: typing.Optional[int] = None,
+            discriminator: ObjectDiscriminator = None,
     ) -> typing.Type["BaseObject"]:
         """
         Return the registered Python class for an SDK object key.
 
         The exact ``(object_key, discriminator)`` registration is preferred.
-        If it is absent and a discriminator was supplied, the method falls back
-        to the default ``(object_key, None)`` registration.
+        Tuple discriminators fall back from right to left by replacing values
+        with ``None``. The default ``(object_key, None)`` registration is tried
+        last.
 
         Raises
         ------
@@ -670,15 +684,39 @@ class Config:
             If neither an exact nor a default registration exists.
         """
 
-        object_class = cls._object_classes.get((object_key, discriminator))
+        for candidate in cls._get_discriminator_candidates(discriminator):
+            object_class = cls._object_classes.get((object_key, candidate))
 
-        if object_class is None and discriminator is not None:
-            object_class = cls._object_classes.get((object_key, None))
+            if object_class is not None:
+                return object_class
 
-        if object_class is None:
-            raise KeyError(
-                f"No object class registered for object_key={object_key!r}, "
-                f"discriminator={discriminator!r}.",
-            )
+        raise KeyError(
+            f"No object class registered for object_key={object_key!r}, "
+            f"discriminator={discriminator!r}.",
+        )
 
-        return object_class
+    @classmethod
+    def _get_discriminator_candidates(cls, discriminator: ObjectDiscriminator) -> typing.Iterator[ObjectDiscriminator]:
+        """Yield discriminator candidates from the most specific to the default."""
+
+        try:
+            hash(discriminator)
+        except TypeError:
+            raise TypeError("Object class discriminator must be hashable.") from None
+
+        yield discriminator
+
+        if isinstance(discriminator, tuple):
+            candidate = list(discriminator)
+
+            for index in range(len(candidate) - 1, -1, -1):
+                if candidate[index] is None:
+                    continue
+
+                candidate[index] = None
+                yield tuple(candidate)
+
+            yield None
+
+        elif discriminator is not None:
+            yield None

@@ -4,6 +4,7 @@ from ..api.requests import BitrixAPIValueRequest
 from ..schemas.feature import FeatureGet, FeatureGetData
 from ..utils.functional import type_checker
 from ..utils.types import JSONDict, Timeout
+from ._adapters import BitrixSchemaAdapter
 from ._base_scope import BaseScope
 
 __all__ = [
@@ -32,5 +33,5 @@ class Feature(BaseScope):
             params=params,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValueRequest,
-            result_adapter=FeatureGet.from_bitrix,
+            result_adapter=BitrixSchemaAdapter(FeatureGet),
         )

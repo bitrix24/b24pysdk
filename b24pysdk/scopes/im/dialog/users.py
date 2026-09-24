@@ -1,9 +1,10 @@
-from typing import Optional, Text, Union
+from typing import Optional, Text
 
 from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
+from ....utils.converters import bool_to_bitrix
 from ....utils.functional import type_checker
-from ....utils.types import B24BoolStrict, JSONList, Timeout
+from ....utils.types import JSONList, Timeout
 from ..._base_entity import BaseEntity
 
 __all__ = [
@@ -19,7 +20,7 @@ class Users(BaseEntity):
             self,
             dialog_id: Text,
             *,
-            skip_external: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            skip_external: Optional[bool] = MISSING,
             skip_external_except_types: Optional[Text] = MISSING,
             limit: Optional[int] = MISSING,
             last_id: Optional[int] = MISSING,
@@ -33,7 +34,7 @@ class Users(BaseEntity):
         )
 
         if skip_external is not MISSING:
-            params["SKIP_EXTERNAL"] = B24BoolStrict(skip_external).to_b24()
+            params["SKIP_EXTERNAL"] = bool_to_bitrix(skip_external, is_required=True)
 
         if skip_external_except_types is not MISSING:
             params["SKIP_EXTERNAL_EXCEPT_TYPES"] = skip_external_except_types

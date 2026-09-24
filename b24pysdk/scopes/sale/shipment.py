@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Shipment(BaseEntity):
-    """"""
+    """A set of methods for working with shipments in the online store.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sale/shipment/index.html
+    """
 
     @type_checker
     def add(
@@ -21,7 +24,20 @@ class Shipment(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add shipment
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/shipment/sale-shipment-add.html
+
+        The method adds a shipment.
+
+        Args:
+            fields: Field values for creating a shipment;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "fields": fields,
@@ -40,7 +56,20 @@ class Shipment(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete shipment
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/shipment/sale-shipment-delete.html
+
+        The method deletes a shipment.
+
+        Args:
+            bitrix_id: Identifier of the shipment;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -59,7 +88,20 @@ class Shipment(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get shipment fields
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/shipment/sale-shipment-get.html
+
+        The method retrieves the values of all shipment fields.
+
+        Args:
+            bitrix_id: Shipment identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -72,15 +114,26 @@ class Shipment(BaseEntity):
         )
 
     @type_checker
-    def getfields(
+    def get_fields(
         self,
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get available shipment fields
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/shipment/sale-shipment-get-fields.html
+
+        The method retrieves the available shipment fields.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.getfields,
+            api_wrapper=self.get_fields,
             timeout=timeout,
         )
 
@@ -94,7 +147,26 @@ class Shipment(BaseEntity):
         start: Optional[int] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the list of shipments
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/shipment/sale-shipment-list.html
+
+        The method retrieves a list of shipments.
+
+        Args:
+            select: An array of fields to be selected;
+
+            filter: An object for filtering the selected records;
+
+            order: An object for sorting the selected records, where the key is the field and the value is asc or desc;
+
+            start: This parameter is used to manage pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -126,7 +198,22 @@ class Shipment(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update shipment
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/shipment/sale-shipment-update.html
+
+        The method updates a shipment.
+
+        Args:
+            bitrix_id: Shipment identifier;
+
+            fields: Field values for updating the shipment;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

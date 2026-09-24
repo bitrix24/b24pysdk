@@ -1,10 +1,11 @@
 from functools import cached_property
-from typing import Optional, Text, Union
+from typing import Literal, Optional, Sequence, Text, Union
 
 from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
+from ....utils.converters import bool_to_bitrix
 from ....utils.functional import type_checker
-from ....utils.types import B24BoolStrict, JSONDict, Timeout
+from ....utils.types import B24File, JSONDict, Timeout
 from ..._base_entity import BaseEntity
 from .property import Property
 
@@ -58,13 +59,13 @@ class Item(BaseEntity):
             entity: Text,
             name: Text,
             *,
-            active: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            active: Optional[bool] = MISSING,
             date_active_from: Optional[Text] = MISSING,
             date_active_to: Optional[Text] = MISSING,
             sort: Optional[int] = MISSING,
-            preview_picture: Optional[JSONDict] = MISSING,
+            preview_picture: Sequence[Text] = MISSING,
             preview_text: Optional[Text] = MISSING,
-            detail_picture: Optional[JSONDict] = MISSING,
+            detail_picture: Sequence[Text] = MISSING,
             detail_text: Optional[Text] = MISSING,
             code: Optional[Text] = MISSING,
             section: Optional[int] = MISSING,
@@ -79,7 +80,7 @@ class Item(BaseEntity):
         }
 
         if active is not MISSING:
-            params["ACTIVE"] = B24BoolStrict(active).to_b24()
+            params["ACTIVE"] = bool_to_bitrix(active, is_required=True)
 
         if date_active_from is not MISSING:
             params["DATE_ACTIVE_FROM"] = date_active_from
@@ -91,13 +92,13 @@ class Item(BaseEntity):
             params["SORT"] = sort
 
         if preview_picture is not MISSING:
-            params["PREVIEW_PICTURE"] = preview_picture
+            params["PREVIEW_PICTURE"] = B24File(preview_picture).to_b24()
 
         if preview_text is not MISSING:
             params["PREVIEW_TEXT"] = preview_text
 
         if detail_picture is not MISSING:
-            params["DETAIL_PICTURE"] = detail_picture
+            params["DETAIL_PICTURE"] = B24File(detail_picture).to_b24()
 
         if detail_text is not MISSING:
             params["DETAIL_TEXT"] = detail_text
@@ -125,13 +126,13 @@ class Item(BaseEntity):
             property_values: JSONDict,
             *,
             name: Optional[Text] = MISSING,
-            active: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            active: Optional[bool] = MISSING,
             date_active_from: Optional[Text] = MISSING,
             date_active_to: Optional[Text] = MISSING,
             sort: Optional[int] = MISSING,
-            preview_picture: Optional[JSONDict] = MISSING,
+            preview_picture: Union[Sequence[Text], Literal[False]] = MISSING,
             preview_text: Optional[Text] = MISSING,
-            detail_picture: Optional[JSONDict] = MISSING,
+            detail_picture: Union[Sequence[Text], Literal[False]] = MISSING,
             detail_text: Optional[Text] = MISSING,
             code: Optional[Text] = MISSING,
             section: Optional[int] = MISSING,
@@ -149,7 +150,7 @@ class Item(BaseEntity):
             params["NAME"] = name
 
         if active is not MISSING:
-            params["ACTIVE"] = B24BoolStrict(active).to_b24()
+            params["ACTIVE"] = bool_to_bitrix(active, is_required=True)
 
         if date_active_from is not MISSING:
             params["DATE_ACTIVE_FROM"] = date_active_from
@@ -161,13 +162,17 @@ class Item(BaseEntity):
             params["SORT"] = sort
 
         if preview_picture is not MISSING:
-            params["PREVIEW_PICTURE"] = preview_picture
+            params["PREVIEW_PICTURE"] = (
+                False if preview_picture is False else B24File(preview_picture).to_b24()
+            )
 
         if preview_text is not MISSING:
             params["PREVIEW_TEXT"] = preview_text
 
         if detail_picture is not MISSING:
-            params["DETAIL_PICTURE"] = detail_picture
+            params["DETAIL_PICTURE"] = (
+                False if detail_picture is False else B24File(detail_picture).to_b24()
+            )
 
         if detail_text is not MISSING:
             params["DETAIL_TEXT"] = detail_text

@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Propertygroup(BaseEntity):
-    """"""
+    """Mehtods for working in property groups in the online store.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sale/property-group/index.html
+    """
 
     @type_checker
     def add(
@@ -21,7 +24,20 @@ class Propertygroup(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Create property group
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/property-group/sale-property-group-add.html
+
+        The method creates a property group.
+
+        Args:
+            fields: Field values for creating a property group;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "fields": fields,
@@ -40,7 +56,20 @@ class Propertygroup(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete property
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/property-group/sale-property-group-delete.html
+
+        The method deletes a property group.
+
+        Args:
+            bitrix_id: Identifier of the property group;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -59,7 +88,20 @@ class Propertygroup(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get values of all fields in a property group by ID
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/property-group/sale-property-group-get.html
+
+        The method retrieves the values of all fields in a property group.
+
+        Args:
+            bitrix_id: Identifier of the property group;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -77,7 +119,18 @@ class Propertygroup(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get available fields of property groups
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/property-group/sale-property-group-get-fields.html
+
+        The method retrieves the available fields of property groups.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get_fields,
@@ -93,7 +146,24 @@ class Propertygroup(BaseEntity):
         order: Optional[JSONDict] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of property groups
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/property-group/sale-property-group-list.html
+
+        The method retrieves a list of property groups.
+
+        Args:
+            select: An array of fields to be selected;
+
+            filter: An object for filtering the selected records;
+
+            order: An object for sorting the selected records, where the key is the field and the value is asc or desc;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -122,7 +192,22 @@ class Propertygroup(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update property group fields
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/property-group/sale-property-group-update.html
+
+        The method updates the fields of a property group.
+
+        Args:
+            bitrix_id: Identifier of the property group;
+
+            fields: An array of fields to be updated;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

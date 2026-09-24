@@ -1,5 +1,7 @@
 ## Wrapper Classes Creation Principles
 
+This guide covers wrapper structure, public signatures, request construction, result adapters, exports, and verification. Docstring content is maintained separately in `AI-SCOPES-DOC-CREATION-GUIDE.md`; do not duplicate its templates or parameter-description rules here.
+
 ### Definition: What Is a “Scope”?
 **Scope** denotes a logically coherent family of Bitrix24 REST methods that operate on the same functional area (for example, CRM, tasks, users). Scopes introduce a navigable namespace that aligns SDK objects with the REST hierarchy described in the official documentation: https://apidocs.bitrix24.com/api-reference/scopes/permissions.html. In practice, the scope corresponds to the substring preceding the first dot in an API method name—for example, the method `crm.lead.add` belongs to the `crm` scope, whereas `user.current` belongs to the `user` scope. This strict namespacing enables predictable method resolution and simplifies programmatic discovery of available operations.
 
@@ -29,9 +31,9 @@
 
 ### 2. Code Structure and Organization
 
-Each scope resides under `b24pysdk/scopes/` and is named exactly as in the Bitrix24 REST reference (https://apidocs.bitrix24.com/). The directory layout depends on whether the scope contains nested entities:
+Each public root scope resides under `b24pysdk/scopes/` and must expose the same public context name as the corresponding Bitrix24 REST scope (https://apidocs.bitrix24.com/). The internal Python module or package name may differ when the repository already has a justified naming convention or collision avoidance; for example, the public `client.ai` context is implemented by `b24pysdk/scopes/ai_admin/`. The public client chain and generated REST method name are authoritative. The directory layout depends on whether the scope contains nested entities:
 
-- Case 1: The scope exposes nested entities (for example, `socialnetwork.workgroup`).
+- Case 1: The scope exposes nested entities (for example, `socialnetwork.api.workgroup`).
   - A directory `b24pysdk/scopes/<scope_name>/` is created with the following contents:
     `b24pysdk/scopes/<scope_name>/__init__.py` — exports the public scope class inheriting from `BaseScope`.  
     `b24pysdk/scopes/<scope_name>/<entity>.py` — one file per subordinate entity, each defining exactly one `BaseEntity` subclass.
@@ -42,7 +44,7 @@ Each scope resides under `b24pysdk/scopes/` and is named exactly as in the Bitri
 
 **Important:**
 - One module must define exactly one public class.
-- The class name must be the capitalized file name (`workgroup.py` → class `Workgroup`).
+- The class name normally follows the capitalized file name (`workgroup.py` → `Workgroup`). Preserve established acronym spelling where applicable (`api.py` → `API`).
 - Private or shared infrastructure intended only for internal reuse should be placed in underscore-prefixed modules (for example, `_base_crm.py`, `_productrows.py`) within the same directory.
 - Each module must declare `__all__` to make the exported symbol explicit and to keep `Client` auto-completion deterministic.
 
@@ -70,24 +72,26 @@ Correct SDK Call: client.bizproc.workflow.template.add()
 
 Incorrect SDK Call: client.bizproc.workflow.template_add()
 
-Required Structure (Correct):
+Required Structure (current SDK layout):
 
-Scope: b24pysdk/scopes/bizproc/__init__.py
+Scope: `b24pysdk/scopes/bizproc/__init__.py`
 ```python
 class Bizproc(BaseScope):
-@cached_property
-def workflow(self) -> Workflow:
-    return Workflow(self)
+    @cached_property
+    def workflow(self) -> Workflow:
+        return Workflow(self)
 ```
-Entity: b24pysdk/scopes/bizproc/workflow.py
+
+Entity/package: `b24pysdk/scopes/bizproc/workflow/__init__.py`
 
 ```python
 class Workflow(BaseEntity):
-@cached_property
-def template(self) -> Template:
-    return Template(self)
+    @cached_property
+    def template(self) -> Template:
+        return Template(self)
 ```
-Sub-Entity: b24pysdk/scopes/bizproc/template.py
+
+Sub-entity: `b24pysdk/scopes/bizproc/workflow/template.py`
 
 ```python
 class Template(BaseEntity):
@@ -95,14 +99,11 @@ class Template(BaseEntity):
 ```
 
 **Rule for Multi-Level Nesting:**
-> If a REST method contains more than two segments (e.g., `scope.entity.subentity.*`), each segment beyond the scope must map to a dedicated package level: `b24pysdk/scopes/<scope>/<entity>/<subentity>/...`. This ensures the SDK’s call hierarchy (`client.<scope>.<entity>.<subentity>.*`) mirrors the REST endpoint structure exactly.
+> Every REST path segment beyond the root scope must map to a navigable SDK context, but it does not require a directory for every segment in all scope families. Follow the existing layout of the scope being extended.
 >
-> For example, for methods under `entity.item.property.*`, the structure must be:
-> - `b24pysdk/scopes/entity/__init__.py` → `class Entity(BaseScope)`
-> - `b24pysdk/scopes/entity/item.py` → `class Item(BaseEntity)`
-> - `b24pysdk/scopes/entity/item/property.py` → `class Property(BaseEntity)` with method `add()`
+> In the current `bizproc` implementation, `workflow` is a package because it owns the nested `template` context: `bizproc/workflow/__init__.py` contains `Workflow` and `bizproc/workflow/template.py` contains `Template`. The required invariant is still the public chain `client.bizproc.workflow.template.add()`.
 >
-> This guarantees consistent, predictable, and IDE-friendly navigation across all scopes, regardless of depth.
+> Introduce or preserve a subpackage when the existing module would conflict with a required package or when several closely related internal modules justify it. Never flatten the public API into names such as `template_add()`.
 
 ---
 
@@ -129,13 +130,13 @@ class Socialnetwork(BaseScope):
         return API(self)
 ```
 
-### 4. Example of an Object Class (inherits from BaseEntity)
+### 4. Example of an Entity Class (inherits from BaseEntity)
 
 ```python
-# b24pysdk/scopes/socialnetwork/api.py
+# b24pysdk/scopes/socialnetwork/api/__init__.py
 from functools import cached_property
 
-from .._base_entity import BaseEntity
+from ..._base_entity import BaseEntity
 from .workgroup import Workgroup
 
 __all__ = [
@@ -153,11 +154,11 @@ class API(BaseEntity):
 ```
 
 ```python
-# b24pysdk/scopes/socialnetwork/workgroup.py
-from ...api.requests import BitrixAPIRequest
-from ...utils.functional import type_checker
-from ...utils.types import JSONDict, Timeout
-from .._base_entity import BaseEntity
+# b24pysdk/scopes/socialnetwork/api/workgroup.py
+from ....api.requests import BitrixAPIRequest
+from ....utils.functional import type_checker
+from ....utils.types import JSONDict, Timeout
+from ..._base_entity import BaseEntity
 
 __all__ = [
     "Workgroup",
@@ -186,13 +187,15 @@ class Workgroup(BaseEntity):
 ### 6. How to Add Public Wrapper Methods
 
 - **Naming:** Method names in Python must mirror the Bitrix24 REST method names. When the remote endpoint uses camelCase, define the wrapper in snake_case; the framework will convert it back to camelCase. If the REST suffix is already a single lowercase token without camelCase boundaries (for example, `findbycomm`, `getexternallink`), keep the public wrapper name exactly as in REST and do not insert synthetic underscores or private alias helpers only to reconstruct the method name. Leading or trailing underscores are permissible when needed to avoid keyword collisions (for example, `_fields`, `import_`).
-- **Signature:** Parameters documented at the top level in Bitrix24 REST documentation must be expressed in snake_case. Always include `timeout: Timeout = None`. For parameters described as arrays, annotate them with `Iterable` (or a concrete subtype) and convert them to `list` internally if necessary. Example:
+- **REST-only contract:** Add wrappers only for real Bitrix24 REST methods confirmed in the current REST documentation or MCP server. Do not add browser/frontend-only helpers such as `BX24.*` methods or UI-only JavaScript actions.
+- **Signature:** Express top-level Bitrix24 parameters in `snake_case` and always include keyword-only `timeout: Timeout = None`. Required values have no default. Use `MISSING` for an omittable API parameter and test it with `is not MISSING`; use `Optional[T]` only when an explicit `None` is a valid value distinct from omission. Do not annotate `T = MISSING` as `Optional[T]` merely because it has a sentinel default.
+- **Iterable parameters:** Accept `Iterable[T]` when callers may pass tuples, generators, or other one-pass iterables. Materialize exactly once before putting the value into `params`, but preserve an existing list instead of copying it:
 
 ```python
     params: JSONDict = {}
 
-    if select is not None:
-        if select.__class__ is not list:
+    if select is not MISSING:
+        if not isinstance(select, list):
             select = list(select)
 
         params["select"] = select
@@ -201,25 +204,32 @@ class Workgroup(BaseEntity):
 - **Decorator:** Annotate every public wrapper with `@type_checker` to enforce runtime validation. When methods delegate to other wrappers, apply the decorator only at the entry point to avoid redundant validation.
 - **Result Formation:**
     - Assemble the `params` dictionary using native Python primitives (`int`, `float`, `bool`, `None`), standard typing hints (`Optional`, `Text`, `Iterable`), and SDK-specific helper types from `b24pysdk/utils/types` (`Timeout`, `JSONDict`, etc.) when special formatting is required. All SDK-specific helper types described in chapter 7.
-    - Do not use deprecated `B24Bool` or `B24BoolStrict` in new wrapper signatures or parameter conversion logic. Boolean REST values must be converted with `bool_to_bitrix` from `b24pysdk/utils/converters.py`.
+    - Declare request payloads as `params: JSONDict = {...}` or `params: JSONDict = {}`. Do not use unannotated `params = {...}` in new wrappers.
+    - Annotate public boolean parameters with native `bool` or `Optional[bool]` and convert outgoing values with `bool_to_bitrix` from `b24pysdk.utils.converters`. Select the representation required by the endpoint with `serialize_as`.
     - Invoke `self._make_bitrix_api_request(...)`, providing:
       - `api_wrapper` — the current Python method, enabling `_get_api_method` to compute the REST method name.
       - `params` — omit when the endpoint accepts no payload.
       - `timeout` — propagate the caller-supplied timeout.
-      - `bitrix_api_request_type` and `result_adapter` — only when the method has a defined schema adapter in `b24pysdk.schemas`.
-    - Return the resulting `BitrixAPIRequest` instance; do not perform immediate network I/O inside the wrapper.
-    - Keep `.result` as the raw Bitrix24 response shape. Use `.value` or `.values` only for methods whose result is intentionally adapted to Python-friendly schema objects.
+      - `bitrix_api_request_type` and `result_adapter` — whenever the public result is adapted to one value, several values, schemas, or SDK objects.
+    - Return the resulting lazy request object; do not perform immediate network I/O inside the wrapper.
+    - Keep `_make_bitrix_api_request(...)` calls multi-line even when only `api_wrapper` and `timeout` are passed.
+    - Parameterize return annotations with both raw and adapted types. Use `BitrixAPIRequest[RawT]` for an unadapted response, `BitrixAPIValueRequest[RawT, ValueT]` for one adapted value, and `BitrixAPIValuesRequest[RawT, ItemT]` for an adapted collection.
+    - Prefer the endpoint's exact raw result type. Use the broad `B24APIResult` union only when the endpoint can genuinely return several unrelated JSON result shapes, not as a default annotation.
+    - Keep `.result` as the raw Bitrix24 response shape. Adapted requests expose `.value` or `.values`; a values request also provides `.as_list()` and `.as_list_fast()` where supported by the request layer.
+    - Choose the adapter by the public contract, not merely by response shape: use result/schema adapters for scalar or schema conversion and `BitrixObjectAdapter` / `BitrixObjectsAdapter` for object results. The object adapter key must exactly match the target object's `OBJECT_KEY`, and that object module must be imported during normal SDK initialization so the registry can resolve it.
+    - When a method returns one value from a known enumeration, keep the raw serialized domain as the first generic parameter and expose the enum as the adapted value: `BitrixAPIValueRequest[SomeLiteral, SomeEnum]` with `BitrixResultAdapter(SomeEnum)`. Import both the named `Literal` alias and the enum class because the enum is required at runtime by the adapter. Do not annotate such a method as `BitrixAPIRequest[SomeEnum]`: the raw `.result` remains a string, while `.value` contains the enum member.
 
 **Example:**
 ```python
-# b24pysdk/scopes/socialnetwork/workgroup.py
-from typing import Iterable, Optional, Text
+# b24pysdk/scopes/socialnetwork/api/workgroup.py
+from typing import Iterable, Text
 
-from ...api.requests import BitrixAPIRequest
-from ...utils.converters import bool_to_bitrix
-from ...utils.functional import type_checker
-from ...utils.types import JSONDict, Timeout
-from .._base_entity import BaseEntity
+from ...._constants import MISSING
+from ....api.requests import BitrixAPIRequest
+from ....utils.converters import bool_to_bitrix
+from ....utils.functional import type_checker
+from ....utils.types import JSONDict, JSONList, Timeout
+from ..._base_entity import BaseEntity
 
 __all__ = [
     "Workgroup",
@@ -235,16 +245,16 @@ class Workgroup(BaseEntity):
             params: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """"""
 
-        params: JSONDict = {
+        _params: JSONDict = {
             "params": params,
         }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
-            params=params,
+            params=_params,
             timeout=timeout,
         )
 
@@ -252,25 +262,25 @@ class Workgroup(BaseEntity):
     def list(
             self,
             *,
-            filter: Optional[JSONDict] = None,
-            select: Optional[Iterable[Text]] = None,
-            is_admin: Optional[bool] = None,
+            filter: JSONDict = MISSING,
+            select: Iterable[Text] = MISSING,
+            is_admin: bool = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONList]:
         """"""
 
         params: JSONDict = {}
 
-        if filter is not None:
+        if filter is not MISSING:
             params["filter"] = filter
 
-        if select is not None:
-            if select.__class__ is not list:
+        if select is not MISSING:
+            if not isinstance(select, list):
                 select = list(select)
 
             params["select"] = select
 
-        if is_admin is not None:
+        if is_admin is not MISSING:
             params["IS_ADMIN"] = bool_to_bitrix(is_admin, is_required=True)
 
         return self._make_bitrix_api_request(
@@ -280,52 +290,116 @@ class Workgroup(BaseEntity):
         )
 ```
 
+For a method adapted to SDK objects, declare the values request and object adapter explicitly:
+
+```python
+@type_checker
+def get(
+        self,
+        *,
+        timeout: Timeout = None,
+) -> BitrixAPIValuesRequest[JSONList, PlacementObject]:
+    """"""
+    return self._make_bitrix_api_request(
+        api_wrapper=self.get,
+        timeout=timeout,
+        bitrix_api_request_type=BitrixAPIValuesRequest,
+        result_adapter=BitrixObjectsAdapter("placement", client=self._client),
+    )
+```
+
+Here `"placement"` must equal `PlacementObject.OBJECT_KEY`. Do not replace an object result with a plain schema merely to avoid registering or importing the object class.
+
+For one enumerated result, declare the raw literal and adapted enum separately:
+
+```python
+from .....api.requests import BitrixAPIValueRequest
+from .....constants.list import ListIBlockType, ListIBlockTypeLiteral
+from ...._adapters import BitrixResultAdapter
+
+
+@type_checker
+def id(
+        self,
+        *,
+        iblock_id: int = MISSING,
+        iblock_code: Text = MISSING,
+        timeout: Timeout = None,
+) -> BitrixAPIValueRequest[ListIBlockTypeLiteral, ListIBlockType]:
+    """"""
+
+    params: JSONDict = {}
+
+    if iblock_id is MISSING and iblock_code is MISSING:
+        raise ValueError("Either 'iblock_id' or 'iblock_code' must be provided.")
+
+    if iblock_id is not MISSING:
+        params["IBLOCK_ID"] = iblock_id
+
+    if iblock_code is not MISSING:
+        params["IBLOCK_CODE"] = iblock_code
+
+    return self._make_bitrix_api_request(
+        api_wrapper=self.id,
+        params=params,
+        timeout=timeout,
+        bitrix_api_request_type=BitrixAPIValueRequest,
+        result_adapter=BitrixResultAdapter(ListIBlockType),
+    )
+```
+
+In this contract, `request.result` is a `ListIBlockTypeLiteral` string returned by Bitrix24, and `request.value` is the corresponding `ListIBlockType` member.
+
 ---
 
 ### 7. SDK-Specific Helper Types
 
-The SDK provides a set of helper types in the `b24pysdk/utils/types` module. These types should be used in parameter annotations instead of basic Python types when special data processing for Bitrix24 is required.
+The SDK provides helper types in `b24pysdk.utils.types` and domain-specific named literals/enums under `b24pysdk.constants`. Reuse the existing type from its actual module instead of redefining the same serialized domain locally.
 
 #### Basic Type Aliases
 
-- **`JSONDict`** — Dictionary with string keys for representing JSON structures  
-- **`JSONList`** — List of `JSONDict` items for object arrays  
-- **`JSONDictGenerator`** — Generator yielding `JSONDict` items  
-- **`Key`** — Dictionary key (either `int` or `str`)  
-- **`Number`** — Numeric value (`float` or `int`)  
-- **`Timeout`** — Optional request timeout (single number or `(connect, read)` tuple)  
-- **`DefaultTimeout`** — Default timeout specification  
+The following aliases live in `b24pysdk.utils.types`:
 
-#### Bitrix24-Specific Types
+- **`JSONDict`** — Dictionary with string keys for representing one JSON object.  
+- **`JSONList`** — `List[JSONDict]`. Use it only when the endpoint returns or accepts a list whose items are JSON objects; use an endpoint-specific `List[T]` for scalar item lists such as `List[int]` or `List[Text]`.  
+- **`JSONGenerator`** — Generator yielding `JSONDict` items.  
+- **`Key`** — Dictionary key (either `int` or `str`).  
+- **`Number`** — Numeric value (`float` or `int`).  
+- **`Timeout`** — Optional request timeout (single number or `(connect, read)` tuple).  
+- **`DefaultTimeout`** — Default timeout specification.  
+- **`B24RequestTuple`** — Tuple `(api_method, params)` for one batch request.  
+- **`B24Requests`** — Collection of batch requests (`Mapping` or `Sequence` of `B24RequestTuple`).  
 
-- **`B24APIResult`** — API call result type (`JSONDict`, `JSONList`, `bool`, or `None`)  
-- **`B24AppStatusLiteral`** — Literal strings for Bitrix24 application statuses: `"F"` (Free), `"D"` (Demo), `"T"` (Trial), `"P"` (Paid), `"L"` (Local), `"S"` (Subscription)  
-- **`B24BatchMethodTuple`** — Tuple `(api_method, params)` for batch requests  
-- **`B24BatchMethods`** — Collection of batch methods (`Mapping` or `Sequence` of tuples)  
-- **`UserTypeIDLiteral`** — Literal strings for CRM user field types: `"string"`, `"integer"`, `"double"`, `"date"`, `"datetime"`, `"boolean"`, `"file"`, `"enumeration"`, `"url"`, `"address"`, `"money"`, `"iblock_section"`, `"iblock_element"`, `"employee"`, `"crm"`, `"crm_status"`  
+#### Bitrix24-Specific Types and Constants
+
+- **`B24APIResult`** — Broad union from `b24pysdk.utils.types` used by the generic response layer for supported raw Bitrix24 result shapes. Prefer an endpoint-specific result type in wrapper annotations.  
+- **`B24AppStatusLiteral`** — Application-status literal from `b24pysdk.utils.types`; reuse the existing alias instead of redefining the values in a scope.  
+- **`UserTypeIDLiteral`** — CRM user-field type literal from `b24pysdk.constants.userfield`, not `b24pysdk.utils.types`. Import it from the constants package/module when required.  
 
 #### Boolean Conversion Helpers
 
-`B24Bool` and `B24BoolStrict` are deprecated. Do not use them in new scope wrappers.
+Use helpers from `b24pysdk.utils.converters`:
 
-Use helpers from `b24pysdk/utils/converters.py` instead:
-
-- `bool_to_bitrix(value, is_required=True)` converts Python `bool` to strict Bitrix24 `"Y"` / `"N"`.
-- `bool_to_bitrix(value, is_required=False)` also allows `None` and converts it to `"D"`.
+- `bool_to_bitrix(value, is_required=True)` converts a required Python `bool` to Bitrix24 `"Y"` / `"N"` by default.
+- `bool_to_bitrix(value, is_required=False)` accepts `None`; with the default string representation, `None` becomes `"D"`.
+- `serialize_as=int` produces `1` / `0`, while an optional `None` remains `None`.
+- `serialize_as=bool` preserves native `True` / `False`, while an optional `None` remains `None`; use this for API v3 methods that expect JSON booleans.
 - `bool_from_bitrix(value, is_required=True|False)` converts Bitrix24 boolean literals back to Python values for schemas and response adapters.
 
-For request parameters documented as `Y` / `N`, annotate the wrapper argument as `bool` or `Optional[bool]`, then convert it before adding to `params`:
+For request parameters documented as `Y` / `N`, annotate the wrapper argument as `bool`. Use `bool = MISSING` when the parameter may be omitted; use `Optional[bool]` only if the API also accepts an explicit null-like value. Never pass `MISSING` to the converter. After checking the sentinel, convert the value before adding it to `params`, as in `crm.item`:
 
 ```python
-if is_admin is not None:
-    params["IS_ADMIN"] = bool_to_bitrix(is_admin, is_required=True)
+if use_original_uf_names is not MISSING:
+    params["useOriginalUfNames"] = bool_to_bitrix(use_original_uf_names, is_required=True)
 ```
+
+Set `is_required=True` when the wrapper accepts only a real boolean whenever the parameter is present. Use `is_required=False` only when explicit `None` is part of the endpoint contract. Do not replace omission with `None`: an omitted parameter must remain absent from `params`.
 
 ##### **`DocumentType`** — Immutable Document Type Tuple
 Represents a Bitrix24 document type as a 3-element tuple.
 
 **Structure:** `(module: str, document: str, entity: str)`  
-**Validation:** Ensures exactly 3 string elements  
+**Validation:** The current runtime implementation validates that the value is a `Sequence` with exactly 3 elements. The annotation is `Sequence[Text]`, but `_validate()` does not currently inspect each element's runtime type.  
 **Methods:** `to_b24() -> List[str]` for API serialization  
 **Typing:** For parameters that will be validated using this class, specify the type as `Sequence[Text]`
 
@@ -333,16 +407,16 @@ Represents a Bitrix24 document type as a 3-element tuple.
 Represents a file for upload as a 2-element tuple.
 
 **Structure:** `(filename: str, base64_content: str)`  
-**Validation:** Ensures exactly 2 string elements  
+**Validation:** The current runtime implementation validates that the value is a `Sequence` with exactly 2 elements. The annotation is `Sequence[Text]`, but `_validate()` does not currently inspect each element's runtime type.  
 **Methods:** `to_b24() -> List[str]` for API serialization  
 **Typing:** For parameters that will be validated using this class, specify the type as `Sequence[Text]`
 
 ##### When using validation classes, convert parameters to the required value using `to_b24()`. Example:
 
 ```python
-document_type: Optional[Sequence[Text]] = None,
+document_type: Sequence[Text] = MISSING,
 
-if document_type is not None:
+if document_type is not MISSING:
     params["DOCUMENT_TYPE"] = DocumentType(document_type).to_b24()
 ```
 
@@ -352,19 +426,24 @@ if document_type is not None:
   - List function parameters one per line.
   - Declare `__all__` explicitly with the exported class.
   - Do not use `dict()` for parameter collections. Initialize dictionaries with `{}`.
-  - Limit type annotations to constructs described in Section 6.
-  - Use `bitrix_id` instead of `id` in your values for params
-  - Leave class and method docstrings empty.
-  - Methods within a class must be ordered alphabetically
+  - During the wrapper-generation phase, keep placeholder docstrings empty when documentation is a separate task. Final docstrings must follow `AI-SCOPES-DOC-CREATION-GUIDE.md`.
+  - Use precise generic request annotations and the signature rules from Section 6.
+  - Use `bitrix_id` instead of shadowing the built-in `id` in public Python signatures; map it to the exact API key inside `params`.
+  - Order public methods alphabetically, while keeping navigation properties and special methods in their established structural positions.
 
-- 2\. Handle boolean parameters expected as `Y`/`N` by:
+- 2\. Handle boolean parameters through `bool_to_bitrix`:
   - Annotating the parameter as `bool`.
-  - Converting the value with `bool_to_bitrix(<bool_value>, is_required=True)` before transmission.
-  - Never use deprecated `B24Bool` or `B24BoolStrict` in new code.
+  - Checking `MISSING` before conversion when the parameter is omittable.
+  - Selecting `serialize_as=str`, `int`, or `bool` from the exact REST contract; the default is `str`.
+  - Passing `is_required=True` unless explicit `None` is a valid API value.
   
-- 3\. List all mandatory parameters before the `*` separator; place optional keyword-only parameters afterwards and retrieve them with `dict.get("<param_name>")` rather than direct indexing.
+- 3\. Put required positional parameters before `*` and optional keyword-only parameters after it unless compatibility with an established public signature requires otherwise. Use `MISSING` to distinguish omission from an explicit `None`. Build `params` explicitly with `is not MISSING`; do not use `dict.get()` as a substitute for modelling omission correctly.
   
-- 4\. After implementing a new scope, expose it via `b24pysdk/_client.py` so that consumers can access it through the fluent client interface.
+- 4\. After implementing a new root scope, wire it into the SDK's lazy scope exports and client interface:
+  - add the type-only import, `__all__` entry, and `_SCOPE_MODULES` entry in `b24pysdk/scopes/__init__.py`;
+  - add the corresponding `@cached_property` in `b24pysdk/client.py` on the client version(s) that support the scope;
+  - for an API v3 root scope, update `b24pysdk/scopes/_v3/__init__.py` and the corresponding v3 client property instead of placing it in the v1/v2 root registry.
+  Preserve the existing lazy-import pattern; do not eagerly import every scope merely to expose the new context.
 
 - 5\. If a scope method also serves as a scope for other methods, such as crm.automation.trigger, which can also invoke crm.automation.trigger.*, the __call__ method should be defined:
 ```python
@@ -376,16 +455,16 @@ class Trigger(BaseCRM):
             self,
             *,
             target: Text,
-            code: Optional[Text] = None,
+            code: Text = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params: JSONDict = {
             "target": target,
         }
 
-        if code is not None:
+        if code is not MISSING:
             params["code"] = code
 
         return self._make_bitrix_api_request(
@@ -405,7 +484,7 @@ class Userfield(BaseCRM):
             fields: JSONDict,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[int]:
         """"""
         return self._add(fields, timeout=timeout)
 
@@ -415,7 +494,7 @@ class Userfield(BaseCRM):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONDict]:
         """"""
         return self._get(bitrix_id, timeout=timeout)
 
@@ -423,10 +502,10 @@ class Userfield(BaseCRM):
     def list(
             self,
             *,
-            filter: Optional[JSONDict] = None,
-            order: Optional[JSONDict] = None,
+            filter: JSONDict = MISSING,
+            order: JSONDict = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[JSONList]:
         """"""
         return self._list(
             filter=filter,
@@ -440,9 +519,9 @@ class Userfield(BaseCRM):
             bitrix_id: int,
             fields: JSONDict,
             *,
-            list: Optional[JSONList] = None,
+            list: JSONList = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
 
         params: JSONDict = {
@@ -450,7 +529,7 @@ class Userfield(BaseCRM):
             "fields": fields,
         }
 
-        if list is not None:
+        if list is not MISSING:
             params["LIST"] = list
 
         return self._make_bitrix_api_request(
@@ -465,13 +544,11 @@ class Userfield(BaseCRM):
             bitrix_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIRequest[bool]:
         """"""
         return self._delete(bitrix_id, timeout=timeout)
 ```
-- 7\. For parameters that accept a predefined, finite set of known string literal values, use the typing.Annotated and typing.Literal combination:
-    - Annotate the parameter as Annotated[<base_type>, Literal["value1", "value2", ...]] (e.g., Annotated[Text, Literal["ASC", "DESC"]]).
-    - 
+- 7\. For parameters that accept a predefined finite set, use only `Annotated` with the project's corresponding `Literal` alias, for example `Annotated[Text, EventTypeLiteral]`. Do not use `Union[Annotated[Text, SomeLiteral], SomeEnum]`: members of `StrEnum` are already strings covered by the literal value domain. Reuse an existing constant alias instead of repeating values inline. Before adding a new type, search existing constants for the same serialized value domain and reuse the shared type when the values and meaning coincide. Add genuinely new enumerations and named `Literal` aliases to the appropriate module under `b24pysdk.constants`, export them there, and import only the literal alias into a scope wrapper unless the enum class is separately required at runtime, for example by `BitrixResultAdapter`. Group-related constants shared by `sonet_group` and `socialnetwork.api.workgroup` belong in `b24pysdk.constants.group` and use the `Group` prefix. For the permission codes `A`, `E`, and `K`, annotate wrapper parameters as `Annotated[Text, GroupPermissionRoleLiteral]`; reserve `GroupPermissionRole` for enum conversion such as `EnumField` or `BitrixResultAdapter`. Do not add a separate participant-role enum until an implemented public API requires distinct role semantics.
 - 8\. When type annotations require classes or types that are only used for static analysis or could cause circular imports or runtime overhead if imported normally, place those imports inside an if TYPE_CHECKING: block.
 
 - 9\. Observe recurring implementation patterns found across existing scopes:
@@ -479,5 +556,21 @@ class Userfield(BaseCRM):
   - Group shared logic inside underscore-prefixed helper modules (for example, `_base_crm.py`, `_relationships/`, `_images/`) and reuse these abstractions instead of duplicating code across entities.
   - Respect the pervasive use of `__slots__` in base classes to minimise memory overhead; avoid adding dynamic attributes outside the declared slots.
   - Map Python arguments to the exact Bitrix24 parameter names (often uppercase) within `params`, mirroring the style already used in `scopes/access.py`, `scopes/crm/*`, and other modules.
-  - Ensure every module maintains a clear import structure: local imports first, followed by SDK utilities (`BitrixAPIRequest`, `type_checker`, helper types) to preserve readability.
+  - Keep imports grouped in the project order: standard-library imports, parent SDK modules (`api`, `constants`, `objects`, `schemas`, `utils`), base scope/entity modules, and finally local sibling modules.
 
+---
+
+### 9. Required Verification
+
+Before considering a new or changed wrapper complete:
+
+- Verify the generated REST method name for every public method, including snake_case-to-camelCase conversion, keyword-safe names, and `__call__` contexts.
+- Verify exact request parameter keys, nesting, casing, boolean conversion, and omission. Test that `MISSING` parameters are absent and that explicit `None` is transmitted only when the endpoint supports it.
+- Test required parameters, each optional parameter independently, and representative combinations. For iterable inputs, test a list, tuple, generator, and empty iterable; ensure a generator is consumed once and an existing list is not copied unnecessarily.
+- Verify the return annotation, request class, and adapter together. Confirm `.result` retains the raw response while `.value` or `.values` exposes the declared adapted type.
+- For an enumerated scalar result, verify that the first generic parameter is the raw named `Literal`, the second is the enum class, `BitrixResultAdapter` receives that enum class, `.result` remains the serialized string, and `.value` is the corresponding enum member.
+- For object adapters, verify the `OBJECT_KEY`, import-time registration, complete/partial response handling, and client propagation into created objects.
+- Verify nested contexts are cached and resolve to the exact public chain without flattened helper names.
+- Export a new root scope through the lazy registry in `b24pysdk/scopes/__init__.py` (or `b24pysdk/scopes/_v3/__init__.py` for v3) and add the matching `@cached_property` in `b24pysdk/client.py`; then check imports and IDE completion.
+- Run the project's formatter/linter, type checker, compilation checks, and focused wrapper tests without performing network I/O during request construction.
+- Handle final class and method documentation as a separate pass using `AI-SCOPES-DOC-CREATION-GUIDE.md`.

@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Blocks(BaseCRM):
-    """"""
+    """Class for managing additional content blocks for the timeline.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/layout-blocks/index.html
+    """
 
     @type_checker
     def get(
@@ -22,7 +25,24 @@ class Blocks(BaseCRM):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """"""
+        """Retrieve a set of additional content blocks for the timeline record
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/layout-blocks/crm-timeline-layout-blocks-get.html
+
+        The method retrieves a set of additional content blocks for a timeline record.
+
+        Args:
+            entity_type_id: Identifier of the CRM object type associated with the timeline record;
+
+            entity_id: Identifier of the CRM object associated with the timeline record;
+
+            timeline_id: Identifier of the timeline record;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIValuesRequest
+        """
 
         params: JSONDict = {
             "entityTypeId": entity_type_id,
@@ -46,7 +66,26 @@ class Blocks(BaseCRM):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Set a set of additional content blocks in the CRM timeline record
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/layout-blocks/crm-timeline-layout-blocks-set.html
+
+        The method sets a set of additional content blocks for a timeline record.
+
+        Args:
+            entity_type_id: Identifier of the CRM object to which the timeline record is linked;
+
+            entity_id: Identifier of the CRM object to which the timeline record is linked;
+
+            timeline_id: Identifier of the timeline record;
+
+            layout: Object describing the set of additional content blocks;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIValuesRequest
+        """
 
         params: JSONDict = {
             "entityTypeId": entity_type_id,
@@ -70,7 +109,24 @@ class Blocks(BaseCRM):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[Optional[bool]]:
-        """"""
+        """Delete a set of additional content blocks for the timeline record
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/layout-blocks/crm-timeline-layout-blocks-delete.html
+
+        The method removes a set of additional content blocks for a timeline record.
+
+        Args:
+            entity_type_id: Identifier of the CRM object to which the timeline record is linked;
+
+            entity_id: Identifier of the CRM object to which the timeline record is linked;
+
+            timeline_id: Identifier of the timeline record;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIValuesRequest
+        """
 
         params: JSONDict = {
             "entityTypeId": entity_type_id,

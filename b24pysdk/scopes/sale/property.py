@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Property(BaseEntity):
-    """"""
+    """A set of methods for working with order properties on online store.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sale/property/index.html
+    """
 
     @type_checker
     def add(
@@ -21,7 +24,20 @@ class Property(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add order property
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/property/sale-property-add.html
+
+        The method adds an order property.
+
+        Args:
+            fields: Field values for creating an order property;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "fields": fields,
@@ -40,7 +56,20 @@ class Property(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete order property
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/property/sale-property-delete.html
+
+        The method deletes an order property.
+
+        Args:
+            bitrix_id: Identifier of the order property;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -59,7 +88,20 @@ class Property(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get order property
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/property/sale-property-get.html
+
+        The method retrieves the order property.
+
+        Args:
+            bitrix_id: Identifier of the order property;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -78,7 +120,20 @@ class Property(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get fields and settings for a specific type
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/property/sale-property-get-fields-by-type.html
+
+        The method retrieves the available fields of order properties by property type.
+
+        Args:
+            type: Order property type;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "type": type,
@@ -100,7 +155,26 @@ class Property(BaseEntity):
         start: Optional[int] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the list of order properties
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/property/sale-property-list.html
+
+        The method retrieves a list of order properties.
+
+        Args:
+            select: An array of fields to be selected;
+
+            filter: An object for filtering the selected records;
+
+            order: An object for sorting the selected records, where the key is the field and the value is asc or desc;
+
+            start: This parameter is used to manage pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -132,7 +206,22 @@ class Property(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update order property
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/property/sale-property-update.html
+
+        The method updates the order property.
+
+        Args:
+            bitrix_id: Identifier of the order property;
+
+            fields: Field values for creating the order property;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

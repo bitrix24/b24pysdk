@@ -1,9 +1,12 @@
-from typing import Iterable, Optional, Text
+from typing import Iterable, Text
 
 from ..._constants import MISSING
-from ...api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIRequest, BitrixAPIValuesRequest
+from ...objects.event.offline import OfflineEvent as OfflineEventObject
+from ...schemas.event import EventOfflineGetData
 from ...utils.functional import type_checker
-from ...utils.types import JSONDict, Timeout
+from ...utils.types import JSONDict, JSONList, Timeout
+from .._adapters import BitrixObjectsAdapter
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -21,20 +24,21 @@ class Offline(BaseEntity):
     def get(
             self,
             *,
-            filter: Optional[JSONDict] = MISSING,
-            order: Optional[JSONDict] = MISSING,
-            limit: Optional[int] = MISSING,
-            clear: Optional[bool] = MISSING,
-            process_id: Optional[Text] = MISSING,
-            auth_connector: Optional[Text] = MISSING,
-            error: Optional[bool] = MISSING,
+            filter: JSONDict = MISSING,
+            order: JSONDict = MISSING,
+            limit: int = MISSING,
+            clear: bool = MISSING,
+            process_id: Text = MISSING,
+            auth_connector: Text = MISSING,
+            error: bool = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValuesRequest[EventOfflineGetData, OfflineEventObject]:
         """Retrieve a list of offline events with cleanup
 
         Documentation: https://apidocs.bitrix24.com/api-reference/events/event-offline-get.html
 
-        The method returns the first offline events in the queue to the application according to the filter settings.
+        The method returns the first offline events in the queue to the
+        application according to the filter settings.
 
         Args:
             filter: Record filter;
@@ -53,8 +57,9 @@ class Offline(BaseEntity):
 
             timeout: Timeout in seconds.
 
-        Return:
-            Instance of BitrixAPIRequest
+        Returns:
+            Request whose ``result`` retains the package and whose ``values``
+            contains the adapted offline events.
         """
 
         params: JSONDict = {}
@@ -84,18 +89,24 @@ class Offline(BaseEntity):
             api_wrapper=self.get,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValuesRequest,
+            result_adapter=BitrixObjectsAdapter(
+                "event.offline",
+                client=self._client,
+                wrapper="events",
+            ),
         )
 
     @type_checker
     def list(
             self,
             *,
-            filter: Optional[JSONDict] = MISSING,
-            order: Optional[JSONDict] = MISSING,
-            start: Optional[int] = MISSING,
-            auth_connector: Optional[Text] = MISSING,
+            filter: JSONDict = MISSING,
+            order: JSONDict = MISSING,
+            start: int = MISSING,
+            auth_connector: Text = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValuesRequest[JSONList, OfflineEventObject]:
         """Get a list of offline events
 
         Documentation: https://apidocs.bitrix24.com/api-reference/events/event-offline-list.html
@@ -111,8 +122,8 @@ class Offline(BaseEntity):
 
             timeout: Timeout in seconds.
 
-        Return:
-            Instance of BitrixAPIRequest
+        Returns:
+            Request with adapted ``OfflineEvent`` objects in ``values``.
         """
 
         params: JSONDict = {}
@@ -133,6 +144,8 @@ class Offline(BaseEntity):
             api_wrapper=self.list,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValuesRequest,
+            result_adapter=BitrixObjectsAdapter("event.offline", client=self._client),
         )
 
     @type_checker
@@ -140,8 +153,8 @@ class Offline(BaseEntity):
             self,
             process_id: Text,
             *,
-            bitrix_id: Optional[Iterable[int]] = MISSING,
-            message_id: Optional[Iterable[int]] = MISSING,
+            bitrix_id: Iterable[int] = MISSING,
+            message_id: Iterable[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Clear offline event queue
@@ -190,19 +203,21 @@ class Offline(BaseEntity):
             self,
             process_id: Text,
             *,
-            message_id: Optional[Iterable[int]] = MISSING,
+            message_id: Iterable[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Register offline event queue processing errors
 
         Documentation: https://apidocs.bitrix24.com/api-reference/events/event-offline-error.html
 
-        The method retains a database records marked with an error when using offline events.
+        The method retains database records marked with an error when using
+        offline events.
 
         Args:
             process_id: Identifier of the process that is handling the records;
 
-            message_id: Array of values for the message field of the records to be marked as erroneous;
+            message_id: Array of message field values for the records to be
+                marked as erroneous;
 
             timeout: Timeout in seconds.
 

@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Consent(BaseEntity):
-    """"""
+    """Class for managing user consents.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/user-consent/index.html
+    """
 
     @type_checker
     def add(
@@ -26,7 +29,30 @@ class Consent(BaseEntity):
             originator_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Save the user consent
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/user-consent/user-consent-consent-add.html
+
+        The method saves the user's consent.
+
+        Args:
+            agreement_id: Agreement identifier;
+
+            ip: User's IP address;
+
+            user_id: User identifier;
+
+            url: URL of the page where consent was obtained;
+
+            origin_id: Identifier of the source;
+
+            originator_id: Identifier of the element in the source;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "AGREEMENT_ID": agreement_id,
@@ -37,13 +63,13 @@ class Consent(BaseEntity):
             params["USER_ID"] = user_id
 
         if url is not MISSING:
-            params["url"] = url
+            params["URL"] = url
 
         if origin_id is not MISSING:
-            params["origin_id"] = origin_id
+            params["ORIGIN_ID"] = origin_id
 
         if originator_id is not MISSING:
-            params["originator_id"] = originator_id
+            params["ORIGINATOR_ID"] = originator_id
 
         return self._make_bitrix_api_request(
             api_wrapper=self.add,

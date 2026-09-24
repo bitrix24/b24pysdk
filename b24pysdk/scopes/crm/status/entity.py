@@ -13,7 +13,10 @@ __all__ = [
 
 
 class Entity(BaseCRM):
-    """"""
+    """Class for retrieving information about reference guides.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/crm/status/index.html
+    """
 
     @type_checker
     def items(

@@ -6,6 +6,7 @@ from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest
 from ...schemas.crm.field import CRMFieldsData, CRMFieldsDict
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
+from ._links import Contact
 from ._productrows import Productrows
 from ._userfield import Userfield
 from .item.base_item import BaseItem
@@ -20,6 +21,11 @@ class Quote(BaseItem):
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/quote/index.html
     """
+
+    @cached_property
+    def contact(self) -> Contact:
+        """"""
+        return Contact(self)
 
     @cached_property
     def productrows(self) -> Productrows:

@@ -1,10 +1,11 @@
 from functools import cached_property
-from typing import Iterable, Optional, Text, Union
+from typing import Iterable, Optional, Text
 
 from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
+from ....utils.converters import bool_to_bitrix
 from ....utils.functional import type_checker
-from ....utils.types import B24BoolStrict, JSONDict, JSONList, Timeout
+from ....utils.types import JSONDict, JSONList, Timeout
 from ..._base_entity import BaseEntity
 from .config import Config
 from .extra import Extra
@@ -48,9 +49,9 @@ class Delivery(BaseEntity):
         *,
         description: Optional[Text] = MISSING,
         sort: Optional[int] = MISSING,
-        active: Optional[Union[bool, B24BoolStrict]] = MISSING,
+        active: Optional[bool] = MISSING,
         config: Optional[JSONList] = MISSING,
-        logotype: Optional[Text] = MISSING,
+        logotype: Text = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -68,7 +69,7 @@ class Delivery(BaseEntity):
             params["SORT"] = sort
 
         if active is not MISSING:
-            params["ACTIVE"] = B24BoolStrict(active).to_b24()
+            params["ACTIVE"] = bool_to_bitrix(active, is_required=True)
 
         if config is not MISSING:
             params["CONFIG"] = config
@@ -91,8 +92,8 @@ class Delivery(BaseEntity):
         currency: Optional[Text] = MISSING,
         description: Optional[Text] = MISSING,
         sort: Optional[int] = MISSING,
-        active: Optional[Union[bool, B24BoolStrict]] = MISSING,
-        logotype: Optional[Text] = MISSING,
+        active: Optional[bool] = MISSING,
+        logotype: Text = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -112,7 +113,7 @@ class Delivery(BaseEntity):
             fields["SORT"] = sort
 
         if active is not MISSING:
-            fields["ACTIVE"] = B24BoolStrict(active).to_b24()
+            fields["ACTIVE"] = bool_to_bitrix(active, is_required=True)
 
         if logotype is not MISSING:
             fields["LOGOTYPE"] = logotype

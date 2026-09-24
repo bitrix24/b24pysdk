@@ -664,7 +664,7 @@ class Landing(BaseEntity):
         )
 
     @type_checker
-    def mark_deleted_block(
+    def markdeletedblock(
             self,
             lid: int,
             block: int,
@@ -712,7 +712,7 @@ class Landing(BaseEntity):
             params["preventHistory"] = bool_to_bitrix(prevent_history, is_required=True)
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.mark_deleted_block,
+            api_wrapper=self.markdeletedblock,
             params=params,
             timeout=timeout,
         )
@@ -750,7 +750,7 @@ class Landing(BaseEntity):
         )
 
     @type_checker
-    def mark_undeleted_block(
+    def markundeletedblock(
             self,
             lid: int,
             block: int,
@@ -786,7 +786,7 @@ class Landing(BaseEntity):
             params["scope"] = scope
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.mark_undeleted_block,
+            api_wrapper=self.markundeletedblock,
             params=params,
             timeout=timeout,
         )

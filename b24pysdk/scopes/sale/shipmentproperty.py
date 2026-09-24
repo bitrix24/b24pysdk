@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Shipmentproperty(BaseEntity):
-    """"""
+    """Class for working with shipping properties in the online store.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sale/shipment-property/index.html
+    """
 
     @type_checker
     def add(
@@ -21,7 +24,20 @@ class Shipmentproperty(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add shipment property
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/shipment-property/sale-shipment-property-add.html
+
+        The method adds a shipment property.
+
+        Args:
+            fields: Field values for creating a shipment property;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "fields": fields,
@@ -40,7 +56,20 @@ class Shipmentproperty(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete shipment property
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/shipment-property/sale-shipment-property-delete.html
+
+        The method deletes a shipment property.
+
+        Args:
+            bitrix_id: Identifier of the shipment property;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -59,7 +88,20 @@ class Shipmentproperty(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get shipment property
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/shipment-property/sale-shipment-property-get.html
+
+        The method retrieves the shipment property.
+
+        Args:
+            bitrix_id: Identifier of the shipment property;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -78,7 +120,20 @@ class Shipmentproperty(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get fields and settings of shipment property for a specific property type
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/shipment-property/sale-shipment-property-get-fields-by-type.html
+
+        The method retrieves the available fields of shipment properties by property type.
+
+        Args:
+            type: Shipment property type;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "type": type,
@@ -100,7 +155,26 @@ class Shipmentproperty(BaseEntity):
         start: Optional[int] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of shipment properties
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/shipment-property/sale-shipment-property-list.html
+
+        The method retrieves a list of shipment properties.
+
+        Args:
+            select: An array of fields to be selected;
+
+            filter: An object for filtering the selected records;
+
+            order: An object for sorting the selected records, where the key is the field and the value is asc or desc;
+
+            start: This parameter is used to manage pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -132,7 +206,22 @@ class Shipmentproperty(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update shipment property
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/shipment-property/sale-shipment-property-update.html
+
+        The method updates the shipment property.
+
+        Args:
+            bitrix_id: Identifier of the shipment property;
+
+            fields: Field values for updating the shipment property;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

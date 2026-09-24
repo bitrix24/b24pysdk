@@ -15,7 +15,10 @@ __all__ = [
 
 
 class Entity(BaseScope):
-    """"""
+    """Class for working with data storages.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/entity/entities/index.html
+    """
 
     @cached_property
     def section(self) -> Section:
@@ -36,7 +39,24 @@ class Entity(BaseScope):
             access: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Create a data storage
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/entity/entities/entity-add.html
+
+        The method creates a new data storage for the application.
+
+        Args:
+            entity: Character identifier for the storage;
+
+            name: Name of the storage;
+
+            access: Access permissions;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIValueRequest
+        """
 
         params = {
             "ENTITY": entity,
@@ -62,7 +82,24 @@ class Entity(BaseScope):
             entity_new: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update storage parameters
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/entity/entities/entity-update.html
+
+        The method updates the parameters of the application's data storage.
+
+        Args:
+            entity: Identifier of the application's data storage;
+
+            name: New name for the storage;
+
+            access: New set of access permissions;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIValueRequest
+        """
 
         params = {
             "ENTITY": entity,
@@ -91,7 +128,22 @@ class Entity(BaseScope):
             access: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get or modify access permissions
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/entity/entities/entity-rights.html
+
+        The method retrieves the current set of access permissions for the application's data storage or modifies it.
+
+        Args:
+            entity: Identifier of the application's data storage;
+
+            access: A new set of permissions;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIValueRequest
+        """
 
         params = {
             "ENTITY": entity,
@@ -113,7 +165,20 @@ class Entity(BaseScope):
             entity: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get storage parameters or list of storages
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/entity/entities/entity-get.html
+
+        The method returns the parameters of the specified storage or a list of all storages of the application.
+
+        Args:
+            entity: Identifier of the application's data storage;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIValueRequest
+        """
 
         params: JSONDict = {}
 
@@ -133,7 +198,20 @@ class Entity(BaseScope):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete a storage
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/entity/entities/entity-delete.html
+
+        The method removes the application's data store.
+
+        Args:
+            entity: Identifier of the application's data storage;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIValueRequest
+        """
 
         params = {
             "ENTITY": entity,

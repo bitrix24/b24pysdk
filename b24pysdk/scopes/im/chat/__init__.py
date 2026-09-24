@@ -3,8 +3,9 @@ from typing import Iterable, Optional, Text, Union
 
 from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
+from ....utils.converters import bool_to_bitrix
 from ....utils.functional import type_checker
-from ....utils.types import B24BoolStrict, JSONDict, Timeout
+from ....utils.types import JSONDict, Timeout
 from ..._base_entity import BaseEntity
 from .user import User
 
@@ -31,7 +32,7 @@ class Chat(BaseEntity):
             description: Optional[Text] = MISSING,
             color: Optional[Text] = MISSING,
             message: Optional[Text] = MISSING,
-            avatar: Optional[Text] = MISSING,
+            avatar: Text = MISSING,
             entity_type: Optional[Text] = MISSING,
             entity_id: Optional[Union[int, Text]] = MISSING,
             owner_id: Optional[Union[int, Text]] = MISSING,
@@ -104,7 +105,7 @@ class Chat(BaseEntity):
     def mute(
             self,
             chat_id: Union[int, Text],
-            mute: Union[bool, B24BoolStrict],
+            mute: bool,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
@@ -112,7 +113,7 @@ class Chat(BaseEntity):
 
         params = dict(
             CHAT_ID=chat_id,
-            MUTE=B24BoolStrict(mute).to_b24(),
+            MUTE=bool_to_bitrix(mute, is_required=True),
         )
 
         return self._make_bitrix_api_request(

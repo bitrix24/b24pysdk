@@ -1,9 +1,10 @@
 from typing import Annotated, Text
 
 from ....api.requests import BitrixAPIValueRequest
+from ....constants.userfield import UserTypeIDLiteral
 from ....schemas.crm.userfield import CRMUserfieldFieldsData, CRMUserfieldFieldsDict
 from ....utils.functional import type_checker
-from ....utils.types import JSONDict, Timeout, UserTypeIDLiteral
+from ....utils.types import JSONDict, Timeout
 from .._base_crm import BaseCRM
 
 __all__ = [
@@ -12,7 +13,10 @@ __all__ = [
 
 
 class Settings(BaseCRM):
-    """"""
+    """Class for retrieving descriptions of settings fields.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/user-defined-fields/index.html
+    """
 
     @type_checker
     def fields(

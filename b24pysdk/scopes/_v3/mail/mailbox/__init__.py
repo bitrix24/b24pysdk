@@ -14,7 +14,10 @@ __all__ = [
 
 
 class Mailbox(BaseEntity):
-    """"""
+    """Methods for retrieving user's mailboxes.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/mail/mailbox/index.html
+    """
 
     @cached_property
     def field(self) -> Field:
@@ -29,7 +32,22 @@ class Mailbox(BaseEntity):
             select: Optional[Iterable[Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get mailbox
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/mail/mailbox/mail-mailbox-get.html
+
+        The method retrieves a mailbox by its identifier.
+
+        Args:
+            bitrix_id: Mailbox identifier;
+
+            select: Optional list of fields to return;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "id": bitrix_id,
@@ -56,7 +74,24 @@ class Mailbox(BaseEntity):
             pagination: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of mailboxes
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/mail/mailbox/mail-mailbox-list.html
+
+        The method retrieves a list of the current user's mailboxes based on specified conditions.
+
+        Args:
+            name: Mailbox name fragment for filtering;
+
+            email: Email fragment for filtering;
+
+            pagination: Pagination parameters;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -82,7 +117,20 @@ class Mailbox(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get senders
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/mail/mailbox/mail-mailbox-senders.html
+
+        The method returns a list of senders available to the current user.
+
+        Args:
+            pagination: Pagination parameters;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "pagination": pagination,

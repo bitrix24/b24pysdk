@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Stages(BaseEntity):
-    """"""
+    """Class for managing stages of Kanban and "My planner".
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/tasks/stages/index.html
+    """
 
     @type_checker
     def add(
@@ -22,7 +25,22 @@ class Stages(BaseEntity):
             is_admin: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add a Kanban or "My plan" stage
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/stages/task-stages-add.html
+
+        The method adds a Kanban or "My Plan" stage.
+
+        Args:
+            fields: Field values for adding a new stage;
+
+            is_admin: If set to true, permission checks will not occur, provided the requester is an administrator of the account;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "fields": fields,
@@ -45,7 +63,22 @@ class Stages(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Check the ability to move task
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/stages/task-stages-can-move-task.html
+
+        The method checks whether the current user can move tasks in the specified object.
+
+        Args:
+            entity_id: ID of the object;
+
+            entity_type: Type of the object;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "entityId": entity_id,
@@ -66,7 +99,22 @@ class Stages(BaseEntity):
             is_admin: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete a Kanban or "My plan" stage
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/stages/task-stages-delete.html
+
+        The method deletes a Kanban or "My Plan" stage.
+
+        Args:
+            bitrix_id: Identifier of the stage to be deleted;
+
+            is_admin: If set to true, permission checks will be skipped, provided the requester is an administrator of the account;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "id": bitrix_id,
@@ -89,7 +137,22 @@ class Stages(BaseEntity):
             is_admin: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the list of Kanban stages or "My plan"
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/stages/task-stages-get.html
+
+        The method task.stages.get retrieves Kanban stages or "My Plan" stages.
+
+        Args:
+            entity_id: Identifier of the object;
+
+            is_admin: If set to true, permission checks will not occur, provided that the requester is an administrator of the account;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "entityId": entity_id,
@@ -114,7 +177,26 @@ class Stages(BaseEntity):
             after: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Move task from one stage to another
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/stages/task-stages-move-task.html
+
+        The method moves a task from one stage to another and allows you to change the task position within a group Kanban or "My Plan".
+
+        Args:
+            bitrix_id: Task identifier;
+
+            stage_id: ID of the stage to which the task should be moved;
+
+            before: ID of the task before which the task should be placed in the stage;
+
+            after: ID of the task after which the task should be placed in the stage;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "id": bitrix_id,
@@ -142,7 +224,24 @@ class Stages(BaseEntity):
             is_admin: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update Kanban stage or "My plan"
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/stages/task-stages-update.html
+
+        The method updates Kanban or "My Plan" stages.
+
+        Args:
+            bitrix_id: Identifier of the stage;
+
+            fields: Field values for updating the stage;
+
+            is_admin: If set to true, permission checks will not occur, provided the requester is an administrator of the account;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "id": bitrix_id,

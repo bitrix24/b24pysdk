@@ -91,8 +91,8 @@ class Contact(BaseLink):
     def delete(
             self,
             bitrix_id: int,
-            *,
             fields: JSONDict,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Remove contact from CRM entity.

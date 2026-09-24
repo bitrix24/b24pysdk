@@ -1,9 +1,10 @@
-from typing import Optional, Text, Union
+from typing import Optional, Text
 
 from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
+from ....utils.converters import bool_to_bitrix
 from ....utils.functional import type_checker
-from ....utils.types import B24BoolStrict, JSONDict, JSONList, Timeout
+from ....utils.types import JSONDict, JSONList, Timeout
 from ..._base_entity import BaseEntity
 
 __all__ = [
@@ -56,9 +57,9 @@ class Last(BaseEntity):
     def get(
             self,
             *,
-            skip_openlines: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            skip_chat: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            skip_dialog: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            skip_openlines: Optional[bool] = MISSING,
+            skip_chat: Optional[bool] = MISSING,
+            skip_dialog: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONList]:
         """"""
@@ -66,13 +67,13 @@ class Last(BaseEntity):
         params: JSONDict = {}
 
         if skip_openlines is not MISSING:
-            params["SKIP_OPENLINES"] = B24BoolStrict(skip_openlines).to_b24()
+            params["SKIP_OPENLINES"] = bool_to_bitrix(skip_openlines, is_required=True)
 
         if skip_chat is not MISSING:
-            params["SKIP_CHAT"] = B24BoolStrict(skip_chat).to_b24()
+            params["SKIP_CHAT"] = bool_to_bitrix(skip_chat, is_required=True)
 
         if skip_dialog is not MISSING:
-            params["SKIP_DIALOG"] = B24BoolStrict(skip_dialog).to_b24()
+            params["SKIP_DIALOG"] = bool_to_bitrix(skip_dialog, is_required=True)
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,

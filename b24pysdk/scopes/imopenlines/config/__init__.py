@@ -3,8 +3,9 @@ from typing import Optional, Text, Union
 
 from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
+from ....utils.converters import bool_to_bitrix
 from ....utils.functional import type_checker
-from ....utils.types import B24BoolStrict, JSONDict, Timeout
+from ....utils.types import JSONDict, Timeout
 from ..._base_entity import BaseEntity
 from .list import List
 from .path import Path
@@ -71,8 +72,8 @@ class Config(BaseEntity):
             self,
             config_id: Union[int, Text],
             *,
-            with_queue: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            show_offline: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            with_queue: Optional[bool] = MISSING,
+            show_offline: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -82,10 +83,10 @@ class Config(BaseEntity):
         )
 
         if with_queue is not MISSING:
-            params["WITH_QUEUE"] = B24BoolStrict(with_queue).to_b24()
+            params["WITH_QUEUE"] = bool_to_bitrix(with_queue, is_required=True)
 
         if show_offline is not MISSING:
-            params["SHOW_OFFLINE"] = B24BoolStrict(show_offline).to_b24()
+            params["SHOW_OFFLINE"] = bool_to_bitrix(show_offline, is_required=True)
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,

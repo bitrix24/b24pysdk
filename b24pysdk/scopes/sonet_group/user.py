@@ -1,9 +1,11 @@
-from typing import Annotated, Iterable, Literal, Optional, Text, Union
+from typing import Annotated, Iterable, List, Literal, Text, Union
 
 from ..._constants import MISSING
-from ...api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIRequest, BitrixAPIValuesRequest
+from ...schemas.sonet_group.user import SonetGroupMember, SonetGroupMembersData, SonetGroupUserGroup, SonetGroupUserGroupsData
 from ...utils.functional import type_checker
-from ...utils.types import Timeout
+from ...utils.types import JSONDict, Timeout
+from .._adapters import BitrixSchemasAdapter
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -12,7 +14,10 @@ __all__ = [
 
 
 class User(BaseEntity):
-    """"""
+    """Class for managing users in groups.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sonet-group/index.html
+    """
 
     @type_checker
     def add(
@@ -21,13 +26,28 @@ class User(BaseEntity):
             user_id: Union[int, Iterable[int]],
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """"""
+    ) -> BitrixAPIRequest[List[Text]]:
+        """Add users to group
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sonet-group/members/sonet-group-user-add.html
+
+        The method adds users to a workgroup or project without an invitation and confirmation.
+
+        Args:
+            group_id: Identifier of the workgroup or project;
+
+            user_id: User identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if user_id.__class__ is not list and not isinstance(user_id, int):
             user_id = list(user_id)
 
-        params = {
+        params: JSONDict = {
             "GROUP_ID": group_id,
             "USER_ID": user_id,
         }
@@ -45,13 +65,28 @@ class User(BaseEntity):
             user_id: Union[int, Iterable[int]],
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """"""
+    ) -> BitrixAPIRequest[List[Text]]:
+        """Remove user from group
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sonet-group/members/sonet-group-user-delete.html
+
+        The method removes participants from a workgroup or project.
+
+        Args:
+            group_id: Identifier of the workgroup or project;
+
+            user_id: Identifier of the participant;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if user_id.__class__ is not list and not isinstance(user_id, int):
             user_id = list(user_id)
 
-        params = {
+        params: JSONDict = {
             "GROUP_ID": group_id,
             "USER_ID": user_id,
         }
@@ -65,20 +100,35 @@ class User(BaseEntity):
     @type_checker
     def get(
             self,
-            bitrix_id: int,
+            group_id: int,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """"""
+    ) -> BitrixAPIValuesRequest[SonetGroupMembersData, SonetGroupMember]:
+        """Get the list of group participants
 
-        params = {
-            "ID": bitrix_id,
+        Documentation: https://apidocs.bitrix24.com/api-reference/sonet-group/members/sonet-group-user-get.html
+
+        The method returns a list of active participants in a workgroup or project.
+
+        Args:
+            group_id: Identifier of the workgroup or project;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+
+        params: JSONDict = {
+            "ID": group_id,
         }
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValuesRequest,
+            result_adapter=BitrixSchemasAdapter(SonetGroupMember),
         )
 
     @type_checker
@@ -86,11 +136,24 @@ class User(BaseEntity):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """"""
+    ) -> BitrixAPIValuesRequest[SonetGroupUserGroupsData, SonetGroupUserGroup]:
+        """Get the list of groups for the current user
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sonet-group/sonet-group-user-groups.html
+
+        The method returns the groups and projects that the current user is a member of.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
         return self._make_bitrix_api_request(
             api_wrapper=self.groups,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValuesRequest,
+            result_adapter=BitrixSchemasAdapter(SonetGroupUserGroup),
         )
 
     @type_checker
@@ -99,15 +162,32 @@ class User(BaseEntity):
             group_id: int,
             user_id: Union[int, Iterable[int]],
             *,
-            message: Optional[Text] = MISSING,
+            message: Text = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """"""
+    ) -> BitrixAPIRequest[List[Text]]:
+        """Invite users to group
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sonet-group/members/sonet-group-user-invite.html
+
+        The method sends invitations to users in a workgroup or project.
+
+        Args:
+            group_id: Identifier of the workgroup or project;
+
+            user_id: User identifier;
+
+            message: Invitation text;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if user_id.__class__ is not list and not isinstance(user_id, int):
             user_id = list(user_id)
 
-        params = {
+        params: JSONDict = {
             "GROUP_ID": group_id,
             "USER_ID": user_id,
         }
@@ -126,12 +206,27 @@ class User(BaseEntity):
             self,
             group_id: int,
             *,
-            message: Optional[Text] = MISSING,
+            message: Text = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """"""
+    ) -> BitrixAPIRequest[bool]:
+        """Send a request to join the group
 
-        params = {
+        Documentation: https://apidocs.bitrix24.com/api-reference/sonet-group/members/sonet-group-user-request.html
+
+        The method sends a request from the current user to join a workgroup or project.
+
+        Args:
+            group_id: Identifier of the workgroup or project;
+
+            message: Text of the request to join;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+
+        params: JSONDict = {
             "GROUP_ID": group_id,
         }
 
@@ -152,13 +247,30 @@ class User(BaseEntity):
             role: Annotated[Text, Literal["E", "K"]],
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """"""
+    ) -> BitrixAPIRequest[List[Text]]:
+        """Change role of group participants
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sonet-group/members/sonet-group-user-update.html
+
+        The method changes the role of participants in a workgroup or project.
+
+        Args:
+            group_id: Identifier of the workgroup or project;
+
+            user_id: User identifier;
+
+            role: Code of the new participant role;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if user_id.__class__ is not list and not isinstance(user_id, int):
             user_id = list(user_id)
 
-        params = {
+        params: JSONDict = {
             "GROUP_ID": group_id,
             "USER_ID": user_id,
             "ROLE": role,

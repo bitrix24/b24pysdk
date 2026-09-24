@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Mode(BaseCRM):
-    """"""
+    """Class for obtaining
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/crm/index.html
+    """
 
     @type_checker
     def get(
@@ -20,7 +23,18 @@ class Mode(BaseCRM):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIValueRequest[Literal[1, 2], CRMSettingsMode]:
-        """"""
+        """Determine the current CRM operating mode
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/crm-settings-mode-get.html
+
+        The method returns the current settings of the CRM operating mode: with (classic) or without leads (simple).
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIValuesRequest
+        """
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
             timeout=timeout,

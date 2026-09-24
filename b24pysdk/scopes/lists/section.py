@@ -1,9 +1,12 @@
-from typing import Iterable, Optional, Text
+from typing import Annotated, Iterable, Text
 
 from ..._constants import MISSING
-from ...api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest, BitrixAPIValuesRequest
+from ...constants.list import ListIBlockType, ListIBlockTypeLiteral
+from ...objects.list.section import BaseListSection
 from ...utils.functional import type_checker
-from ...utils.types import JSONDict, Timeout
+from ...utils.types import JSONDict, JSONList, Timeout
+from .._adapters import BitrixObjectAdapter, BitrixObjectsAdapter
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -12,21 +15,24 @@ __all__ = [
 
 
 class Section(BaseEntity):
-    """"""
+    """Methods for Bitrix24 universal-list sections."""
 
     @type_checker
     def add(
             self,
-            iblock_type_id: Text,
+            iblock_type_id: Annotated[Text, ListIBlockTypeLiteral],
             section_code: Text,
             fields: JSONDict,
             *,
-            iblock_id: Optional[int] = MISSING,
-            iblock_code: Optional[Text] = MISSING,
-            iblock_section_id: Optional[int] = MISSING,
+            iblock_id: int = MISSING,
+            iblock_code: Text = MISSING,
+            iblock_section_id: int = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """"""
+    ) -> BitrixAPIValueRequest[int, BaseListSection]:
+        """Create a list section and adapt its identifier to an object."""
+
+        if iblock_id is MISSING and iblock_code is MISSING:
+            raise ValueError("Pass iblock_id or iblock_code.")
 
         params: JSONDict = {
             "IBLOCK_TYPE_ID": iblock_type_id,
@@ -47,55 +53,32 @@ class Section(BaseEntity):
             api_wrapper=self.add,
             params=params,
             timeout=timeout,
-        )
-
-    @type_checker
-    def delete(
-            self,
-            iblock_type_id: Text,
-            *,
-            iblock_id: Optional[int] = MISSING,
-            iblock_code: Optional[Text] = MISSING,
-            section_id: Optional[int] = MISSING,
-            section_code: Optional[Text] = MISSING,
-            timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """"""
-
-        params: JSONDict = {
-            "IBLOCK_TYPE_ID": iblock_type_id,
-        }
-
-        if iblock_id is not MISSING:
-            params["IBLOCK_ID"] = iblock_id
-
-        if iblock_code is not MISSING:
-            params["IBLOCK_CODE"] = iblock_code
-
-        if section_id is not MISSING:
-            params["SECTION_ID"] = section_id
-
-        if section_code is not MISSING:
-            params["SECTION_CODE"] = section_code
-
-        return self._make_bitrix_api_request(
-            api_wrapper=self.delete,
-            params=params,
-            timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=BitrixObjectAdapter(
+                "list.section",
+                client=self._client,
+                discriminator=(
+                    ListIBlockType(iblock_type_id),
+                    None if iblock_id is MISSING else iblock_id,
+                ),
+            ),
         )
 
     @type_checker
     def get(
             self,
-            iblock_type_id: Text,
+            iblock_type_id: Annotated[Text, ListIBlockTypeLiteral],
             *,
-            iblock_id: Optional[int] = MISSING,
-            iblock_code: Optional[Text] = MISSING,
-            filter: Optional[JSONDict] = MISSING,
-            select: Optional[Iterable[Text]] = MISSING,
+            iblock_id: int = MISSING,
+            iblock_code: Text = MISSING,
+            filter: JSONDict = MISSING,
+            select: Iterable[Text] = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """"""
+    ) -> BitrixAPIValuesRequest[JSONList, BaseListSection]:
+        """Return sections of the requested Bitrix24 list."""
+
+        if iblock_id is MISSING and iblock_code is MISSING:
+            raise ValueError("Pass iblock_id or iblock_code.")
 
         params: JSONDict = {
             "IBLOCK_TYPE_ID": iblock_type_id,
@@ -120,21 +103,37 @@ class Section(BaseEntity):
             api_wrapper=self.get,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValuesRequest,
+            result_adapter=BitrixObjectsAdapter(
+                "list.section",
+                client=self._client,
+                select=None if select is MISSING else select,
+                discriminator=(
+                    ListIBlockType(iblock_type_id),
+                    None if iblock_id is MISSING else iblock_id,
+                ),
+            ),
         )
 
     @type_checker
     def update(
             self,
-            iblock_type_id: Text,
+            iblock_type_id: Annotated[Text, ListIBlockTypeLiteral],
             fields: JSONDict,
             *,
-            iblock_id: Optional[int] = MISSING,
-            iblock_code: Optional[Text] = MISSING,
-            section_id: Optional[int] = MISSING,
-            section_code: Optional[Text] = MISSING,
+            iblock_id: int = MISSING,
+            iblock_code: Text = MISSING,
+            section_id: int = MISSING,
+            section_code: Text = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """"""
+    ) -> BitrixAPIRequest[bool]:
+        """Update a list section by identifier or symbolic code."""
+
+        if iblock_id is MISSING and iblock_code is MISSING:
+            raise ValueError("Pass iblock_id or iblock_code.")
+
+        if section_id is MISSING and section_code is MISSING:
+            raise ValueError("Pass section_id or section_code.")
 
         params: JSONDict = {
             "IBLOCK_TYPE_ID": iblock_type_id,
@@ -155,6 +154,47 @@ class Section(BaseEntity):
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def delete(
+            self,
+            iblock_type_id: Annotated[Text, ListIBlockTypeLiteral],
+            *,
+            iblock_id: int = MISSING,
+            iblock_code: Text = MISSING,
+            section_id: int = MISSING,
+            section_code: Text = MISSING,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest[bool]:
+        """Delete a list section by identifier or symbolic code."""
+
+        if iblock_id is MISSING and iblock_code is MISSING:
+            raise ValueError("Pass iblock_id or iblock_code.")
+
+        if section_id is MISSING and section_code is MISSING:
+            raise ValueError("Pass section_id or section_code.")
+
+        params: JSONDict = {
+            "IBLOCK_TYPE_ID": iblock_type_id,
+        }
+
+        if iblock_id is not MISSING:
+            params["IBLOCK_ID"] = iblock_id
+
+        if iblock_code is not MISSING:
+            params["IBLOCK_CODE"] = iblock_code
+
+        if section_id is not MISSING:
+            params["SECTION_ID"] = section_id
+
+        if section_code is not MISSING:
+            params["SECTION_CODE"] = section_code
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.delete,
             params=params,
             timeout=timeout,
         )

@@ -1,7 +1,7 @@
-from typing import TYPE_CHECKING, Optional, Type, Union
+from typing import TYPE_CHECKING, List, Literal, NoReturn, Optional, Type, Union
 
 from ...utils.converters import dict_from_bitrix, dict_to_bitrix
-from ...utils.types import JSONDict, JSONList
+from ...utils.types import JSONDict, cast
 from .._filter_lookups import NO_FILTER_OPERATORS
 from .base_field import BaseField
 
@@ -13,8 +13,19 @@ __all__ = [
 ]
 
 
-class DictField(BaseField[JSONDict, JSONDict]):
-    """Field that exposes a Bitrix24 dictionary value as ``dict``."""
+class DictField(BaseField[Union[JSONDict, List[NoReturn], Literal[False]], JSONDict]):
+    """Field that exposes a Bitrix24 dictionary value as ``dict``.
+
+    Some Bitrix24 methods serialize an absent dictionary as ``false`` and an
+    empty associative array as ``[]`` instead of ``{}``. ``False`` is
+    normalized to ``None`` and an empty list to an empty dictionary. Non-empty
+    lists remain invalid.
+
+    Loaded mappings preserve their object identity. An in-place change can
+    therefore be persisted explicitly with ``save(update_fields=[...])``. It
+    does not create a local assignment and is not included in a parameterless
+    ``save()`` call.
+    """
 
     _FILTER_OPERATORS = NO_FILTER_OPERATORS
 
@@ -25,10 +36,21 @@ class DictField(BaseField[JSONDict, JSONDict]):
                 self,
                 instance: Optional["BaseObject"],
                 owner: Type["BaseObject"],
-        ) -> Union["DictField", Optional[JSONDict], JSONList]: ...
+        ) -> Union["DictField", Optional[JSONDict], List[NoReturn]]: ...
 
-    def _convert_from_bitrix(self, value: Optional[JSONDict]) -> Optional[JSONDict]:
-        """Convert a single raw Bitrix24 dictionary value to ``dict``."""
+    def _convert_from_bitrix(self, value: Optional[Union[JSONDict, List[NoReturn], Literal[False]]]) -> Optional[JSONDict]:
+        """Convert a raw mapping, empty array, or false value to Python."""
+
+        if value is False:
+            value = None
+
+        if isinstance(value, list):
+            if value:
+                raise ValueError(f"Cannot convert non-empty Bitrix24 list to dict: {value!r}")
+
+            value = {}
+
+        value = cast(Optional[JSONDict], value)
 
         if self.is_required:
             if value is None:

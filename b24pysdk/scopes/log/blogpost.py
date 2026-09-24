@@ -1,10 +1,10 @@
 from functools import cached_property
-from typing import Any, List, Optional, Text
+from typing import Iterable, List, Optional, Sequence, Text
 
 from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import classproperty, type_checker
-from ...utils.types import JSONDict, Timeout
+from ...utils.types import B24File, JSONDict, Timeout
 from .._base_entity import BaseEntity
 from .getusers import Getusers
 
@@ -37,7 +37,7 @@ class Blogpost(BaseEntity):
             post_title: Optional[Text] = MISSING,
             dest: Optional[List[Text]] = MISSING,
             sperm: Optional[List[Text]] = MISSING,
-            files: Optional[Any] = MISSING,
+            files: Iterable[Sequence[Text]] = MISSING,
             important: Optional[Text] = MISSING,
             important_date_end: Optional[Text] = MISSING,
             site_id: Optional[Text] = MISSING,
@@ -101,7 +101,7 @@ class Blogpost(BaseEntity):
             params["SPERM"] = sperm
 
         if files is not MISSING:
-            params["FILES"] = files
+            params["FILES"] = [B24File(file).to_b24() for file in files]
 
         if important is not MISSING:
             params["IMPORTANT"] = important
@@ -261,7 +261,7 @@ class Blogpost(BaseEntity):
             post_title: Optional[Text] = MISSING,
             dest: Optional[List[Text]] = MISSING,
             sperm: Optional[List[Text]] = MISSING,
-            files: Optional[Any] = MISSING,
+            files: Iterable[Sequence[Text]] = MISSING,
             important: Optional[Text] = MISSING,
             important_date_end: Optional[Text] = MISSING,
             site_id: Optional[Text] = MISSING,
@@ -321,7 +321,7 @@ class Blogpost(BaseEntity):
             params["SPERM"] = sperm
 
         if files is not MISSING:
-            params["FILES"] = files
+            params["FILES"] = [B24File(file).to_b24() for file in files]
 
         if important is not MISSING:
             params["IMPORTANT"] = important

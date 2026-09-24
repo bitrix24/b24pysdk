@@ -41,9 +41,9 @@ class Link(BaseCRM):
     @type_checker
     def get(
             self,
-            *,
             entity_type_id: int,
             entity_id: int,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get requisite link with CRM object.
@@ -189,9 +189,9 @@ class Link(BaseCRM):
     @type_checker
     def unregister(
             self,
-            *,
             entity_type_id: int,
             entity_id: int,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Unlink requisite from object.

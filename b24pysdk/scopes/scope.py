@@ -1,4 +1,4 @@
-from typing import List, Optional, Text
+from typing import List, Text
 
 from .._constants import MISSING
 from ..api.requests import BitrixAPIRequest
@@ -17,7 +17,7 @@ class Scope(BaseScope):
     @type_checker
     def __call__(
             self,
-            full: Optional[bool] = MISSING,
+            full: bool = MISSING,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[List[Text]]:

@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from .event import Event
     from .events import Events
     from .feature import Feature
+    from .humanresources import Humanresources
     from .im import Im
     from .imbot import Imbot
     from .imconnector import Imconnector
@@ -68,6 +69,7 @@ __all__ = [
     "Event",
     "Events",
     "Feature",
+    "Humanresources",
     "Im",
     "Imbot",
     "Imconnector",
@@ -119,6 +121,7 @@ _SCOPE_MODULES: Dict[Text, Text] = {
     "Event": ".event",
     "Events": ".events",
     "Feature": ".feature",
+    "Humanresources": ".humanresources",
     "Im": ".im",
     "Imbot": ".imbot",
     "Imconnector": ".imconnector",

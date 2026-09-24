@@ -1,9 +1,10 @@
-from typing import Optional, Sequence, Text, Union
+from typing import Optional, Sequence, Text
 
 from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
+from ...utils.converters import bool_to_bitrix
 from ...utils.functional import type_checker
-from ...utils.types import B24BoolStrict, B24File, JSONDict, Timeout
+from ...utils.types import B24File, JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -82,11 +83,11 @@ class Section(BaseEntity):
             name: Text,
             *,
             description: Optional[Text] = MISSING,
-            active: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            active: Optional[bool] = MISSING,
             code: Optional[Text] = MISSING,
             sort: Optional[int] = MISSING,
-            picture: Optional[Sequence[Text]] = MISSING,
-            detail_picture: Optional[Sequence[Text]] = MISSING,
+            picture: Sequence[Text] = MISSING,
+            detail_picture: Sequence[Text] = MISSING,
             section: Optional[int] = MISSING,
             timeout: Timeout = None,
             **fields,
@@ -109,9 +110,9 @@ class Section(BaseEntity):
 
             sort: Sorting order value;
 
-            picture: JSON dictionary representing the section's picture;
+            picture: File name and Base64-encoded content;
 
-            detail_picture: JSON dictionary for the section's detailed picture;
+            detail_picture: Detailed picture file name and Base64-encoded content;
 
             section: Identifier of the parent section;
 
@@ -130,7 +131,7 @@ class Section(BaseEntity):
             params["DESCRIPTION"] = description
 
         if active is not MISSING:
-            params["ACTIVE"] = B24BoolStrict(active).to_b24()
+            params["ACTIVE"] = bool_to_bitrix(active, is_required=True)
 
         if code is not MISSING:
             params["CODE"] = code
@@ -163,11 +164,11 @@ class Section(BaseEntity):
             *,
             name: Optional[Text] = MISSING,
             description: Optional[Text] = MISSING,
-            active: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            active: Optional[bool] = MISSING,
             code: Optional[Text] = MISSING,
             sort: Optional[int] = MISSING,
-            picture: Optional[Sequence[Text]] = MISSING,
-            detail_picture: Optional[Sequence[Text]] = MISSING,
+            picture: Sequence[Text] = MISSING,
+            detail_picture: Sequence[Text] = MISSING,
             section: Optional[int] = MISSING,
             timeout: Timeout = None,
             **fields,
@@ -192,9 +193,9 @@ class Section(BaseEntity):
 
             sort: New sorting order value;
 
-            picture: JSON dictionary for updating the section's picture;
+            picture: File name and Base64-encoded content;
 
-            detail_picture: JSON dictionary for the section's updated detailed picture;
+            detail_picture: Detailed picture file name and Base64-encoded content;
 
             section: Identifier of the new parent section;
 
@@ -216,7 +217,7 @@ class Section(BaseEntity):
             params["DESCRIPTION"] = description
 
         if active is not MISSING:
-            params["ACTIVE"] = B24BoolStrict(active).to_b24()
+            params["ACTIVE"] = bool_to_bitrix(active, is_required=True)
 
         if code is not MISSING:
             params["CODE"] = code

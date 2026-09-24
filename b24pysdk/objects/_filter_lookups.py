@@ -86,7 +86,14 @@ class InFilterOperator(BaseFilterOperator):
 
     @classmethod
     def prepare_value(cls, bitrix_field: "BaseField[Any, Any]", value: Any) -> Any:
-        """Convert each filter item for a Bitrix24 IN lookup."""
+        """Validate and convert an iterable for a Bitrix24 ``IN`` lookup.
+
+        For a scalar field, each candidate is converted independently and the
+        resulting list is used as the filter value. For a multiple field, the
+        iterable represents that field's public multiple value and is converted
+        by the descriptor as a whole. Strings, mappings, and other unsupported
+        pseudo-iterables are rejected by ``BaseField.is_iterable()``.
+        """
 
         if not bitrix_field.is_iterable(value):
             raise TypeError(

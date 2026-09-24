@@ -40,7 +40,17 @@ class ClientProvider:
 
     @property
     def client(self) -> "ClientType":
-        """Return a concrete client, resolving factories lazily."""
+        """Return and cache a concrete client, resolving factories lazily.
+
+        An explicitly supplied client wins immediately. Otherwise the provider's
+        factory is called once; if absent, the current SDK default factory is
+        called once. The resolved client is retained by this provider so all
+        managers and objects sharing it use the same client and portal cache.
+
+        Raises:
+            BitrixObjectClientError: If neither this provider nor SDK
+                configuration can produce a client.
+        """
 
         if self._client is not None:
             return self._client

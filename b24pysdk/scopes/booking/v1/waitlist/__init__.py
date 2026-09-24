@@ -15,7 +15,10 @@ __all__ = [
 
 
 class Waitlist(BaseEntity):
-    """"""
+    """Class for working with waitlists.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/booking/waitlist/index.html
+    """
 
     @cached_property
     def client(self) -> Client:
@@ -34,7 +37,20 @@ class Waitlist(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add waitlist
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/waitlist/booking-v1-waitlist-add.html
+
+        The method adds an entry to the waitlist.
+
+        Args:
+            fields: An object containing field values for creating an entry in the waitlist;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "fields": fields,
@@ -53,7 +69,20 @@ class Waitlist(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Create a waitlist entry from booking
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/waitlist/booking-v1-waitlist-createfrombooking.html
+
+        The method creates a waitlist entry based on an existing booking.
+
+        Args:
+            booking_id: Booking identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "bookingId": booking_id,
@@ -72,7 +101,20 @@ class Waitlist(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete entry
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/waitlist/booking-v1-waitlist-delete.html
+
+        The method removes an entry from the waitlist.
+
+        Args:
+            bitrix_id: Booking identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -91,7 +133,20 @@ class Waitlist(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a record from the waitlist
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/waitlist/booking-v1-waitlist-get.html
+
+        The method returns information about a waitlist record by its identifier.
+
+        Args:
+             bitrix_id: Identifier of the waitlist record;
+
+             timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -110,7 +165,20 @@ class Waitlist(BaseEntity):
             filter: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of records from the waitlist
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/waitlist/booking-v1-waitlist-list.html
+
+        The method returns a list of records from the waitlist based on the filter.
+
+        Args:
+            filter: An object for filtering waitlist records;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -131,7 +199,22 @@ class Waitlist(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update a record in the waitlist
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/booking/waitlist/booking-v1-waitlist-update.html
+
+        The method updates the information of a record in the waitlist.
+
+        Args:
+            bitrix_id: Identifier of the waitlist record;
+
+            fields: An object containing field values for updating the record;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

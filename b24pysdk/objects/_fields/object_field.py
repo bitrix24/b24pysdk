@@ -3,8 +3,9 @@ from typing import TYPE_CHECKING, Any, Generic, Iterable, List, Optional, Text, 
 from ..._config import Config
 from ..._constants import MISSING
 from ...utils.type_vars import BOT
+from ...utils.types import ObjectDiscriminator
 from .._object_results import BitrixObjectList
-from ..errors import BitrixObjectFieldReadOnlyError
+from ..errors import BitrixObjectFieldError
 from .base_cached_field import BaseCachedField
 from .base_field import BaseField
 
@@ -23,16 +24,15 @@ class ObjectField(BaseCachedField[Any, BOT], Generic[BOT]):
     key. It can be passed directly as a ``BaseField`` instance.
 
     ``object_class`` can be either a concrete SDK object class or its registered
-    object key. Object keys are resolved lazily through ``Config`` to avoid cyclic
-    imports and to use the most recently registered object subclass. A concrete
-    class is used directly and is not resolved again through the registry.
-
-    ``request_name`` belongs to the object field itself. If omitted, it defaults
-    to this descriptor's attribute name rather than the source field name.
+    object key. String references are resolved lazily with the explicitly
+    provided ``discriminator`` and then cached on the field descriptor.
+    A concrete class is validated when the field is created and is not resolved
+    through the registry.
     """
 
-    __slots__ = ("_object_class", "source_field")
+    __slots__ = ("_discriminator", "_object_class", "source_field")
 
+    _discriminator: ObjectDiscriminator
     _object_class: Union[Text, Type[BOT]]
     source_field: BaseField[Any, Any]
 
@@ -41,9 +41,16 @@ class ObjectField(BaseCachedField[Any, BOT], Generic[BOT]):
             source_field: BaseField[Any, Any],
             *,
             object_class: Union[Text, Type[BOT]],
+            discriminator: ObjectDiscriminator = None,
     ):
         if isinstance(source_field, ObjectField):
             raise TypeError("ObjectField source cannot be another ObjectField.")
+
+        if isinstance(object_class, str):
+            if not object_class:
+                raise ValueError("Object class key must be a non-empty string.")
+        else:
+            self._validate_object_class(object_class)
 
         super().__init__(
             bitrix_code=source_field.bitrix_code,
@@ -51,11 +58,13 @@ class ObjectField(BaseCachedField[Any, BOT], Generic[BOT]):
             is_read_only=source_field.is_read_only,
             is_multiple=source_field.is_multiple,
             is_pk=source_field.is_pk,
-            is_missing_allowed=source_field.is_missing_allowed,
+            is_updatable=source_field.is_updatable,
+            request_name=source_field.request_name,
         )
 
         self.source_field = source_field
         self._object_class = object_class
+        self._discriminator = discriminator
 
     if TYPE_CHECKING:
         def __get__(
@@ -69,6 +78,15 @@ class ObjectField(BaseCachedField[Any, BOT], Generic[BOT]):
                 instance: Optional["BaseObject"],
                 owner: Type["BaseObject"],
         ) -> Union["ObjectField[BOT]", Optional[BOT], BitrixObjectList[BOT]]:
+            """Return the descriptor or the cached related-object projection.
+
+            The first instance read obtains the raw source value and converts
+            primary keys into lightweight related objects. It does not fetch
+            those related objects from Bitrix24. The projection is cached on the
+            parent instance; ``select_related()`` later replaces its placeholders
+            through this same cache.
+            """
+
             if instance is None:
                 return self
 
@@ -94,11 +112,19 @@ class ObjectField(BaseCachedField[Any, BOT], Generic[BOT]):
             instance: Optional["BaseObject"],
             value: Optional[Union[BOT, Iterable[BOT]]],
     ):
+        """Store related objects as both raw keys and a converted cache.
+
+        A multiple iterable is materialized once into ``BitrixObjectList`` so
+        generators are not consumed separately by raw conversion and caching.
+        ``to_bitrix_value()`` validates object types and stores their primary
+        keys through the source field's conversion rules. Non-``None`` objects
+        are then cached directly, preserving identity for subsequent reads.
+        """
+
         if instance is None:
             raise AttributeError(f"Field {self!r} cannot be set on the object class.")
 
-        if self.is_read_only:
-            raise BitrixObjectFieldReadOnlyError(f"Field {self.attr_name!r} is read-only.")
+        self.check_is_updatable()
 
         if self.is_multiple and value is not None:
             if not self.is_iterable(value):
@@ -122,25 +148,45 @@ class ObjectField(BaseCachedField[Any, BOT], Generic[BOT]):
 
     @property
     def object_class(self) -> Type[BOT]:
-        """Return the related SDK object class."""
+        """Return the related SDK object class.
 
-        object_class_reference = self._object_class
+        String references are resolved lazily with the configured discriminator
+        and then cached on the field descriptor.
+        """
 
-        if isinstance(object_class_reference, str):
-            if not object_class_reference:
-                raise ValueError("Object class key must be a non-empty string.")
+        object_class = self._object_class
 
-            return Config.get_object_class(object_key=object_class_reference)
+        if not isinstance(object_class, str):
+            return object_class
+
+        try:
+            resolved_object_class = Config.get_object_class(object_key=object_class, discriminator=self._discriminator)
+        except KeyError:
+            field_name = getattr(self, "attr_name", self.bitrix_code)
+            raise BitrixObjectFieldError(
+                f"No related object class is registered for "
+                f"ObjectField {field_name!r} with "
+                f"object_key={object_class!r} and "
+                f"discriminator={self._discriminator!r}. Import or register "
+                "the related object class before accessing this field.",
+            ) from None
+
+        self._validate_object_class(resolved_object_class)
+        self._object_class = resolved_object_class
+
+        return resolved_object_class
+
+    @staticmethod
+    def _validate_object_class(object_class: Type[BOT], /):
+        """Validate a concrete related SDK object class once."""
 
         from .._base_object import BaseObject  # noqa: PLC0415
 
-        if not issubclass(object_class_reference, BaseObject):
+        if not (isinstance(object_class, type) and issubclass(object_class, BaseObject)):
             raise TypeError(
-                f"Object class reference {object_class_reference!r} must be "
+                f"Object class reference {object_class!r} must be "
                 "a BaseObject subclass or a registered object key.",
             )
-
-        return object_class_reference
 
     def from_bitrix_value(
             self,
@@ -148,7 +194,17 @@ class ObjectField(BaseCachedField[Any, BOT], Generic[BOT]):
             *,
             instance: "BaseObject" = MISSING,
     ) -> Union[Optional[BOT], BitrixObjectList[BOT]]:
-        """Convert a raw Bitrix24 field value to a public Python value."""
+        """Convert relation keys into lazy SDK object references.
+
+        No related-object API request is performed. Multiple values are
+        materialized into a ``BitrixObjectList`` and retain source order and
+        duplicate keys. The owning instance's client provider is propagated to
+        every placeholder and to the list so later loads use the same portal.
+
+        As with ``BaseField``, a whole ``None`` value is permitted only for a
+        non-required field, while ``None`` items inside a multiple relation are
+        always rejected.
+        """
 
         if self.is_multiple:
             if value is None:
@@ -165,7 +221,10 @@ class ObjectField(BaseCachedField[Any, BOT], Generic[BOT]):
                     if bitrix_pk is None:
                         raise ValueError(f"Field {self.attr_name!r} does not allow None items.")
 
-                    yield self._convert_from_bitrix(bitrix_pk, instance=instance)
+                    bitrix_object = self._convert_from_bitrix(bitrix_pk, instance=instance)
+
+                    if bitrix_object is not None:
+                        yield bitrix_object
 
             return BitrixObjectList(iter_bitrix_objects(), client_provider=getattr(instance, "_client_provider"))
 
@@ -177,7 +236,12 @@ class ObjectField(BaseCachedField[Any, BOT], Generic[BOT]):
             *,
             instance: "BaseObject" = MISSING,
     ) -> Optional[BOT]:
-        """Convert one related primary key to an SDK object."""
+        """Convert one source value into a primary-key-only related object.
+
+        The source descriptor performs the scalar conversion first. A non-null
+        key creates a lazy object sharing the parent instance's client provider;
+        none of the related object's remote fields are loaded here.
+        """
 
         source_value = self.source_field._convert_from_bitrix(value)
 

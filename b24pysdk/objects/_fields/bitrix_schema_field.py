@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Generic, List, Optional, Text, Type, Union
 
+from ...schemas._base_schema import BaseSchema
 from ...utils.type_vars import BST
 from ...utils.types import JSONDict
 from .._filter_lookups import NO_FILTER_OPERATORS
@@ -34,20 +35,30 @@ class BitrixSchemaField(BaseField[JSONDict, BST], Generic[BST]):
             *,
             schema_class: Type[BST],
             is_pk: bool = False,
-            is_required: bool = False,
+            is_required: Optional[bool] = None,
             is_multiple: bool = False,
             is_read_only: bool = False,
-            is_missing_allowed: bool = False,
+            is_updatable: bool = True,
+            request_name: Optional[Text] = None,
     ):
+        if not (isinstance(schema_class, type) and issubclass(schema_class, BaseSchema)):
+            raise TypeError("schema_class must be a BaseSchema subclass.")
+
         super().__init__(
             bitrix_code=bitrix_code,
             is_pk=is_pk,
             is_required=is_required,
             is_multiple=is_multiple,
             is_read_only=is_read_only,
-            is_missing_allowed=is_missing_allowed,
+            is_updatable=is_updatable,
+            request_name=request_name,
         )
         self._schema_class = schema_class
+
+    @property
+    def schema_class(self) -> Type[BST]:
+        """Return the immutable schema class used by this field."""
+        return self._schema_class
 
     if TYPE_CHECKING:
         def __get__(

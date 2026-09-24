@@ -1,10 +1,11 @@
 from functools import cached_property
-from typing import Annotated, Iterable, Literal, Optional, Text, Union
+from typing import Annotated, Iterable, Literal, Optional, Text
 
 from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
+from ....utils.converters import bool_to_bitrix
 from ....utils.functional import type_checker
-from ....utils.types import B24BoolStrict, JSONDict, Timeout
+from ....utils.types import JSONDict, Timeout
 from ..._base_entity import BaseEntity
 from .handler import Handler
 from .pay import Pay
@@ -158,9 +159,9 @@ class Paysystem(BaseEntity):
             *,
             settings: Optional[JSONDict] = MISSING,
             description: Optional[Text] = MISSING,
-            active: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            logotype: Optional[Text] = MISSING,
-            new_window: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            active: Optional[bool] = MISSING,
+            logotype: Text = MISSING,
+            new_window: Optional[bool] = MISSING,
             xml_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
@@ -211,10 +212,10 @@ class Paysystem(BaseEntity):
             params["SETTINGS"] = settings
 
         if new_window is not MISSING:
-            params["NEW_WINDOW"] = B24BoolStrict(new_window).to_b24()
+            params["NEW_WINDOW"] = bool_to_bitrix(new_window, is_required=True)
 
         if active is not MISSING:
-            params["ACTIVE"] = B24BoolStrict(active).to_b24()
+            params["ACTIVE"] = bool_to_bitrix(active, is_required=True)
 
         if description is not MISSING:
             params["DESCRIPTION"] = description

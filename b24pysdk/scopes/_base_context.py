@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Callable, Optional, Text, Type, Union, overloa
 
 from ..api.requests import BitrixAPIRequest
 from ..protocols import BitrixTokenFullProtocol
+from ..utils.case import snake_to_camel
 from ..utils.functional import classproperty
 from ..utils.type_vars import BARequestT, BAResultT, BValueT
 from ..utils.types import JSONDict, Timeout
@@ -97,23 +98,6 @@ class BaseContext(ABC):
         base_path = getattr(self._context, "_path", None)
         return f"{base_path}.{self._name}" if base_path else self._name
 
-    @staticmethod
-    def _snake_to_camel(snake_str: Text) -> Text:
-        """
-        Convert snake_case name to lowerCamelCase.
-
-        Used to transform Python wrapper method names into Bitrix24 REST method
-        segments.
-
-        Args:
-            snake_str: Python-style snake_case name.
-
-        Returns:
-            lowerCamelCase representation.
-        """
-        first, *parts = snake_str.strip("_").split("_")
-        return "".join((first.lower(), *(part.title() for part in parts)))
-
     def _get_api_method(self, api_wrapper: Callable[..., BARequestT]) -> Text:
         """
         Build Bitrix24 REST API method name for a wrapper method.
@@ -125,7 +109,7 @@ class BaseContext(ABC):
             Full Bitrix24 REST API method name.
         """
         api_wrapper_name = getattr(api_wrapper, "__name__", None)
-        return f"{self}.{self._snake_to_camel(api_wrapper_name)}" if api_wrapper_name else str(self)
+        return f"{self}.{snake_to_camel(api_wrapper_name)}" if api_wrapper_name else str(self)
 
     @overload
     def _make_bitrix_api_request(

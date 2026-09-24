@@ -1,9 +1,10 @@
-from typing import Annotated, Literal, Optional, Text, Union
+from typing import Annotated, Literal, Optional, Text
 
 from ....._constants import MISSING
 from .....api.requests import BitrixAPIRequest
+from .....utils.converters import bool_to_bitrix
 from .....utils.functional import type_checker
-from .....utils.types import B24BoolStrict, JSONDict, JSONList, Timeout
+from .....utils.types import JSONDict, JSONList, Timeout
 from ...._base_entity import BaseEntity
 
 __all__ = [
@@ -21,7 +22,7 @@ class Service(BaseEntity):
         type: Annotated[Text, Literal["enum", "checkbox", "quantity"]],
         name: Text,
         *,
-        active: Optional[Union[bool, B24BoolStrict]] = MISSING,
+        active: Optional[bool] = MISSING,
         code: Optional[Text] = MISSING,
         sort: Optional[int] = MISSING,
         description: Optional[Text] = MISSING,
@@ -38,7 +39,7 @@ class Service(BaseEntity):
         }
 
         if active is not MISSING:
-            params["ACTIVE"] = B24BoolStrict(active).to_b24()
+            params["ACTIVE"] = bool_to_bitrix(active, is_required=True)
 
         if code is not MISSING:
             params["CODE"] = code
@@ -67,7 +68,7 @@ class Service(BaseEntity):
         bitrix_id: int,
         *,
         name: Optional[Text] = MISSING,
-        active:  Optional[Union[bool, B24BoolStrict]] = MISSING,
+        active:  Optional[bool] = MISSING,
         code: Optional[Text] = MISSING,
         sort: Optional[int] = MISSING,
         description: Optional[Text] = MISSING,
@@ -85,7 +86,7 @@ class Service(BaseEntity):
             params["NAME"] = name
 
         if active is not MISSING:
-            params["ACTIVE"] = B24BoolStrict(active).to_b24()
+            params["ACTIVE"] = bool_to_bitrix(active, is_required=True)
 
         if code is not MISSING:
             params["CODE"] = code

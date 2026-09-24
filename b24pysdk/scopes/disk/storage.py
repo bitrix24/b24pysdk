@@ -2,8 +2,9 @@ from typing import Iterable, Optional, Sequence, Text
 
 from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
+from ...utils.converters import bool_to_bitrix
 from ...utils.functional import type_checker
-from ...utils.types import B24Bool, B24File, JSONDict, JSONList, Timeout
+from ...utils.types import B24File, JSONDict, JSONList, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -18,7 +19,7 @@ class Storage(BaseEntity):
     """
 
     @type_checker
-    def addfolder(
+    def add_folder(
             self,
             bitrix_id: int,
             data: JSONDict,
@@ -56,7 +57,7 @@ class Storage(BaseEntity):
             params["rights"] = rights
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.addfolder,
+            api_wrapper=self.add_folder,
             params=params,
             timeout=timeout,
         )
@@ -92,7 +93,7 @@ class Storage(BaseEntity):
         )
 
     @type_checker
-    def getchildren(
+    def get_children(
             self,
             bitrix_id: int,
             *,
@@ -131,16 +132,16 @@ class Storage(BaseEntity):
             params["order"] = order
 
         if start is not MISSING:
-            params["START"] = start
+            params["start"] = start
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.getchildren,
+            api_wrapper=self.get_children,
             params=params,
             timeout=timeout,
         )
 
     @type_checker
-    def getfields(
+    def get_fields(
             self,
             *,
             timeout: Timeout = None,
@@ -158,12 +159,12 @@ class Storage(BaseEntity):
         """
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.getfields,
+            api_wrapper=self.get_fields,
             timeout=timeout,
         )
 
     @type_checker
-    def getforapp(
+    def get_for_app(
             self,
             *,
             timeout: Timeout = None,
@@ -181,12 +182,12 @@ class Storage(BaseEntity):
         """
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.getforapp,
+            api_wrapper=self.get_for_app,
             timeout=timeout,
         )
 
     @type_checker
-    def getlist(
+    def get_list(
             self,
             *,
             filter: Optional[JSONDict] = MISSING,
@@ -221,16 +222,16 @@ class Storage(BaseEntity):
             params["order"] = order
 
         if start is not MISSING:
-            params["START"] = start
+            params["start"] = start
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.getlist,
+            api_wrapper=self.get_list,
             params=params,
             timeout=timeout,
         )
 
     @type_checker
-    def gettypes(
+    def get_types(
             self,
             *,
             timeout: Timeout = None,
@@ -248,7 +249,7 @@ class Storage(BaseEntity):
         """
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.gettypes,
+            api_wrapper=self.get_types,
             timeout=timeout,
         )
 
@@ -286,7 +287,7 @@ class Storage(BaseEntity):
         )
 
     @type_checker
-    def uploadfile(
+    def upload_file(
             self,
             bitrix_id: int,
             file_content: Sequence[Text],
@@ -323,7 +324,7 @@ class Storage(BaseEntity):
         }
 
         if generate_unique_name is not MISSING:
-            params["generateUniqueName"] = B24Bool(generate_unique_name).to_b24()
+            params["generateUniqueName"] = bool_to_bitrix(generate_unique_name)
 
         if rights is not MISSING:
             if rights.__class__ is not list:
@@ -332,7 +333,7 @@ class Storage(BaseEntity):
             params["rights"] = rights
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.uploadfile,
+            api_wrapper=self.upload_file,
             params=params,
             timeout=timeout,
         )

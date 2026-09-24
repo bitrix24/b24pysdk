@@ -5,6 +5,7 @@ from ....utils.functional import classproperty
 from ..._base_entity import BaseEntity
 from .company import Company
 from .document import Document
+from .hcmlink import Hcmlink
 from .mysafe import Mysafe
 from .personal import Personal
 
@@ -29,6 +30,11 @@ class B2e(BaseEntity):
     def document(self) -> Document:
         """"""
         return Document(self)
+
+    @cached_property
+    def hcmlink(self) -> Hcmlink:
+        """"""
+        return Hcmlink(self)
 
     @cached_property
     def mysafe(self) -> Mysafe:

@@ -38,8 +38,8 @@ class Bindings(BaseCRM):
     @type_checker
     def list(
             self,
-            *,
             filter: JSONDict,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONList]:
         """Get the list of bindings for a record in the timeline.

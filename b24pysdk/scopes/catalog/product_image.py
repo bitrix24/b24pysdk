@@ -1,9 +1,9 @@
-from typing import Iterable, Optional, Text
+from typing import Iterable, Optional, Sequence, Text
 
 from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import classproperty, type_checker
-from ...utils.types import JSONDict, Timeout
+from ...utils.types import B24File, JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -25,7 +25,7 @@ class ProductImage(BaseEntity):
     def add(
             self,
             fields: JSONDict,
-            file_content: Iterable[Text],
+            file_content: Sequence[Text],
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
@@ -56,12 +56,9 @@ class ProductImage(BaseEntity):
             Instance of BitrixAPIRequest.
         """
 
-        if file_content.__class__ is not list:
-            file_content = list(file_content)
-
         params: JSONDict = {
             "fields": fields,
-            "fileContent": file_content,
+            "fileContent": B24File(file_content).to_b24(),
         }
 
         return self._make_bitrix_api_request(

@@ -1,6 +1,5 @@
 from typing import Dict, Final, Mapping, Optional, Sequence, Text, Union, overload
 
-from ..._constants import MAX_BATCH_SIZE
 from ...constants.version import B24APIVersion
 from ...protocols import BitrixTokenProtocol
 from ...schemas.api import BatchResponseData
@@ -25,7 +24,6 @@ class _BatchCaller(BaseCaller):
     """
 
     _API_METHOD: Final[Text] = "batch"
-    _MAX_BATCH_SIZE: Final[int] = MAX_BATCH_SIZE
 
     __slots__ = ("_halt", "_ignore_size_limit", "_methods")
 
@@ -89,7 +87,7 @@ class _BatchCaller(BaseCaller):
         if len(methods) > self._MAX_BATCH_SIZE:
             if self._ignore_size_limit:
 
-                message = f"Batch size {len(methods)} exceeds limit {MAX_BATCH_SIZE}. Truncating to first {MAX_BATCH_SIZE} requests."
+                message = f"Batch size {len(methods)} exceeds limit {self._MAX_BATCH_SIZE}. Truncating to first {self._MAX_BATCH_SIZE} requests."
                 self._config.logger.warning(message)
 
                 if isinstance(methods, Mapping):
@@ -97,7 +95,7 @@ class _BatchCaller(BaseCaller):
                 else:
                     return methods[:self._MAX_BATCH_SIZE]
             else:
-                raise ValueError(f"Maximum batch size is {MAX_BATCH_SIZE}!")
+                raise ValueError(f"Maximum batch size is {self._MAX_BATCH_SIZE}!")
         else:
             return methods
 

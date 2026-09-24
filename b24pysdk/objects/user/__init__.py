@@ -1,19 +1,21 @@
-from typing import TYPE_CHECKING, Any, Callable, Generic, Hashable, Iterable, Mapping, Optional, Sequence, Text, TypeVar, Union
+from typing import TYPE_CHECKING, Annotated, Any, Callable, Dict, Generic, Hashable, Iterable, List, Literal, Mapping, Optional, Sequence, Text, TypeVar, Union
 
 from ..._constants import MISSING
 from ...constants.user import PersonalGender, UserType
-from ...schemas.user.file import UserFile
+from ...schemas.file import URLFile
+from ...schemas.user.userfield import UserUserfieldListItem
 from ...utils.types import JSONDict, JSONList, Self, Timeout
 from .._base_object import BaseObject
 from .._fields import BoolField, DateField, DateTimeField, EnumField, FileField, IntField, ObjectField, TextField, TimeZoneField
 from .._managers import BaseFieldManager, BaseObjectManager
 from .._object_results import BitrixObjectBatchAddResult, BitrixObjectBatchWriteResult
+from ..errors import BitrixObjectFieldError
 
 if TYPE_CHECKING:
     from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest, BitrixAPIValuesRequest
     from ...client import ClientType
-    from .._object_results import BitrixObjectList
-    from ..department import Department
+    from ..department import Department  # noqa: F401
+    from .userfield import UserUserfield
 
 __all__ = [
     "User",
@@ -25,83 +27,185 @@ __all__ = [
 class User(BaseObject[int]):
     """Bitrix24 portal user."""
 
-    _OBJECT_KEY = "user"
-    _PK_TYPE = int
+    OBJECT_KEY = "user"
+    PK = int
+
     _UPDATE_KEY = None
-    _USERFIELD_AVAILABLE = True
+    _USERFIELD_BITRIX_CODE_PREFIX = "UF_USR_"
 
     fields: "UserFieldManager[Self]"
     objects: "UserManager[Self]"
 
     bitrix_id = IntField("ID", is_pk=True)
-    xml_id = IntField("XML_ID", is_missing_allowed=True)
+    xml_id = TextField("XML_ID")
     active = BoolField("ACTIVE", is_required=True)
-    name = TextField("NAME", is_missing_allowed=True)
-    last_name = TextField("LAST_NAME", is_missing_allowed=True)
-    second_name = TextField("SECOND_NAME", is_missing_allowed=True)
-    title = TextField("TITLE", is_missing_allowed=True)
-    email = TextField("EMAIL", is_missing_allowed=True)
-    last_login = DateTimeField("LAST_LOGIN")
-    date_register = DateTimeField("DATE_REGISTER", is_required=True)
-    time_zone = TimeZoneField("TIME_ZONE", is_missing_allowed=True)
-    is_online = BoolField("IS_ONLINE", is_required=True)
-    timestamp_x = DateTimeField("TIMESTAMP_X", is_missing_allowed=True)
-    last_activity_date = DateTimeField("LAST_ACTIVITY_DATE", is_missing_allowed=True)
-    personal_gender = EnumField("PERSONAL_GENDER", enum_class=PersonalGender)
-    personal_www = TextField("PERSONAL_WWW", is_missing_allowed=True)
+    name = TextField("NAME")
+    last_name = TextField("LAST_NAME")
+    second_name = TextField("SECOND_NAME")
+    title = TextField("TITLE")
+    email = TextField("EMAIL")
+    last_login = DateTimeField("LAST_LOGIN", is_read_only=True)
+    date_register = DateTimeField("DATE_REGISTER", is_required=True, is_read_only=True)
+    time_zone = TimeZoneField("TIME_ZONE")
+    is_online = BoolField("IS_ONLINE", is_required=True, is_read_only=True)
+    timestamp_x = DateTimeField("TIMESTAMP_X", is_read_only=True)
+    last_activity_date = DateTimeField("LAST_ACTIVITY_DATE", is_read_only=True)
+    personal_gender = EnumField[PersonalGender]("PERSONAL_GENDER", enum_class=PersonalGender)
+    personal_www = TextField("PERSONAL_WWW")
     personal_birthday = DateField("PERSONAL_BIRTHDAY")
-    personal_photo: Optional[UserFile] = FileField("PERSONAL_PHOTO", file_class=UserFile, is_missing_allowed=True)
-    personal_icq = TextField("PERSONAL_ICQ", is_missing_allowed=True)
-    personal_phone = TextField("PERSONAL_PHONE", is_missing_allowed=True)
-    personal_fax = TextField("PERSONAL_FAX", is_missing_allowed=True)
-    personal_profession = TextField("PERSONAL_PROFESSION", is_missing_allowed=True)
-    personal_mobile = TextField("PERSONAL_MOBILE", is_missing_allowed=True)
-    personal_pager = TextField("PERSONAL_PAGER", is_missing_allowed=True)
-    personal_street = TextField("PERSONAL_STREET", is_missing_allowed=True)
-    personal_city = TextField("PERSONAL_CITY", is_missing_allowed=True)
-    personal_state = TextField("PERSONAL_STATE", is_missing_allowed=True)
-    personal_zip = TextField("PERSONAL_ZIP", is_missing_allowed=True)
-    personal_country = TextField("PERSONAL_COUNTRY", is_missing_allowed=True)
-    personal_mailbox = TextField("PERSONAL_MAILBOX", is_missing_allowed=True)
-    personal_notes = TextField("PERSONAL_NOTES", is_missing_allowed=True)
-    work_phone = TextField("WORK_PHONE", is_missing_allowed=True)
-    work_company = TextField("WORK_COMPANY", is_missing_allowed=True)
-    work_position = TextField("WORK_POSITION", is_missing_allowed=True)
-    work_department = TextField("WORK_DEPARTMENT", is_missing_allowed=True)
-    work_www = TextField("WORK_WWW", is_missing_allowed=True)
-    work_fax = TextField("WORK_FAX", is_missing_allowed=True)
-    work_pager = TextField("WORK_PAGER", is_missing_allowed=True)
-    work_street = TextField("WORK_STREET", is_missing_allowed=True)
-    work_mailbox = TextField("WORK_MAILBOX", is_missing_allowed=True)
-    work_city = TextField("WORK_CITY", is_missing_allowed=True)
-    work_state = TextField("WORK_STATE", is_missing_allowed=True)
-    work_zip = TextField("WORK_ZIP", is_missing_allowed=True)
-    work_country = TextField("WORK_COUNTRY", is_missing_allowed=True)
-    work_profile = TextField("WORK_PROFILE", is_missing_allowed=True)
-    work_logo = TextField("WORK_LOGO", is_missing_allowed=True)
-    work_notes = TextField("WORK_NOTES", is_missing_allowed=True)
-    uf_skype_link = TextField("UF_SKYPE_LINK", is_missing_allowed=True)
-    uf_zoom = TextField("UF_ZOOM", is_missing_allowed=True)
+    personal_photo = FileField[URLFile]("PERSONAL_PHOTO", file_class=URLFile)
+    personal_icq = TextField("PERSONAL_ICQ")
+    personal_phone = TextField("PERSONAL_PHONE")
+    personal_fax = TextField("PERSONAL_FAX")
+    personal_profession = TextField("PERSONAL_PROFESSION")
+    personal_mobile = TextField("PERSONAL_MOBILE")
+    personal_pager = TextField("PERSONAL_PAGER")
+    personal_street = TextField("PERSONAL_STREET")
+    personal_city = TextField("PERSONAL_CITY")
+    personal_state = TextField("PERSONAL_STATE")
+    personal_zip = TextField("PERSONAL_ZIP")
+    personal_country = TextField("PERSONAL_COUNTRY")
+    personal_mailbox = TextField("PERSONAL_MAILBOX")
+    personal_notes = TextField("PERSONAL_NOTES")
+    work_phone = TextField("WORK_PHONE")
+    work_company = TextField("WORK_COMPANY")
+    work_position = TextField("WORK_POSITION")
+    work_department = TextField("WORK_DEPARTMENT")
+    work_www = TextField("WORK_WWW")
+    work_fax = TextField("WORK_FAX")
+    work_pager = TextField("WORK_PAGER")
+    work_street = TextField("WORK_STREET")
+    work_mailbox = TextField("WORK_MAILBOX")
+    work_city = TextField("WORK_CITY")
+    work_state = TextField("WORK_STATE")
+    work_zip = TextField("WORK_ZIP")
+    work_country = TextField("WORK_COUNTRY")
+    work_profile = TextField("WORK_PROFILE")
+    # work_logo = TextField("WORK_LOGO")
+    work_notes = TextField("WORK_NOTES")
+    uf_skype_link = TextField("UF_SKYPE_LINK")
+    uf_zoom = TextField("UF_ZOOM")
     uf_employment_date = DateField("UF_EMPLOYMENT_DATE")
-    uf_timeman = TextField("UF_TIMEMAN", is_missing_allowed=True)
-    uf_department_ids = IntField("UF_DEPARTMENT", is_multiple=True, is_missing_allowed=True)
-    uf_departments: Optional["BitrixObjectList[Department]"] = ObjectField(uf_department_ids, object_class="department")
-    uf_interests = TextField("UF_INTERESTS", is_missing_allowed=True)
-    uf_skills = TextField("UF_SKILLS", is_missing_allowed=True)
-    uf_web_sites = TextField("UF_WEB_SITES", is_missing_allowed=True)
-    uf_xing = TextField("UF_XING", is_missing_allowed=True)
-    uf_linkedin = TextField("UF_LINKEDIN", is_missing_allowed=True)
-    uf_facebook = TextField("UF_FACEBOOK", is_missing_allowed=True)
-    uf_twitter = TextField("UF_TWITTER", is_missing_allowed=True)
-    uf_skype = TextField("UF_SKYPE", is_missing_allowed=True)
-    uf_district = TextField("UF_DISTRICT", is_missing_allowed=True)
-    uf_phone_inner = TextField("UF_PHONE_INNER", is_missing_allowed=True)
-    user_type = EnumField("USER_TYPE", enum_class=UserType, is_required=True)
+    uf_timeman = TextField("UF_TIMEMAN")
+    uf_department_ids = IntField("UF_DEPARTMENT", is_multiple=True)
+    uf_departments = ObjectField["Department"](uf_department_ids, object_class="department")
+    uf_interests = TextField("UF_INTERESTS")
+    uf_skills = TextField("UF_SKILLS")
+    uf_web_sites = TextField("UF_WEB_SITES")
+    uf_xing = TextField("UF_XING")
+    uf_linkedin = TextField("UF_LINKEDIN")
+    uf_facebook = TextField("UF_FACEBOOK")
+    uf_twitter = TextField("UF_TWITTER")
+    uf_skype = TextField("UF_SKYPE")
+    uf_district = TextField("UF_DISTRICT")
+    uf_phone_inner = TextField("UF_PHONE_INNER")
+    user_type = EnumField[UserType]("USER_TYPE", enum_class=UserType, is_required=True)
 
     @property
     def url(self) -> Text:
         """Return the absolute Bitrix24 user profile URL."""
         return f"{self._base_url}/company/personal/user/{self.bitrix_pk}/"
+
+    def _get_userfields(
+            self,
+            *,
+            timeout: Timeout = None,
+    ) -> Dict[Text, "UserUserfield"]:
+        """Return all user custom-field objects cached for this client."""
+
+        cache_key = "user.userfield", None
+        objects_cache = self.client.get_cache("bitrix_objects")
+        userfields = objects_cache.get(cache_key)
+
+        if userfields is None:
+            userfield_objects = self.client.user.userfield.list(timeout=timeout).values
+            userfields = {
+                userfield_object.field_name: userfield_object
+                for userfield_object in userfield_objects
+            }
+            objects_cache[cache_key] = userfields
+
+        return userfields
+
+    def _get_userfield(
+            self,
+            bitrix_code: Text,
+            *,
+            timeout: Timeout = None,
+    ) -> "UserUserfield":
+        """Return cached metadata for one user custom field."""
+        try:
+            return self._get_userfields(timeout=timeout)[bitrix_code]
+        except KeyError:
+            raise BitrixObjectFieldError(
+                f"{self.__class__.__name__} has no user custom field metadata for {bitrix_code!r}.",
+            ) from None
+
+    def get_field(
+            self,
+            bitrix_code: Text,
+            *,
+            timeout: Timeout = None,
+    ) -> Any:
+        """Return field metadata by Bitrix24 field code."""
+
+        userfield_bitrix_code_prefix = self._USERFIELD_BITRIX_CODE_PREFIX
+
+        if (
+                userfield_bitrix_code_prefix is not None
+                and bitrix_code.startswith(userfield_bitrix_code_prefix)
+        ):
+            return self._get_userfield(bitrix_code, timeout=timeout)
+
+        return super().get_field(bitrix_code, timeout=timeout)
+
+    def get_field_title(
+            self,
+            bitrix_code: Text,
+            *,
+            timeout: Timeout = None,
+    ) -> Text:
+        """Return the localized user field title by Bitrix24 field code.
+
+        ``user.fields`` contains titles for both standard and custom user
+        fields. Calling the base metadata lookup deliberately bypasses
+        ``User.get_field()``, which returns a ``UserUserfield`` object for a
+        custom field so its selectable items remain available.
+        """
+        return super().get_field(bitrix_code, timeout=timeout)
+
+    def get_field_items(
+            self,
+            bitrix_code: Text,
+            *,
+            timeout: Timeout = None,
+    ) -> List[UserUserfieldListItem]:
+        """Return selectable items for a user custom list field."""
+
+        userfield_bitrix_code_prefix = self._USERFIELD_BITRIX_CODE_PREFIX
+
+        if (
+                userfield_bitrix_code_prefix is None
+                or not bitrix_code.startswith(userfield_bitrix_code_prefix)
+        ):
+            raise BitrixObjectFieldError(
+                f"User field {bitrix_code!r} is not a user custom field and has no selectable items.",
+            )
+
+        userfield_object = self._get_userfield(bitrix_code, timeout=timeout)
+        items = userfield_object.list
+
+        if items is None:
+            raise BitrixObjectFieldError(
+                f"User custom field {bitrix_code!r} is not a list field and has no selectable items.",
+            )
+
+        if not isinstance(items, list):
+            raise BitrixObjectFieldError(
+                f"User custom field {bitrix_code!r} returned invalid selectable items metadata.",
+            )
+
+        return items
 
     def _get_bitrix_data(self) -> JSONDict:
         """Load raw user data from Bitrix24."""
@@ -168,13 +272,21 @@ class UserManager(BaseObjectManager[_UserT], Generic[_UserT]):
         """Return users filtered by SDK object attribute names."""
         return self._filter(**filters)
 
-    def from_pks(self, bitrix_pks: Iterable[Hashable]) -> Self:
+    def from_pks(self, bitrix_pks: Iterable[int]) -> Self:
         """Return users filtered by Bitrix24 primary keys."""
         return self._from_pks(bitrix_pks)
 
     def order(self, *fields: Text) -> Self:
         """Return users ordered by SDK object attribute names."""
         return self._order(*fields)
+
+    def select(self, *fields: Text) -> Self:
+        """Return users with the requested SDK object fields selected."""
+        return self._select(*fields)
+
+    def select_all(self) -> Self:
+        """Return users with all registered fields requested."""
+        return self._select_all()
 
     def _add_order_param(self, params: JSONDict):
         """Add ``user.get`` ordering parameters to request parameters."""
@@ -202,11 +314,47 @@ class UserManager(BaseObjectManager[_UserT], Generic[_UserT]):
     def add(
             self,
             *,
+            email: Text,
+            extranet: bool = False,
+            sonet_group_ids: Iterable[int] = MISSING,
             timeout: Timeout = None,
             **fields: Any,
     ) -> _UserT:
-        """Create a Bitrix24 user."""
-        return self._add(**fields, timeout=timeout)
+        """Create an intranet or extranet Bitrix24 user.
+
+        Args:
+            email: Required user email address.
+            extranet: Whether to create an extranet user. A non-empty
+                ``sonet_group_ids`` is required when this is ``True``.
+            sonet_group_ids: Workgroup or project IDs for an extranet user.
+            timeout: Optional request timeout.
+            **fields: User field values keyed by SDK attribute names.
+
+        Raises:
+            ValueError: If ``sonet_group_ids`` is omitted or empty for an
+                extranet user.
+        """
+
+        add_params = None
+
+        if extranet:
+            if sonet_group_ids is MISSING:
+                raise ValueError("sonet_group_ids is required for an extranet user.")
+
+            if sonet_group_ids.__class__ is not list:
+                sonet_group_ids = list(sonet_group_ids)
+
+            add_params = {
+                "EXTRANET": "Y",
+                "SONET_GROUP_ID": sonet_group_ids,
+            }
+
+        return self._add(
+            add_params,
+            email=email,
+            timeout=timeout,
+            **fields,
+        )
 
     def _get_add_api_wrapper(self, client: "ClientType") -> Callable[..., "BitrixAPIValueRequest[int, _UserT]"]:
         """Return the add API method resolved from the supplied client."""
@@ -230,7 +378,7 @@ class UserManager(BaseObjectManager[_UserT], Generic[_UserT]):
         """Update users matching the current query in batches."""
         return self._update(**fields, timeout=timeout)
 
-    def admin_mode(self, admin_mode: bool = True) -> Self:
+    def with_admin_mode(self, admin_mode: bool = True) -> Self:
         """Return users query with the ``ADMIN_MODE`` request parameter."""
         return self._with_params(admin_mode=admin_mode)
 
@@ -244,16 +392,16 @@ class UserManager(BaseObjectManager[_UserT], Generic[_UserT]):
             name: Optional[Text] = MISSING,
             last_name: Optional[Text] = MISSING,
             work_position: Optional[Text] = MISSING,
-            uf_department_name: Optional[Text] = MISSING,
-            user_type: Optional[UserType] = MISSING,
-            find: Optional[Text] = MISSING,
+            uf_department_name: Text = MISSING,
+            user_type: Union[Annotated[Text, Literal["email", "employee", "extranet"]], UserType] = MISSING,
+            find: Text = MISSING,
     ) -> Self:
         """Return users query that loads results through ``user.search``."""
 
-        filter_param: Optional[JSONDict] = None
+        filter_params: Optional[JSONDict] = None
 
         if uf_department_name is not MISSING:
-            filter_param = {
+            filter_params = {
                 "UF_DEPARTMENT_NAME": uf_department_name,
             }
 
@@ -272,14 +420,14 @@ class UserManager(BaseObjectManager[_UserT], Generic[_UserT]):
             filters["user_type"] = user_type
 
         if find is not MISSING:
-            if filters or filter_param is not None:
+            if filters or filter_params is not None:
                 raise ValueError("user.search does not support mixing 'FIND' with other search fields.")
 
-            filter_param = {
+            filter_params = {
                 "FIND": find,
             }
 
-        return self._filter(filter_param, **filters)._with_api_wrapper(
+        return self._filter(filter_params, **filters)._with_api_wrapper(
             lambda client: client.user.search,
         )
 

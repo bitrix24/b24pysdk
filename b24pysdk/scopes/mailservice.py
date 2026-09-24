@@ -2,8 +2,9 @@ from typing import Optional, Text
 
 from .._constants import MISSING
 from ..api.requests import BitrixAPIRequest
+from ..utils.converters import bool_to_bitrix
 from ..utils.functional import type_checker
-from ..utils.types import B24Bool, Timeout
+from ..utils.types import Timeout
 from ._base_scope import BaseScope
 
 __all__ = [
@@ -31,11 +32,11 @@ class Mailservice(BaseScope):
 
         params = {
             "NAME": name,
-            "ENCRYPTION": B24Bool(encryption).to_b24(),
+            "ENCRYPTION": bool_to_bitrix(encryption),
         }
 
         if active is not MISSING:
-            params["ACTIVE"] = B24Bool(active).to_b24()
+            params["ACTIVE"] = bool_to_bitrix(active)
 
         if server is not MISSING:
             params["SERVER"] = server
@@ -138,7 +139,7 @@ class Mailservice(BaseScope):
         }
 
         if active is not MISSING:
-            params["ACTIVE"] = B24Bool(active).to_b24()
+            params["ACTIVE"] = bool_to_bitrix(active)
 
         if name is not MISSING:
             params["NAME"] = name
@@ -150,7 +151,7 @@ class Mailservice(BaseScope):
             params["PORT"] = port
 
         if encryption is not MISSING:
-            params["ENCRYPTION"] = B24Bool(encryption).to_b24()
+            params["ENCRYPTION"] = bool_to_bitrix(encryption)
 
         if link is not MISSING:
             params["LINK"] = link

@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Elapseditem(BaseEntity):
-    """"""
+    """A set of methods for working with time tracking in tasks.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/tasks/elapsed-item/index.html
+    """
 
     @type_checker
     def add(
@@ -22,7 +25,22 @@ class Elapseditem(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add elapsed time record
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/elapsed-item/task-elapsed-item-add.html
+
+        The method adds elapsed time to a task. The identifier of the added record is returned.
+
+        Args:
+            task_id: Task identifier;
+
+            arfields: An object containing records about the user, time, and comments;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "TASKID": task_id,
@@ -43,7 +61,22 @@ class Elapseditem(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete time entry
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/elapsed-item/task-elapsed-item-delete.html
+
+        The method deletes a time entry.
+
+        Args:
+            task_id: Task identifier;
+
+            item_id: Time entry identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "TASKID": task_id,
@@ -64,7 +97,22 @@ class Elapseditem(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get time entry by ID
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/elapsed-item/task-elapsed-item-get.html
+
+        The method returns a time entry by its ID.
+
+        Args:
+            task_id: Task identifier;
+
+            item_id: Time entry identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "TASKID": task_id,
@@ -88,7 +136,28 @@ class Elapseditem(BaseEntity):
             params: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of time tracking records
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/elapsed-item/task-elapsed-item-get-list.html
+
+        The method returns a list of time tracking records for a task.
+
+        Args:
+            task_id: Task identifier;
+
+            order: An object for sorting the selected records, where the key is the field and the value is asc or desc;
+
+            filter: Object for filtering the result;
+
+            select: Array of fields of records that will be returned by the method;
+
+            params: Object for call options;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         payload = dict()
 
@@ -122,7 +191,18 @@ class Elapseditem(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of methods and their descriptions
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/elapsed-item/task-elapsed-item-get-manifest.html
+
+        The method returns a list of methods and their descriptions.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
         return self._make_bitrix_api_request(
             api_wrapper=self.getmanifest,
             timeout=timeout,
@@ -137,7 +217,24 @@ class Elapseditem(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Check action permission
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/elapsed-item/task-elapsed-item-is-action-allowed.html
+
+        The method checks whether an action is permitted for a record: creation, update, and deletion.
+
+        Args:
+            task_id: Task identifier;
+
+            item_id: Time entry identifier;
+
+            action_id: Action identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "TASKID": task_id,
@@ -160,7 +257,24 @@ class Elapseditem(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update time entry
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/elapsed-item/task-elapsed-item-update.html
+
+        The method updates the parameters of the specified time entry.
+
+        Args:
+            task_id: Task identifier;
+
+            item_id: Time entry identifier;
+
+            arfields: An object containing records about the user, time, and comments;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "TASKID": task_id,

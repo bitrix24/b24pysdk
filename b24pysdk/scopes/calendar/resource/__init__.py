@@ -13,7 +13,10 @@ __all__ = [
 
 
 class Resource(BaseEntity):
-    """"""
+    """Class for managing service provision for a specific time.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/calendar/resource/index.html
+    """
 
     @cached_property
     def booking(self) -> Booking:
@@ -27,7 +30,20 @@ class Resource(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add a new resource
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/calendar/resource/calendar-resource-add.html
+
+        The method adds a new resource.
+
+        Args:
+            name: Resource name;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "name": name,
@@ -46,7 +62,20 @@ class Resource(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete resource
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/calendar/resource/calendar-resource-delete.html
+
+        The method deletes a resource.
+
+        Args:
+            resource_id: Resource ID;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "resourceId": resource_id,
@@ -64,7 +93,18 @@ class Resource(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of all resources
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/calendar/resource/calendar-resource-list.html
+
+        The method retrieves a list of all resources.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
@@ -79,7 +119,22 @@ class Resource(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update resource
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/calendar/resource/calendar-resource-update.html
+
+        The method updates a resource.
+
+        Args:
+            resource_id: Resource ID;
+
+            name: New name of the resource;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "resourceId": resource_id,

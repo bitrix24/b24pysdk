@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Enumeration(BaseCRM):
-    """"""
+    """Class for retrieving custom field description.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/user-defined-fields/index.html
+    """
 
     @type_checker
     def fields(

@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Files(BaseEntity):
-    """"""
+    """Class for attaching files to tasks.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/tasks/index.html
+    """
 
     @type_checker
     def attach(
@@ -23,7 +26,22 @@ class Files(BaseEntity):
             params: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Attach files to a task
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/tasks-task-files-attach.html
+
+        The method adds a file from Drive to a task.
+
+        Args:
+            task_id: The identifier of the task to which the file needs to be attached;
+
+            file_id: The identifier of the file on Drive;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         payload = {
             "taskId": task_id,

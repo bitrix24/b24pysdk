@@ -8,7 +8,10 @@ from ..._base_entity import BaseEntity
 
 
 class _BaseField(BaseEntity):
-    """"""
+    """Methods for retrieving fields.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/mail/index.html
+    """
 
     @type_checker
     def get(
@@ -18,7 +21,22 @@ class _BaseField(BaseEntity):
             select: Optional[Iterable[Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get fields description
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/mail/index.html
+
+        The method returns the description of a field by name.
+
+        Args:
+            name: Name of the field whose description is to be retrieved;
+
+            select: List of description fields to be returned in the response;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "name": name,
@@ -43,7 +61,20 @@ class _BaseField(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of fields
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/mail/index.html
+
+        The method returns a list of available fields.
+
+        Args:
+            select: List of description fields that need to be returned in the response;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if select.__class__ is not list:
             select = list(select)

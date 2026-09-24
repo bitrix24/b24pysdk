@@ -135,6 +135,8 @@ class Sender(BaseEntity):
     ) -> BitrixAPIRequest[bool]:
         """Updates an SMS provider
 
+        Documentation: https://apidocs.bitrix24.com/api-reference/messageservice/messageservice-sender-update.html
+
         The method updates an existing message provider.
 
         Args:

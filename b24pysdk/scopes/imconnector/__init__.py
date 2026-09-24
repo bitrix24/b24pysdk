@@ -3,8 +3,9 @@ from typing import Optional, Text, Union
 
 from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
+from ...utils.converters import bool_to_bitrix
 from ...utils.functional import type_checker
-from ...utils.types import B24BoolStrict, JSONDict, Timeout
+from ...utils.types import JSONDict, Timeout
 from .._base_scope import BaseScope
 from .chat import Chat
 from .connector import Connector
@@ -93,13 +94,13 @@ class Imconnector(BaseScope):
             placement_handler: Text,
             *,
             icon_disabled: Optional[JSONDict] = MISSING,
-            del_external_messages: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            edit_internal_messages: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            del_internal_messages: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            newsletter: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            need_system_messages: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            need_signature: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            chat_group: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            del_external_messages: Optional[bool] = MISSING,
+            edit_internal_messages: Optional[bool] = MISSING,
+            del_internal_messages: Optional[bool] = MISSING,
+            newsletter: Optional[bool] = MISSING,
+            need_system_messages: Optional[bool] = MISSING,
+            need_signature: Optional[bool] = MISSING,
+            chat_group: Optional[bool] = MISSING,
             comment: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
@@ -116,25 +117,25 @@ class Imconnector(BaseScope):
             params["ICON_DISABLED"] = icon_disabled
 
         if del_external_messages is not MISSING:
-            params["DEL_EXTERNAL_MESSAGES"] = B24BoolStrict(del_external_messages).to_b24()
+            params["DEL_EXTERNAL_MESSAGES"] = bool_to_bitrix(del_external_messages, is_required=True)
 
         if edit_internal_messages is not MISSING:
-            params["EDIT_INTERNAL_MESSAGES"] = B24BoolStrict(edit_internal_messages).to_b24()
+            params["EDIT_INTERNAL_MESSAGES"] = bool_to_bitrix(edit_internal_messages, is_required=True)
 
         if del_internal_messages is not MISSING:
-            params["DEL_INTERNAL_MESSAGES"] = B24BoolStrict(del_internal_messages).to_b24()
+            params["DEL_INTERNAL_MESSAGES"] = bool_to_bitrix(del_internal_messages, is_required=True)
 
         if newsletter is not MISSING:
-            params["NEWSLETTER"] = B24BoolStrict(newsletter).to_b24()
+            params["NEWSLETTER"] = bool_to_bitrix(newsletter, is_required=True)
 
         if need_system_messages is not MISSING:
-            params["NEED_SYSTEM_MESSAGES"] = B24BoolStrict(need_system_messages).to_b24()
+            params["NEED_SYSTEM_MESSAGES"] = bool_to_bitrix(need_system_messages, is_required=True)
 
         if need_signature is not MISSING:
-            params["NEED_SIGNATURE"] = B24BoolStrict(need_signature).to_b24()
+            params["NEED_SIGNATURE"] = bool_to_bitrix(need_signature, is_required=True)
 
         if chat_group is not MISSING:
-            params["CHAT_GROUP"] = B24BoolStrict(chat_group).to_b24()
+            params["CHAT_GROUP"] = bool_to_bitrix(chat_group, is_required=True)
 
         if comment is not MISSING:
             params["COMMENT"] = comment
@@ -151,9 +152,9 @@ class Imconnector(BaseScope):
             connector: Text,
             *,
             line: Optional[Union[int, Text]] = MISSING,
-            error: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            configured: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            status: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            error: Optional[bool] = MISSING,
+            configured: Optional[bool] = MISSING,
+            status: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -166,13 +167,13 @@ class Imconnector(BaseScope):
             params["LINE"] = line
 
         if error is not MISSING:
-            params["ERROR"] = B24BoolStrict(error).to_b24()
+            params["ERROR"] = bool_to_bitrix(error, is_required=True)
 
         if configured is not MISSING:
-            params["CONFIGURED"] = B24BoolStrict(configured).to_b24()
+            params["CONFIGURED"] = bool_to_bitrix(configured, is_required=True)
 
         if status is not MISSING:
-            params["STATUS"] = B24BoolStrict(status).to_b24()
+            params["STATUS"] = bool_to_bitrix(status, is_required=True)
 
         return self._make_bitrix_api_request(
             api_wrapper=self.status,

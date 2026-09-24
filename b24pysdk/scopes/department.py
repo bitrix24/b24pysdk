@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Text
+from typing import Dict, Iterable, Optional, Text, Union
 
 from .._constants import MISSING
 from ..api.requests import BitrixAPIRequest, BitrixAPIValueRequest, BitrixAPIValuesRequest
@@ -49,7 +49,7 @@ class Department(BaseScope):
             name: Text,
             parent: int,
             *,
-            sort: Optional[int] = MISSING,
+            sort: int = MISSING,
             uf_head: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIValueRequest[int, DepartmentObject]:
@@ -98,13 +98,13 @@ class Department(BaseScope):
     def get(
             self,
             *,
-            sort: Optional[Text] = MISSING,
-            order: Optional[Text] = MISSING,
-            bitrix_id: Optional[int] = MISSING,
-            name: Optional[Text] = MISSING,
+            sort: Text = MISSING,
+            order: Text = MISSING,
+            bitrix_id: Union[int, Iterable[int]] = MISSING,
+            name: Text = MISSING,
             parent: Optional[int] = MISSING,
             uf_head: Optional[int] = MISSING,
-            start: Optional[int] = MISSING,
+            start: int = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIValuesRequest[JSONList, DepartmentObject]:
         """
@@ -119,7 +119,7 @@ class Department(BaseScope):
 
             order: Order logic for sorting;
 
-            bitrix_id: Specific department ID to retrieve;
+            bitrix_id: Specific department ID or iterable of department IDs to retrieve;
 
             name: Name of the department to retrieve;
 
@@ -144,6 +144,9 @@ class Department(BaseScope):
             params["order"] = order
 
         if bitrix_id is not MISSING:
+            if not (isinstance(bitrix_id, int) or bitrix_id.__class__ is list):
+                bitrix_id = list(bitrix_id)
+
             params["ID"] = bitrix_id
 
         if name is not MISSING:
@@ -171,9 +174,9 @@ class Department(BaseScope):
             self,
             bitrix_id: int,
             *,
-            name: Optional[Text] = MISSING,
-            sort: Optional[int] = MISSING,
-            parent: Optional[int] = MISSING,
+            name: Text = MISSING,
+            sort: int = MISSING,
+            parent: int = MISSING,
             uf_head: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:

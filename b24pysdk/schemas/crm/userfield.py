@@ -1,10 +1,9 @@
 from dataclasses import dataclass
 from typing import Annotated, Dict, List, Optional, Text, TypedDict
 
-from ...constants.userfield import UserTypeID
+from ...constants.userfield import UserTypeID, UserTypeIDLiteral
 from ...utils.converters import bool_from_bitrix, text_from_bitrix, text_to_bitrix
 from ...utils.dataclasses import frozen_dataclass_kwargs
-from ...utils.types import UserTypeIDLiteral
 from .._base_schema import BaseSchema
 from .._base_schema_dict import BaseSchemaDict
 

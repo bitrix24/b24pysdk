@@ -4,6 +4,7 @@ from ..api.requests import BitrixAPIValueRequest
 from ..schemas.access import AccessNamesData, AccessNamesDict
 from ..utils.functional import type_checker
 from ..utils.types import JSONDict, Timeout
+from ._adapters import BitrixSchemaDictAdapter
 from ._base_scope import BaseScope
 
 __all__ = [
@@ -35,5 +36,5 @@ class Access(BaseScope):
             params=params,
             timeout=timeout,
             bitrix_api_request_type=BitrixAPIValueRequest,
-            result_adapter=AccessNamesDict.from_bitrix,
+            result_adapter=BitrixSchemaDictAdapter(AccessNamesDict),
         )

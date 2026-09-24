@@ -157,16 +157,16 @@ def test_get_nearest(bitrix_client: BaseClient):
     """"""
 
     try:
-        bitrix_response = bitrix_client.calendar.event.get.nearest(
+        bitrix_response = bitrix_client.calendar.event.get_nearest(
             type="user",
             owner_id=BITRIX_PORTAL_OWNER_ID,
             days=30,
         ).response
     except BitrixAPINotFound:
-        pytest.skip("calendar.event.get.nearest is not available on this portal")
+        pytest.skip("calendar.event.getNearest is not available on this portal")
 
     assert isinstance(bitrix_response, BitrixAPIResponse)
-    assert isinstance(bitrix_response.result, list), "calendar.event.get.nearest result should be a list"
+    assert isinstance(bitrix_response.result, list), "calendar.event.getNearest result should be a list"
 
     for event in bitrix_response.result:
         assert isinstance(event, dict), "Each nearest event should be a dict"

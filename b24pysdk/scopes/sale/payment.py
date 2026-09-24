@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Payment(BaseEntity):
-    """"""
+    """A set of methods for managing payments.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sale/payment/index.html
+    """
 
     @type_checker
     def add(
@@ -21,7 +24,20 @@ class Payment(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add payment
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/payment/sale-payment-add.html
+
+        The method adds a new payment.
+
+        Args:
+            fields: Field values for creating a payment in the form of a structure;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "fields": fields,
@@ -40,7 +56,20 @@ class Payment(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete payment
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/payment/sale-payment-delete.html
+
+        The method deletes a payment.
+
+        Args:
+            bitrix_id: Payment identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -59,7 +88,20 @@ class Payment(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get payment
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/payment/sale-payment-get.html
+
+        The method retrieves the values of all payment fields by Id.
+
+        Args:
+            bitrix_id: Payment identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -77,7 +119,18 @@ class Payment(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get payment fields
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/payment/sale-payment-get-fields.html
+
+        The method retrieves the available payment fields.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get_fields,
@@ -94,7 +147,26 @@ class Payment(BaseEntity):
         start: Optional[int] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the list of payments
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/payment/sale-payment-list.html
+
+        The method retrieves a list of payments.
+
+        Args:
+            select: An array of fields to be selected;
+
+            filter: An object for filtering the selected records;
+
+            order: An object for sorting the selected records, where the key is the field and the value is asc or desc;
+
+            start: This parameter is used to manage pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -126,7 +198,22 @@ class Payment(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update payment
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/payment/sale-payment-update.html
+
+        The method is used to update fields of the payment collection item.
+
+        Args:
+            bitrix_id: Payment identifier;
+
+            fields: Field values for creating a payment;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

@@ -17,7 +17,13 @@ __all__ = [
 
 
 class BitrixObjectList(list[BOT], Generic[BOT]):
-    """Typed list of SDK objects with small object-specific helpers."""
+    """Materialized SDK objects plus a provider for list-level operations.
+
+    Object instances keep their own client providers. The provider stored on
+    this list is used only for operations that coordinate the collection, such
+    as batch update and delete. Slices and ``copy()`` preserve that provider and
+    create a shallow list: contained SDK objects are intentionally shared.
+    """
 
     __slots__ = ("_client_provider",)
 
@@ -30,6 +36,13 @@ class BitrixObjectList(list[BOT], Generic[BOT]):
             *,
             client_provider: Optional[ClientProvider] = None,
     ):
+        """Materialize ``iterable`` and select a list-level client provider.
+
+        Constructing from another ``BitrixObjectList`` inherits its provider
+        unless one is supplied explicitly. Other iterables use a new provider,
+        which can later resolve the SDK default client if needed.
+        """
+
         if client_provider is None and isinstance(iterable, BitrixObjectList):
             client_provider = iterable._client_provider
 
@@ -94,10 +107,37 @@ class BitrixObjectList(list[BOT], Generic[BOT]):
     def update(  # noqa: C901
             self,
             updated_data: Optional[JSONDict] = None,
+            /,
             *,
             timeout: Timeout = None,
     ) -> "BitrixObjectBatchWriteResult[BOT]":
-        """Update objects using supplied data or their local unsaved changes."""
+        """Update eligible objects through one logical batch operation.
+
+        ``updated_data`` is raw data keyed by Bitrix24 field codes and is reused
+        for every object when supplied. The mapping is treated as read-only and
+        is not copied per object. If it is ``None``, each object's ``local_data``
+        property provides an independent snapshot; objects without local changes
+        are skipped.
+
+        Request objects are created first and passed together to the client,
+        which may split them into protocol-sized batches. Numeric results are
+        converted to booleans. For each truthy success result, exactly the data sent for that object is applied to its loaded
+        state. False success values and API errors are reported without marking
+        fields clean. If the list is empty, or every local snapshot is empty, no
+        client call is made.
+
+        Args:
+            updated_data: Shared raw update payload, or ``None`` to use each
+                object's local unsaved changes.
+            timeout: Optional timeout for request construction and batch calls.
+
+        Returns:
+            Objects mapped to successful results and errors separately.
+
+        Raises:
+            ValueError: If an explicitly supplied payload is empty.
+            BitrixObjectError: If any object has no public ``update()`` support.
+        """
 
         if updated_data is not None and not updated_data:
             raise ValueError("Pass at least one field to update.")
@@ -112,7 +152,7 @@ class BitrixObjectList(list[BOT], Generic[BOT]):
                     f"{type(bitrix_object).__name__} does not support update().",
                 )
 
-            object_updated_data = bitrix_object.local_data  if updated_data is None else updated_data
+            object_updated_data = bitrix_object.local_data if updated_data is None else updated_data
 
             if not object_updated_data:
                 continue
@@ -122,6 +162,8 @@ class BitrixObjectList(list[BOT], Generic[BOT]):
             bitrix_objects_by_batch_key[batch_key] = bitrix_object
 
             if updated_data is None:
+                # Retain the exact snapshot used to construct this request so a
+                # later local edit cannot change what is marked as persisted.
                 updated_data_by_batch_key[batch_key] = object_updated_data
 
             batch_requests[batch_key] = bitrix_object._make_update_request(object_updated_data, timeout=timeout)
@@ -149,7 +191,7 @@ class BitrixObjectList(list[BOT], Generic[BOT]):
             if value:
                 bitrix_object._apply_updated_data(object_updated_data)
 
-            result[bitrix_object] = value
+            result[bitrix_object] = value if isinstance(value, bool) else bool(value)
 
         for batch_key, value in (batch_result.result_error or {}).items():
             bitrix_object = bitrix_objects_by_batch_key[batch_key]
@@ -166,7 +208,17 @@ class BitrixObjectList(list[BOT], Generic[BOT]):
             *,
             timeout: Timeout = None,
     ) -> "BitrixObjectBatchWriteResult[BOT]":
-        """Delete all objects in the list and return objects grouped by batch outcome."""
+        """Delete all objects through one logical batch operation.
+
+        Each object contributes one lazy delete request. The list-level client
+        executes the request collection and results are translated from internal
+        string batch keys back to object instances. An empty list short-circuits
+        without resolving a client or making an API call.
+
+        Raises:
+            BitrixObjectError: If any contained object has no public
+                ``delete()`` support.
+        """
 
         result: Dict[BOT, B24APIResult] = {}
         result_error: Dict[BOT, B24APIResult] = {}
@@ -235,7 +287,7 @@ class BitrixObjectList(list[BOT], Generic[BOT]):
 
 
 class BitrixObjectBatchAddResult(Generic[BOT]):
-    """Result of a bulk object add operation."""
+    """Successful objects and caller-keyed errors from a bulk add operation."""
 
     __slots__ = ("errors", "results")
 
@@ -263,7 +315,13 @@ class BitrixObjectBatchAddResult(Generic[BOT]):
 
 
 class BitrixObjectBatchWriteResult(Generic[BOT]):
-    """Result of a bulk object write operation."""
+    """Object-keyed success and error mappings from a bulk write operation.
+
+    ``results`` and ``errors`` expose fresh ``BitrixObjectList`` views over the
+    mapping keys and preserve the provider used for the originating list-level
+    operation. The raw API values remain available in ``result`` and
+    ``result_error``.
+    """
 
     __slots__ = ("_client_provider", "result", "result_error")
 

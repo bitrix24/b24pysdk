@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING, Any, Generic, Iterable, List, Optional, Text, 
 from ..._constants import MISSING
 from ...schemas._base_file_schema import BaseFileSchema
 from .._filter_lookups import NO_FILTER_OPERATORS
-from ..errors import BitrixObjectFieldReadOnlyError
 from .base_cached_field import BaseCachedField
 
 if TYPE_CHECKING:
@@ -41,10 +40,11 @@ class FileField(BaseCachedField[Any, _BFileT], Generic[_BFileT]):
             *,
             file_class: Type[_BFileT],
             is_pk: bool = False,
-            is_required: bool = False,
+            is_required: Optional[bool] = None,
             is_multiple: bool = False,
             is_read_only: bool = False,
-            is_missing_allowed: bool = False,
+            is_updatable: bool = True,
+            request_name: Optional[Text] = None,
     ):
         if not issubclass(file_class, BaseFileSchema):
             raise TypeError("file_class must be a BaseFileSchema subclass.")
@@ -55,13 +55,14 @@ class FileField(BaseCachedField[Any, _BFileT], Generic[_BFileT]):
             is_required=is_required,
             is_multiple=is_multiple,
             is_read_only=is_read_only,
-            is_missing_allowed=is_missing_allowed,
+            is_updatable=is_updatable,
+            request_name=request_name,
         )
         self._file_class = file_class
 
     @property
     def file_class(self) -> Type[_BFileT]:
-        """Return the file schema class used by this field."""
+        """Return the immutable file schema class used by this field."""
         return self._file_class
 
     if TYPE_CHECKING:
@@ -76,6 +77,14 @@ class FileField(BaseCachedField[Any, _BFileT], Generic[_BFileT]):
                 instance: Optional["BaseObject"],
                 owner: Type["BaseObject"],
         ) -> Union["FileField[_BFileT]", Optional[_BFileT], List[_BFileT]]:
+            """Return the descriptor or a cached converted file value.
+
+            The first instance read converts raw field data with portal context
+            from the owning object and caches the resulting file object or list.
+            Later reads reuse that projection until its source Bitrix24 value is
+            changed, refreshed, or successfully updated.
+            """
+
             if instance is None:
                 return self
 
@@ -101,11 +110,18 @@ class FileField(BaseCachedField[Any, _BFileT], Generic[_BFileT]):
             instance: Optional["BaseObject"],
             value: Optional[Union[_BFileT, Iterable[_BFileT]]],
     ):
+        """Store file objects as raw write data and a converted cache.
+
+        Multiple iterables are materialized once so a generator can be converted
+        and cached consistently. Raw write values are recorded as local changes;
+        non-null public file objects are cached to preserve identity until the
+        object is refreshed or the update is confirmed.
+        """
+
         if instance is None:
             raise AttributeError(f"Field {self!r} cannot be set on the object class.")
 
-        if self.is_read_only:
-            raise BitrixObjectFieldReadOnlyError(f"Field {self.attr_name!r} is read-only.")
+        self.check_is_updatable()
 
         if self.is_multiple and value is not None:
             if not self.is_iterable(value):
@@ -130,10 +146,17 @@ class FileField(BaseCachedField[Any, _BFileT], Generic[_BFileT]):
             *,
             instance: "BaseObject" = MISSING,
     ) -> Union[Optional[_BFileT], List[_BFileT]]:
-        """Convert raw Bitrix24 file values to concrete file objects."""
+        """Convert raw file metadata into portal-aware file objects.
+
+        Multiple values are eagerly converted into a new list. The owning object
+        is forwarded to scalar conversion so remote file schemas receive the
+        correct portal domain. Whole-value ``None`` follows field requiredness;
+        ``None`` items inside a multiple value are never accepted, while empty
+        optional items converted to ``None`` are omitted from the result.
+        """
 
         if self.is_multiple:
-            if not value:
+            if value is None:
                 if self.is_required:
                     raise ValueError(f"Field {self.attr_name!r} is required.")
 
@@ -142,13 +165,16 @@ class FileField(BaseCachedField[Any, _BFileT], Generic[_BFileT]):
             if not self.is_iterable(value):
                 raise TypeError(f"Field {self.attr_name!r} expects an iterable value.")
 
-            files = []
+            files: List[_BFileT] = []
 
             for item in value:
                 if item is None:
                     raise ValueError(f"Field {self.attr_name!r} does not allow None items.")
 
-                files.append(self._convert_from_bitrix(item, instance=instance))
+                file = self._convert_from_bitrix(item, instance=instance)
+
+                if file is not None:
+                    files.append(file)
 
             return files
 
@@ -160,7 +186,13 @@ class FileField(BaseCachedField[Any, _BFileT], Generic[_BFileT]):
             *,
             instance: "BaseObject" = MISSING,
     ) -> Optional[_BFileT]:
-        """Convert one raw Bitrix24 file value to a concrete file object."""
+        """Create one validated file-schema object with portal context.
+
+        Empty scalar values use the field's existing optional/required semantics.
+        A non-empty remote value requires an owning SDK object because its client
+        supplies the portal domain. The schema factory's return type is checked
+        to catch broken custom implementations at the descriptor boundary.
+        """
 
         if not value:
             if self.is_required:

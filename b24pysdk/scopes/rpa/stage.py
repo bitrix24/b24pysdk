@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Stage(BaseEntity):
-    """"""
+    """Methods for working with stages.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/stage/index.html
+    """
 
     @type_checker
     def add(
@@ -21,7 +24,20 @@ class Stage(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Create a new stage
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/stage/rpa-stage-add.html
+
+        This method adds a new stage.
+
+        Args:
+            fields: An object with fields of the stage;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "fields": fields,
@@ -40,7 +56,20 @@ class Stage(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete stage
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/stage/rpa-stage-delete.html
+
+        This method deletes a stage.
+
+        Args:
+            bitrix_id: Identifier of the stage;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -59,7 +88,20 @@ class Stage(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get information about stage
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/stage/rpa-stage-get.html
+
+        This method retrieves information about a stage by its id.
+
+        Args:
+            bitrix_id: Identifier of the stage;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -79,7 +121,22 @@ class Stage(BaseEntity):
             start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the list of stages for the process
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/stage/rpa-stage-list-for-type.html
+
+        This method retrieves a list of process stages, sorted on order with final stages at the end.
+
+        Args:
+            type_id: Identifier of the process;
+
+            start: The parameter is used for managing pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "typeId": type_id,
@@ -102,7 +159,22 @@ class Stage(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update stage
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/stage/rpa-stage-update.html
+
+        This method updates the stage by id.
+
+        Args:
+            bitrix_id: Identifier of the stage;
+
+            fields: Object with fields of the stage;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

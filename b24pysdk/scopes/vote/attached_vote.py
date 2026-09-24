@@ -12,7 +12,10 @@ __all__ = [
 
 
 class AttachedVote(BaseEntity):
-    """"""
+    """Class for managing votes.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/vote/index.html
+    """
 
     @classproperty
     def _name(cls):
@@ -32,7 +35,28 @@ class AttachedVote(BaseEntity):
             signed_attach_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Download the voting report
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/vote/vote.attachedvote.download.html
+
+        The method generates and provides a downloadable report for the vote in the specified format.
+
+        Args:
+            attach_id: The ID of the attached vote;
+
+            module_id: The module ID;
+
+            entity_type: The object type;
+
+            entity_id: The ID of the entity;
+
+            signed_attach_id: The signed ID of the attachment;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -71,7 +95,28 @@ class AttachedVote(BaseEntity):
             signed_attach_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get data of attached vote
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/vote/vote.attachedvote.get.html
+
+        The method returns data of the attached vote.
+
+        Args:
+            attach_id: The ID of the attached vote;
+
+            module_id: The module ID;
+
+            entity_type: The object type;
+
+            entity_id: The ID of the entity;
+
+            signed_attach_id: The signed ID of the attachment;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -113,7 +158,32 @@ class AttachedVote(BaseEntity):
             signed_attach_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the list of users who voted for the answer
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/vote/vote.attachedvote.getAnswerVoted.html
+
+        The method returns a list of users who voted for the specified answer option.
+
+        Args:
+            attach_id: The ID of the attached vote;
+
+            page_navigation: Pagination parameters;
+
+            user_for_mobile_format: User data format for mobile devices;
+
+            module_id: The module ID;
+
+            entity_type: The object type;
+
+            entity_id: The ID of the entity;
+
+            signed_attach_id: The signed ID of the attachment;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "answerId": answer_id,
@@ -158,7 +228,24 @@ class AttachedVote(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get multiple votes
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/vote/vote.attachedvote.getMany.html
+
+        The method returns data for multiple votes based on the identifier of the entities to which vote is attached.
+
+        Args:
+            module_id: The module ID;
+
+            entity_type: The object type;
+
+            entity_ids: Array of entity identifiers;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if entity_ids.__class__ is not list:
             entity_ids = list(entity_ids)
@@ -191,7 +278,32 @@ class AttachedVote(BaseEntity):
             signed_attach_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get voting data with voter information
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/vote/vote.attachedvote.getWithVoted.html
+
+        The method returns data for attached vote along with information about the users who voted.
+
+        Args:
+            attach_id: The ID of the attached vote;
+
+            page_size: Pagination parameters;
+
+            user_for_mobile_format: User data format for mobile devices;
+
+            module_id: The module ID;
+
+            entity_type: The object type;
+
+            entity_id: The ID of the entity;
+
+            signed_attach_id: The signed ID of the attachment;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -236,7 +348,28 @@ class AttachedVote(BaseEntity):
             signed_attach_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Recall your vote
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/vote/vote.attachedvote.recall.html
+
+        The method allows a user to withdraw their vote in an active voting session.
+
+        Args:
+            attach_id: The ID of the attached vote;
+
+            module_id: The module ID;
+
+            entity_type: The object type;
+
+            entity_id: The ID of the entity;
+
+            signed_attach_id: The signed ID of the attachment;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -275,7 +408,28 @@ class AttachedVote(BaseEntity):
             signed_attach_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Resume voting
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/vote/vote.attachedvote.resume.html
+
+        The method resumes a stopped vote, allowing users to participate in it again.
+
+        Args:
+            attach_id: The ID of the attached vote;
+
+            module_id: The module ID;
+
+            entity_type: The object type;
+
+            entity_id: The ID of the entity;
+
+            signed_attach_id: The signed ID of the attachment;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -314,7 +468,28 @@ class AttachedVote(BaseEntity):
             signed_attach_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Stop voting
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/vote/vote.attachedvote.stop.html
+
+        The method halts an active vote, preventing further participation.
+
+        Args:
+            attach_id: The ID of the attached vote;
+
+            module_id: The module ID;
+
+            entity_type: The object type;
+
+            entity_id: The ID of the entity;
+
+            signed_attach_id: The signed ID of the attachment;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -354,7 +529,30 @@ class AttachedVote(BaseEntity):
             signed_attach_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Vote in the attached voting
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/vote/vote.attachedvote.vote.html
+
+        The method allows you to vote in an attached voting.
+
+        Args:
+            ballot: Voting data;
+
+            attach_id: The ID of the attached vote;
+
+            module_id: The module ID;
+
+            entity_type: The object type;
+
+            entity_id: The ID of the entity;
+
+            signed_attach_id: The signed ID of the attachment;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "ballot": ballot,

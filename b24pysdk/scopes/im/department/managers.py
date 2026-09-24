@@ -1,9 +1,10 @@
-from typing import Iterable, Optional, Union
+from typing import Iterable, Optional
 
 from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
+from ....utils.converters import bool_to_bitrix
 from ....utils.functional import type_checker
-from ....utils.types import B24BoolStrict, JSONDict, Timeout
+from ....utils.types import JSONDict, Timeout
 from ..._base_entity import BaseEntity
 
 __all__ = [
@@ -19,7 +20,7 @@ class Managers(BaseEntity):
             self,
             bitrix_id: Iterable[int],
             *,
-            user_data: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            user_data: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
         """"""
@@ -32,7 +33,7 @@ class Managers(BaseEntity):
         )
 
         if user_data is not MISSING:
-            params["USER_DATA"] = B24BoolStrict(user_data).to_b24()
+            params["USER_DATA"] = bool_to_bitrix(user_data, is_required=True)
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,

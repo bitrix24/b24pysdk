@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Status(BaseEntity):
-    """"""
+    """Class for working with statuses in the online store
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sale/status/index.html
+    """
 
     @type_checker
     def add(
@@ -21,7 +24,20 @@ class Status(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Create status
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/status/sale-status-add.html
+
+        The method creates a status for an order or delivery.
+
+        Args:
+            fields: Field values for creating the status;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "fields": fields,
@@ -40,7 +56,20 @@ class Status(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete status
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/status/sale-status-delete.html
+
+        The method deletes an order or delivery status.
+
+        Args:
+            bitrix_id: Status identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -59,7 +88,20 @@ class Status(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get values of all status fields by ID
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/status/sale-status-get.html
+
+        The method retrieves the values of all fields of the status.
+
+        Args:
+            bitrix_id: Symbolic identifier of the status;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -77,7 +119,18 @@ class Status(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get available fields
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/status/sale-status-get-fields.html
+
+        The method returns the available fields of statuses.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get_fields,
@@ -94,7 +147,26 @@ class Status(BaseEntity):
         start: Optional[int] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the list of statuses
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/status/sale-status-list.html
+
+        The method retrieves a list of statuses.
+
+        Args:
+            select: An array of fields to be selected;
+
+            filter: An object for filtering the selected records;
+
+            order: An object for sorting the selected records, where the key is the field and the value is asc or desc;
+
+            start: This parameter is used to manage pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -126,7 +198,22 @@ class Status(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update status
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/status/sale-status-update.html
+
+        The method updates the status of an order or delivery.
+
+        Args:
+            bitrix_id: Symbolic identifier of the status;
+
+            fields: Field values for updating the status;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

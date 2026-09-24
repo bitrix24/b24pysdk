@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 
 __all__ = [
     "IntField",
+    "ListField",
 ]
 
 
@@ -47,3 +48,16 @@ class IntField(BaseField[Union[int, Text], int]):
             return int_to_bitrix(value, is_required=True)
 
         return int_to_bitrix(value, is_required=False)
+
+
+class ListField(IntField):
+    """Bitrix24 list field that exposes selected item ID as ``int``."""
+
+    __slots__ = ()
+
+    if TYPE_CHECKING:
+        def __get__(
+                self,
+                instance: Optional["BaseObject"],
+                owner: Type["BaseObject"],
+        ) -> Union["ListField", Optional[int], List[int]]: ...

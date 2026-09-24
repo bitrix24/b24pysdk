@@ -4,6 +4,7 @@ from .._base_scope import BaseScope
 from .api import API
 from .flow import Flow
 from .task import Task
+from .template import Template
 
 __all__ = [
     "Tasks",
@@ -27,3 +28,8 @@ class Tasks(BaseScope):
     def task(self) -> Task:
         """"""
         return Task(self)
+
+    @cached_property
+    def template(self) -> Template:
+        """"""
+        return Template(self)

@@ -3,8 +3,9 @@ from typing import Annotated, Literal, Optional, Text, Union
 
 from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
+from ....utils.converters import bool_to_bitrix
 from ....utils.functional import type_checker
-from ....utils.types import B24BoolStrict, JSONDict, Timeout
+from ....utils.types import JSONDict, Timeout
 from ..._base_entity import BaseEntity
 from .history import History
 from .personal import Personal
@@ -111,7 +112,7 @@ class Notify(BaseEntity):
     def confirm(
             self,
             bitrix_id: int,
-            notify_value: Union[bool, B24BoolStrict],
+            notify_value: bool,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
@@ -119,7 +120,7 @@ class Notify(BaseEntity):
 
         params = {
             "ID": bitrix_id,
-            "NOTIFY_VALUE": B24BoolStrict(notify_value).to_b24(),
+            "NOTIFY_VALUE": bool_to_bitrix(notify_value, is_required=True),
         }
 
         return self._make_bitrix_api_request(
@@ -167,7 +168,7 @@ class Notify(BaseEntity):
             last_id: Optional[int] = MISSING,
             last_type: Optional[Literal[1, 3]] = MISSING,
             limit: Optional[int] = MISSING,
-            convert_text: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            convert_text: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
         """"""
@@ -184,7 +185,7 @@ class Notify(BaseEntity):
             params["LIMIT"] = limit
 
         if convert_text is not MISSING:
-            params["CONVERT_TEXT"] = B24BoolStrict(convert_text).to_b24()
+            params["CONVERT_TEXT"] = bool_to_bitrix(convert_text, is_required=True)
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,

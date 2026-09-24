@@ -15,7 +15,10 @@ __all__ = [
 
 
 class Reports(BaseEntity):
-    """"""
+    """Methods for working with reports on an employee's absences.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/timeman/timecontrol/index.html
+    """
 
     @cached_property
     def settings(self) -> Settings:
@@ -38,7 +41,28 @@ class Reports(BaseEntity):
             workday_hours: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get report on identified absences
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/timeman/timecontrol/timeman-timecontrol-reports-get.html
+
+        The method retrieves a report on identified absences.
+
+        Args:
+            user_id: User ID for whom the reports are requested;
+
+            month: Month number;
+
+            year: Year;
+
+            idle_minutes: Maximum time of absence at the workplace that is not counted as absence;
+
+            workday_hours: Duration of the workday in hours;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "USER_ID": user_id,

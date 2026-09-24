@@ -1,9 +1,10 @@
-from typing import Optional, Text, Union
+from typing import Optional, Text
 
 from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
+from ....utils.converters import bool_to_bitrix
 from ....utils.functional import type_checker
-from ....utils.types import B24BoolStrict, JSONList, Timeout
+from ....utils.types import JSONList, Timeout
 from ..._base_entity import BaseEntity
 
 __all__ = [
@@ -19,8 +20,8 @@ class User(BaseEntity):
             self,
             find: Text,
             *,
-            business: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            avatar_hr: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            business: Optional[bool] = MISSING,
+            avatar_hr: Optional[bool] = MISSING,
             offset: Optional[int] = MISSING,
             limit: Optional[int] = MISSING,
             timeout: Timeout = None,
@@ -32,10 +33,10 @@ class User(BaseEntity):
         )
 
         if business is not MISSING:
-            params["BUSINESS"] = B24BoolStrict(business).to_b24()
+            params["BUSINESS"] = bool_to_bitrix(business, is_required=True)
 
         if avatar_hr is not MISSING:
-            params["AVATAR_HR"] = B24BoolStrict(avatar_hr).to_b24()
+            params["AVATAR_HR"] = bool_to_bitrix(avatar_hr, is_required=True)
 
         if offset is not MISSING:
             params["OFFSET"] = offset

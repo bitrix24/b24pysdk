@@ -69,7 +69,7 @@ class URLField(TextField):
         ) -> Union["URLField", Optional[Text], List[Text]]: ...
 
     @classmethod
-    def _validate_url(cls, value: Text) -> Text:
+    def validate_url(cls, value: Text) -> Text:
         """Validate and return an HTTP or HTTPS URL."""
 
         if cls._URL_PATTERN.fullmatch(value) is None:
@@ -85,7 +85,7 @@ class URLField(TextField):
         if converted_value is None:
             return None
 
-        return self._validate_url(converted_value)
+        return self.validate_url(converted_value)
 
     def _convert_to_bitrix(self, value: Optional[Text]) -> Optional[Text]:
         """Validate and convert a single Python URL value."""
@@ -95,4 +95,4 @@ class URLField(TextField):
         if converted_value is None:
             return None
 
-        return self._validate_url(converted_value)
+        return self.validate_url(converted_value)

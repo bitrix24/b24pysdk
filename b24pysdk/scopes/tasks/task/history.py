@@ -12,7 +12,10 @@ __all__ = [
 
 
 class History(BaseEntity):
-    """"""
+    """Class for retrieving task history.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/tasks/index.html
+    """
 
     @type_checker
     def list(
@@ -24,7 +27,26 @@ class History(BaseEntity):
             start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get task history
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/tasks-task-history-list.html
+
+        The method retrieves the history of changes for a task.
+
+        Args:
+            task_id: The identifier of the task for which the history needs to be retrieved;
+
+            filter: Filter by event type;
+
+            order: An object for sorting the result;
+
+            start: Parameter for managing pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "taskId": task_id,

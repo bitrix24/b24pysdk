@@ -1,3 +1,4 @@
+import collections.abc
 import functools
 import typing
 
@@ -106,8 +107,8 @@ class _TypeChecker(typing.Generic[_FT]):
 
     Validates positional and keyword arguments against function annotations
     before calling the wrapped function. Supports standard types, ``Any``,
-    ``Literal``, ``Union`` and ``Annotated`` with type-based metadata
-    constraints.
+    ``Literal``, ``Union``, ``Iterable`` and ``Annotated`` with type-based
+    metadata constraints.
     """
 
     _HandlerType = typing.Callable[[typing.Any, typing.Type, typing.Text], bool]
@@ -179,6 +180,7 @@ class _TypeChecker(typing.Generic[_FT]):
             Mapping of supported typing origins to validation handlers.
         """
         return {
+            collections.abc.Iterable: self._iterable_handler,
             typing.Annotated: self._annotated_handler,
             typing.Any: self._any_handler,
             typing.Literal: self._literal_handler,
@@ -295,6 +297,29 @@ class _TypeChecker(typing.Generic[_FT]):
             Always True.
         """
         return True
+
+    @staticmethod
+    def _iterable_handler(value: typing.Any, *_) -> bool:
+        """Validate a supported iterable container without consuming it.
+
+        Text, byte sequences, and mappings formally implement ``Iterable`` but
+        represent scalar or keyed values in SDK method parameters. Rejecting
+        them prevents accidental iteration over characters, bytes, or mapping
+        keys. The iterable is deliberately not consumed here, so one-shot
+        generators remain intact for the wrapped function.
+
+        Args:
+            value: Runtime argument value.
+            expected_type: Iterable annotation being checked.
+            param_name: Function parameter name used in error messages.
+
+        Returns:
+            True for a supported iterable container, otherwise False.
+        """
+        return (
+                isinstance(value, collections.abc.Iterable)
+                and not isinstance(value, (collections.abc.Mapping, str, bytes, bytearray))
+        )
 
     @staticmethod
     def _literal_handler(

@@ -1,4 +1,4 @@
-from typing import Iterable, Optional, Text
+from typing import Iterable, Optional, Text, Union
 
 from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
@@ -12,19 +12,41 @@ __all__ = [
 
 
 class Event(BaseEntity):
-    """"""
+    """Methods for real-time Push&Pull communication, including connection setup, event sending, and push notifications.
+
+    Documentation: https://apidocs.bitrix24.com/settings/interactivity/push-and-pull/index.html
+    """
 
     @type_checker
     def add(
             self,
             command: Text,
             *,
-            params: Optional[Iterable[JSONDict]] = MISSING,
+            params: Optional[JSONDict] = MISSING,
             module_id: Optional[Text] = MISSING,
-            user_id: Optional[int] = MISSING,
+            user_id: Optional[Union[int, Iterable[int]]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Send events to the RT channel
+
+        Documentation: https://apidocs.bitrix24.com/settings/interactivity/push-and-pull/pull-application-event-add.html
+
+        The method sends an event to the RT channel of the application.
+
+        Args:
+            command: The event command;
+
+            params: Event parameters;
+
+            module_id: The identifier of the event module;
+
+            user_id: The user identifier or an array of user identifiers;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         api_params = {
             "COMMAND": command,
@@ -40,6 +62,9 @@ class Event(BaseEntity):
             api_params["MODULE_ID"] = module_id
 
         if user_id is not MISSING:
+            if user_id.__class__ is not list and not isinstance(user_id, int):
+                user_id = list(user_id)
+
             api_params["USER_ID"] = user_id
 
         return self._make_bitrix_api_request(

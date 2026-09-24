@@ -133,6 +133,7 @@ def test_department_get_as_list_fast(bitrix_client: ClientType):
         Department.objects
         .using(client=bitrix_client)
         .order("-bitrix_pk")
+        .all()
         .as_fast()
     )
 

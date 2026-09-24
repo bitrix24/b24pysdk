@@ -9,7 +9,10 @@ __all__ = [
 
 
 class Comment(BaseEntity):
-    """"""
+    """Methods for working with comments in the timeline of entities.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/comment/index.html
+    """
 
     @type_checker
     def add(
@@ -20,7 +23,24 @@ class Comment(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Create a new comment in the timeline
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/comment/rpa-comment-add.html
+
+        This method creates a new comment in the timeline of the item with the identifier itemId for the process with the identifier typeId.
+
+        Args:
+            type_id: Identifier of the process;
+
+            item_id: Identifier of the item;
+
+            fields: Object describing the fields of the comment;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "typeId": type_id,
@@ -41,7 +61,20 @@ class Comment(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete comment
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/comment/rpa-comment-delete.html
+
+        This method deletes a comment with the identifier id that were added by the same user.
+
+        Args:
+            bitrix_id: Record identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -61,7 +94,22 @@ class Comment(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update timeline entry
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/comment/rpa-comment-update.html
+
+        This method updates the timeline entry with the identifier id. It only updates the title and description fields.
+
+        Args:
+            bitrix_id: Identifier of the comment;
+
+            fields: An object describing the fields of the comment;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

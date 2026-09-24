@@ -3,8 +3,9 @@ from typing import Optional, Text, Union
 
 from ....._constants import MISSING
 from .....api.requests import BitrixAPIRequest
+from .....utils.converters import bool_to_bitrix
 from .....utils.functional import type_checker
-from .....utils.types import B24BoolStrict, Timeout
+from .....utils.types import Timeout
 from ...._base_entity import BaseEntity
 from .user import User
 
@@ -27,7 +28,7 @@ class Chat(BaseEntity):
             crm_entity_type: Text,
             crm_entity: Union[int, Text],
             *,
-            active_only: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            active_only: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -38,7 +39,7 @@ class Chat(BaseEntity):
         )
 
         if active_only is not MISSING:
-            params["ACTIVE_ONLY"] = B24BoolStrict(active_only).to_b24()
+            params["ACTIVE_ONLY"] = bool_to_bitrix(active_only, is_required=True)
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,

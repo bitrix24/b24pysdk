@@ -3,7 +3,7 @@ from typing import Dict, Iterable, Optional, Sequence, Text
 from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import B24Bool, B24File, JSONDict, Timeout
+from ...utils.types import B24File, JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -18,7 +18,7 @@ class Folder(BaseEntity):
     """
 
     @type_checker
-    def addsubfolder(
+    def add_sub_folder(
             self,
             bitrix_id: int,
             data: Dict,
@@ -47,13 +47,13 @@ class Folder(BaseEntity):
         }
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.addsubfolder,
+            api_wrapper=self.add_sub_folder,
             params=params,
             timeout=timeout,
         )
 
     @type_checker
-    def copyto(
+    def copy_to(
             self,
             bitrix_id: int,
             target_folder_id: int,
@@ -82,13 +82,13 @@ class Folder(BaseEntity):
         }
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.copyto,
+            api_wrapper=self.copy_to,
             params=params,
             timeout=timeout,
         )
 
     @type_checker
-    def deletetree(
+    def delete_tree(
             self,
             bitrix_id: int,
             *,
@@ -114,7 +114,7 @@ class Folder(BaseEntity):
         }
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.deletetree,
+            api_wrapper=self.delete_tree,
             params=params,
             timeout=timeout,
         )
@@ -184,7 +184,7 @@ class Folder(BaseEntity):
         )
 
     @type_checker
-    def getchildren(
+    def get_children(
             self,
             bitrix_id: int,
             *,
@@ -222,16 +222,16 @@ class Folder(BaseEntity):
             params["order"] = order
 
         if start is not MISSING:
-            params["START"] = start
+            params["start"] = start
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.getchildren,
+            api_wrapper=self.get_children,
             params=params,
             timeout=timeout,
         )
 
     @type_checker
-    def getfields(
+    def get_fields(
             self,
             *,
             timeout: Timeout = None,
@@ -251,12 +251,12 @@ class Folder(BaseEntity):
         """
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.getfields,
+            api_wrapper=self.get_fields,
             timeout=timeout,
         )
 
     @type_checker
-    def markdeleted(
+    def mark_deleted(
             self,
             bitrix_id: int,
             *,
@@ -282,13 +282,13 @@ class Folder(BaseEntity):
         }
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.markdeleted,
+            api_wrapper=self.mark_deleted,
             params=params,
             timeout=timeout,
         )
 
     @type_checker
-    def moveto(
+    def move_to(
             self,
             bitrix_id: int,
             target_folder_id: int,
@@ -317,7 +317,7 @@ class Folder(BaseEntity):
         }
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.moveto,
+            api_wrapper=self.move_to,
             params=params,
             timeout=timeout,
         )
@@ -390,7 +390,7 @@ class Folder(BaseEntity):
         )
 
     @type_checker
-    def sharetouser(
+    def share_to_user(
             self,
             bitrix_id: int,
             user_id: int,
@@ -407,18 +407,18 @@ class Folder(BaseEntity):
         }
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.sharetouser,
+            api_wrapper=self.share_to_user,
             params=params,
             timeout=timeout,
         )
 
     @type_checker
-    def uploadfile(
+    def upload_file(
             self,
             bitrix_id: int,
-            file_content: Sequence[Text],
-            data: JSONDict,
             *,
+            data: Optional[JSONDict] = MISSING,
+            file_content: Sequence[Text] = MISSING,
             generate_unique_name: Optional[bool] = MISSING,
             rights: Optional[Iterable[Dict]] = MISSING,
             timeout: Timeout = None,
@@ -444,12 +444,16 @@ class Folder(BaseEntity):
 
         params = {
             "id": bitrix_id,
-            "fileContent": B24File(file_content).to_b24(),
-            "data": data,
         }
 
+        if file_content is not MISSING:
+            params["fileContent"] = B24File(file_content).to_b24()
+
+        if data is not MISSING:
+            params["data"] = data
+
         if generate_unique_name is not MISSING:
-            params["generateUniqueName"] = B24Bool(generate_unique_name).to_b24()
+            params["generateUniqueName"] = generate_unique_name
 
         if rights is not MISSING:
             if rights.__class__ is not list:
@@ -458,7 +462,7 @@ class Folder(BaseEntity):
             params["rights"] = rights
 
         return self._make_bitrix_api_request(
-            api_wrapper=self.uploadfile,
+            api_wrapper=self.upload_file,
             params=params,
             timeout=timeout,
         )

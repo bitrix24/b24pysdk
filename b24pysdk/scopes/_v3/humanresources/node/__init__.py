@@ -6,7 +6,8 @@ from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
 from .....utils.types import JSONDict, Timeout
 from ...._base_entity import BaseEntity
-from .field import Field
+from ..._field import Field
+from .communication import Communication
 from .member import Member
 
 __all__ = [
@@ -15,7 +16,10 @@ __all__ = [
 
 
 class Node(BaseEntity):
-    """"""
+    """Class for managing departments or teams.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/departments/node/index.html
+    """
 
     @cached_property
     def field(self) -> Field:
@@ -26,6 +30,11 @@ class Node(BaseEntity):
     def member(self) -> Member:
         """"""
         return Member(self)
+
+    @cached_property
+    def communication(self) -> Communication:
+        """"""
+        return Communication(self)
 
     @type_checker
     def add(  # noqa: C901, PLR0912
@@ -47,9 +56,48 @@ class Node(BaseEntity):
             settings: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Create department
 
-        params = {
+        Documentation: https://apidocs.bitrix24.com/api-reference/departments/node/humanresources-node-add.html
+
+        The method creates a new department or team.
+
+        Args:
+            type: The type of the structure element being created;
+
+            name: The name of the department or team;
+
+            parent_id: The ID of the parent department or team;
+
+            description: The description of the department or team;
+
+            color_name: The color of the team;
+
+            user_ids: Users to be added to the department or team;
+
+            move_users_to_node: Determines whether to transfer users from user_ids to the new department;
+
+            create_chat: Determines whether to create a new chat for the department;
+
+            binding_chat_ids: An array of identifiers of existing chats to be linked to the department;
+
+            create_channel: Determines whether to create a new channel for the department;
+
+            binding_channel_ids: An array of identifiers of existing channels to be linked to the department;
+
+            create_collab: Determines whether to create a new collaboration for the department;
+
+            binding_collab_ids: An array of identifiers of existing collaborations to be linked to the department;
+
+            settings: The settings for the department or team;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+
+        params: JSONDict = {
             "type": type,
             "name": name,
             "parentId": parent_id,
@@ -111,9 +159,24 @@ class Node(BaseEntity):
             select: Optional[Iterable[Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get child departments
 
-        params = {
+        Documentation: https://apidocs.bitrix24.com/api-reference/departments/node/humanresources-node-children.html
+
+        The method returns the direct child departments and teams of the selected structure element.
+
+        Args:
+            bitrix_id: Identifier of the parent department or team;
+
+            select: List of fields of the department or team to return;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+
+        params: JSONDict = {
             "id": bitrix_id,
         }
 
@@ -135,7 +198,18 @@ class Node(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the number of departments
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/departments/node/humanresources-node-count.html
+
+        The method returns the total number of departments within the company's structure.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         return self._make_bitrix_api_request(
             api_wrapper=self.count,
@@ -152,9 +226,28 @@ class Node(BaseEntity):
             color_name: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update department
 
-        params = {
+        Documentation: https://apidocs.bitrix24.com/api-reference/departments/node/humanresources-node-edit.html
+
+        The method updates the properties of a department or team.
+
+        Args:
+            bitrix_id: Identifier of the department or team;
+
+            name: New name of the department or team;
+
+            description: New description of the department or team;
+
+            color_name: New color name of the team;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+
+        params: JSONDict = {
             "id": bitrix_id,
         }
 
@@ -181,9 +274,24 @@ class Node(BaseEntity):
             select: Optional[Iterable[Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get department or team by ID
 
-        params = {
+        Documentation: https://apidocs.bitrix24.com/api-reference/departments/node/humanresources-node-get.html
+
+        The method returns a department or team by its identifier.
+
+        Args:
+            bitrix_id: Identifier of the department or team;
+
+            select: List of department fields to return;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+
+        params: JSONDict = {
             "id": bitrix_id,
         }
 
@@ -208,9 +316,26 @@ class Node(BaseEntity):
             pagination: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of departments
 
-        params = {
+        Documentation: https://apidocs.bitrix24.com/api-reference/departments/node/humanresources-node-list.html
+
+        The method returns a list of departments or teams.
+
+        Args:
+            type: Type of the structure element;
+
+            select: List of department fields to return;
+
+            pagination: Pagination parameter;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+
+        params: JSONDict = {
             "type": type,
         }
 
@@ -237,9 +362,24 @@ class Node(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Move department
 
-        params = {
+        Documentation: https://apidocs.bitrix24.com/api-reference/departments/node/humanresources-node-move.html
+
+        The method changes the parent department for a department or team.
+
+        Args:
+            bitrix_id: Identifier of the department or team to be moved;
+
+            parent_id: Identifier od the new parent department;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+
+        params: JSONDict = {
             "id": bitrix_id,
             "parentId": parent_id,
         }
@@ -260,9 +400,28 @@ class Node(BaseEntity):
             pagination: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Find departments
 
-        params = {
+        Documentation: https://apidocs.bitrix24.com/api-reference/departments/node/humanresources-node-search.html
+
+        The method searches for departments or teams by name.
+
+        Args:
+            type: Type of the structure element;
+
+            name: arch string for part of the department or team;
+
+            parent_id: Identifier of the parent department to limit the search;
+
+            pagination: Pagination parameter;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+
+        params: JSONDict = {
             "type": type,
             "name": name,
         }

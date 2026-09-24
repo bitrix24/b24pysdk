@@ -1,12 +1,11 @@
 from datetime import datetime
-from typing import Callable, Dict, Final, Iterable, Literal, Optional, Text, Tuple, Union
+from typing import Callable, Dict, Final, Iterable, List, Literal, Optional, Text, Tuple, Union
 
-from ..._constants import MAX_BATCH_SIZE
 from ...constants.version import B24APIVersion
 from ...protocols import BitrixTokenProtocol
 from ...schemas.api import BatchResponseData, BatchResultData, ListFastResponseData, ResponseData, TimeResponseData
 from ...utils.types import B24APIVersionLiteral, B24RequestTuple, JSONDict, JSONGenerator, JSONList, Timeout, cast
-from ._base_caller import BaseCaller
+from ._base_list_caller import BaseListCaller
 from ._utils import get_empty_time
 from .call_batch import call_batch
 from .call_method import call_method
@@ -16,20 +15,25 @@ __all__ = [
 ]
 
 
-class _ListFastCaller(BaseCaller):
+class _ListFastCaller(BaseListCaller):
     """
-    Caller for fast classic list retrieval by moving ID window.
+    Caller for fast classic list retrieval without total counting.
 
-    Instead of relying on Bitrix ``total`` counting, this caller orders results
-    by an ID-like field, disables total calculation with ``start=-1``, and uses
-    batch requests whose filters depend on the last ID returned by the previous
-    page. This is useful for large V1/V2 datasets where total counting is slow.
+    For an unknown result set, the caller uses a moving ID window whose batch
+    filters depend on the last ID returned by the preceding page. When the
+    request filters only by explicit IDs, it skips that pagination chain and
+    sends independent ID chunks instead. Both strategies order results by an
+    ID-like field and use ``start=-1`` to disable total calculation.
     """
 
     _DEFAULT_ID_FIELD: Final[Text] = "ID"
-    _DEFAULT_ORDER_PATTERN: Final[Callable[[Text, Text], JSONDict]] = staticmethod(lambda id_field, sorting: {"order": {id_field: sorting}})
-    _HALT: Final[bool] = True
-    _MAX_BATCH_SIZE: Final[int] = MAX_BATCH_SIZE
+    _DEFAULT_FILTER_PATTERN: Final[Callable[[Text, Union[int, Text]], JSONDict]] = staticmethod(
+        lambda filter_key, filter_value: {"filter": {filter_key: filter_value}},
+    )
+    _DEFAULT_ORDER_PATTERN: Final[Callable[[Text, Text], JSONDict]] = staticmethod(
+        lambda id_field, sorting: {"order": {id_field: sorting}},
+    )
+    _MANAGED_PARAMS: Final[Tuple[Text, ...]] = ("order", "sort", "start")
     _START: Final[int] = -1
 
     _REQUEST_ID_FIELDS: Final[Dict[Text, Text]] = {
@@ -40,14 +44,19 @@ class _ListFastCaller(BaseCaller):
     }
 
     _ORDER_PATTERNS: Final[Dict[Text, Callable[[Text, Text], JSONDict]]] = {
-        "department": staticmethod(lambda id_field, sorting: {"SORT": id_field, "ORDER": sorting}),
-        "user": staticmethod(lambda id_field, sorting: {"SORT": id_field, "ORDER": sorting}),
-        "user.userfield": _DEFAULT_ORDER_PATTERN,
+        "department": lambda id_field, sorting: {"SORT": id_field, "ORDER": sorting},
+        "user": lambda id_field, sorting: {"SORT": id_field, "ORDER": sorting},
+        "user.userfield": lambda id_field, sorting: {"order": {id_field: sorting}},
+    }
+
+    _FILTER_PATTERNS: Final[Dict[Text, Callable[[Text, Union[int, Text]], JSONDict]]] = {
+        "department": lambda filter_key, filter_value: {filter_key: filter_value},
     }
 
     __slots__ = (
         "_counter",
         "_descending",
+        "_filter_pattern",
         "_last_id",
         "_limit",
         "_now_datetime",
@@ -68,6 +77,7 @@ class _ListFastCaller(BaseCaller):
     _request_id_field: Optional[Text]
     _response_id_field: Optional[Text]
     _wrapper: Optional[Text]
+    _filter_pattern: Callable[[Text, Union[int, Text]], JSONDict]
     _order_pattern: Callable[[Text, Text], JSONDict]
     _results: Optional[Union[JSONDict, JSONList]]
 
@@ -93,8 +103,8 @@ class _ListFastCaller(BaseCaller):
             auth_token: OAuth access token or webhook token.
             is_webhook: Whether ``auth_token`` is a webhook token.
             api_method: List-like REST method name.
-            params: Base method parameters. They are merged with generated
-                ordering, filter, and ``start=-1`` parameters.
+            params: Base method parameters. ``order``, ``sort``, and ``start``
+                must not be passed because this caller manages them internally.
             descending: Retrieve items by descending ID-like field when ``True``.
             limit: Maximum number of yielded items, or ``None`` for all items.
             prefer_version: Preferred API version. V3 methods are rejected
@@ -114,6 +124,19 @@ class _ListFastCaller(BaseCaller):
         )
         if self._api_version == B24APIVersion.V3:
             raise TypeError("Bitrix API v3 methods are not supported by call_list_fast yet.")
+
+        managed_params = tuple(
+            key
+            for key in self._params
+            if key.lower() in self._MANAGED_PARAMS
+        )
+
+        if managed_params:
+            raise ValueError(
+                "Parameters managed internally by call_list_fast cannot be passed in params: "
+                f"{', '.join(map(repr, managed_params))}.",
+            )
+
         self._descending = descending
         self._limit = limit
         self._now_datetime = self._config.get_local_datetime()
@@ -123,6 +146,7 @@ class _ListFastCaller(BaseCaller):
         self._request_id_field = self._get_initial_request_id_field()
         self._response_id_field = None
         self._wrapper = None
+        self._filter_pattern = self._get_filter_pattern()
         self._order_pattern = self._get_order_pattern()
         self._results = None
 
@@ -162,6 +186,24 @@ class _ListFastCaller(BaseCaller):
 
         return order_pattern or self._DEFAULT_ORDER_PATTERN
 
+    def _get_filter_pattern(self) -> Callable[[Text, Union[int, Text]], JSONDict]:
+        """
+        Resolve how the current method expresses a dynamic ID filter.
+
+        Most list methods place comparison filters inside ``filter``. A few
+        older methods, such as ``department.get``, accept filter fields at the
+        top request level, so their moving ID boundary must use the same shape.
+        """
+
+        api_method = self._api_method
+        filter_pattern = self._FILTER_PATTERNS.get(api_method)
+
+        while not (api_method.find(".") == -1 or filter_pattern):
+            api_method, _ = api_method.rsplit(".", maxsplit=1)
+            filter_pattern = self._FILTER_PATTERNS.get(api_method)
+
+        return filter_pattern or self._DEFAULT_FILTER_PATTERN
+
     @property
     def _cmp(self) -> Literal[">", "<"]:
         """Return the comparison operator used to advance the ID window."""
@@ -194,9 +236,9 @@ class _ListFastCaller(BaseCaller):
 
     @staticmethod
     def _force_values(collection: Union[JSONDict, JSONList]) -> Iterable[Union[JSONDict, JSONList]]:
-        """Return iterable values for either dict-shaped or list-shaped results."""
+        """Return batch values ordered by their numeric command keys."""
         if isinstance(collection, dict):
-            return collection.values()
+            return (collection[key] for key in sorted(collection, key=int))
         else:
             return collection
 
@@ -268,7 +310,7 @@ class _ListFastCaller(BaseCaller):
         else:
             raise TypeError(f"Bitrix API method {self._api_method!r} is not a list-type method!")
 
-    def _get_path(self, index: int) -> Text:
+    def _get_path(self, counter: int) -> Text:
         """
         Build a Bitrix batch expression pointing to the previous request result.
 
@@ -276,14 +318,14 @@ class _ListFastCaller(BaseCaller):
         last item ID from the previous command and continue the moving ID window.
         """
 
-        path = f"$result[req_{index - 1}]"
+        path = f"$result[{counter}]"
 
         if self._wrapper:
             path = f"{path}[{self._wrapper}]"
 
         return path
 
-    def _get_filter_by_id(self, index: int) -> JSONDict:
+    def _get_filter_by_id(self, counter: int) -> JSONDict:
         """
         Generate the moving ID filter for one command in a batch chain.
 
@@ -293,23 +335,21 @@ class _ListFastCaller(BaseCaller):
         to fetch several consecutive pages.
         """
 
-        if index == 0:
-            if self._last_id:
-                return {
-                    "filter": {
-                        self._filter_key: self._last_id,
-                    },
-                }
-            else:
+        if counter == 1:
+            if not self._last_id:
                 return {}
 
-        return {
-            "filter": {
-                self._filter_key: f"{self._get_path(index)}[{self._MAX_BATCH_SIZE - 1}][{self._response_id_field}]",
-            },
-        }
+            filter_value = self._last_id
+        else:
+            filter_value = (
+                f"{self._get_path(counter - 1)}"
+                f"[{self._MAX_BATCH_SIZE - 1}]"
+                f"[{self._response_id_field}]"
+            )
 
-    def _generate_method_params(self, index: int = 0) -> JSONDict:
+        return self._filter_pattern(self._filter_key, filter_value)
+
+    def _generate_method_params(self, counter: int = 1) -> JSONDict:
         """
         Build parameters for one fast-list request.
 
@@ -319,7 +359,7 @@ class _ListFastCaller(BaseCaller):
         return self._deep_merge(
             self._params,
             self._order_by_id,
-            self._get_filter_by_id(index=index),
+            self._get_filter_by_id(counter=counter),
             {"start": self._START},
         )
 
@@ -346,8 +386,9 @@ class _ListFastCaller(BaseCaller):
         Generate one chain of fast-list batch commands.
 
         Every command uses the same API method with generated order, filter, and
-        ``start=-1`` parameters. Commands are named ``req_0``, ``req_1``, ...
-        because later filters reference earlier command results by these names.
+        ``start=-1`` parameters. Commands use one-based string keys ``"1"``,
+        ``"2"``, ... so Bitrix keeps batch results dict-shaped. Later filters
+        reference preceding command results by these keys.
         The number of generated commands is limited by the remaining requested
         item count when ``limit`` is set.
 
@@ -358,18 +399,60 @@ class _ListFastCaller(BaseCaller):
 
         methods: Dict[Text, B24RequestTuple] = {}
 
-        for index in range(self._get_batch_methods_count()):
-            method_params = self._generate_method_params(index=index)
-            methods[f"req_{index}"] = (self._api_method, method_params)
+        for counter in range(1, self._get_batch_methods_count() + 1):
+            method_params = self._generate_method_params(counter=counter)
+            methods[str(counter)] = (self._api_method, method_params)
+
+        return methods
+
+    def _generate_filter_id_batch_methods(
+            self,
+            filter_key: Text,
+            filter_id_key: Text,
+            filter_ids: List[int],
+    ) -> Dict[Text, B24RequestTuple]:
+        """Generate independent ``start=-1`` commands for explicit IDs.
+
+        Each command receives at most one Bitrix24 page of IDs and therefore
+        cannot require pagination. The regular ID ordering is included in every
+        command. An empty ``filter_key`` means that the API method accepts ``ID``
+        directly at the top request level.
+
+        Args:
+            filter_key: Enclosing filter key, or an empty string for a
+                top-level ID filter.
+            filter_id_key: Actual case-preserving ``ID`` or ``@ID`` key.
+            filter_ids: IDs assigned to this physical batch request.
+
+        Returns:
+            Named method commands ready for one ``call_batch`` invocation.
+        """
+
+        methods: Dict[Text, B24RequestTuple] = {}
+
+        for counter, start in enumerate(range(0, len(filter_ids), self._MAX_BATCH_SIZE), start=1):
+            id_chunk = filter_ids[start:start + self._MAX_BATCH_SIZE]
+            filter_params = (
+                {filter_key: {filter_id_key: id_chunk}}
+                if filter_key else {filter_id_key: id_chunk}
+            )
+            method_params = self._deep_merge(
+                self._params,
+                filter_params,
+                self._order_by_id,
+                {"start": self._START},
+            )
+            methods[str(counter)] = (self._api_method, method_params)
 
         return methods
 
     def _fetch_first_response(self) -> ResponseData:
         """
-        Fetch the first page outside batch to discover wrapper and ID field names.
+        Fetch the first moving-ID page to discover wrapper and ID field names.
 
         Later batch commands depend on the response wrapper and ID field found
-        in this initial response.
+        in this initial response. The explicit ID-only strategy does not need
+        this discovery request.
         """
         if self._bitrix_token:
             response = self._bitrix_token.call_method(
@@ -389,13 +472,13 @@ class _ListFastCaller(BaseCaller):
 
         return cast(ResponseData, response)
 
-    def _fetch_next_batch_response(self) -> BatchResponseData:
-        """Fetch the next chain of pages through one classic batch request."""
+    def _fetch_batch_response(self, methods: Dict[Text, B24RequestTuple]) -> BatchResponseData:
+        """Execute one classic batch containing the supplied commands."""
         return call_batch(
             domain=self._domain,
             auth_token=self._auth_token,
             is_webhook=self._is_webhook,
-            methods=self._generate_batch_methods(),
+            methods=methods,
             halt=self._HALT,
             bitrix_token=self._bitrix_token,
             **self._kwargs,
@@ -455,58 +538,123 @@ class _ListFastCaller(BaseCaller):
 
         return False
 
-    def _generate_result(self) -> JSONGenerator:
-        """
-        Yield items one by one while fetching additional pages as needed.
+    def _generate_result_by_ids(
+            self,
+            filter_key: Text,
+            filter_id_key: Text,
+            filter_ids: List[int],
+    ) -> JSONGenerator:
+        """Yield explicitly selected IDs through independent batch commands.
 
-        The generator starts with a normal method call, then repeatedly requests
-        chained batch pages until a short page is returned or ``limit`` is
-        reached.
+        IDs are sorted in the requested traversal direction before chunking.
+        Batch command results are processed by their one-based numeric keys, while
+        objects from each command are yielded immediately without accumulating an
+        intermediate list. One physical batch contains at most ``MAX_BATCH_SIZE``
+        commands, and every command filters at most ``MAX_BATCH_SIZE`` IDs.
+
+        Args:
+            filter_key: Enclosing filter key, or an empty string for a
+                top-level ID filter.
+            filter_id_key: Actual case-preserving ``ID`` or ``@ID`` key.
+            filter_ids: Complete materialized collection of requested IDs.
         """
+
+        sorted_filter_ids = sorted(filter_ids, reverse=self._descending)
+        start = 0
+
+        while start < len(sorted_filter_ids):
+            methods_count = self._get_batch_methods_count()
+
+            if not methods_count:
+                return
+
+            end = start + methods_count * self._MAX_BATCH_SIZE
+
+            batch_response = self._fetch_batch_response(
+                methods=self._generate_filter_id_batch_methods(
+                    filter_key=filter_key,
+                    filter_id_key=filter_id_key,
+                    filter_ids=sorted_filter_ids[start:end],
+                ),
+            )
+
+            start = end
+
+            batch_result = batch_response["result"]
+
+            self._warn_batch_result_errors(batch_result)
+            self._add_time(batch_response["time"])
+
+            for result_value in self._force_values(batch_result["result"]):
+                _, unwrapped_result_values = self._unwrap_result(result_value)
+
+                for unwrapped_result_value in unwrapped_result_values:
+                    yield unwrapped_result_value
+                    self._counter += 1
+
+                    if self._limit is not None and self._counter >= self._limit:
+                        return
+
+    def _generate_paginated_result(self) -> JSONGenerator:
+        """Yield an unknown result set through moving-ID pagination."""
+
+        response = self._fetch_first_response()
+
+        self._add_time(response["time"])
+        self._wrapper, unwrapped_result_values = self._unwrap_result(response["result"])
+
+        if unwrapped_result_values:
+            self._results = [response["result"]]
+        else:
+            return
+
+        self._response_id_field = self._extract_response_id_field(unwrapped_result_values[0])
+
+        while self._results:
+            for result_values in self._results_values:
+                unwrapped_result_values = result_values[self._wrapper] if self._wrapper else result_values
+
+                if not unwrapped_result_values:
+                    return
+
+                new_last_id = int(unwrapped_result_values[-1][self._response_id_field])
+
+                if not self._update_last_id(new_last_id):
+                    return
+
+                for result_value in unwrapped_result_values:
+                    yield result_value
+                    self._counter += 1
+
+                    if self._limit is not None and self._counter >= self._limit:
+                        return
+
+                if len(unwrapped_result_values) < self._MAX_BATCH_SIZE:
+                    return
+
+            batch_response = self._fetch_batch_response(methods=self._generate_batch_methods())
+            batch_result = batch_response["result"]
+
+            self._warn_batch_result_errors(batch_result)
+            self._add_time(batch_response["time"])
+            self._results = batch_result["result"]
+
+    def _generate_result(self) -> JSONGenerator:
+        """Select the ID-only or moving-ID strategy and yield its items."""
         try:
             if self._limit is not None and self._limit <= 0:
                 return
 
-            response = self._fetch_first_response()
+            filter_key, filter_id_key, filter_ids = self._check_filter_by_id_only()
 
-            self._add_time(response["time"])
-            self._wrapper, unwrapped_result_values = self._unwrap_result(response["result"])
-
-            if unwrapped_result_values:
-                self._results = [response["result"]]
+            if filter_ids is None:
+                yield from self._generate_paginated_result()
             else:
-                return
-
-            self._response_id_field = self._extract_response_id_field(unwrapped_result_values[0])
-
-            while self._results:
-                for result_values in self._results_values:
-                    unwrapped_result_values = result_values[self._wrapper] if self._wrapper else result_values
-
-                    if not unwrapped_result_values:
-                        return
-
-                    new_last_id = int(unwrapped_result_values[-1][self._response_id_field])
-
-                    if not self._update_last_id(new_last_id):
-                        return
-
-                    for result_value in unwrapped_result_values:
-                        yield result_value
-                        self._counter += 1
-
-                        if self._limit is not None and self._counter >= self._limit:
-                            return
-
-                    if len(unwrapped_result_values) < self._MAX_BATCH_SIZE:
-                        return
-
-                batch_response = self._fetch_next_batch_response()
-                batch_result = batch_response["result"]
-
-                self._warn_batch_result_errors(batch_result)
-                self._add_time(batch_response["time"])
-                self._results = batch_result["result"]
+                yield from self._generate_result_by_ids(
+                    filter_key=filter_key,
+                    filter_id_key=filter_id_key,
+                    filter_ids=filter_ids,
+                )
         finally:
             self._config.logger.debug("finish call_list_fast")
 
@@ -548,7 +696,12 @@ def call_list_fast(
         **kwargs,
 ) -> ListFastResponseData:
     """
-    Retrieve a large classic list result using ID-window pagination.
+    Retrieve a large classic list result without Bitrix total counting.
+
+    Unknown result sets use moving-ID pagination. Requests filtered only by an
+    explicit ID iterable are split into independent sorted commands instead,
+    avoiding both the discovery request and pagination by the last returned ID.
+    Every generated method call includes ``start=-1``.
 
     Note:
         On small sets of items (2550 entries and less), ``call_list`` can be
@@ -561,7 +714,9 @@ def call_list_fast(
         auth_token: OAuth access token or webhook token.
         is_webhook: Whether ``auth_token`` is a webhook token.
         api_method: List-like REST method name, for example ``crm.deal.list``.
-        params: Base method parameters sent to Bitrix.
+        params: Base method parameters sent to Bitrix. Must not contain
+            ``order``, ``sort``, or ``start`` because this helper generates
+            these parameters internally.
         descending: Retrieve items in descending ID order when ``True``.
         limit: Maximum number of items to retrieve.
         timeout: Request timeout in seconds.

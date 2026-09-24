@@ -3,7 +3,7 @@ from typing import Annotated, Iterable, Literal, Optional, Text, Union
 from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import classproperty, type_checker
-from ...utils.types import Number, Timeout
+from ...utils.types import JSONDict, Number, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -12,7 +12,10 @@ __all__ = [
 
 
 class ExternalCall(BaseEntity):
-    """"""
+    """Class for working with external telephony calls.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/telephony/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -22,18 +25,39 @@ class ExternalCall(BaseEntity):
     def attach_record(
             self,
             call_id: Text,
-            filename: Text,
             *,
-            file_content: Optional[Text] = MISSING,
-            record_url: Optional[Text] = MISSING,
+            filename: Text = MISSING,
+            file_content: Text = MISSING,
+            record_url: Text = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Attach a record to a completed call
 
-        params = {
+        Documentation: https://apidocs.bitrix24.com/api-reference/telephony/telephony-external-call-attach-record.html
+
+        The method attaches a record to a completed call and to the CRM activity of the call.
+
+        Args:
+            call_id: Call identifier;
+
+            filename: The name of the record file;
+
+            file_content: The file in Base64 encoding;
+
+            record_url: The URL of the record on an external server;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+
+        params: JSONDict = {
             "CALL_ID": call_id,
-            "FILENAME": filename,
         }
+
+        if filename is not MISSING:
+            params["FILENAME"] = filename
 
         if file_content is not MISSING:
             params["FILE_CONTENT"] = file_content
@@ -67,7 +91,40 @@ class ExternalCall(BaseEntity):
             add_to_chat: Optional[Literal[0, 1]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Finish call and log it in telephony statistics
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/telephony/telephony-external-call-finish.html
+
+        The method ends an external call, saves it in the statistics, and logs it in the CRM activity.
+
+        Args:
+            call_id: Call identifier;
+
+            user_id: The identifier of the user who ends the call;
+
+            user_phone_inner: The internal number of the user;
+
+            duration: The duration of the call in seconds;
+
+            cost: The cost of the call;
+
+            cost_currency: The currency of the call cost;
+
+            status_code: The result code of the call;
+
+            failed_reason: Text reason for the failed call;
+
+            record_url: URL of the call recording;
+
+            vote: Rating of the call;
+
+            add_to_chat: Add a message about the call to the employee's chat;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if user_id is MISSING and user_phone_inner is MISSING:
             raise ValueError("Either 'user_id' or 'user_phone_inner' must be provided")
@@ -120,7 +177,22 @@ class ExternalCall(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Hide call card for user
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/telephony/telephony-external-call-hide.html
+
+        The method hides the call card for a user or a list of users.
+
+        Args:
+            call_id: Call identifier;
+
+            user_id: Identifier or an array of user identifiers;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if user_id.__class__ is not list and not isinstance(user_id, int):
             user_id = list(user_id)
@@ -156,7 +228,46 @@ class ExternalCall(BaseEntity):
             external_call_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Register an external call
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/telephony/telephony-external-call-register.html
+
+        The method registers an external call in Bitrix24.
+
+        Args:
+            phone_number: The client's phone number;
+
+            call_type: The type of call;
+
+            user_phone_inner: The internal number of the user;
+
+            user_id: The identifier of the user for whom the call is registered;
+
+            call_start_date: The date and time the call started in ISO-8601 format with timezone indication;
+
+            crm_create: Automatic creation of a CRM object if no suitable object is found by the number;
+
+            crm_source: The identifier of the CRM source;
+
+            crm_entity_type: The type of CRM object to associate with the call;
+
+            crm_entity_id: The identifier of the CRM object from;
+
+            show: Show the call detail form after registration;
+
+            add_to_chat: Add a message about the call to the employee's chat;
+
+            call_list_id: The identifier of the call list to which call is linked;
+
+            line_number: The line number of the external line;
+
+            external_call_id: The external identifier of the call on the side of the PBX/integration;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if user_id is MISSING and user_phone_inner is MISSING:
             raise ValueError("Either 'user_id' or 'user_phone_inner' must be provided")
@@ -215,7 +326,20 @@ class ExternalCall(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Find a client in CRM by phone number
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/telephony/telephony-external-call-search-crm-entities.html
+
+        The method returns CRM entities based on the client's phone number and the details of the responsible employee.
+
+        Args:
+            phone_number: The client's phone number;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "PHONE_NUMBER": phone_number,
@@ -235,7 +359,22 @@ class ExternalCall(BaseEntity):
             user_id: Optional[Union[int, Iterable[int]]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Show call card to user
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/telephony/telephony-external-call-show.html
+
+        The method displays the call card to a user or a list of users;
+
+        Args:
+            call_id: Call identifier;
+
+            user_id: Identifier of the user or an array of user identifiers;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "CALL_ID": call_id,

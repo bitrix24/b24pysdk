@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Counters(BaseEntity):
-    """"""
+    """Class for retrieving user counters.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/tasks/index.html
+    """
 
     @type_checker
     def get(
@@ -29,7 +32,24 @@ class Counters(BaseEntity):
             ]]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get user counters
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/tasks-task-counters-get.html
+
+        The method retrieves task counter values for the specified user.
+
+        Args:
+            user_id: The identifier of the user for whom to retrieve counters;
+
+            group_id: The identifier of the group for which to retrieve task counters;
+
+            type: The role for which to retrieve counters;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

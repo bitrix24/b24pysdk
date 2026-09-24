@@ -92,6 +92,48 @@ class Repo(BaseEntity):
         )
 
     @type_checker
+    def bind(
+            self,
+            fields: JSONDict,
+            *,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params: JSONDict = {
+            "fields": fields,
+        }
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.bind,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
+    def unbind(
+            self,
+            code: Text,
+            *,
+            handler: Optional[Text] = MISSING,
+            timeout: Timeout = None,
+    ) -> BitrixAPIRequest:
+        """"""
+
+        params: JSONDict = {
+            "code": code,
+        }
+
+        if handler is not MISSING:
+            params["handler"] = handler
+
+        return self._make_bitrix_api_request(
+            api_wrapper=self.unbind,
+            params=params,
+            timeout=timeout,
+        )
+
+    @type_checker
     def get_list(
             self,
             *,

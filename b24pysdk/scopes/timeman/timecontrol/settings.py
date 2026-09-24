@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Settings(BaseEntity):
-    """"""
+    """Class for managing settings of time tracking tool.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/timeman/timecontrol/index.html
+    """
 
     @type_checker
     def get(
@@ -20,7 +23,18 @@ class Settings(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get time control settings
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/timeman/timecontrol/timeman-timecontrol-settings-get.html
+
+        The method retrieves the settings of the time control module.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
             timeout=timeout,
@@ -43,7 +57,40 @@ class Settings(BaseEntity):
             report_full_users: Optional[Iterable[int]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Set time control settings
+
+        Documentation; https://apidocs.bitrix24.com/api-reference/timeman/timecontrol/timeman-timecontrol-settings-set.html
+
+        The method sets the configurations for the time control module.
+
+        Args:
+            active: Activate the time control module;
+
+            minimum_idle_for_report: Minimum idle time in minutes after which a report is required;
+
+            register_offline: Register offline status;
+
+            register_idle: Register idle status;
+
+            register_desktop: Register desktop application status;
+
+            report_request_type: Report request type;
+
+            report_request_users: Array of user IDs for whom report requests are required;
+
+            report_simple_type: Type of simple report;
+
+            report_simple_users: Array of user IDs with access to the simple report;
+
+            report_full_type: Type of full report;
+
+            report_full_users: Array of user IDs with access to the full report;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Report(BaseEntity):
-    """"""
+    """Class for managing identified absences.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/timeman/timecontrol/index.html
+    """
 
     @type_checker
     def add(
@@ -25,7 +28,28 @@ class Report(BaseEntity):
             calendar: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add absence report
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/timeman/timecontrol/timeman-timecontrol-report-add.html
+
+        The method sends an absence report and adds it to the calendar.
+
+        Args:
+            report_id: Identifier of the absence record;
+
+            text: Report text;
+
+            user_id: Identifier of the user;
+
+            type: Report type;
+
+            calendar: Flag for adding event to calendar;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "REPORT_ID": report_id,

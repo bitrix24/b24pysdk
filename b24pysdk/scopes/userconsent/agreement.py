@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Agreement(BaseEntity):
-    """"""
+    """Class for retrieving user agreements.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/user-consent/index.html
+    """
 
     @type_checker
     def list(
@@ -20,7 +23,18 @@ class Agreement(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the list of agreements
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/user-consent/user-consent-agreement-list.html
+
+        The method returns a list of agreements.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
             timeout=timeout,
@@ -34,7 +48,22 @@ class Agreement(BaseEntity):
             replace: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the text of the agreement
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/user-consent/user-consent-agreement-text.html
+
+        The method returns the text of the agreement.
+
+        Args:
+            bitrix_id: Identifier of the agreement;
+
+            replace: Array of replacements for text substitution;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "id": bitrix_id,

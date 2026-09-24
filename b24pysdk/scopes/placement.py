@@ -1,11 +1,12 @@
-from typing import List, Optional, Text
+from typing import List, Text
 
 from .._constants import MISSING
-from ..api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ..api.requests import BitrixAPIRequest, BitrixAPIValueRequest, BitrixAPIValuesRequest
+from ..objects.placement import Placement as PlacementObject
 from ..schemas.results import CountResultData
 from ..utils.functional import type_checker
-from ..utils.types import JSONDict, Timeout
-from ._adapters import BitrixResultAdapter
+from ..utils.types import JSONDict, JSONList, Timeout
+from ._adapters import BitrixObjectsAdapter, BitrixResultAdapter
 from ._base_scope import BaseScope
 
 __all__ = [
@@ -25,16 +26,15 @@ class Placement(BaseScope):
             placement: Text,
             handler: Text,
             *,
-            title: Optional[Text] = MISSING,
-            description: Optional[Text] = MISSING,
-            group_name: Optional[Text] = MISSING,
-            lang_all: Optional[JSONDict] = MISSING,
-            options: Optional[JSONDict] = MISSING,
-            user_id: Optional[int] = MISSING,
+            title: Text = MISSING,
+            description: Text = MISSING,
+            group_name: Text = MISSING,
+            lang_all: JSONDict = MISSING,
+            options: JSONDict = MISSING,
+            user_id: int = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """
-        Register a widget placement handler.
+        """Register a widget placement handler.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/widgets/placement-bind.html
 
@@ -52,7 +52,7 @@ class Placement(BaseScope):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest.
+            Lazy request containing the registration success flag.
         """
 
         params: JSONDict = {
@@ -89,9 +89,8 @@ class Placement(BaseScope):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """
-        Retrieve registered widget placement handlers.
+    ) -> BitrixAPIValuesRequest[JSONList, PlacementObject]:
+        """Retrieve registered widget placement handlers as SDK objects.
 
         Documentation: https://apidocs.bitrix24.com/api-reference/widgets/placement-get.html
 
@@ -101,19 +100,21 @@ class Placement(BaseScope):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest.
+            Lazy values request containing ``PlacementObject`` instances.
         """
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValuesRequest,
+            result_adapter=BitrixObjectsAdapter("placement", client=self._client),
         )
 
     @type_checker
     def list(
             self,
             *,
-            scope: Optional[Text] = MISSING,
-            full: Optional[bool] = MISSING,
+            scope: Text = MISSING,
+            full: bool = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[List[Text]]:
         """
@@ -151,8 +152,8 @@ class Placement(BaseScope):
             self,
             placement: Text,
             *,
-            handler: Optional[Text] = MISSING,
-            user_id: Optional[int] = MISSING,
+            handler: Text = MISSING,
+            user_id: int = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIValueRequest[CountResultData, int]:
         """

@@ -23,8 +23,9 @@ __all__ = [
 class Department(BaseObject[int]):
     """Bitrix24 company department."""
 
-    _OBJECT_KEY = "department"
-    _PK_TYPE = int
+    OBJECT_KEY = "department"
+    PK = int
+
     _UPDATE_KEY = None
 
     fields: "DepartmentFieldManager[Self]"
@@ -33,10 +34,10 @@ class Department(BaseObject[int]):
     bitrix_id = IntField("ID", is_pk=True)
     name = TextField("NAME", is_required=True)
     sort = IntField("SORT", is_required=True)
-    parent_id = IntField("PARENT", is_missing_allowed=True)
-    parent: Optional[Self] = ObjectField(parent_id, object_class="department")
-    uf_head_id = IntField("UF_HEAD", is_missing_allowed=True)
-    uf_head: Optional["User"] = ObjectField(uf_head_id, object_class="user")
+    parent_id = IntField("PARENT")
+    parent = ObjectField[Self](parent_id, object_class="department")
+    uf_head_id = IntField("UF_HEAD")
+    uf_head = ObjectField["User"](uf_head_id, object_class="user")
 
     def _get_bitrix_data(self) -> JSONDict:
         """Load raw department data from Bitrix24."""
@@ -53,13 +54,22 @@ class Department(BaseObject[int]):
 
         return result[0]
 
+    def get_field_title(
+            self,
+            bitrix_code: Text,
+            *,
+            timeout: Timeout = None,
+    ) -> Text:
+        """Return the localized department field title by Bitrix24 field code."""
+        return self.get_field(bitrix_code, timeout=timeout)
+
     def update(
             self,
             *,
-            name: Optional[Text] = MISSING,
-            sort: Optional[int] = MISSING,
-            parent_id: Optional[int] = MISSING,
-            parent: Optional[Self] = MISSING,
+            name: Text = MISSING,
+            sort: int = MISSING,
+            parent_id: int = MISSING,
+            parent: Self = MISSING,
             head_id: Optional[int] = MISSING,
             uf_head: Optional["User"] = MISSING,
             timeout: Timeout = None,
@@ -150,6 +160,10 @@ class DepartmentManager(BaseObjectManager[_DepartmentT], Generic[_DepartmentT]):
         """Return departments filtered by SDK object attribute names."""
         return self._filter(**filters)
 
+    def from_pks(self, bitrix_pks: Iterable[int]) -> Self:
+        """Return departments filtered by Bitrix24 primary keys."""
+        return self._from_pks(bitrix_pks)
+
     def order(self, *fields: Text) -> Self:
         """Return departments ordered by SDK object attribute names."""
         return self._order(*fields)
@@ -181,9 +195,9 @@ class DepartmentManager(BaseObjectManager[_DepartmentT], Generic[_DepartmentT]):
             self,
             *,
             name: Text,
-            parent_id: Optional[int] = MISSING,
-            parent: Optional[_DepartmentT] = MISSING,
-            sort: Optional[int] = MISSING,
+            parent_id: int = MISSING,
+            parent: _DepartmentT = MISSING,
+            sort: int = MISSING,
             head_id: Optional[int] = MISSING,
             uf_head: Optional["User"] = MISSING,
             timeout: Timeout = None,
@@ -236,10 +250,10 @@ class DepartmentManager(BaseObjectManager[_DepartmentT], Generic[_DepartmentT]):
     def update(
             self,
             *,
-            name: Optional[Text] = MISSING,
-            sort: Optional[int] = MISSING,
-            parent_id: Optional[int] = MISSING,
-            parent: Optional[_DepartmentT] = MISSING,
+            name: Text = MISSING,
+            sort: int = MISSING,
+            parent_id: int = MISSING,
+            parent: _DepartmentT = MISSING,
             head_id: Optional[int] = MISSING,
             uf_head: Optional["User"] = MISSING,
             timeout: Timeout = None,

@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Im(BaseEntity):
-    """"""
+    """Class for poll creation.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/vote/index.html
+    """
 
     @classproperty
     def _name(cls):
@@ -27,7 +30,24 @@ class Im(BaseEntity):
             template_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Create and send a vote in chat
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/vote/vote.integration.im.send.html
+
+        The method creates and sends a vote to the specified chat in the messanger.
+
+        Args:
+            chat_id: Cha identifier;
+
+            im_message_vote_data: Vote data containing the question and answer options;
+
+            template_id: A unique identifier for the request, with no format requirements;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "chatId": chat_id,

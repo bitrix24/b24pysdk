@@ -31,7 +31,26 @@ class Document(BaseEntity):
             start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of custom field values for inventory accounting documents
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/catalog/userfield-document/catalog-userfield-document-list.html
+
+        The method returns a paginated list of custom field values for inventory accounting documents.
+
+        Args:
+            select: An array containing the list of fields to select;
+
+            filter: An object for filtering the selected records;
+
+            order: A sorting object;
+
+            start: The parameter is used for pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+              Instance of BitrixAPIRequest
+        """
 
         if select.__class__ is not list:
             select = list(select)

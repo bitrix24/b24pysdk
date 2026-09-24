@@ -1,9 +1,10 @@
-from typing import Optional, Text, Union
+from typing import Optional, Text
 
 from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
+from ....utils.converters import bool_to_bitrix
 from ....utils.functional import type_checker
-from ....utils.types import B24BoolStrict, JSONDict, Timeout
+from ....utils.types import JSONDict, Timeout
 from ..._base_entity import BaseEntity
 
 __all__ = [
@@ -22,7 +23,7 @@ class Handler(BaseEntity):
         settings: JSONDict,
         *,
         sort: Optional[int] = MISSING,
-        supports_ffd105: Optional[Union[bool, B24BoolStrict]] = MISSING,
+        supports_ffd105: Optional[bool] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """"""
@@ -37,7 +38,7 @@ class Handler(BaseEntity):
             params["SORT"] = sort
 
         if supports_ffd105 is not MISSING:
-            params["SUPPORTS_FFD105"] = B24BoolStrict(supports_ffd105).to_b24()
+            params["SUPPORTS_FFD105"] = bool_to_bitrix(supports_ffd105, is_required=True)
 
         return self._make_bitrix_api_request(
             api_wrapper=self.add,

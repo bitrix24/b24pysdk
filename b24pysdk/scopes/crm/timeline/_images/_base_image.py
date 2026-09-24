@@ -16,9 +16,9 @@ class BaseImage(BaseCRM):
     @abstractmethod
     def add(
             self,
-            *,
             code: Text,
             file_content: Text,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Add new visual element.
@@ -50,8 +50,8 @@ class BaseImage(BaseCRM):
     @abstractmethod
     def get(
             self,
-            *,
             code: Text,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get information about the image.
@@ -93,8 +93,8 @@ class BaseImage(BaseCRM):
     @abstractmethod
     def delete(
             self,
-            *,
             code: Text,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[Optional[bool]]:
         """Delete image.

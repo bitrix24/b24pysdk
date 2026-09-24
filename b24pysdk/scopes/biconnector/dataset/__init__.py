@@ -170,10 +170,10 @@ class Dataset(BaseBiconnector):
     def fields_update(
             self,
             bitrix_id: int,
-            add: Optional[Iterable[JSONDict]] = MISSING,
-            update: Optional[Iterable[JSONDict]] = MISSING,
-            delete: Optional[Iterable[int]] = MISSING,
             *,
+            add: Iterable[JSONDict] = MISSING,
+            update: Iterable[JSONDict] = MISSING,
+            delete: Iterable[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """

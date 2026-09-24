@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Task(BaseEntity):
-    """"""
+    """A set of methods for working with tasks.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/task/index.html
+    """
 
     @type_checker
     def add_user(
@@ -24,7 +27,26 @@ class Task(BaseEntity):
             user_value: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add user to existing task
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/task/rpa-task-add-user.html
+
+        The method will add a user to an existing task.
+
+        Args:
+            type_id: Process identifier;
+
+            stage_id: Stage identifier;
+
+            robot_name: Name of the Automation rule;
+
+            user_value: String with user in the format First Last [user ID]
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -55,7 +77,24 @@ class Task(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Remove Automation rule
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/task/rpa-task-delete.html
+
+        This method removes the Automation rule named robotName from the process with the identifier typeId at the stage with the identifier stageId.
+
+        Args:
+            type_id: Identifier of the process;
+
+            stage_id: Stage identifier;
+
+            robot_name: Name of the automation rule;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "typeId": type_id,
@@ -75,7 +114,18 @@ class Task(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Execute the command
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/outdated/rpa/task/rpa-task-do.html
+
+        This method executes a task.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         return self._make_bitrix_api_request(
             api_wrapper=self.do,

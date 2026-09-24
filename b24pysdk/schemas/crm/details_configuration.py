@@ -59,7 +59,7 @@ class CRMDetailsConfigurationElement(BaseSchema[CRMDetailsConfigurationElementDa
         }
 
         if self.option_flags is not None:
-            bitrix_data["optionFlags"] = bool_to_bitrix(self.option_flags, is_required=True, as_int=True)
+            bitrix_data["optionFlags"] = bool_to_bitrix(self.option_flags, is_required=True, serialize_as=int)
 
         if self.options is not None:
             bitrix_data["options"] = self.options

@@ -9,7 +9,10 @@ __all__ = [
 
 
 class Payment(BaseEntity):
-    """"""
+    """Class for obtaining payment link in CRM objects.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/payment/index.html
+    """
 
     @type_checker
     def get_public_url(
@@ -18,7 +21,21 @@ class Payment(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Generate a link for a specific payment
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/payment/salescenter-payment-get-public-url.html
+
+        This method generates a link for a specific payment.
+        The payment method selected will be passed to this particular payment.
+
+        Args:
+            bitrix_id: Payment identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "id": bitrix_id,

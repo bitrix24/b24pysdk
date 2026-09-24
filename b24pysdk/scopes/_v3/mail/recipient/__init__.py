@@ -14,7 +14,10 @@ __all__ = [
 
 
 class Recipient(BaseEntity):
-    """"""
+    """Class for retrieving contacts that can be selected when addressing an e-mail.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/mail/recipient/index.html
+    """
 
     @cached_property
     def field(self) -> Field:
@@ -29,7 +32,22 @@ class Recipient(BaseEntity):
             pagination: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of contacts
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/mail/recipient/mail-recipient-listcontacts.html
+
+        The method searches for contacts in the current user's address book.
+
+        Args:
+            query: Search string by contact name or e-mail;
+
+            pagination: Pagination parameters;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -53,7 +71,22 @@ class Recipient(BaseEntity):
             pagination: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of employees
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/mail/recipient/mail-recipient-listemployees.html
+
+        The method searches for employees by name or e-mail.
+
+        Args:
+            query: Search string by employee name or e-mail;
+
+            pagination: Pagination parameters;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "query": query,

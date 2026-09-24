@@ -1,11 +1,10 @@
-from typing import Final, Iterable, List, Mapping, Optional, Text, Tuple, Union
+from typing import List, Optional, Text, Union
 
-from ..._constants import MAX_BATCH_SIZE
 from ...constants.version import B24APIVersion
 from ...protocols import BitrixTokenProtocol
 from ...schemas.api import BatchResponseData, BatchResultData, ListResponseData, ResponseData, TimeResponseData
 from ...utils.types import B24APIVersionLiteral, B24RequestTuple, JSONDict, JSONList, Timeout, cast
-from ._base_caller import BaseCaller
+from ._base_list_caller import BaseListCaller
 from ._utils import get_empty_time
 from .call_batches import call_batches
 from .call_method import call_method
@@ -15,20 +14,17 @@ __all__ = [
 ]
 
 
-class _ListCaller(BaseCaller):
+class _ListCaller(BaseListCaller):
     """
     Caller for classic list methods that return ``total``/``next`` pagination.
 
     The caller fetches the first page with a normal method call, then uses batch
     requests to load remaining pages by ``start`` offsets. It also has a
-    shortcut for requests that filter only by a list of IDs: in that case the ID
-    list is split into chunks and fetched through batch calls.
+    shortcut for requests filtered only by an iterable of IDs. The ID filter
+    may be nested under ``filter`` or passed at the top level by methods such as
+    ``department.get``. Empty ID iterables return an empty result without an API
+    request; non-empty ID-only requests are split into batch chunks.
     """
-
-    _ALLOWED_PARAMS_FOR_OPTIMIZATION_BY_ID: Final[Tuple[Text, ...]] = ("filter", "select")
-    _FILTER_ID_KEYS: Final[Tuple[Text, ...]] = ("id", "@id")
-    _HALT: Final[bool] = True
-    _STEP: Final[int] = MAX_BATCH_SIZE
 
     __slots__ = ("_limit", "_time")
 
@@ -56,8 +52,9 @@ class _ListCaller(BaseCaller):
             auth_token: OAuth access token or webhook token.
             is_webhook: Whether ``auth_token`` is a webhook token.
             api_method: List-like REST method name.
-            params: Method parameters, usually including ``filter`` and
-                ``select``.
+            params: Method parameters. Most list methods use nested ``filter``
+                and ``select`` parameters, while some methods accept filters
+                such as ``ID`` directly at the top level.
             limit: Maximum number of items to return, or ``None`` for all
                 available items reported by Bitrix.
             prefer_version: Preferred API version. V3 list methods are rejected
@@ -65,6 +62,7 @@ class _ListCaller(BaseCaller):
             bitrix_token: Optional token wrapper used for retry/refresh logic.
             **kwargs: Extra requester options forwarded to lower-level calls.
         """
+
         super().__init__(
             domain=domain,
             auth_token=auth_token,
@@ -75,55 +73,11 @@ class _ListCaller(BaseCaller):
             bitrix_token=bitrix_token,
             **kwargs,
         )
+
         if self._api_version == B24APIVersion.V3:
             raise TypeError("Bitrix API v3 methods are not supported by call_list yet.")
+
         self._limit = limit
-
-    def _check_filter_by_id_only(self) -> Tuple[Text, Text, List[int]]:
-        """
-        Detect whether the request can be optimized as ID-only filtering.
-
-        The optimization is safe only when method parameters contain no
-        meaningful keys except ``filter`` and ``select``, and the filter itself
-        contains only ``id`` or ``@id`` with an iterable list of IDs. Such
-        requests can be split into independent batch commands by ID chunks
-        instead of using ``start`` pagination.
-
-        Returns:
-            A tuple containing the actual filter key, the actual ID-filter key,
-            and the list of IDs. Empty strings/list mean the optimization is not
-            applicable.
-        """
-
-        filter_key: Text = ""
-        filter_id_key: Text = ""
-        filter_ids: List[int] = []
-
-        for key in self._params:
-            if key.lower() == "filter":
-                filter_key = key
-
-            if key.lower() not in self._ALLOWED_PARAMS_FOR_OPTIMIZATION_BY_ID:
-                return filter_key, filter_id_key, filter_ids
-
-        if not (filter_key and isinstance(self._params[filter_key], Mapping)):
-            return filter_key, filter_id_key, filter_ids
-
-        for filter_field in self._params[filter_key]:
-            if filter_field.lower() in self._FILTER_ID_KEYS:
-                filter_id_key = filter_field
-            else:
-                return filter_key, filter_id_key, filter_ids
-
-        if not filter_id_key:
-            return filter_key, filter_id_key, filter_ids
-
-        filter_id_value = self._params[filter_key][filter_id_key]
-
-        if isinstance(filter_id_value, Iterable) and not isinstance(filter_id_value, (str, bytes)):
-            filter_ids = list(filter_id_value)
-
-        return filter_key, filter_id_key, filter_ids
 
     def _generate_filter_id_methods_for_batch(
             self,
@@ -136,7 +90,14 @@ class _ListCaller(BaseCaller):
 
         The ID list is split into chunks of ``_STEP`` IDs. Each generated command
         reuses the original method and parameters but replaces the ID filter
-        value with the current chunk.
+        value with the current chunk. An empty ``filter_key`` means that the ID
+        filter belongs at the top level rather than inside a ``filter`` mapping.
+
+        Args:
+            filter_key: Actual enclosing filter key, or an empty string for a
+                top-level ID filter.
+            filter_id_key: Actual case-preserving ``ID`` or ``@ID`` key.
+            filter_ids: Materialized IDs to split into batch chunks.
 
         Returns:
             List of ``(api_method, params)`` tuples ready for ``call_batches``.
@@ -144,9 +105,14 @@ class _ListCaller(BaseCaller):
 
         methods: List[B24RequestTuple] = []
 
-        for start in range(0, len(filter_ids), self._STEP):
-            id_chunk = filter_ids[start:start + self._STEP]
-            chunk_params = self._params | {filter_key: {filter_id_key: id_chunk}}
+        for start in range(0, len(filter_ids), self._MAX_BATCH_SIZE):
+            id_chunk = filter_ids[start:start + self._MAX_BATCH_SIZE]
+
+            if filter_key:
+                chunk_params = self._params | {filter_key: {filter_id_key: id_chunk}}
+            else:
+                chunk_params = self._params | {filter_id_key: id_chunk}
+
             methods.append((self._api_method, chunk_params))
 
         return methods
@@ -173,7 +139,7 @@ class _ListCaller(BaseCaller):
 
         methods: List[B24RequestTuple] = []
 
-        for start in range(next_step, total, self._STEP):
+        for start in range(next_step, total, self._MAX_BATCH_SIZE):
             page_params = self._params | {"start": start}
             methods.append((self._api_method, page_params))
 
@@ -282,8 +248,9 @@ class _ListCaller(BaseCaller):
         Fetch list items with classic Bitrix pagination and return a normalized response.
 
         Returns ``{"result": [...], "time": ...}`` regardless of the original
-        wrapper key used by the Bitrix method. When possible, remaining pages
-        are fetched through batch requests for fewer HTTP round trips.
+        wrapper key used by the Bitrix method. Empty ID filters are resolved
+        locally, ID-only requests use batch chunks, and other requests fetch the
+        first page normally before batching any remaining pages.
         """
 
         self._config.logger.debug(
@@ -302,7 +269,13 @@ class _ListCaller(BaseCaller):
 
             filter_key, filter_id_key, filter_ids = self._check_filter_by_id_only()
 
-            if filter_ids:
+            if filter_ids is not None:
+                if not filter_ids:
+                    return {
+                        "result": [],
+                        "time": get_empty_time(),
+                    }
+
                 batch_response = self._fetch_batches_response(
                     methods=self._generate_filter_id_methods_for_batch(
                         filter_key=filter_key,
@@ -342,7 +315,7 @@ class _ListCaller(BaseCaller):
             if self._limit is not None:
                 total = min(total, self._limit)
 
-            if next_step and (self._limit is None or self._limit > self._STEP):
+            if next_step and (self._limit is None or self._limit > self._MAX_BATCH_SIZE):
                 batch_response = self._fetch_batches_response(
                     methods=self._generate_methods_for_batch(
                         next_step=next_step,
@@ -389,7 +362,8 @@ def call_list(
         auth_token: OAuth access token or webhook token.
         is_webhook: Whether ``auth_token`` is a webhook token.
         api_method: List-like REST method name, for example ``crm.deal.list``.
-        params: Method parameters sent to Bitrix.
+        params: Method parameters sent to Bitrix. ID filters may be nested under
+            ``filter`` or passed directly for methods that use top-level filters.
         limit: Maximum number of items to retrieve.
         timeout: Request timeout in seconds.
         prefer_version: Preferred API version to resolve the method against.

@@ -9,7 +9,10 @@ __all__ = [
 
 
 class Schedule(BaseEntity):
-    """"""
+    """Class for retrieving work schedule.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/timeman/schedule/index.html
+    """
 
     @type_checker
     def get(
@@ -18,7 +21,20 @@ class Schedule(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get work schedule
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/timeman/schedule/timeman-schedule-get.html
+
+        The method retrieves the work schedule by its identifier.
+
+        Args:
+            bitrix_id: Identifier of the schedule;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

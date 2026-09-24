@@ -4,7 +4,7 @@ from _pytest.cacheprovider import Cache
 from b24pysdk import Config
 from b24pysdk.api.responses import BitrixAPIResponse
 from b24pysdk.client import BaseClient
-from b24pysdk.constants.sonet_group import SonetGroupMemberRole
+from b24pysdk.constants.group import GroupMemberRole
 
 from ....constants import BITRIX_PORTAL_OWNER_ID, SDK_NAME
 
@@ -15,7 +15,7 @@ pytestmark = [
 ]
 
 _SONET_GROUP_USER_TIMEOUT: int = 10
-_MODERATOR_ROLE: SonetGroupMemberRole = SonetGroupMemberRole.MODERATOR
+_MODERATOR_ROLE: GroupMemberRole = GroupMemberRole.MODERATOR
 _GROUP_FIELDS = ("GROUP_ID", "GROUP_NAME", "ROLE")
 _USER_FIELDS = ("USER_ID", "ROLE")
 

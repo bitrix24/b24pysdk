@@ -16,7 +16,17 @@ __all__ = [
 
 
 class BaseManager(ABC, Generic[BOT]):
-    """Base descriptor for managers bound to an SDK object class."""
+    """Copy-on-access descriptor for managers bound to an SDK object class.
+
+    The manager declared in a class body remains an unbound template. Accessing
+    it through an SDK object class returns a clone bound to that owner, so query
+    state and client selection never leak back into the shared descriptor.
+    Managers are intentionally unavailable through object instances.
+
+    Clones share ``ClientProvider`` instances until ``using()`` explicitly
+    replaces the provider. This lets one lazily resolved client be reused across
+    an entire object graph without resolving it during descriptor access.
+    """
 
     __slots__ = ("_client_provider", "_object_class")
 
@@ -37,6 +47,13 @@ class BaseManager(ABC, Generic[BOT]):
             instance: None,
             owner: Type[BOT],
     ) -> Self:
+        """Bind a fresh manager clone to the descriptor's owner class.
+
+        Returning a clone for every access isolates future query-builder state.
+        The template's provider is retained by reference so lazy client
+        resolution remains shared until the caller invokes ``using()``.
+        """
+
         if instance is not None:
             raise AttributeError(f"{self.__class__.__name__} is available only on the object class.")
 
@@ -57,7 +74,11 @@ class BaseManager(ABC, Generic[BOT]):
             client: Optional["ClientType"] = None,
             client_factory: Optional[Callable[[], "ClientType"]] = None,
     ) -> Self:
-        """Return a manager copy with an explicit client source."""
+        """Return a manager clone with a new explicit client provider.
+
+        Exactly one of ``client`` and ``client_factory`` is required. The source
+        is not resolved here, and the current manager remains unchanged.
+        """
 
         if client is None and client_factory is None:
             raise ValueError("Pass either client or client_factory.")

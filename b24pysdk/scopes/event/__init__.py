@@ -1,12 +1,14 @@
 from functools import cached_property
-from typing import Annotated, Literal, Optional, Text
+from typing import Annotated, Text
 
 from ..._constants import MISSING
-from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest
+from ...api.requests import BitrixAPIRequest, BitrixAPIValueRequest, BitrixAPIValuesRequest
+from ...constants.event import EventTypeLiteral
+from ...objects.event import Event as EventObject
 from ...schemas.results import CountResultData
 from ...utils.functional import type_checker
-from ...utils.types import JSONDict, Timeout
-from .._adapters import BitrixResultAdapter
+from ...utils.types import JSONDict, JSONList, Timeout
+from .._adapters import BitrixObjectsAdapter, BitrixResultAdapter
 from .._base_scope import BaseScope
 from .offline import Offline
 
@@ -16,31 +18,33 @@ __all__ = [
 
 
 class Event(BaseScope):
-    """"""
+    """Methods for managing Bitrix24 event handler registrations."""
 
     @cached_property
     def offline(self) -> Offline:
-        """"""
+        """Return the offline-event queue scope."""
         return Offline(self)
 
     @type_checker
     def bind(
             self,
             event: Text,
-            handler: Text,
+            handler: Text = MISSING,
             *,
-            auth_type: Optional[int] = MISSING,
-            event_type: Optional[Annotated[Text, Literal["offline", "online"]]] = MISSING,
-            auth_connector: Optional[Text] = MISSING,
-            options: Optional[Text] = MISSING,
+            auth_type: int = MISSING,
+            event_type: Annotated[Text, EventTypeLiteral] = MISSING,
+            auth_connector: Text = MISSING,
+            options: JSONDict = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Register an event handler."""
 
         params: JSONDict = {
             "event": event,
-            "handler": handler,
         }
+
+        if handler is not MISSING:
+            params["handler"] = handler
 
         if auth_type is not MISSING:
             params["auth_type"] = auth_type
@@ -65,29 +69,33 @@ class Event(BaseScope):
             self,
             *,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
-        """"""
+    ) -> BitrixAPIValuesRequest[JSONList, EventObject]:
+        """Return registered event handlers as SDK objects."""
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValuesRequest,
+            result_adapter=BitrixObjectsAdapter("event", client=self._client),
         )
 
     @type_checker
     def unbind(
             self,
             event: Text,
-            handler: Text,
+            handler: Text = MISSING,
             *,
-            auth_type: Optional[int] = MISSING,
-            event_type: Optional[Annotated[Text, Literal["offline", "online"]]] = MISSING,
+            auth_type: int = MISSING,
+            event_type: Annotated[Text, EventTypeLiteral] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIValueRequest[CountResultData, int]:
-        """"""
+        """Unregister matching event handlers and return their count."""
 
         params: JSONDict = {
             "event": event,
-            "handler": handler,
         }
+
+        if handler is not MISSING:
+            params["handler"] = handler
 
         if auth_type is not MISSING:
             params["auth_type"] = auth_type

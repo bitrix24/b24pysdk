@@ -20,8 +20,8 @@ class Category(BaseCRM):
     @type_checker
     def fields(
             self,
-            *,
             entity_type_id: int,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIValueRequest[CRMFieldsResultData, CRMFieldsDict]:
         """Get funnel fields.
@@ -53,8 +53,8 @@ class Category(BaseCRM):
     def add(
             self,
             fields: JSONDict,
-            *,
             entity_type_id: int,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Create a new funnel.
@@ -97,8 +97,8 @@ class Category(BaseCRM):
     def get(
             self,
             bitrix_id: int,
-            *,
             entity_type_id: int,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get funnel by ID.
@@ -132,8 +132,8 @@ class Category(BaseCRM):
     @type_checker
     def list(
             self,
-            *,
             entity_type_id: int,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of funnels.
@@ -166,8 +166,8 @@ class Category(BaseCRM):
             self,
             bitrix_id: int,
             fields: JSONDict,
-            *,
             entity_type_id: int,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Update funnel.
@@ -213,8 +213,8 @@ class Category(BaseCRM):
     def delete(
             self,
             bitrix_id: int,
-            *,
             entity_type_id: int,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[None]:
         """Delete funnel.

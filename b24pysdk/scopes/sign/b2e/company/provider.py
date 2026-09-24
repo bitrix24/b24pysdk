@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Provider(BaseEntity):
-    """"""
+    """Class for retrieving company's signing providers.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sign/index.html
+    """
 
     @type_checker
     def list(
@@ -25,7 +28,28 @@ class Provider(BaseEntity):
             offset: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the list of providers
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sign/sign-b2e-company-provider-list.html
+
+        The method returns a list of signature providers for the selected company.
+
+        Args:
+            company_uuid: UUID of the company in HCM Link;
+
+            company_crm_id: Identifier of the company in CRM, connected in the integration as "my company";
+
+            language: Language for localizing provider names;
+
+            limit: Number of records per page;
+
+            offset: Parameter for managing pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

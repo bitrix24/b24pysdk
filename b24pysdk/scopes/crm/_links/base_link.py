@@ -82,8 +82,8 @@ class BaseLink(BaseCRM):
     def delete(
             self,
             bitrix_id: int,
-            *,
             fields: JSONDict,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Delete connection between CRM entities.

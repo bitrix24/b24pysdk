@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Commentitem(BaseEntity):
-    """"""
+    """Class for managing comments in tasks.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/tasks/comment-item/index.html
+    """
 
     @type_checker
     def add(
@@ -22,7 +25,22 @@ class Commentitem(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add comment
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/comment-item/task-comment-item-add.html
+
+        The method adds a comment to a task.
+
+        Args:
+            task_id: Task identifier;
+
+            fields: Object with comment fields;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "TASKID": task_id,
@@ -43,7 +61,22 @@ class Commentitem(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete comment
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/comment-item/task-comment-item-delete.html
+
+        The method deletes a comment.
+
+        Args:
+            task_id: Task identifier;
+
+            item_id: Comment identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "TASKID": task_id,
@@ -64,7 +97,22 @@ class Commentitem(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get comment by ID
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/comment-item/task-comment-item-get.html
+
+        The method retrieves a comment by its ID.
+
+        Args:
+            task_id: Task identifier;
+
+            item_id: Comment identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "TASKID": task_id,
@@ -86,7 +134,24 @@ class Commentitem(BaseEntity):
             filter: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the list of comments
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/comment-item/task-comment-item-get-list.html
+
+        The method retrieves a list of task comments.
+
+        Args:
+            task_id: Task identifier;
+
+            order: An object for sorting the selected records, where the key is the field and the value is asc or desc;
+
+            filter: An object for filtering the result;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "TASKID": task_id,
@@ -113,7 +178,24 @@ class Commentitem(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update comment
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/comment-item/task-comment-item-update.html
+
+        The method updates comment data.
+
+        Args:
+            task_id: Task identifier;
+
+            item_id: Comment identifier;
+
+            fields: Comment fields to update;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "TASKID": task_id,

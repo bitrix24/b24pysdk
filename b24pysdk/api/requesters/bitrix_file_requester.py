@@ -1,13 +1,15 @@
 from email.message import Message
-from typing import Dict, Final, Optional, Text
+from typing import TYPE_CHECKING, Dict, Final, Optional, Text
 from urllib.parse import urlsplit, urlunsplit
 
 import requests
 
 from ...errors import BitrixFileDownloadError, BitrixRequestError, BitrixRequestTimeout
-from ...schemas.file import BitrixFileResponseData
 from ...utils.types import Number, Timeout
 from ._base_requester import BaseRequester
+
+if TYPE_CHECKING:
+    from ...schemas.file import BitrixFileResponseData
 
 __all__ = [
     "BitrixFileRequester",
@@ -127,7 +129,7 @@ class BitrixFileRequester(BaseRequester):
 
         return message.get_filename()
 
-    def call(self) -> BitrixFileResponseData:
+    def call(self) -> "BitrixFileResponseData":
         """Execute the request and return downloaded file data."""
 
         response = self._get()

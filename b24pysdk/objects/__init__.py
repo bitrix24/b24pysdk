@@ -1,3 +1,4 @@
+from ._base_pk import BasePK as BaseBitrixPK
 from ._client_provider import ClientProvider
 from ._fields import (
     AddressField,
@@ -9,10 +10,12 @@ from ._fields import (
     EnumField,
     FileField,
     FloatField,
+    HTMLField,
     IntField,
     ListField,
     MoneyField,
     ObjectField,
+    RawField,
     TextField,
     TimeField,
     TimeZoneField,
@@ -22,6 +25,7 @@ from ._object_results import BitrixObjectBatchAddResult, BitrixObjectBatchWriteR
 
 __all__ = [
     "AddressField",
+    "BaseBitrixPK",
     "BitrixObjectBatchAddResult",
     "BitrixObjectBatchWriteResult",
     "BitrixObjectList",
@@ -34,10 +38,12 @@ __all__ = [
     "EnumField",
     "FileField",
     "FloatField",
+    "HTMLField",
     "IntField",
     "ListField",
     "MoneyField",
     "ObjectField",
+    "RawField",
     "TextField",
     "TimeField",
     "TimeZoneField",

@@ -19,11 +19,11 @@ class Note(BaseCRM):
     @type_checker
     def get(
             self,
-            *,
-            entity_type_id: int,
-            entity_id: int,
+            owner_type_id: int,
+            owner_id: int,
             item_type: int,
             item_id: int,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get Information about note.
@@ -33,9 +33,9 @@ class Note(BaseCRM):
         This method returns information about a note related to a timeline record.
 
         Args:
-            entity_type_id: Identifier of the entity type to which the record belongs;
+            owner_type_id: Identifier of the entity type to which the record belongs;
 
-            entity_id: Identifier of the entity to which the record belongs;
+            owner_id: Identifier of the entity to which the record belongs;
 
             item_type: Type of the record to which the note should be applied:
 
@@ -51,8 +51,8 @@ class Note(BaseCRM):
         """
 
         params = {
-            "entityTypeId": entity_type_id,
-            "entityId": entity_id,
+            "ownerTypeId": owner_type_id,
+            "ownerId": owner_id,
             "itemType": item_type,
             "itemId": item_id,
         }
@@ -66,11 +66,11 @@ class Note(BaseCRM):
     @type_checker
     def delete(
             self,
-            *,
-            entity_type_id: int,
-            entity_id: int,
+            owner_type_id: int,
+            owner_id: int,
             item_type: int,
             item_id: int,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Delete note.
@@ -78,9 +78,9 @@ class Note(BaseCRM):
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/note/crm-timeline-note-delete.html
 
         Args:
-            entity_type_id: Identifier of the entity type to which the record belongs;
+            owner_type_id: Identifier of the entity type to which the record belongs;
 
-            entity_id: Identifier of the entity to which the record belongs;
+            owner_id: Identifier of the entity to which the record belongs;
 
             item_type: Type of the record to which the note should be applied:
 
@@ -96,8 +96,8 @@ class Note(BaseCRM):
         """
 
         params = {
-            "entityTypeId": entity_type_id,
-            "entityId": entity_id,
+            "ownerTypeId": owner_type_id,
+            "ownerId": owner_id,
             "itemType": item_type,
             "itemId": item_id,
         }
@@ -111,12 +111,12 @@ class Note(BaseCRM):
     @type_checker
     def save(
             self,
-            *,
-            entity_type_id: int,
-            entity_id: int,
+            owner_type_id: int,
+            owner_id: int,
             item_type: int,
             item_id: int,
             text: Text,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Save note.
@@ -124,9 +124,9 @@ class Note(BaseCRM):
         Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/note/crm-timeline-note-save.html
 
         Args:
-            entity_type_id: Identifier of the entity type to which the record belongs;
+            owner_type_id: Identifier of the entity type to which the record belongs;
 
-            entity_id: Identifier of the entity to which the record belongs;
+            owner_id: Identifier of the entity to which the record belongs;
 
             item_type: Type of the record to which the note should be applied:
 
@@ -144,8 +144,8 @@ class Note(BaseCRM):
         """
 
         params = {
-            "entityTypeId": entity_type_id,
-            "entityId": entity_id,
+            "ownerTypeId": owner_type_id,
+            "ownerId": owner_id,
             "itemType": item_type,
             "itemId": item_id,
             "text": text,

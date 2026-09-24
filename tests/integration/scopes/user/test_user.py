@@ -125,7 +125,7 @@ def test_user_get(bitrix_client: ClientType, cache: Cache):
         User.objects
         .using(client=bitrix_client)
         .filter(bitrix_pk=user_id)
-        .admin_mode()
+        .with_admin_mode()
         .first()
     )
 
@@ -156,7 +156,7 @@ def test_user_get_as_list(bitrix_client: ClientType):
     users = (
         User.objects
         .using(client=bitrix_client)
-        .admin_mode()
+        .with_admin_mode()
         .all()
         .to_list()
     )
@@ -176,7 +176,7 @@ def test_user_get_as_list_fast(bitrix_client: ClientType):
     users = (
         User.objects
         .using(client=bitrix_client)
-        .admin_mode()
+        .with_admin_mode()
         .order("-bitrix_pk")
         .as_fast()
     )
@@ -210,7 +210,7 @@ def test_user_search(bitrix_client: ClientType, cache: Cache):
         User.objects
         .using(client=bitrix_client)
         .search(find=f"{_PERSONAL_PROFESSION} {user_id}")
-        .admin_mode()
+        .with_admin_mode()
         .first()
     )
 
@@ -238,7 +238,7 @@ def test_user_search_as_list(bitrix_client: ClientType, cache: Cache):
         User.objects
         .using(client=bitrix_client)
         .search(name=_NAME)
-        .admin_mode()
+        .with_admin_mode()
         .all()
         .to_list()
     )
@@ -263,7 +263,7 @@ def test_user_search_as_list_fast(bitrix_client: ClientType, cache: Cache):
         User.objects
         .using(client=bitrix_client)
         .search(last_name=_LAST_NAME)
-        .admin_mode()
+        .with_admin_mode()
         .order("-bitrix_pk")
         .as_fast()
     )

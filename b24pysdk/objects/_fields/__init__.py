@@ -7,10 +7,11 @@ from .dict_field import DictField
 from .enum_field import EnumField
 from .file_field import FileField
 from .float_field import FloatField
-from .int_field import IntField
-from .list_field import ListField
+from .html_field import HTMLField
+from .int_field import IntField, ListField
 from .money_field import MoneyField
 from .object_field import ObjectField
+from .raw_field import RawField
 from .text_field import TextField, URLField
 from .time_field import TimeField
 from .timezone_field import TimeZoneField
@@ -25,10 +26,12 @@ __all__ = [
     "EnumField",
     "FileField",
     "FloatField",
+    "HTMLField",
     "IntField",
     "ListField",
     "MoneyField",
     "ObjectField",
+    "RawField",
     "TextField",
     "TimeField",
     "TimeZoneField",

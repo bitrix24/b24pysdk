@@ -9,7 +9,7 @@ from ....schemas.crm.duplicate.volatile_type import (
     CRMDuplicateVolatileTypesData,
 )
 from ....schemas.results import IDResultData
-from ....utils.functional import type_checker
+from ....utils.functional import classproperty, type_checker
 from ....utils.types import JSONDict, Timeout
 from ..._adapters import BitrixResultAdapter, BitrixSchemasAdapter
 from .._base_crm import BaseCRM
@@ -24,6 +24,10 @@ class VolatileType(BaseCRM):
 
     Documentation: https://apidocs.bitrix24.com/api-reference/crm/duplicates/volatile-type/index.html
     """
+
+    @classproperty
+    def _name(cls) -> Text:
+        return "volatileType"
 
     @type_checker
     def fields(
@@ -94,9 +98,9 @@ class VolatileType(BaseCRM):
     @type_checker
     def register(
             self,
-            *,
             entity_type_id: Annotated[int, Literal[1, 3, 4]],
             field_code: Text,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIValueRequest[IDResultData, int]:
         """Add a field to the duplicate search

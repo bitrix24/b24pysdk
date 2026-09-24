@@ -6,7 +6,7 @@ from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
 from .....utils.types import JSONDict, Timeout
 from ...._base_entity import BaseEntity
-from .field import Field
+from ..._field import Field
 
 __all__ = [
     "Record",
@@ -14,7 +14,10 @@ __all__ = [
 
 
 class Record(BaseEntity):
-    """"""
+    """Class for retrieving time tracking records for an employee.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/timeman/record/index.html
+    """
 
     @cached_property
     def field(self) -> Field:
@@ -31,7 +34,26 @@ class Record(BaseEntity):
             pagination: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of time records
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/timeman/record/timeman-record-list.html
+
+        The method returns a list of time records for an employee.
+
+        Args:
+            filter: Condition for filtering records;
+
+            select: List of fields too return in the response;
+
+            order: Sorting results;
+
+            pagination: Parameter for managing pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if filter.__class__ is not list:
             filter = list(filter)

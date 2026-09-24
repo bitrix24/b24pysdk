@@ -1,10 +1,11 @@
 from functools import cached_property
-from typing import Iterable, Optional, Union
+from typing import Iterable, Optional
 
 from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
+from ....utils.converters import bool_to_bitrix
 from ....utils.functional import type_checker
-from ....utils.types import B24BoolStrict, JSONList, Timeout
+from ....utils.types import JSONList, Timeout
 from ..._base_entity import BaseEntity
 from .colleagues import Colleagues
 from .employees import Employees
@@ -38,7 +39,7 @@ class Department(BaseEntity):
             self,
             bitrix_id: Iterable[int],
             *,
-            user_data: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            user_data: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONList]:
         """"""
@@ -51,7 +52,7 @@ class Department(BaseEntity):
         )
 
         if user_data is not MISSING:
-            params["USER_DATA"] = B24BoolStrict(user_data).to_b24()
+            params["USER_DATA"] = bool_to_bitrix(user_data, is_required=True)
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,

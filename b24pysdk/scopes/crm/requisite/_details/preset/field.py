@@ -40,9 +40,9 @@ class Field(BaseCRM):
     @type_checker
     def add(
             self,
-            *,
             preset: JSONDict,
             fields: JSONDict,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[int]:
         """Add a custom field to the CRM requisite template
@@ -88,8 +88,8 @@ class Field(BaseCRM):
     def get(
             self,
             bitrix_id: int,
-            *,
             preset: JSONDict,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get custom field of requisite template by ID.
@@ -123,8 +123,8 @@ class Field(BaseCRM):
     @type_checker
     def list(
             self,
-            *,
             preset: JSONDict,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """Get a list of customizable fields.
@@ -156,9 +156,9 @@ class Field(BaseCRM):
     def update(
             self,
             bitrix_id: int,
-            *,
             preset: JSONDict,
             fields: JSONDict,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Update custom fields of a given CRM requisite template.
@@ -210,8 +210,8 @@ class Field(BaseCRM):
     def delete(
             self,
             bitrix_id: int,
-            *,
             preset: JSONDict,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Delete custom field from CRM requisite template.
@@ -245,8 +245,8 @@ class Field(BaseCRM):
     @type_checker
     def availabletoadd(
             self,
-            *,
             preset: JSONDict,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[List[Text]]:
         """Get fields available for addition to the CRM requisite template.

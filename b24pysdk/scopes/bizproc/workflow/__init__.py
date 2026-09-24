@@ -14,7 +14,10 @@ __all__ = [
 
 
 class Workflow(BaseEntity):
-    """"""
+    """Class for managing workflows.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/bizproc/index.html
+    """
 
     @cached_property
     def template(self) -> Template:
@@ -30,7 +33,24 @@ class Workflow(BaseEntity):
             parameters: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Start business process
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/bizproc/bizproc-workflow-start.html
+
+        The method initiates a new business process.
+
+        Args:
+            template_id: Identifier of the business process template;
+
+            document_id: Identifier of the document to start the business process;
+
+            parameters: Values for the parameters of the business process template;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "TEMPLATE_ID": template_id,
@@ -56,7 +76,26 @@ class Workflow(BaseEntity):
             start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of running workflows
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/bizproc/bizproc-workflow-instances.html
+
+        The method retrieves a list of running workflows.
+
+        Args:
+            select: An array containing the list of fields to select;
+
+            filter: An object for filtering the list of running workflows;
+
+            order: An object for sorting the list of running workflows;
+
+            start: This parameter is used for managing pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -88,7 +127,20 @@ class Workflow(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete running process
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/bizproc/bizproc-workflow-kill.html
+
+        The method deletes the running workflow along with all process data.
+
+        Args:
+            bitrix_id: Identifier of the workflow;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "ID": bitrix_id,
@@ -108,7 +160,22 @@ class Workflow(BaseEntity):
             status: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Stop active workflow
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/bizproc/bizproc-workflow-terminate.html
+
+        The method stops the specified workflow.
+
+        Args:
+            bitrix_id: Identifier of the workflow to be stopped;
+
+            status: Set the status text;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "ID": bitrix_id,

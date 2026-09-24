@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Item(BaseCRM):
-    """"""
+    """Class for managing pinned records in the timeline.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/actions/index.html
+    """
 
     @type_checker
     def pin(
@@ -22,7 +25,24 @@ class Item(BaseCRM):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[Optional[bool]]:
-        """"""
+        """Pin a timeline entry
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/actions/crm-timeline-item-pin.html
+
+        The method pins an entry in the timeline.
+
+        Args:
+            bitrix_id: Identifier of the timeline item;
+
+            owner_type_id: Identifier of the CRM object type to which the item is linked;
+
+            owner_id: Identifier of the CRM element to which the item is linked;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIValuesRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -45,7 +65,24 @@ class Item(BaseCRM):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[Optional[bool]]:
-        """"""
+        """Unpin a timeline entry
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/timeline/actions/crm-timeline-item-unpin.html
+
+        The method unpins a timeline entry.
+
+        Args:
+            bitrix_id: Identifier of the timeline item;
+
+            owner_type_id: Identifier of the CRM object type to which the item is linked;
+
+            owner_id: Identifier of the CRM element to which the item is linked;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIValuesRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

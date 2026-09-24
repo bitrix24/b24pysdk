@@ -1,9 +1,10 @@
-from typing import Iterable, Optional, Text, Union
+from typing import Iterable, Optional, Text
 
 from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
+from ...utils.converters import bool_to_bitrix
 from ...utils.functional import type_checker
-from ...utils.types import B24BoolStrict, JSONDict, Timeout
+from ...utils.types import JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -21,9 +22,9 @@ class Command(BaseEntity):
             command: Text,
             lang: Iterable[JSONDict],
             *,
-            common: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            hidden: Optional[Union[bool, B24BoolStrict]] = MISSING,
-            extranet_support: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            common: Optional[bool] = MISSING,
+            hidden: Optional[bool] = MISSING,
+            extranet_support: Optional[bool] = MISSING,
             client_id: Optional[Text] = MISSING,
             event_command_add: Optional[Text] = MISSING,
             timeout: Timeout = None,
@@ -40,13 +41,13 @@ class Command(BaseEntity):
         }
 
         if common is not MISSING:
-            params["COMMON"] = B24BoolStrict(common).to_b24()
+            params["COMMON"] = bool_to_bitrix(common, is_required=True)
 
         if hidden is not MISSING:
-            params["HIDDEN"] = B24BoolStrict(hidden).to_b24()
+            params["HIDDEN"] = bool_to_bitrix(hidden, is_required=True)
 
         if extranet_support is not MISSING:
-            params["EXTRANET_SUPPORT"] = B24BoolStrict(extranet_support).to_b24()
+            params["EXTRANET_SUPPORT"] = bool_to_bitrix(extranet_support, is_required=True)
 
         if client_id is not MISSING:
             params["CLIENT_ID"] = client_id

@@ -1,5 +1,7 @@
+from typing import Text
+
 from ...api.requests import BitrixAPIRequest
-from ...utils.functional import type_checker
+from ...utils.functional import classproperty, type_checker
 from ...utils.types import Timeout
 from .._base_entity import BaseEntity
 
@@ -13,6 +15,10 @@ class AttachedObject(BaseEntity):
 
     Documentation: https://apidocs.bitrix24.com/api-reference/disk/attached-object/index.html
     """
+
+    @classproperty
+    def _name(cls) -> Text:
+        return "attachedObject"
 
     @type_checker
     def get(

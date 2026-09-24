@@ -2,8 +2,9 @@ from typing import Iterable, Optional, Text, Union
 
 from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
+from ...utils.converters import bool_to_bitrix
 from ...utils.functional import type_checker
-from ...utils.types import B24Bool, JSONDict, Timeout
+from ...utils.types import JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -69,7 +70,7 @@ class Document(BaseEntity):
             params["values"] = values
 
         if stamps_enabled is not MISSING:
-            params["stampsEnabled"] = B24Bool(stamps_enabled).to_b24()
+            params["stampsEnabled"] = bool_to_bitrix(stamps_enabled)
 
         if fields is not MISSING:
             params["fields"] = fields
@@ -139,7 +140,7 @@ class Document(BaseEntity):
 
         params: JSONDict = {
             "id": bitrix_id,
-            "status": B24Bool(status).to_b24(),
+            "status": bool_to_bitrix(status),
         }
 
         return self._make_bitrix_api_request(
@@ -332,7 +333,7 @@ class Document(BaseEntity):
             params["values"] = values
 
         if stamps_enabled is not MISSING:
-            params["stampsEnabled"] = B24Bool(stamps_enabled).to_b24()
+            params["stampsEnabled"] = bool_to_bitrix(stamps_enabled)
 
         if fields is not MISSING:
             params["fields"] = fields

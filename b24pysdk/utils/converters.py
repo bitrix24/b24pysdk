@@ -69,47 +69,68 @@ def bool_from_bitrix(value: typing.Optional[typing.Union[bool, int, typing.Annot
     raise ValueError(f"Cannot convert Bitrix24 value to bool: {value!r}")
 
 @typing.overload
-def bool_to_bitrix(value: bool, /, *, is_required: typing.Literal[True], as_int: typing.Literal[True]) -> typing.Literal[0, 1]: ...
+def bool_to_bitrix(value: bool, /, *, is_required: typing.Literal[True], serialize_as: typing.Type[bool]) -> bool: ...
 
 @typing.overload
-def bool_to_bitrix(value: bool, /, *, is_required: typing.Literal[True], as_int: typing.Literal[False] = False) -> _types.B24BoolStrictLiteral: ...
+def bool_to_bitrix(value: typing.Optional[bool], /, *, is_required: typing.Literal[False] = False, serialize_as: typing.Type[bool]) -> typing.Optional[bool]: ...
 
 @typing.overload
-def bool_to_bitrix(value: typing.Optional[bool], /, *, is_required: typing.Literal[False] = False, as_int: typing.Literal[False] = False) -> _types.B24BoolLiteral: ...
+def bool_to_bitrix(value: bool, /, *, is_required: typing.Literal[True], serialize_as: typing.Type[int]) -> typing.Literal[0, 1]: ...
 
-def bool_to_bitrix(value: typing.Optional[bool], /, *, is_required: bool = False, as_int: bool = False) -> typing.Union[_types.B24BoolLiteral, typing.Literal[0, 1]]:
+@typing.overload
+def bool_to_bitrix(value: typing.Optional[bool], /, *, is_required: typing.Literal[False] = False, serialize_as: typing.Type[int]) -> typing.Optional[typing.Literal[0, 1]]: ...
+
+@typing.overload
+def bool_to_bitrix(value: bool, /, *, is_required: typing.Literal[True], serialize_as: typing.Type[typing.Text] = str) -> _types.B24BoolStrictLiteral: ...
+
+@typing.overload
+def bool_to_bitrix(value: typing.Optional[bool], /, *, is_required: typing.Literal[False] = False, serialize_as: typing.Type[typing.Text] = str) -> _types.B24BoolLiteral: ...
+
+def bool_to_bitrix(
+        value: typing.Optional[bool],
+        /,
+        *,
+        is_required: bool = False,
+        serialize_as: typing.Type[typing.Union[bool, int, typing.Text]] = str,
+) -> typing.Optional[typing.Union[bool, int, typing.Text]]:
     """
     Convert a Python ``bool`` value to Bitrix24 boolean value.
 
     Args:
         value: Python boolean value.
         is_required: Whether ``None`` should be treated as an error.
-        as_int: Whether strict boolean values should be converted to ``1`` or
-            ``0`` instead of ``Y`` or ``N``. Can be used only together with
-            ``is_required=True``.
+        serialize_as: Outgoing representation type. Use ``str`` for ``Y``/``N``
+            and optional ``D``, ``int`` for ``1``/``0``, or ``bool`` for native
+            booleans used by API v3.
 
     Returns:
-        Bitrix24 boolean value. Returns ``D`` when ``is_required`` is False
-        and the input value is ``None``. Returns ``1`` or ``0`` when
-        ``as_int`` is True.
+        Bitrix24 boolean value in the requested representation. An optional
+        ``None`` is serialized as ``D`` for the string format and as ``None``
+        for the integer and boolean formats.
 
     Raises:
-        ValueError: If the value is required but ``None``, if ``as_int`` is
-            used without ``is_required=True``, or if the value cannot be
-            converted to Bitrix24 boolean value.
+        TypeError: If ``serialize_as`` is not ``str``, ``int``, or ``bool``.
+        ValueError: If the value is required but ``None`` or cannot be
+            converted to a Bitrix24 boolean value.
     """
 
-    if as_int and not is_required:
-        raise ValueError("Cannot convert Python value to Bitrix24 int bool when is_required is False")
+    if serialize_as not in (bool, int, str):
+        raise TypeError("serialize_as must be bool, int, or str.")
 
     if value is True:
-        return 1 if as_int else "Y"
+        if serialize_as is bool:
+            return True
+
+        return 1 if serialize_as is int else "Y"
 
     if value is False:
-        return 0 if as_int else "N"
+        if serialize_as is bool:
+            return False
+
+        return 0 if serialize_as is int else "N"
 
     if value is None and not is_required:
-        return "D"
+        return "D" if serialize_as is str else None
 
     raise ValueError(f"Cannot convert Python value to Bitrix24 bool: {value!r}")
 
@@ -273,8 +294,10 @@ def dict_from_bitrix(value: typing.Optional[_types.JSONDict], /, *, is_required:
         is_required: Whether ``None`` should be treated as an error.
 
     Returns:
-        Python ``dict`` instance, or ``None`` when ``is_required`` is False
-        and the input value is ``None``.
+        The original Python ``dict`` instance, or ``None`` when
+        ``is_required`` is False and the input value is ``None``. Preserving
+        identity allows an object field mapping to be changed in place and
+        then explicitly persisted through ``save(update_fields=[...])``.
 
     Raises:
         ValueError: If the value is required but ``None``, or cannot be
@@ -288,7 +311,7 @@ def dict_from_bitrix(value: typing.Optional[_types.JSONDict], /, *, is_required:
         raise ValueError(f"Cannot convert empty Bitrix24 value to dict: {value!r}")
 
     if isinstance(value, dict):
-        return dict(value)
+        return value
 
     raise ValueError(f"Cannot convert Bitrix24 value to dict: {value!r}")
 

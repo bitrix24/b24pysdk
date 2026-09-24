@@ -1,4 +1,4 @@
-from typing import Iterable, Optional
+from typing import Iterable
 
 from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
@@ -40,10 +40,10 @@ class Fields(BaseEntity):
     def update(
             self,
             bitrix_id: int,
-            add: Optional[Iterable[JSONDict]] = MISSING,
-            update: Optional[Iterable[JSONDict]] = MISSING,
-            delete: Optional[Iterable[int]] = MISSING,
             *,
+            add: Iterable[JSONDict] = MISSING,
+            update: Iterable[JSONDict] = MISSING,
+            delete: Iterable[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """

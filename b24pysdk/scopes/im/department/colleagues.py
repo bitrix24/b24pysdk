@@ -2,8 +2,9 @@ from typing import List, Optional, Union
 
 from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
+from ....utils.converters import bool_to_bitrix
 from ....utils.functional import type_checker
-from ....utils.types import B24BoolStrict, JSONDict, Timeout
+from ....utils.types import JSONDict, Timeout
 from ..._base_entity import BaseEntity
 
 __all__ = [
@@ -18,7 +19,7 @@ class Colleagues(BaseEntity):
     def list(
             self,
             *,
-            user_data: Optional[Union[bool, B24BoolStrict]] = MISSING,
+            user_data: Optional[bool] = MISSING,
             offset: Optional[int] = MISSING,
             limit: Optional[int] = MISSING,
             timeout: Timeout = None,
@@ -28,7 +29,7 @@ class Colleagues(BaseEntity):
         params: JSONDict = {}
 
         if user_data is not MISSING:
-            params["USER_DATA"] = B24BoolStrict(user_data).to_b24()
+            params["USER_DATA"] = bool_to_bitrix(user_data, is_required=True)
 
         if offset is not MISSING:
             params["OFFSET"] = offset

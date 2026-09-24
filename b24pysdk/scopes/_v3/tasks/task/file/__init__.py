@@ -5,7 +5,7 @@ from ......api.requests import BitrixAPIRequest
 from ......utils.functional import type_checker
 from ......utils.types import Timeout
 from ....._base_entity import BaseEntity
-from .field import Field
+from ...._field import Field
 
 __all__ = [
     "File",
@@ -13,7 +13,10 @@ __all__ = [
 
 
 class File(BaseEntity):
-    """"""
+    """Class for attaching files to tasks.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/tasks/index.html
+    """
 
     @cached_property
     def field(self) -> Field:
@@ -28,7 +31,22 @@ class File(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Attach files to a task
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/tasks-task-file-attach.html
+
+        The method adds files from Drive to a task.
+
+        Args:
+            task_id: Task identifier;
+
+            file_ids: An array of file identifiers from Drive;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if file_ids.__class__ is not list:
             file_ids = list(file_ids)

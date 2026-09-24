@@ -1,3 +1,4 @@
+from functools import cached_property
 from typing import Iterable, Optional, Text
 
 from ....._constants import MISSING
@@ -5,6 +6,7 @@ from .....api.requests import BitrixAPIRequest
 from .....utils.functional import type_checker
 from .....utils.types import JSONDict, JSONList, Timeout
 from ...._base_entity import BaseEntity
+from ..._field import Field
 
 __all__ = [
     "Result",
@@ -12,7 +14,15 @@ __all__ = [
 
 
 class Result(BaseEntity):
-    """"""
+    """Class for managing task results.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/tasks/result/index.html
+    """
+
+    @cached_property
+    def field(self) -> Field:
+        """"""
+        return Field(self)
 
     @type_checker
     def add(
@@ -21,7 +31,20 @@ class Result(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """"""
+        """Add result to task
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/result/tasks-task-result-add.html
+
+        The method adds a result to a task.
+
+        Args:
+            fields: Object with result fields;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "fields": fields,
@@ -40,7 +63,20 @@ class Result(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """"""
+        """Add result from task chat message
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/result/tasks-task-result-addfromchatmessage.html
+
+        The method creates a task result from a task chat message.
+
+        Args:
+            fields: Object with result fields;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "fields": fields,
@@ -60,7 +96,22 @@ class Result(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """"""
+        """Update task result
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/result/tasks-task-result-update.html
+
+        The method updates the text of the task result.
+
+        Args:
+            bitrix_id: Identifier of the result;
+
+            fields: Object with result fields;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "id": bitrix_id,
@@ -83,7 +134,26 @@ class Result(BaseEntity):
             pagination: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONList]:
-        """"""
+        """Get task result list
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/result/tasks-task-result-list-rest-v3.html
+
+        The method returns a list of task results.
+
+        Args:
+            filter: An array of conditions for filtering the list of results;
+
+            order: An object for sorting the list of results in the format;
+
+            select: An array of fields to select;
+
+            pagination: An object for pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if filter.__class__ is not list:
             filter = list(filter)
@@ -117,7 +187,20 @@ class Result(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """"""
+        """Delete task result
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/tasks/result/tasks-task-result-delete.html
+
+        The method deletes the task result.
+
+        Args:
+            bitrix_id: Identifier of the result;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "id": bitrix_id,

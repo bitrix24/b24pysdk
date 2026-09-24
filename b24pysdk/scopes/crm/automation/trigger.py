@@ -20,8 +20,8 @@ class Trigger(BaseCRM):
     @type_checker
     def __call__(
             self,
-            *,
             target: Text,
+            *,
             code: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
@@ -58,9 +58,9 @@ class Trigger(BaseCRM):
     @type_checker
     def add(
             self,
-            *,
             code: Text,
             name: Text,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Add trigger.
@@ -82,7 +82,7 @@ class Trigger(BaseCRM):
 
         params = {
             "CODE": code,
-            "name": name,
+            "NAME": name,
         }
 
         return self._make_bitrix_api_request(
@@ -94,10 +94,10 @@ class Trigger(BaseCRM):
     @type_checker
     def execute(
             self,
-            *,
             code: Text,
             owner_type_id: int,
             owner_id: int,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Executes the trigger.
@@ -157,8 +157,8 @@ class Trigger(BaseCRM):
     @type_checker
     def delete(
             self,
-            *,
             code: Text,
+            *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
         """Delete triggers.
