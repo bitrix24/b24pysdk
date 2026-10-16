@@ -13,7 +13,10 @@ __all__ = [
 
 
 class Feature(BaseScope):
-    """"""
+    """Class for checking the availability of functionality in Bitrix24.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/common/system/index.html
+    """
 
     @type_checker
     def get(
@@ -22,7 +25,20 @@ class Feature(BaseScope):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIValueRequest[FeatureGetData, FeatureGet]:
-        """"""
+        """Get information about feature availability in Bitrix24
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/common/system/feature-get.html
+
+        The method returns information about the availability of features in a specific Bitrix24.
+
+        Args:
+            code: Key of the event;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "CODE": code,

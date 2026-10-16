@@ -12,7 +12,10 @@ __all__ = [
 
 
 class User(BaseEntity):
-    """"""
+    """Class for managing users in chats.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/outdated/chats/index.html
+    """
 
     @type_checker
     def list(
@@ -23,7 +26,7 @@ class User(BaseEntity):
             client_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Deprecated"""
 
         params = {
             "CHAT_ID": chat_id,

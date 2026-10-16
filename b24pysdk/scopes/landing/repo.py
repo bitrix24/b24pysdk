@@ -98,7 +98,18 @@ class Repo(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add embedding placement
+
+        The method register embedding placement by the current application in the landing section.
+
+        Args:
+            fields: Fields for embedding placement;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "fields": fields,
@@ -118,7 +129,22 @@ class Repo(BaseEntity):
             handler: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Remove embedding placement
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/landing/embedding/index.html
+
+        The method removes the embedding placement registered by the current application in the landing section.
+
+        Args:
+            code: Code of the embedding placement;
+
+            handler: Path of the embedding placement handler;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "code": code,

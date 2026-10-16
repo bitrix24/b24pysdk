@@ -10,7 +10,10 @@ __all__ = [
 
 
 class User(BaseEntity):
-    """"""
+    """Class for obtaining companies from an HR system to the current user.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sign/hcm-link/index.html
+    """
 
     @type_checker
     def list(
@@ -20,7 +23,22 @@ class User(BaseEntity):
             offset: int = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONList]:
-        """"""
+        """Get current user HCM link company list
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sign/hcm-link/humanresources-hcmlink-company-user-list.html
+
+        The method retrieves companies from an HR system linked to the current Bitrix24 user.
+
+        Args:
+            limit: Number of records per page;
+
+            offset: Offset for page navigation;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

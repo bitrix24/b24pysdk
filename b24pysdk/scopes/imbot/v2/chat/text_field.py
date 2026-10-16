@@ -12,7 +12,10 @@ __all__ = [
 
 
 class TextField(BaseEntity):
-    """"""
+    """Class for managing availability of text field.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/ui/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -29,7 +32,26 @@ class TextField(BaseEntity):
             enabled: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Managing the text input field
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/ui/chat-text-field-enabled.html
+
+        The method enables the text input field in the chat.
+
+        Args:
+            bot_id: Bot ID;
+
+            dialog_id: Dialog ID;
+
+            bot_token: Unique authorization bot token;
+
+            enabled: Control the input field;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "botId": bot_id,

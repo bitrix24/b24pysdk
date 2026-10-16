@@ -42,6 +42,11 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
     _ORDER_KEY: ClassVar[Optional[Text]] = "order"
     _SELECT_KEY: ClassVar[Text] = "select"
     _ADD_KEY: ClassVar[Optional[Text]] = "fields"
+    # False means the endpoint returns a complete collection in one response;
+    # its values adapter, rather than the list caller, handles the raw shape.
+    _IS_LIST_METHOD: ClassVar[bool] = True
+    # Pagination and server-side ordering are independent API capabilities.
+    _SUPPORTS_ORDER: ClassVar[bool] = True
 
     __slots__ = (
         "_api_wrapper",
@@ -154,10 +159,7 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
         """
 
         if self._response is None:
-            response = cast(
-                Union[BitrixObjectList[BOT], Generator[BOT, None, None]],
-                self._make_list_request().values,
-            )
+            response = self._load_response()
 
             select_related_param = self._query_state.select_related_param
 
@@ -172,6 +174,44 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
             self._response = response
 
         return self._response
+
+    def _load_response(self) -> Union[BitrixObjectList[BOT], Generator[BOT, None, None]]:
+        """Load objects according to the endpoint's collection contract.
+
+        List methods use normal or fast pagination. Complete collections and
+        reversed queries without server-side ordering reverse response order
+        locally before applying the limit. Reversed paginated queries without
+        ordering must load all remaining pages to find the last object.
+        Caching and related-object loading stay in ``_get_response()``.
+        """
+
+        if self._is_fast and not (self._IS_LIST_METHOD and self._SUPPORTS_ORDER):
+            raise BitrixObjectError(
+                "Fast list loading requires a paginated API method with ordering support.",
+            )
+
+        if not self._IS_LIST_METHOD or (self._is_reversed and not self._SUPPORTS_ORDER):
+            request = self._make_request()
+
+            # Mapping-shaped collections go directly to their adapter. For a
+            # paginated endpoint without ordering, omit the request limit:
+            # reversing only the first page would give an incorrect last().
+            response = cast(
+                BitrixObjectList[BOT],
+                request.as_list().values if self._IS_LIST_METHOD else request.values,
+            )
+
+            if self._is_reversed:
+                response.reverse()
+
+            # Apply the limit after any local reversal. Slicing preserves the
+            # object-list type and client provider.
+            return response if self._limit_param is None else response[:self._limit_param]
+
+        return cast(
+            Union[BitrixObjectList[BOT], Generator[BOT, None, None]],
+            self._make_list_request().values,
+        )
 
     def timeout(self, timeout: DefaultTimeout) -> Self:
         """Return a manager copy with a request timeout."""
@@ -190,7 +230,13 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
         )
 
     def as_fast(self, is_fast: bool = True) -> Self:
-        """Return a lazy iterable manager with fast one-pass loading enabled or disabled."""
+        """Return a manager copy with fast one-pass loading enabled or disabled.
+
+        This flag does not make an untouched manager executable. Call a query
+        method such as ``all()`` or ``filter()`` before evaluating it. Fast
+        loading forbids a start offset and validates PK-only ordering when the
+        list request is constructed.
+        """
 
         if is_fast and self._start_param is not None:
             raise BitrixObjectError("Fast list loading does not support start offset.")
@@ -200,7 +246,12 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
         )
 
     def to_list(self) -> BitrixObjectList[BOT]:
-        """Execute the current query and return results as a typed object list."""
+        """Materialize the current query and cache a reusable typed object list.
+
+        An already cached list is returned unchanged. If a fast generator was
+        partly consumed, only its remaining objects can be materialized; this
+        method does not restart the query.
+        """
 
         response = self._get_response()
 
@@ -420,7 +471,11 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
         return None
 
     def last(self) -> Optional[BOT]:
-        """Execute the reversed current query with limit ``1`` and return the first object, if any."""
+        """Return the first object of the reversed query with limit ``1``.
+
+        Without server-side ordering, this is the last object in API response
+        order and requires loading the complete collection after any start.
+        """
         return self.reverse().first()
 
     def limit(self, limit: Optional[int]) -> Self:
@@ -437,7 +492,12 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
         )
 
     def reverse(self) -> Self:
-        """Return a lazy iterable manager with reversed ordering."""
+        """Return a lazy iterable manager with reversed ordering.
+
+        Paginated methods with ordering support reverse server-side ordering.
+        Other methods reverse the complete adapted collection locally before
+        applying ``limit``; paginated methods must first load all remaining pages.
+        """
         return self._clone(
             query_state=self._query_state.with_is_reversed(not self._is_reversed),
         )
@@ -611,7 +671,15 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
         )
 
     def _order(self, *fields: Text) -> Self:
-        """Return a manager copy with additional ordering parameters."""
+        """Merge SDK ordering fields into a new manager's ordering mapping.
+
+        Prefix an attribute name with ``-`` for descending order. Repeating a
+        field replaces its direction and moves it to the end of the ordering
+        sequence. ``bitrix_pk`` expands to every primary-key component.
+        """
+
+        if not self._SUPPORTS_ORDER:
+            raise BitrixObjectError("This API method does not support server-side ordering.")
 
         if not fields:
             raise ValueError("Pass at least one order field.")
@@ -679,6 +747,10 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
         ``from_pks()`` method and is also the contract used by
         ``select_related()``. It creates one ``IN`` filter; it never falls back
         to one request per primary key.
+
+        Only a single-field primary key supports this generic implementation.
+        The input is converted eagerly by the filter operator, including when
+        it is a generator; an empty iterable is retained as an empty IN filter.
         """
 
         if isinstance(bitrix_pks, (str, bytes, bytearray)):
@@ -712,7 +784,12 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
         )
 
     def _with_api_wrapper(self, api_wrapper: Callable[["ClientType"], Callable[..., "BitrixAPIValuesRequest[Any, BOT]"]]) -> Self:
-        """Return a manager copy using another API wrapper."""
+        """Switch the wrapper while preserving query state in a new manager.
+
+        Switching alone does not enable result evaluation. An alternative
+        endpoint valid without parameters should finish its builder with
+        ``all()`` so a previously untouched manager can execute it.
+        """
         return self._clone(api_wrapper=api_wrapper)
 
     def _with_params(self, **kwargs: Any) -> Self:
@@ -737,9 +814,11 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
     ) -> JSONDict:
         """Return add parameters built from raw codes and SDK field values.
 
-        ``fields_params`` accepts endpoint-specific fields keyed by their raw
-        Bitrix24 codes. Values supplied through SDK attribute names are
-        converted normally and override matching raw codes.
+        ``add_params`` supplies already serialized entries for the add payload.
+        With ``_ADD_KEY`` set, those entries use raw Bitrix24 field codes and
+        are nested under that key. Without it, they use top-level wrapper
+        parameter names. ``fields`` uses SDK attribute names; its values are
+        converted and override matching entries in ``add_params``.
         """
 
         if not add_params and not fields:
@@ -812,8 +891,8 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
         """Return effective ordering after applying ``reverse()``.
 
         Reversal never mutates the stored order mapping. If no explicit order
-        exists, primary-key fields are used in descending order so ``last()``
-        still has deterministic semantics.
+        exists, primary-key fields are used in descending order for endpoints
+        that support server-side ordering. Other endpoints reverse locally.
         """
 
         order_param = self._query_state.order_param
@@ -905,7 +984,7 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
             params[self._FILTER_KEY] = filter_param
 
     def _add_order_param(self, params: JSONDict):
-        """Attach effective ordering unless fast pagination owns the order.
+        """Attach effective ordering for normal paginated list methods.
 
         With a dedicated order key, the effective mapping is attached by
         reference; otherwise its entries are merged into the fresh top-level
@@ -913,7 +992,9 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
         new mapping in ``_get_order_param()``.
         """
 
-        if self._is_fast:
+        # Fast pagination supplies its own order. Complete collections reverse
+        # locally because their endpoint does not accept pagination ordering.
+        if self._is_fast or not self._IS_LIST_METHOD or not self._SUPPORTS_ORDER:
             return
 
         order_param = self._get_order_param()
@@ -1019,9 +1100,9 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
             """Load unique related keys and index returned objects by key.
 
             Empty key collections short-circuit without resolving the related
-            manager or making an API request. A single fast manager query is
-            used for all keys, allowing the API layer to split explicit IDs
-            into independent requests without last-ID pagination.
+            manager or making an API request. One manager query is used for
+            all keys. Fast loading is enabled only when the related endpoint
+            supports both pagination and ordering.
             """
 
             if not unique_pks:
@@ -1043,7 +1124,13 @@ class BaseObjectManager(BaseManager[BOT], ABC, Generic[BOT]):
                     "by primary keys via from_pks().",
                 )
 
-            related_manager = from_pks(unique_pks).as_fast()
+            related_manager = from_pks(unique_pks)
+
+            # Fast ID traversal needs pagination and server-side ordering.
+            # Otherwise, retain the normal collection-loading strategy.
+            if related_manager._IS_LIST_METHOD and related_manager._SUPPORTS_ORDER:
+                related_manager = related_manager.as_fast()
+
             related_query_state = related_manager._query_state
 
             # Explicit select() state and select_related() state stay separate:

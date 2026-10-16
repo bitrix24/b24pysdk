@@ -16,7 +16,10 @@ __all__ = [
 
 
 class Cashbox(BaseEntity):
-    """"""
+    """Class for managing cash registers.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sale/cashbox/index.html
+    """
 
     @cached_property
     def check(self) -> Check:
@@ -44,7 +47,38 @@ class Cashbox(BaseEntity):
         settings: Optional[JSONDict] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add cash register
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/cashbox/sale-cashbox-add.html
+
+        The method adds a cash register.
+
+        Args:
+            name: Name of the cash register;
+
+            rest_code: REST handler code for the cash register;
+
+            email: Email address to which notifications will be sent in case of errors during receipt printing;
+
+            ofd: OFD handler code;
+
+            ofd_settings: OFD settings;
+
+            number_kkm: External identifier of the cash register;
+
+            active: Activity status of the cash register;
+
+            sort: Sorting;
+
+            use_offline: Whether the cash register is used offline;
+
+            settings: Cash register settings;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "NAME": name,
@@ -86,7 +120,20 @@ class Cashbox(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete cash register
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/cashbox/sale-cashbox-delete.html
+
+        The method deletes a cash register.
+
+        Args:
+            bitrix_id: Identifier of the cash register to be deleted;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "ID": bitrix_id,
@@ -107,7 +154,24 @@ class Cashbox(BaseEntity):
         order: Optional[JSONDict] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of configured cash registers
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/cashbox/sale-cashbox-list.html
+
+        The method retrieves a list of configured cash registers.
+
+        Args:
+            select: An array with the list of fields to select;
+
+            filter: An object for filtering selected cash registers;
+
+            order: An object for sorting selected records;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -136,7 +200,22 @@ class Cashbox(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update existing cash register
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/cashbox/sale-cashbox-update.html
+
+        The method updates an existing cash register.
+
+        Args:
+            bitrix_id: Identifier of the cash register being updated;
+
+            fields: Values of the fields to be updated;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "ID": bitrix_id,

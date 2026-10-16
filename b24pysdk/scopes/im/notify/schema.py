@@ -9,7 +9,10 @@ __all__ = [
 
 
 class Schema(BaseEntity):
-    """"""
+    """Class for retrieving notification types schema.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chats/notifications/index.html
+    """
 
     @type_checker
     def get(
@@ -17,7 +20,18 @@ class Schema(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """"""
+        """Get notification type schema
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/notifications/im-notify-schema-get.html
+
+        The method returns the schema of available notification types by modules.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,

@@ -15,6 +15,8 @@ from .._base_schema import BaseSchema
 __all__ = [
     "V3Field",
     "V3FieldData",
+    "V3FieldGetData",
+    "V3FieldListData",
 ]
 
 
@@ -31,6 +33,16 @@ class V3FieldData(TypedDict):
     editable: bool
     multiple: bool
     elementType: Optional[Text]
+
+
+class V3FieldGetData(TypedDict):
+    """Raw result envelope returned by REST API v3 field.get methods."""
+    item: V3FieldData
+
+
+class V3FieldListData(TypedDict):
+    """Raw result envelope returned by REST API v3 field.list methods."""
+    items: List[V3FieldData]
 
 
 @dataclass(**frozen_dataclass_kwargs())

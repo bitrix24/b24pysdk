@@ -14,7 +14,10 @@ __all__ = [
 
 
 class Chat(BaseEntity):
-    """"""
+    """Class for working with chats.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/outdated/chats/index.html
+    """
 
     @cached_property
     def user(self) -> User:
@@ -30,7 +33,7 @@ class Chat(BaseEntity):
             bot_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Deprecated"""
 
         params = {
             "CHAT_ID": chat_id,
@@ -56,7 +59,7 @@ class Chat(BaseEntity):
             client_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Deprecated"""
 
         params = {
             "CHAT_ID": chat_id,

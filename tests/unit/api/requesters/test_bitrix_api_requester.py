@@ -1,5 +1,4 @@
-import io
-from typing import IO, Any, Dict, List, Text, Tuple
+from typing import Any, Dict, List, Text
 from unittest.mock import Mock, patch
 
 import pytest
@@ -15,15 +14,11 @@ pytestmark = [
     pytest.mark.bitrix_api_requester,
 ]
 
-_FILE_IO_1: IO[bytes] = io.BytesIO(b"file_content_1")
-_FILE_TUPLE_1: Tuple[Text, IO[bytes]] = ("test.txt", _FILE_IO_1)
-
 _URL_FOR_SINGLE_TESTS: Text = "https://example.bitrix24.com/rest/test.method/"
 
 _INIT_CASE_1: Dict[Text, Any] = {
     "url": "https://example.bitrix24.com/rest/user.get/",
     "params": {"ID": 1, "select": ["ID", "NAME"]},
-    "files": {"file": _FILE_TUPLE_1},
     "timeout": 30.0,
     "max_retries": 3,
     "initial_retry_delay": 0.5,
@@ -33,7 +28,6 @@ _INIT_CASE_1: Dict[Text, Any] = {
 _INIT_CASE_2: Dict[Text, Any] = {
     "url": "https://example.bitrix24.com/rest/crm.lead.add/",
     "params": {"TITLE": "New Lead"},
-    "files": None,
     "timeout": 10.0,
     "max_retries": 1,
     "initial_retry_delay": None,
@@ -43,7 +37,6 @@ _INIT_CASE_2: Dict[Text, Any] = {
 _INIT_CASE_3: Dict[Text, Any] = {
     "url": "https://example.bitrix24.com/rest/no.params/",
     "params": None,
-    "files": None,
     "max_retries": None,
     "initial_retry_delay": None,
     "retry_delay_increment": None,
@@ -61,7 +54,6 @@ def test_initialization_and_properties(case):
     obj = BitrixAPIRequester(
         url=case["url"],
         params=case["params"],
-        files=case["files"],
         max_retries=case["max_retries"],
         initial_retry_delay=case["initial_retry_delay"],
         retry_delay_increment=case["retry_delay_increment"],
@@ -69,7 +61,6 @@ def test_initialization_and_properties(case):
 
     assert obj._url == case["url"]
     assert obj._params == case["params"]
-    assert obj._files == case["files"]
 
 
 def test_headers_property():

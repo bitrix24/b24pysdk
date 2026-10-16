@@ -13,7 +13,10 @@ __all__ = [
 
 
 class Request(BaseEntity):
-    """"""
+    """Class for working with delivery requests.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sale/delivery/delivery-request/index.html
+    """
 
     @type_checker
     def update(
@@ -27,7 +30,30 @@ class Request(BaseEntity):
         overwrite_properties: Optional[bool] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update delivery request
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/delivery/delivery-request/sale-delivery-request-update.html
+
+        The method updates the delivery request.
+
+        Args:
+            delivery_id: Identifier of the delivery service to which delivery request belongs;
+
+            request_id: Identifier of the delivery request;
+
+            finalize: Indicator of the need to finalize the delivery request;
+
+            status: Status of the delivery request;
+
+            properties: Properties of the delivery request;
+
+            overwrite_properties: Indicator of the need to completely overwrite the property values of the request during the update;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "DELIVERY_ID": delivery_id,
@@ -62,7 +88,26 @@ class Request(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Create notifications for delivery request
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/delivery/delivery-request/sale-delivery-request-send-message.html
+
+        The method creates notifications for a delivery request.
+
+        Args:
+            delivery_id: Identifier of the delivery service related to the delivery request;
+
+            request_id: Identifier of the delivery request;
+
+            addressee: Recipient of the message;
+
+            message: Message;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "DELIVERY_ID": delivery_id,
@@ -85,7 +130,22 @@ class Request(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete delivery request
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/delivery/delivery-request/sale-delivery-request-delete.html
+
+        The method deletes a delivery request.
+
+        Args:
+            delivery_id: Identifier of the delivery service to which the delivery request belongs;
+
+            request_id: Identifier of the delivery request;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "DELIVERY_ID": delivery_id,

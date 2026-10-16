@@ -9,7 +9,10 @@ __all__ = [
 
 
 class Path(BaseEntity):
-    """"""
+    """Class for retrieving links to the public page of open channels.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/index.html
+    """
 
     @type_checker
     def get(
@@ -17,7 +20,18 @@ class Path(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get link to public of open channels
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/imopenlines-config-path-get.html
+
+        The method retrieves the link to the public page of open channels on the account.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,

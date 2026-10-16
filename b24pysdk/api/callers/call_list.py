@@ -88,7 +88,7 @@ class _ListCaller(BaseListCaller):
         """
         Generate batch commands for the ID-filter optimization.
 
-        The ID list is split into chunks of ``_STEP`` IDs. Each generated command
+        The ID list is split into chunks of ``_MAX_BATCH_SIZE`` IDs. Each generated command
         reuses the original method and parameters but replaces the ID filter
         value with the current chunk. An empty ``filter_key`` means that the ID
         filter belongs at the top level rather than inside a ``filter`` mapping.
@@ -127,11 +127,12 @@ class _ListCaller(BaseListCaller):
 
         Each command reuses the original method and parameters and adds a
         ``start`` offset. Offsets begin from ``next_step`` returned by the first
-        Bitrix response and continue up to ``total``.
+        Bitrix response and continue up to the exclusive absolute ``total``
+        boundary, which may be capped to satisfy the requested result limit.
 
         Args:
             next_step: First ``start`` offset that still needs to be fetched.
-            total: Total number of items to retrieve.
+            total: Exclusive absolute pagination boundary, not a result count.
 
         Returns:
             List of ``(api_method, params)`` tuples ready for ``call_batches``.
@@ -251,6 +252,10 @@ class _ListCaller(BaseListCaller):
         wrapper key used by the Bitrix method. Empty ID filters are resolved
         locally, ID-only requests use batch chunks, and other requests fetch the
         first page normally before batching any remaining pages.
+
+        ``limit`` caps the returned item count after the requested ``start``
+        offset. Pagination boundaries remain absolute offsets into the API
+        result set.
         """
 
         self._config.logger.debug(
@@ -312,20 +317,26 @@ class _ListCaller(BaseListCaller):
 
                 self._config.logger.warning(message)
 
-            if self._limit is not None:
-                total = min(total, self._limit)
+            end_offset = total
 
-            if next_step and (self._limit is None or self._limit > self._MAX_BATCH_SIZE):
+            if next_step and self._limit is not None:
+                # next is an absolute offset, while limit counts returned items.
+                # Add only the number still needed after the first page; this
+                # also respects a nonzero start without modifying the params.
+                end_offset = min(total, next_step + max(0, self._limit - len(result)))
+
+            if next_step and next_step < end_offset:
                 batch_response = self._fetch_batches_response(
                     methods=self._generate_methods_for_batch(
                         next_step=next_step,
-                        total=total,
+                        total=end_offset,
                     ),
                 )
                 result.extend(self._unwrap_batch_result(batch_response["result"]))
                 self._add_time(batch_response["time"])
 
-            del result[total:]
+            if self._limit is not None:
+                del result[self._limit:]
 
             return {
                 "result": result,

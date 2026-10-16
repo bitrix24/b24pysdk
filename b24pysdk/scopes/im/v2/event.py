@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Event(BaseEntity):
-    """"""
+    """Class for managing user messanger events.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/im.v2/events/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -27,7 +30,22 @@ class Event(BaseEntity):
             limit: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Retrieve user events
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/im.v2/events/event-get.html
+
+        The method retrieves events for the current user in polling mode.
+
+        Args:
+            offset: Confirms processed events and returns events starting from this value;
+
+            limit: Maximum number of events returned;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "offset": offset,
@@ -48,7 +66,18 @@ class Event(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Subscribe to events
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/im.v2/events/event-subscribe.html
+
+        The method subscribes the current user to event logging.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
         return self._make_bitrix_api_request(
             api_wrapper=self.subscribe,
             timeout=timeout,
@@ -60,7 +89,18 @@ class Event(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Unsubscribe from events
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/im.v2/events/event-unsubscribe.html
+
+        The method cancels the current user's subscription to event logging.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
         return self._make_bitrix_api_request(
             api_wrapper=self.unsubscribe,
             timeout=timeout,

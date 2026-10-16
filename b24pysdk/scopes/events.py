@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Events(BaseScope):
-    """"""
+    """Class for retrieving a list of available events.
+
+    Documentaiton: https://apidocs.bitrix24.com/api-reference/events/index.html
+    """
 
     @type_checker
     def __call__(
@@ -22,7 +25,22 @@ class Events(BaseScope):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[List[Text]]:
-        """"""
+        """Get a list of available events
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/events/events.html
+
+        The method returns a comprehensive list of available events.
+
+        Args:
+            scope: The method will return events belonging to the specified permission;
+
+            full: The method will return the complete list of events;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

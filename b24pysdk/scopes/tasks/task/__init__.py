@@ -9,7 +9,6 @@ from ..._base_entity import BaseEntity
 from .counters import Counters
 from .favorite import Favorite
 from .files import Files
-from .gantt import Gantt
 from .history import History
 from .result import Result
 
@@ -38,11 +37,6 @@ class Task(BaseEntity):
     def files(self) -> Files:
         """"""
         return Files(self)
-
-    @cached_property
-    def gantt(self) -> Gantt:
-        """"""
-        return Gantt(self)
 
     @cached_property
     def history(self) -> History:

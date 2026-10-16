@@ -17,7 +17,10 @@ __all__ = [
 
 
 class Session(BaseEntity):
-    """"""
+    """Class for retrieving session list.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/statistics/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -68,7 +71,66 @@ class Session(BaseEntity):
             limit: int = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get sessions
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/statistics/imopenlines-v2-session-list.html
+
+        The method retrieves open channel sessions with filters and pagination.
+
+        Args:
+            config_id: Open channel ID;
+
+            config_id_list: List of open channel IDs;
+
+            operator_id: Operator ID;
+
+            operator_id_list: List of operator IDs;
+
+            source: Channel code;
+
+            source_list: List of channel codes;
+
+            status: Session status;
+
+            close_reason: Close reason;
+
+            date_create_from: Start of the creation period in ISO 8601 format;
+
+            date_create_to: End of the creation period in ISO 8601 format;
+
+            date_close_from: Start of the close period in ISO 8601 format;
+
+            date_close_to: End of the close period in ISO 8601 format;
+
+            vote: Customer rating;
+
+            has_vote_head: Filter by supervisor rating availability;
+
+            kpi_first_answer: Filter by first response KPI performance;
+
+            has_crm: Filter by an available CRM link;
+
+            wait_answer_from: Minimum time to first response, seconds;
+
+            wait_answer_to: Maximum time to first response, seconds;
+
+            wait_close_from: Minimum time to close, seconds;
+
+            wait_close_to: Maximum time to close, seconds;
+
+            order: Sort field;
+
+            order_direction: Sort direction;
+
+            offset: Offset of the first page;
+
+            limit: Page size;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

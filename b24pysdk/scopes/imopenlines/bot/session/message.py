@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Message(BaseEntity):
-    """"""
+    """Class for sending automatic message to the dialogue.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/chat-bots/index.html
+    """
 
     @type_checker
     def send(
@@ -22,7 +25,24 @@ class Message(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Send an automatic message in the dialogue
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/chat-bots/imopenlines-bot-session-message-send.html
+
+        The method sends an automatic message from the application chatbot to the open line dialog.
+
+        Args:
+            chat_id: The identifier of the chat to which the method sends the message;
+
+            message: The message text;
+
+            name: The code for the auto-response type;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             CHAT_ID=chat_id,

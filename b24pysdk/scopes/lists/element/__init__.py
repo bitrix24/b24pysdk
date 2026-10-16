@@ -17,7 +17,10 @@ __all__ = [
 
 
 class Element(BaseEntity):
-    """Methods for Bitrix24 universal-list elements."""
+    """Methods for Bitrix24 universal-list elements.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/lists/elements/index.html
+    """
 
     @cached_property
     def get(self) -> Get:
@@ -37,7 +40,32 @@ class Element(BaseEntity):
             list_element_url: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIValueRequest[int, BaseListElement]:
-        """Create a list element and adapt its identifier to an object."""
+        """Create a list element
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/lists/elements/lists-element-add.html
+
+        The method creates a list element.
+
+        Args:
+            iblock_type_id: Identifier of the information block type;
+
+            element_code: Symbolic code of the element;
+
+            fields: Array of fields;
+
+            iblock_id: Identifier of the information block;
+
+            iblock_code: Symbolic code of the information block;
+
+            iblock_section_id: Identifier of the section to which the element is added;
+
+            list_element_url: Template address to the list elements;
+
+            timeout: Timeout in seconds.
+
+        Return:
+            Instance of BitrixAPIValueRequest
+        """
 
         if iblock_id is MISSING and iblock_code is MISSING:
             raise ValueError("Pass iblock_id or iblock_code.")
@@ -86,7 +114,28 @@ class Element(BaseEntity):
             element_code: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """Delete a list element by identifier or symbolic code."""
+        """Delete a list element
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/lists/elements/lists-element-delete.html
+
+        The method removes a list element.
+
+        Args:
+            iblock_type_id: Identifier of the information block type;
+
+            iblock_id: Identifier of the information block;
+
+            iblock_code: Symbolic code of the information block;
+
+            element_id: Identifier of the element;
+
+            element_code: Symbolic code of the element;
+
+            timeout: Timeout in seconds.
+
+        Return:
+            Instance of BitrixAPIRequest
+        """
 
         if iblock_id is MISSING and iblock_code is MISSING:
             raise ValueError("Pass iblock_id or iblock_code.")
@@ -126,7 +175,30 @@ class Element(BaseEntity):
             element_code: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """Fully replace the supplied ordinary fields of a list element."""
+        """Update list element
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/lists/elements/lists-element-update.html
+
+        The method updates a list element.
+
+        Args:
+            iblock_type_id: Identifier of the information block type;
+
+            fields: Array of fields;
+
+            iblock_id: Identifier of the information block;
+
+            iblock_code: Symbolic code of the information block;
+
+            element_id: Identifier of the element;
+
+            element_code: Symbolic code of the element;
+
+            timeout: Timeout in seconds.
+
+        Return:
+            Instance of BitrixAPIRequest
+        """
 
         if iblock_id is MISSING and iblock_code is MISSING:
             raise ValueError("Pass iblock_id or iblock_code.")

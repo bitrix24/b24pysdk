@@ -13,7 +13,10 @@ __all__ = [
 
 
 class Type(BaseEntity):
-    """Methods for available Bitrix24 list field types."""
+    """Methods for available Bitrix24 list field types.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/lists/fields/index.html
+    """
 
     @type_checker
     def get(
@@ -25,7 +28,26 @@ class Type(BaseEntity):
             field_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """Return field types available for the selected list or field."""
+        """Get available field types for universal list
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/lists/fields/lists-field-type-get.html
+
+        The method returns a list of available field types for the list.
+
+        Args:
+            iblock_type_id: Identifier of the information block type;
+
+            iblock_id: Identifier of the information block;
+
+            iblock_code: Symbolic code of the information block;
+
+            field_id: Field identifier;
+
+            timeout: Timeout in seconds.
+
+        Return:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "IBLOCK_TYPE_ID": iblock_type_id,

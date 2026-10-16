@@ -28,6 +28,14 @@ class BitrixAPIBaseValueRequest(BitrixAPIBaseRequest[BAValueResponseT, BAResultT
 
     Subclasses expose adapted data through ``value`` or ``values`` while
     preserving the standard ``response`` and raw ``result`` contract.
+
+    The wrapper's ``result_adapter`` determines the public value type. It may
+    return a scalar, a schema from ``b24pysdk.schemas``, or an entity object from
+    ``b24pysdk.objects``. Schemas provide structured data and their conversion
+    methods. Entity objects retain their identity, client provider, field
+    descriptors, and the read/write operations supported by their class.
+    Adapting an object does not itself load missing fields; partial objects can
+    fetch those fields later through their normal lazy-loading behavior.
     """
 
     __slots__ = ("_result_adapter",)
@@ -68,8 +76,17 @@ class BitrixAPIValueRequest(BitrixAPIBaseValueRequest[BitrixAPIValueResponse[BAR
     Lazy request object that exposes an adapted ``value``.
 
     ``result`` remains the raw Bitrix24 payload. ``value`` is produced from
-    ``result`` by ``result_adapter`` and is intended for schemas or scalar
-    Python-friendly values without lifecycle behavior.
+    ``result`` by ``result_adapter``. Depending on the wrapper, it can be a
+    scalar, a schema from ``b24pysdk.schemas``, or an entity instance from
+    ``b24pysdk.objects``. The request does not restrict the value to a DTO:
+    an adapted entity supports its class's normal lazy field access and
+    operations such as ``update()``, ``save()``, and ``delete()`` where defined.
+
+    An object adapter can construct an entity from response data or just a
+    primary key, as returned by an add method. The latter remains a partial
+    object and can load its remote data on subsequent field access. Accessing
+    ``value`` executes the request lazily; ``result`` remains available for
+    callers that need the original response format.
     """
 
     __slots__ = ()
@@ -101,8 +118,17 @@ class BitrixAPIValuesRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesResponse[B
     Lazy request object that exposes adapted ``values``.
 
     ``result`` remains the raw Bitrix24 payload. ``values`` is produced from
-    ``result`` by ``result_adapter`` and is intended for list-like adapted
-    collections without lifecycle behavior.
+    ``result`` by ``result_adapter``. Collection items can be scalars, schemas
+    from ``b24pysdk.schemas``, or entity objects from ``b24pysdk.objects``.
+    Schema adapters typically return a list; object adapters return a
+    ``BitrixObjectList`` whose items retain their entity behavior and client
+    providers. The collection also supports its object-list operations.
+
+    Direct ``values`` access adapts one API response; it does not fetch further
+    pages automatically. Use ``as_list()`` or ``as_list_fast()`` only when the
+    endpoint supports the respective list caller. These callers process raw
+    responses before adaptation, so a mapping-shaped collection may require
+    direct ``values`` access instead of list pagination.
     """
 
     __slots__ = ()
@@ -182,6 +208,10 @@ class BitrixAPIValuesRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesResponse[B
 class BitrixAPIValuesListRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesListResponse[BValueT], JSONList, BValueT], Generic[BValueT]):
     """
     Lazy list request that exposes adapted ``values``.
+
+    The source adapter is retained, so values can be scalars, schemas, or
+    entity objects. The list caller collects raw pages before the adapter
+    converts the combined result; ``result`` preserves that raw collection.
 
     This duplicates the standard list-request lifecycle for values requests to
     keep the existing ``BitrixAPIRequest.as_list()`` behavior unchanged.
@@ -265,6 +295,10 @@ class BitrixAPIValuesListRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesListRe
 class BitrixAPIValuesListFastRequest(BitrixAPIBaseValueRequest[BitrixAPIValuesListFastResponse[BValueT], JSONGenerator, BValueT], Generic[BValueT]):
     """
     Lazy fast list request that exposes adapted ``values``.
+
+    The source adapter is retained for scalar, schema, or entity values.
+    Raw results may be streamed and adapted as they are consumed; object
+    adapters preserve this one-pass behavior for generator results.
 
     This duplicates the fast list-request lifecycle for values requests to keep
     the existing ``BitrixAPIRequest.as_list_fast()`` behavior unchanged.

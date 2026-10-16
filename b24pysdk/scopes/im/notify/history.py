@@ -12,7 +12,10 @@ __all__ = [
 
 
 class History(BaseEntity):
-    """"""
+    """Class for searching through notification history.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chats/notifications/index.html
+    """
 
     @type_checker
     def search(  # noqa: C901, PLR0912
@@ -31,7 +34,40 @@ class History(BaseEntity):
             group_tag: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """"""
+        """Searching notification history
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/notifications/im-notify-history-search.html
+
+        The method performs a search through the user's notification history.
+
+        Args:
+            search_text: Search text;
+
+            search_type: Filter by notification type;
+
+            search_types: Array of filters by notification types;
+
+            search_date: Date filter in ISO 8601 format;
+
+            search_date_from: Start of the date range in ISO 8601 format;
+
+            search_date_to: End of the date range in ISO 8601 format;
+
+            search_authors: Array of notification author identifiers for filtering;
+
+            last_id: Identifier of the last notification from the previous page to load the next one;
+
+            limit: Number of notifications per page;
+
+            convert_text: Convert notification text;
+
+            group_tag: Group tag for notifications for additional filtering;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

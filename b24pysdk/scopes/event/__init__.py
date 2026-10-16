@@ -18,7 +18,10 @@ __all__ = [
 
 
 class Event(BaseScope):
-    """Methods for managing Bitrix24 event handler registrations."""
+    """Methods for managing Bitrix24 event handler registrations.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/events/index.html
+    """
 
     @cached_property
     def offline(self) -> Offline:
@@ -37,7 +40,30 @@ class Event(BaseScope):
             options: JSONDict = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """Register an event handler."""
+        """Register a new event handler
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/events/event-bind.html
+
+        The method registers a new event handler.
+
+        Args:
+            event: Event name;
+
+            handler: Link to event handler;
+
+            auth_type: Identifier of the user under whom the event handler is authorized;
+
+            event_type: Value for online or offline event;
+
+            auth_connector: Source key;
+
+            options: Additional settings for the registered event;
+
+            timeout: Timeout in seconds.
+
+        Return:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "event": event,
@@ -70,7 +96,18 @@ class Event(BaseScope):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIValuesRequest[JSONList, EventObject]:
-        """Return registered event handlers as SDK objects."""
+        """Return registered event handlers
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/events/event-get.html
+
+        The method allows to retrieve a list of registered event handlers.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Return:
+            Instance of BitrixAPIRequest
+        """
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
             timeout=timeout,
@@ -88,7 +125,26 @@ class Event(BaseScope):
             event_type: Annotated[Text, EventTypeLiteral] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIValueRequest[CountResultData, int]:
-        """Unregister matching event handlers and return their count."""
+        """Unregister event handler
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/events/event-unbind.html
+
+        The method unregisters a registered event handler.
+
+        Args:
+            event: Event name;
+
+            handler: Link to event handler;
+
+            auth_type: Identifier of the user under whom the event handler is authorized;
+
+            event_type: Value for online or offline event;
+
+            timeout: Timeout in seconds.
+
+        Return:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "event": event,

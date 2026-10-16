@@ -13,7 +13,10 @@ __all__ = [
 
 
 class User(BaseEntity):
-    """"""
+    """Class for managing participants in chats.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chats/chat-users/index.html
+    """
 
     @type_checker
     def add(
@@ -24,7 +27,24 @@ class User(BaseEntity):
             hide_history: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Invite participants to chat
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/chat-users/im-chat-user-add.html
+
+        The method adds users to a chat.
+
+        Args:
+            chat_id: Chat ID;
+
+            users: Array of user identifiers to be added to the chat;
+
+            hide_history: Hide chat history for added users;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if users.__class__ is not list:
             users = list(users)
@@ -51,7 +71,22 @@ class User(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Exclude participants from chat
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/chat-users/im-chat-user-delete.html
+
+        The method removes a user from the chat.
+
+        Args:
+            chat_id: Chat ID;
+
+            user_id: User identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             CHAT_ID=chat_id,
@@ -71,7 +106,20 @@ class User(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[List[int]]:
-        """"""
+        """Get chat participants IDs
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/chat-users/im-chat-user-list.html
+
+        The method returns a list of chat participant IDs.
+
+        Args:
+            chat_id: Chat ID;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             CHAT_ID=chat_id,

@@ -2,9 +2,9 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Callable, Dict, Generic, Text
 
 from ...constants.version import B24APIVersion
-from ...schemas.v3 import V3Field, V3FieldData
+from ...schemas.v3.field import V3Field, V3FieldGetData, V3FieldListData
 from ...utils.type_vars import BOT
-from ...utils.types import JSONList, Timeout
+from ...utils.types import Timeout
 from ..errors import BitrixObjectClientError
 from .base_field_manager import BaseFieldManager
 
@@ -18,7 +18,12 @@ __all__ = [
 
 
 class BaseV3FieldManager(BaseFieldManager[BOT], ABC, Generic[BOT]):
-    """Manager for the standard REST API v3 ``field.get`` and ``field.list`` methods."""
+    """Immediate metadata access through REST API v3 field methods.
+
+    Concrete wrappers adapt responses into ``V3Field`` before returning
+    ``value`` or ``values``; this manager does not deserialize those values
+    again. Metadata requests omit ``select`` to request the default shape.
+    """
 
     @property
     def _client(self) -> "ClientV3":
@@ -35,7 +40,11 @@ class BaseV3FieldManager(BaseFieldManager[BOT], ABC, Generic[BOT]):
         return client
 
     def list(self, *, timeout: Timeout = None) -> Dict[Text, V3Field]:
-        """Return all field descriptions indexed by their Bitrix24 names."""
+        """Fetch field schemas and index them by their raw Bitrix24 names.
+
+        This immediate manager call does not cache the mapping itself;
+        ``BaseV3Object.get_fields()`` supplies the per-client metadata cache.
+        """
 
         fields = self._get_list_api_wrapper(self._client)(timeout=timeout).values
 
@@ -50,7 +59,11 @@ class BaseV3FieldManager(BaseFieldManager[BOT], ABC, Generic[BOT]):
             *,
             timeout: Timeout = None,
     ) -> V3Field:
-        """Return field metadata by SDK object attribute name."""
+        """Fetch one field schema by SDK attribute name using ``field.get``.
+
+        The attribute is translated to its raw Bitrix24 name. This call bypasses
+        the full-collection cache used by the object's ``get_field()`` hook.
+        """
 
         bitrix_field = self._meta.get_field(attr_name)
 
@@ -60,11 +73,11 @@ class BaseV3FieldManager(BaseFieldManager[BOT], ABC, Generic[BOT]):
         ).value
 
     @abstractmethod
-    def _get_api_wrapper(self, client: "ClientV3") -> Callable[..., "BitrixAPIValueRequest[V3FieldData, V3Field]"]:
+    def _get_api_wrapper(self, client: "ClientV3") -> Callable[..., "BitrixAPIValueRequest[V3FieldGetData, V3Field]"]:
         """Return the concrete REST API v3 ``field.get`` wrapper."""
         raise NotImplementedError
 
     @abstractmethod
-    def _get_list_api_wrapper(self, client: "ClientV3") -> Callable[..., "BitrixAPIValuesRequest[JSONList, V3Field]"]:
+    def _get_list_api_wrapper(self, client: "ClientV3") -> Callable[..., "BitrixAPIValuesRequest[V3FieldListData, V3Field]"]:
         """Return the concrete REST API v3 ``field.list`` wrapper."""
         raise NotImplementedError

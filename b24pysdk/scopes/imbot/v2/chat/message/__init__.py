@@ -14,7 +14,10 @@ __all__ = [
 
 
 class Message(BaseEntity):
-    """"""
+    """Class for working with messages via chatbots.
+
+    Documentatoin: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/messages/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -35,7 +38,24 @@ class Message(BaseEntity):
             bot_token: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete message
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/messages/chat-message-delete.html
+
+        The method deletes a message.
+
+        Args:
+            bot_id: Bot ID;
+
+            message_id: ID of the message to be deleted;
+
+            bot_token: Unique authorization bot token;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "botId": bot_id,
@@ -60,7 +80,24 @@ class Message(BaseEntity):
             bot_token: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get message
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/messages/chat-message-get.html
+
+        The method returns a message by its ID.
+
+        Args:
+            bot_id: Bot ID;
+
+            message_id: ID of the message;
+
+            bot_token: Unique authorization bot token;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "botId": bot_id,
@@ -86,7 +123,26 @@ class Message(BaseEntity):
             range: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get message context
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/messages/chat-message-get-context.html
+
+        The method returns a window of messages surrounding the specified one.
+
+        Args:
+            bot_id: Bot ID;
+
+            message_id: ID of the message;
+
+            bot_token: Unique authorization bot token;
+
+            range: Number of messages on each side of the central one;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "botId": bot_id,
@@ -115,7 +171,26 @@ class Message(BaseEntity):
             bot_token: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Mark messages as read
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/messages/chat-message-read.html
+
+        The method marks messages as read on behalf of the bot.
+
+        Args:
+            bot_id: Bot ID;
+
+            dialog_id: Dialog ID;
+
+            message_id: ID of the message;
+
+            bot_token: Unique authorization bot token;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "botId": bot_id,
@@ -142,7 +217,26 @@ class Message(BaseEntity):
             bot_token: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Send message
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/messages/chat-message-send.html
+
+        The method sends a message on behalf of the bot to the specified dialog.
+
+        Args:
+            bot_id: Bot ID;
+
+            dialog_id: Dialog ID;
+
+            fields: Message content;
+
+            bot_token: Unique authorization bot token;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "botId": bot_id,
@@ -169,7 +263,26 @@ class Message(BaseEntity):
             bot_token: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update message
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/messages/chat-message-update.html
+
+        The method updates a bot's message.
+
+        Args:
+            bot_id: Bot ID;
+
+            message_id: ID of the message to be updated;
+
+            fields: Message content;
+
+            bot_token: Unique authorization bot token;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "botId": bot_id,

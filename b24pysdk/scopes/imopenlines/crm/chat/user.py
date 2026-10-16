@@ -12,7 +12,10 @@ __all__ = [
 
 
 class User(BaseEntity):
-    """"""
+    """Class for managing users in an existing chats of the CRM objects.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/chats/index.html
+    """
 
     @type_checker
     def add(
@@ -24,7 +27,26 @@ class User(BaseEntity):
             chat_id: Optional[Union[int, Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add user to existing chat
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/chats/imopenlines-crm-chat-user-add.html
+
+        The method adds to a chat associated with a CRM object.
+
+        Args:
+            crm_entity_type: Type of the CRM object;
+
+            crm_entity: Identifier of the CRM object;
+
+            user_id: Identifier of the user or bot to be added to the chat;
+
+            chat_id: Identifier of the chat;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             CRM_ENTITY_TYPE=crm_entity_type,
@@ -51,7 +73,26 @@ class User(BaseEntity):
             chat_id: Optional[Union[int, Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Remove user from chat
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/chats/imopenlines-crm-chat-user-delete.html
+
+        The method removes a user from the chat associated with the CRM object.
+
+        Args:
+            crm_entity_type: Type of the CRM object;
+
+            crm_entity: Identifier of the CRM object;
+
+            user_id: Identifier of the user or bot;
+
+            chat_id: Identifier of the chat;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             CRM_ENTITY_TYPE=crm_entity_type,

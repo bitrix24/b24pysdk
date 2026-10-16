@@ -35,7 +35,9 @@ class classproperty:  # noqa: N801
         Args:
             instance: Instance used for descriptor access, or ``None`` when
                 accessed through the class.
-            owner: Owner class provided by the descriptor protocol.
+            owner: Owner class provided by the descriptor protocol for both
+                class and instance access. If omitted in a manual call, the
+                class is inferred from ``instance``.
 
         Returns:
             Value returned by the registered getter.
@@ -47,7 +49,10 @@ class classproperty:  # noqa: N801
         if self.fget is None:
             raise AttributeError("Unreadable attribute")
 
-        owner = instance if isinstance(instance, type) else type(instance)
+        # Class access passes instance=None, so type(instance) would select
+        # NoneType instead of the owning class supplied by Python.
+        if owner is None:
+            owner = instance if isinstance(instance, type) else type(instance)
 
         return self.fget(owner)
 

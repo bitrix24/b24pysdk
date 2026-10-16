@@ -15,7 +15,10 @@ __all__ = [
 
 
 class Section(BaseEntity):
-    """Methods for Bitrix24 universal-list sections."""
+    """Methods for Bitrix24 universal-list sections.
+
+    Documentation: http://apidocs.bitrix24.com/api-reference/lists/sections/index.html
+    """
 
     @type_checker
     def add(
@@ -29,7 +32,30 @@ class Section(BaseEntity):
             iblock_section_id: int = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIValueRequest[int, BaseListSection]:
-        """Create a list section and adapt its identifier to an object."""
+        """Create a section of the universal list
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/lists/sections/lists-section-add.html
+
+        The method creates a list section.
+
+        Args:
+            iblock_type_id: Identifier of the information block type;
+
+            section_code: Symbolic code of the section;
+
+            fields: Array of fields;
+
+            iblock_id: Identifier of the information block;
+
+            iblock_code: Symbolic code of the information block;
+
+            iblock_section_id: Identifier of the parent section;
+
+            timeout: Timeout in seconds.
+
+        Return:
+            Instance of BitrixAPIValueRequest
+        """
 
         if iblock_id is MISSING and iblock_code is MISSING:
             raise ValueError("Pass iblock_id or iblock_code.")
@@ -75,7 +101,28 @@ class Section(BaseEntity):
             select: Iterable[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIValuesRequest[JSONList, BaseListSection]:
-        """Return sections of the requested Bitrix24 list."""
+        """Get section parameters or list of sections
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/lists/sections/lists-section-get.html
+
+        THe method returns a section or a list of sections.
+
+        Args:
+            iblock_type_id: Identifier of the information block type;
+
+            iblock_id: Identifier of the information block;
+
+            iblock_code: Symbolic code of the information block;
+
+            filter: Object for filtering;
+
+            select: Array with fields to select;
+
+            timeout: Timeout in seconds.
+
+        Return:
+            Instance of BitrixAPIValueRequest
+        """
 
         if iblock_id is MISSING and iblock_code is MISSING:
             raise ValueError("Pass iblock_id or iblock_code.")
@@ -127,7 +174,30 @@ class Section(BaseEntity):
             section_code: Text = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """Update a list section by identifier or symbolic code."""
+        """Update the section of the universal list
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/lists/sections/lists-section-update.html
+
+        The method updates a list section.
+
+        Args:
+            iblock_type_id: Identifier of the information block type;
+
+            fields: Array of fields;
+
+            iblock_id: Identifier of the information block;
+
+            iblock_code: Symbolic code of the information block;
+
+            section_id: Identifier of the section;
+
+            section_code: Symbolic code of the section;
+
+            timeout: Timeout in seconds.
+
+        Return:
+            Instance of BitrixAPIRequest
+        """
 
         if iblock_id is MISSING and iblock_code is MISSING:
             raise ValueError("Pass iblock_id or iblock_code.")
@@ -169,7 +239,28 @@ class Section(BaseEntity):
             section_code: Text = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """Delete a list section by identifier or symbolic code."""
+        """Delete the section of the universal list
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/lists/sections/lists-section-delete.html
+
+        The method removes a section from the list.
+
+        Args:
+            iblock_type_id: Identifier of the information block type;
+
+            iblock_id: Identifier of the information block;
+
+            iblock_code: Symbolic code of the information block;
+
+            section_id: Identifier of the section;
+
+            section_code: Symbolic code of the section;
+
+            timeout: Timeout in seconds.
+
+        Return:
+            Instance of BitrixAPIRequest
+        """
 
         if iblock_id is MISSING and iblock_code is MISSING:
             raise ValueError("Pass iblock_id or iblock_code.")

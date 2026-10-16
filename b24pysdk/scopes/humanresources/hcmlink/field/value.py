@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Value(BaseEntity):
-    """"""
+    """Class for transferring values from HR system.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sign/hcm-link/index.html
+    """
 
     @type_checker
     def set(
@@ -23,7 +26,24 @@ class Value(BaseEntity):
             job: JSONDict = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """"""
+        """Transfer HCM link fields values
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sign/hcm-link/humanresources-hcmlink-field-value-set.html
+
+        The method transfers HR system field values for employees.
+
+        Args:
+            company: Company code in the HR system or CRM company ID;
+
+            data: List of fields values;
+
+            job: Data for updating the synchronization job;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if data.__class__ is not list:
             data = list(data)

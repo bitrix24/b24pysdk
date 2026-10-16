@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Lead(BaseEntity):
-    """"""
+    """Class for creating CRM leads based on a dialog.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/index.html
+    """
 
     @type_checker
     def create(
@@ -20,7 +23,20 @@ class Lead(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Create a lead based on the dialogue
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/sessions/imopenlines-crm-lead-create.html
+
+        The method creates a CRM lead based on the current chat in the open channels.
+
+        Args:
+            chat_id: Identifier of the open channels chat;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             CHAT_ID=chat_id,

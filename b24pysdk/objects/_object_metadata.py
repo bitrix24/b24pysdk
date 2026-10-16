@@ -1,5 +1,6 @@
 from collections.abc import Set as AbstractSet
 from dataclasses import asdict
+from inspect import isabstract
 from types import MappingProxyType
 from typing import (
     TYPE_CHECKING,
@@ -52,7 +53,9 @@ class ObjectMetadata(Generic[BOT]):
     Bitrix-code index: raw reads and writes must still use the source field's
     conversion rules. Object fields have a separate Bitrix-code index used by
     ``select_related()``. Metadata construction also registers the object class
-    in ``Config`` for lazy relation resolution by object key and discriminator.
+    in ``Config`` for lazy relation resolution by object key and discriminator
+    when both ``OBJECT_KEY`` and ``PK`` are defined. Abstract classes may omit
+    either attribute and still receive complete field and cache indexes.
     """
 
     __slots__ = (
@@ -75,8 +78,8 @@ class ObjectMetadata(Generic[BOT]):
     discriminator: ObjectDiscriminator
     is_complete_without_select: bool
     object_class: Type[BOT]
-    object_key: Text
-    pk_type: Type[Hashable]
+    object_key: Optional[Text]
+    pk_type: Optional[Type[Hashable]]
 
     _fields_by_attr_name: Mapping[Text, BaseField[Any, Any]]
     _fields_by_bitrix_code: Mapping[Text, BaseField[Any, Any]]
@@ -108,6 +111,8 @@ class ObjectMetadata(Generic[BOT]):
         Primary-key fields retain their resolved declaration order. The object
         key, primary-key type, response-completeness flag, and optional
         discriminator are validated before the class is registered globally.
+        Missing ``OBJECT_KEY`` or ``PK`` is permitted only for an abstract class;
+        explicitly supplied values and field declarations are always validated.
 
         Args:
             object_class: Newly created ``BaseObject`` subclass.
@@ -120,40 +125,47 @@ class ObjectMetadata(Generic[BOT]):
         """
 
         self.object_class = object_class
+        is_abstract = isabstract(object_class)
 
         # Validate class identity before scanning descriptors. A partially
         # constructed metadata object must never enter the global registry.
         try:
             object_key = getattr(object_class, "OBJECT_KEY")
         except AttributeError:
-            raise BitrixObjectError(
-                f"{object_class.__name__} must define the OBJECT_KEY class attribute.",
-            ) from None
+            if not is_abstract:
+                raise BitrixObjectError(
+                    f"{object_class.__name__} must define the OBJECT_KEY class attribute.",
+                ) from None
 
-        if not isinstance(object_key, str) or not object_key:
-            raise BitrixObjectError(
-                f"{object_class.__name__}.OBJECT_KEY must be a non-empty string, "
-                f"got {object_key!r}.",
-            )
+            object_key = None
+        else:
+            if not isinstance(object_key, str) or not object_key:
+                raise BitrixObjectError(
+                    f"{object_class.__name__}.OBJECT_KEY must be a non-empty string, "
+                    f"got {object_key!r}.",
+                )
 
         try:
             pk_type = getattr(object_class, "PK")
         except AttributeError:
-            raise BitrixObjectError(
-                f"{object_class.__name__} must define the PK class attribute.",
-            ) from None
+            if not is_abstract:
+                raise BitrixObjectError(
+                    f"{object_class.__name__} must define the PK class attribute.",
+                ) from None
 
-        if not isinstance(pk_type, type):
-            raise BitrixObjectError(
-                f"{object_class.__name__}.PK must be a type, "
-                f"got {type(pk_type).__name__!r}.",
-            )
+            pk_type = None
+        else:
+            if not isinstance(pk_type, type):
+                raise BitrixObjectError(
+                    f"{object_class.__name__}.PK must be a type, "
+                    f"got {type(pk_type).__name__!r}.",
+                )
 
-        if not issubclass(pk_type, Hashable):
-            raise BitrixObjectError(
-                f"{object_class.__name__}.PK must define a hashable "
-                "primary-key type.",
-            )
+            if not issubclass(pk_type, Hashable):
+                raise BitrixObjectError(
+                    f"{object_class.__name__}.PK must define a hashable "
+                    "primary-key type.",
+                )
 
         is_complete_without_select = getattr(object_class, "_IS_COMPLETE_WITHOUT_SELECT", True)
 
@@ -263,17 +275,19 @@ class ObjectMetadata(Generic[BOT]):
         self._pk_fields = tuple(pk_fields)
         self._pk_bitrix_codes = tuple(field.bitrix_code for field in pk_fields)
 
-        if len(self._pk_fields) > 1 and not issubclass(self.pk_type, BasePK):
+        if self.pk_type is not None and len(self._pk_fields) > 1 and not issubclass(self.pk_type, BasePK):
             raise BitrixObjectError(
                 f"{object_class.__name__}.PK must inherit from BasePK "
                 "when the object has a composite primary key.",
             )
 
-        Config.register_object_class(
-            object_key=self.object_key,
-            discriminator=self.discriminator,
-            object_class=object_class,
-        )
+        # Abstract field-only bases have indexes, but no resolvable identity.
+        if self.object_key is not None and self.pk_type is not None:
+            Config.register_object_class(
+                object_key=self.object_key,
+                discriminator=self.discriminator,
+                object_class=object_class,
+            )
 
     def __repr__(self) -> Text:
         return f"<{self.__class__.__name__} object_class={self.object_class.__name__!r}>"
@@ -319,7 +333,7 @@ class ObjectMetadata(Generic[BOT]):
 
     @property
     def pk_field(self) -> Optional[BaseField[Any, Any]]:
-        """Return the single primary-key field or None for a composite key."""
+        """Return the sole PK descriptor, or ``None`` for zero or multiple fields."""
 
         if len(self._pk_fields) != 1:
             return None
@@ -334,15 +348,16 @@ class ObjectMetadata(Generic[BOT]):
     def get_bitrix_pk_from_data(self, bitrix_data: JSONDict, /) -> Hashable:
         """Extract, validate, and convert a primary key from raw object data.
 
-        Every registered primary-key field must be present. A scalar key must
-        also be non-``None``. Composite-key schemas define whether individual
-        components may be ``None`` and validate them in ``__post_init__``.
+        Every required primary-key field must be present. An absent optional
+        component of a composite key is supplied as ``None``. A scalar key must
+        be present and non-``None``. Composite-key schemas validate individual
+        components in ``__post_init__``.
         Scalar values and raw composite dictionaries are normalized through
         ``build_bitrix_pk()``.
 
         Raises:
             BitrixObjectFieldNotLoadedError: If any primary-key field was not
-                selected in the response.
+                available in the response and cannot be omitted.
             BitrixObjectFieldError: If no primary key is declared or a scalar
                 primary-key value is ``None``.
         """
@@ -385,7 +400,10 @@ class ObjectMetadata(Generic[BOT]):
         )
 
     def has_bitrix_pk_data(self, bitrix_data: JSONDict, /) -> bool:
-        """Return whether raw Bitrix24 data contains every primary-key field."""
+        """Check key-field presence, allowing absent optional composite parts.
+
+        This is a shape check only; key values are validated during extraction.
+        """
 
         is_composite_pk = len(self._pk_fields) > 1
 
@@ -405,7 +423,8 @@ class ObjectMetadata(Generic[BOT]):
     ) -> BOT:
         """Build a lazy reference or loaded object from one API result value.
 
-        A dictionary must contain all registered primary-key codes. A partial
+        A dictionary must contain all required primary-key codes; optional
+        composite components may be omitted. A partial
         dictionary containing only those codes becomes a lightweight PK-only
         object; a complete dictionary remains loaded data even when the object
         declares no other fields. Ownership of a fresh API dictionary is
@@ -577,12 +596,18 @@ class ObjectMetadata(Generic[BOT]):
         constructed from a scalar value.
 
         Raises:
+            BitrixObjectFieldError: If the class has no primary-key type.
             TypeError: If a scalar is supplied for a composite key, a mapping
                 is supplied for a scalar key, or the configured composite key
                 does not inherit from ``BasePK``.
         """
 
         pk_type = self.pk_type
+
+        if pk_type is None:
+            raise BitrixObjectFieldError(
+                f"{self.object_class.__name__} has no primary-key type.",
+            )
 
         if isinstance(bitrix_pk_data, pk_type):
             return bitrix_pk_data

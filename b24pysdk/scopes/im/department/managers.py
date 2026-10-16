@@ -13,7 +13,10 @@ __all__ = [
 
 
 class Managers(BaseEntity):
-    """"""
+    """Class for retrieving list of department managers.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chats/departments/index.html
+    """
 
     @type_checker
     def get(
@@ -23,7 +26,22 @@ class Managers(BaseEntity):
             user_data: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """"""
+        """Get a list of department managers
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/departments/im-department-managers-get.html
+
+        The method retrieves a list of managers for the specified departments.
+
+        Args:
+            bitrix_id: An array of department IDs;
+
+            user_data: Return detailed user data;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if bitrix_id.__class__ is not list:
             bitrix_id = list(bitrix_id)

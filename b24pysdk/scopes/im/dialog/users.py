@@ -13,7 +13,10 @@ __all__ = [
 
 
 class Users(BaseEntity):
-    """"""
+    """Class for retrieving chat participants.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chats/chat-users/index.html
+    """
 
     @type_checker
     def list(
@@ -27,7 +30,30 @@ class Users(BaseEntity):
             offset: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONList]:
-        """"""
+        """Get the list of participants
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/chat-users/im-dialog-users-list.html
+
+        The method returns detailed information about the participants in the dialog with pagination support.
+
+        Args:
+            dialog_id: Chat identifier;
+
+            skip_external: Exclude system users;
+
+            skip_external_except_types: A list of types of system users to keep in the selection, separated by commas;
+
+            limit: Number of items per page;
+
+            last_id: Identifier of the last user from selection limit;
+
+            offset: Offset for pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             DIALOG_ID=dialog_id,

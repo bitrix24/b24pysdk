@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Scope(BaseScope):
-    """"""
+    """Class for retrieving available scopes to the current application.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/common/index.html
+    """
 
     @type_checker
     def __call__(
@@ -21,7 +24,20 @@ class Scope(BaseScope):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[List[Text]]:
-        """"""
+        """Get a list of available permissions scope
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/common/system/scope.html
+
+        The method returns a list of permissions.
+
+        Args:
+            full: If the parameter is set to true, the method will return the complete list of permissions;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

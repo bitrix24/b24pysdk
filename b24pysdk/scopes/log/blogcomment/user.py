@@ -12,7 +12,10 @@ __all__ = [
 
 
 class User(BaseEntity):
-    """"""
+    """Class for retrieving comments for a news feed post.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/log/blogcomment/index.html
+    """
 
     @type_checker
     def get(
@@ -24,7 +27,26 @@ class User(BaseEntity):
             limit: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get user comments
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/log/blogcomment/log-blogcomment-user-get.html
+
+        The method returns a list of comments on a news feed post for the specified user and information about attached files.
+
+        Args:
+            user_id: The identifier of the user whose comments need to be retrieved;
+
+            first_id: The method will return comments with identifiers greater than the specified value;
+
+            last_id: The method will return comments with identifiers less than the specified value;
+
+            limit: The number of records in the response;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

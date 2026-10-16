@@ -41,7 +41,7 @@ class File(BaseEntity):
             Instance of BitrixAPIRequest.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "targetFolderId": target_folder_id,
         }
@@ -73,7 +73,7 @@ class File(BaseEntity):
             Instance of BitrixAPIRequest.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 
@@ -104,7 +104,7 @@ class File(BaseEntity):
             Instance of BitrixAPIRequest.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 
@@ -135,7 +135,7 @@ class File(BaseEntity):
             Instance of BitrixAPIRequest.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 
@@ -169,7 +169,7 @@ class File(BaseEntity):
             Instance of BitrixAPIRequest.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 
@@ -199,7 +199,6 @@ class File(BaseEntity):
         Returns:
             Instance of BitrixAPIRequest.
         """
-
         return self._make_bitrix_api_request(
             api_wrapper=self.get_fields,
             timeout=timeout,
@@ -226,7 +225,7 @@ class File(BaseEntity):
             Instance of BitrixAPIRequest.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 
@@ -260,7 +259,7 @@ class File(BaseEntity):
             Instance of BitrixAPIRequest.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "targetFolderId": target_folder_id,
         }
@@ -295,7 +294,7 @@ class File(BaseEntity):
             Instance of BitrixAPIRequest.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "newName": new_name,
         }
@@ -327,7 +326,7 @@ class File(BaseEntity):
             Instance of BitrixAPIRequest.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 
@@ -361,7 +360,7 @@ class File(BaseEntity):
             Instance of BitrixAPIRequest.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "versionId": version_id,
         }
@@ -382,7 +381,26 @@ class File(BaseEntity):
             start: int = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Search files and folders
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/disk/file/disk-file-search.html
+
+        The method finds files and folders on Drive by a text query.
+
+        Args:
+            query: Text of the search query;
+
+            type: Type of objects in the result;
+
+            filter: Search scope;
+
+            start: Offset for pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "QUERY": query,
@@ -428,7 +446,7 @@ class File(BaseEntity):
 
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "fileContent": B24File(file_content).to_b24(),
         }

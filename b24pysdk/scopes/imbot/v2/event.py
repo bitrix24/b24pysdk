@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Event(BaseEntity):
-    """"""
+    """Class for retrieving bot events.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/events/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -30,7 +33,28 @@ class Event(BaseEntity):
             with_user_events: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get events
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/events/event-get.html
+
+        The method retrieves events for the bot in polling agent mode.
+
+        Args:
+            bot_id: Bot ID;
+
+            bot_token: Unique authorization token for the bot;
+
+            offset: Confirms all events with IDs less than the specified value;
+
+            limit: Maximum number of events returned;
+
+            with_user_events: Include user events in the response along with bot events;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "botId": bot_id,

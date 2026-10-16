@@ -1,5 +1,5 @@
 import re
-from typing import IO, Dict, Final, Optional, Text, Tuple
+from typing import Dict, Final, Optional, Text
 
 import requests
 
@@ -24,9 +24,8 @@ class BitrixAPIRequester(BaseRequester):
     _HEADERS: Final[Dict] = {"Content-Type": "application/json"}
     _REST_WEBHOOK_URL_RE: Final[re.Pattern] = re.compile(r"(?P<prefix>/rest/(?:api/)?)[^/?#]+/[^/?#]+/")
 
-    __slots__ = ("_files", "_params", "_url")
+    __slots__ = ("_params", "_url")
 
-    _files: Optional[Dict[Text, Tuple[Text, IO]]]
     _params: Optional[JSONDict]
     _url: Text
 
@@ -35,7 +34,6 @@ class BitrixAPIRequester(BaseRequester):
             url: Text,
             *,
             params: Optional[JSONDict] = None,
-            files: Optional[Dict[Text, Tuple[Text, IO]]] = None,
             timeout: Timeout = None,
             max_retries: Optional[int] = None,
             initial_retry_delay: Optional[Number] = None,
@@ -47,7 +45,6 @@ class BitrixAPIRequester(BaseRequester):
         Args:
             url: Prepared Bitrix24 REST API endpoint URL.
             params: JSON-compatible request body parameters.
-            files: Optional files passed to ``requests.post``.
             timeout: Request timeout.
             max_retries: Maximum number of request attempts.
             initial_retry_delay: Delay before the first retry.
@@ -61,7 +58,6 @@ class BitrixAPIRequester(BaseRequester):
         )
         self._url = url
         self._params = params
-        self._files = files
 
     @property
     def _headers(self) -> Dict:
@@ -101,7 +97,6 @@ class BitrixAPIRequester(BaseRequester):
             url=self._url,
             json=self._params,
             headers=self._headers,
-            files=self._files,
             timeout=self._timeout,
             allow_redirects=self._ALLOW_REDIRECTS,
         )

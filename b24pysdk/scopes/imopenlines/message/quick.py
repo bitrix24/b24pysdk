@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Quick(BaseEntity):
-    """"""
+    """Class for sending messages as quick replies.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/messages/index.html
+    """
 
     @type_checker
     def save(
@@ -21,7 +24,22 @@ class Quick(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Save message as quick answer
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/messages/imopenlines-message-quick-save.html
+
+        The method saves a message from the open line chat to the list of quick answers.
+
+        Args:
+            chat_id: Identifier of the open channels chat;
+
+            message_id: Identifier of the message to be added to quick answers;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             CHAT_ID=chat_id,

@@ -200,6 +200,10 @@ class ObjectQueryState:
     ``is_result_query`` distinguishes an unexecuted descriptor/builder from a
     query that may be evaluated. Execution-specific data, including a cached
     response, lives on the manager rather than in this reusable state object.
+
+    Filtering, extra request parameters, limits, offsets, and reversal enable
+    result evaluation. Selection, relation loading, ordering, timeout, and fast
+    mode only configure a query; they preserve its current executable flag.
     """
 
     filter_param: Optional[JSONDict] = None

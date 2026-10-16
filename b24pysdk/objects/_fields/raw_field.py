@@ -9,7 +9,12 @@ __all__ = [
 
 
 class RawField(BaseField[Any, Any]):
-    """Field that preserves an otherwise undocumented Bitrix24 value."""
+    """Field that preserves an otherwise undocumented Bitrix24 value.
+
+    Scalar values pass through unchanged, including mutable objects. Conversion
+    neither validates their shape nor makes a detached copy. Multiple-value
+    container handling is still provided by ``BaseField``.
+    """
 
     _FILTER_OPERATORS = NO_FILTER_OPERATORS
 

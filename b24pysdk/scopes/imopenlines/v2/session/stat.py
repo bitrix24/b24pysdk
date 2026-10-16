@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Stat(BaseEntity):
-    """"""
+    """Class for retrieving batch session metrics.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/statistics/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -24,7 +27,20 @@ class Stat(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get session metrics
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/statistics/imopenlines-v2-session-stat-get.html
+
+        The method retrieves batch metrics for open channel sessions.
+
+        Args:
+            session_id: Array of session IDs;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if session_id.__class__ is not list:
             session_id = list(session_id)

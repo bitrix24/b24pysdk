@@ -36,11 +36,23 @@ class FieldAccessor(Generic[BRawT, BValueT]):
 
     @property
     def raw_value(self) -> Union[Optional[BRawT], List[BRawT]]:
-        """Return the raw Bitrix24 field value."""
+        """Read through the object's raw-value hook without descriptor conversion.
+
+        The hook may load remote data or normalize an entity-specific response,
+        such as a list property's value-ID mapping. This is not a detached
+        snapshot; a mutable value may be shared with the object's state.
+        """
         return self._instance.get_field_value(self._field.bitrix_code, bitrix_field=self._field)
 
     @raw_value.setter
     def raw_value(self, value: Union[Optional[BRawT], Iterable[BRawT]]):
+        """Record raw write data, bypassing scalar descriptor conversion.
+
+        Writability and the multiple-value container are checked. A non-list
+        iterable is materialized once; existing lists and their items are kept
+        by reference. The caller supplies values in the endpoint's write format.
+        """
+
         if self._field.is_multiple and value is not None:
             if not self._field.is_iterable(value):
                 raise TypeError(f"Field {self._field.attr_name!r} expects an iterable raw value.")

@@ -18,7 +18,10 @@ __all__ = [
 
 
 class Delivery(BaseEntity):
-    """"""
+    """Class for working with delivery services in online store.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sale/delivery/delivery/index.html
+    """
 
     @cached_property
     def config(self) -> Config:
@@ -54,7 +57,34 @@ class Delivery(BaseEntity):
         logotype: Text = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add delivery service
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/delivery/delivery/sale-delivery-add.html
+
+        The method adds a delivery service.
+
+        Args:
+            rest_code: Symbolic code of the delivery handler;
+
+            name: Name of the delivery service;
+
+            currency: Symbolic code of the delivery service currency;
+
+            description: Description of the delivery service;
+
+            sort: Sorting;
+
+            active: Indicator of the delivery service's activity;
+
+            config: Values of the delivery service settings;
+
+            logotype: Logo of the delivery service;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "REST_CODE": rest_code,
@@ -96,7 +126,32 @@ class Delivery(BaseEntity):
         logotype: Text = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update delivery service
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/delivery/delivery/sale-delivery-update.html
+
+        The method updates the delivery service.
+
+        Args:
+            bitrix_id: Identifier of the delivery service;
+
+            name: Name of the delivery service;
+
+            currency: Symbolic code of the delivery service currency;
+
+            description: Description of the delivery service;
+
+            sort: Sorting;
+
+            active: Indicator of the delivery service's activity;
+
+            logotype: Logo of the delivery service;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         fields: JSONDict = {}
 
@@ -136,7 +191,20 @@ class Delivery(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete delivery service
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/delivery/delivery/sale-delivery-delete.html
+
+        The method deletes a delivery service.
+
+        Args:
+            bitrix_id: Identifier of the delivery service;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "ID": bitrix_id,
@@ -157,7 +225,24 @@ class Delivery(BaseEntity):
         order: Optional[JSONDict] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of delivery services
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/delivery/delivery/sale-delivery-get-list.html
+
+        The method retrieves a list of delivery services.
+
+        Args:
+            select: An array containing the list of fields toi select;
+
+            filter: An object for filtering the selected delivery services;
+
+            order: An object for sorting the selected delivery services;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Manager(BaseEntity):
-    """"""
+    """Class for managing chat managers.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/chats/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -29,7 +32,26 @@ class Manager(BaseEntity):
             bot_token: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add chat managers
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/chats/chat-manager-add.html
+
+        The method adds users to the current list of chat managers.
+
+        Args:
+            bot_id: Bot ID;
+
+            dialog_id: Dialog ID;
+
+            user_ids: Array of user IDs to assign as managers;
+
+            bot_token: Unique authorization bot token;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if user_ids.__class__ is not list:
             user_ids = list(user_ids)
@@ -59,7 +81,26 @@ class Manager(BaseEntity):
             bot_token: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Remove chat managers
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/chats/chat-manager-delete.html
+
+        The method removes users from the chat managers list.
+
+        Args:
+            bot_id: Bot ID;
+
+            dialog_id: Dialog ID;
+
+            user_ids: Array of user IDs to remove the manager role;
+
+            bot_token: Unique authorization bot token;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if user_ids.__class__ is not list:
             user_ids = list(user_ids)

@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Another(BaseEntity):
-    """"""
+    """Class for completing another's dialogue.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/operators/index.html
+    """
 
     @type_checker
     def finish(
@@ -20,7 +23,20 @@ class Another(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Finish another operator's dialog
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/operators/imopenlines-operator-another-finish.html
+
+        The method ends a dialog in an open line, even if dialog is assigned to another operator.
+
+        Args:
+            chat_id: Identifier of the open line chat;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             CHAT_ID=chat_id,

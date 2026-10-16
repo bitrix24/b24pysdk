@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Message(BaseEntity):
-    """"""
+    """Class for sending messages in open channels.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/messages/index.html
+    """
 
     @type_checker
     def add(
@@ -24,7 +27,26 @@ class Message(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Send a message to open channel
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/messages/imopenlines-crm-message-add.html
+
+        The method sends a message on behalf of an employee or bot in a chat linked to a CRM entity.
+
+        Args:
+            crm_entity_type: Type of the CRM object;
+
+            crm_entity: Identifier of the CRM object;
+
+            user_id: Message sender identifier;
+
+            chat_id: Identifier of the chat;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             CRM_ENTITY_TYPE=crm_entity_type,

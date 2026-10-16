@@ -17,7 +17,13 @@ __all__ = [
 
 
 class BaseV3Object(BaseObject[BOPKT], ABC, Generic[BOPKT]):
-    """Base class for SDK objects backed by Bitrix24 REST API v3."""
+    """Base class for SDK objects backed by Bitrix24 REST API v3.
+
+    Field metadata is provided by a concrete ``BaseV3FieldManager`` and exposed
+    as ``V3Field`` schemas. Entity-specific loading and CRUD hooks remain the
+    responsibility of descendants. No generic source of selectable field items
+    is supplied, so ``get_field_items()`` keeps the base unsupported behavior.
+    """
 
     @property
     def client(self) -> "ClientV3":

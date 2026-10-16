@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Userfieldconfig(BaseScope):
-    """"""
+    """Class for managing custom fields.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/userfieldconfig/index.html
+    """
 
     @type_checker
     def add(
@@ -22,7 +25,22 @@ class Userfieldconfig(BaseScope):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add custom field
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/userfieldconfig/userfieldconfig-add.html
+
+        The method adds a new custom field.
+
+        Args:
+            module_id: Module identifier where the field is created;
+
+            field: Object with custom field settings;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "moduleId": module_id,
@@ -43,7 +61,22 @@ class Userfieldconfig(BaseScope):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete user field
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/userfieldconfig/userfieldconfig-delete.html
+
+        The method removes a user field.
+
+        Args:
+            module_id: Identifier of the module from which the field is being deleted;
+
+            bitrix_id: Identifier of the user field settings;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "moduleId": module_id,
@@ -64,7 +97,22 @@ class Userfieldconfig(BaseScope):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get user field settings
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/userfieldconfig/userfieldconfig-get.html
+
+        The method returns the settings of a user field by its identifier.
+
+        Args:
+            module_id: Identifier of the module from which the field is being deleted;
+
+            bitrix_id: Identifier of the user field settings;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "moduleId": module_id,
@@ -84,7 +132,20 @@ class Userfieldconfig(BaseScope):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get available user field types
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/userfieldconfig/userfieldconfig-get-types.html
+
+        The method returns a set of available user field types for the module.
+
+        Args:
+            module_id: Identifier of the module for which to retrieve available field types;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "moduleId": module_id,
@@ -107,7 +168,28 @@ class Userfieldconfig(BaseScope):
             start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of user field settings
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/userfieldconfig/userfieldconfig-list.html
+
+        The method returns a list of user field settings based on the filter.
+
+        Args:
+            module_id: Identifier of the module from which the field is being deleted;
+
+            select: Set of fields to return;
+
+            order: Object for ordering;
+
+            filter: Object for filtering;
+
+            start: Offset for pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "moduleId": module_id,
@@ -147,7 +229,22 @@ class Userfieldconfig(BaseScope):
             field: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update user field
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/crm/universal/userfieldconfig/userfieldconfig-update.html
+
+        The method updates the settings of an existing user field.
+
+        Args:
+            module_id: Identifier of the module from which the field is being updated;
+
+            bitrix_id: Identifier of the user field settings;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "moduleId": module_id,

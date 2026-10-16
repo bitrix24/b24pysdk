@@ -13,7 +13,10 @@ __all__ = [
 
 
 class Command(BaseEntity):
-    """"""
+    """Class for managing chatbot commands.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/outdated/commands/index.html
+    """
 
     @type_checker
     def register(
@@ -29,7 +32,7 @@ class Command(BaseEntity):
             event_command_add: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Deprecated"""
 
         if lang.__class__ is not list:
             lang = list(lang)
@@ -69,7 +72,7 @@ class Command(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Deprecated"""
 
         params = {
             "COMMAND_ID": command_id,
@@ -90,7 +93,7 @@ class Command(BaseEntity):
             client_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Deprecated"""
 
         params = {
             "COMMAND_ID": command_id,

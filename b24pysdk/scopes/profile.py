@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Profile(BaseScope):
-    """"""
+    """Class for retrieving information about the user.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/common/users/index.html
+    """
 
     @type_checker
     def __call__(
@@ -20,7 +23,18 @@ class Profile(BaseScope):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIValueRequest[ProfileData, ProfileSchema]:
-        """"""
+        """Get basic information about the current user profile
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/common/users/profile.html
+
+        The method returns basic information about the current user without any scopes.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
         return self._make_bitrix_api_request(
             api_wrapper=self,
             timeout=timeout,

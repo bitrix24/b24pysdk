@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Message(BaseEntity):
-    """"""
+    """Class for working with chatbots messages.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/outdated/messages/index.html
+    """
 
     @type_checker
     def delete(
@@ -24,7 +27,7 @@ class Message(BaseEntity):
             client_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Deprecated"""
 
         params = {
             "MESSAGE_ID": message_id,
@@ -55,7 +58,7 @@ class Message(BaseEntity):
             client_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Deprecated"""
 
         params = {
             "MESSAGE_ID": message_id,

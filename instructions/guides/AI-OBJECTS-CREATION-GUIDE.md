@@ -264,11 +264,16 @@ Never omit PK fields from the object declaration. Adapters need them to construc
 
 `ObjectMetadata` rejects:
 
-- missing or invalid `OBJECT_KEY` and `PK`;
+- missing `OBJECT_KEY` or `PK` on a non-abstract class;
+- invalid explicitly defined or inherited `OBJECT_KEY` and `PK`, including on abstract classes;
 - field attribute names containing `__`;
 - duplicate concrete Bitrix24 codes;
 - duplicate `ObjectField` projections for one source code;
 - inline relation source fields that are not separately registered on the class.
+
+Abstractness is determined by `inspect.isabstract()`, not merely by inheritance from `ABC` or a custom `__abstract__` flag. An abstract class may omit `OBJECT_KEY`, `PK`, or both. This exemption applies only to missing class identity attributes: explicitly supplied values and all field declarations are still validated.
+
+Always construct `cls._meta = ObjectMetadata(cls)`, including for abstract classes. Abstract bases may declare fields, and their field, primary-key, relation, and cache indexes must be collected normally. Do not bypass metadata construction to permit a class without identity attributes. A class enters the object registry only when both `OBJECT_KEY` and `PK` are available; every non-abstract descendant must supply or inherit valid values for both.
 
 A subclass field replaces an inherited descriptor with the same attribute name. A non-field attribute with that name removes the inherited field from metadata.
 
@@ -770,11 +775,12 @@ Use the v3 base classes together for an entity implemented through REST API v3:
 
 The scope wrappers for v3 field methods must adapt raw metadata into `V3Field`: a single-field request exposes it through `.value`, and a list request exposes objects through `.values`. Therefore, the field manager must consume those adapted values directly and must not call `V3Field.from_bitrix()` again.
 
+The raw result has an envelope: `field.get` returns `{"item": ...}` (`V3FieldGetData`), while `field.list` returns `{"items": [...]}` (`V3FieldListData`). The shared scope wrapper uses `BitrixSchemaAdapter(V3Field, wrapper="item")` and `BitrixSchemasAdapter(V3Field, wrapper="items")`; the manager must not unwrap these responses again. A restricted `select` can produce an incomplete field description: use raw `.result` for that projection, since adapted `V3Field` access requires its complete schema data.
+
 ```python
 from typing import TYPE_CHECKING, Callable, Generic, TypeVar
 
-from ..schemas.v3 import V3Field, V3FieldData
-from ..utils.types import JSONList
+from ..schemas.v3.field import V3Field, V3FieldGetData, V3FieldListData
 from ._base_v3_object import BaseV3Object
 from ._managers import BaseV3FieldManager, BaseV3ObjectManager
 
@@ -795,10 +801,10 @@ class ExampleV3Manager(BaseV3ObjectManager[_ExampleV3T], Generic[_ExampleV3T]):
 
 
 class ExampleV3FieldManager(BaseV3FieldManager[_ExampleV3T], Generic[_ExampleV3T]):
-    def _get_api_wrapper(self, client: "ClientV3") -> Callable[..., "BitrixAPIValueRequest[V3FieldData, V3Field]"]:
+    def _get_api_wrapper(self, client: "ClientV3") -> Callable[..., "BitrixAPIValueRequest[V3FieldGetData, V3Field]"]:
         return client.example.field.get
 
-    def _get_list_api_wrapper(self, client: "ClientV3") -> Callable[..., "BitrixAPIValuesRequest[JSONList, V3Field]"]:
+    def _get_list_api_wrapper(self, client: "ClientV3") -> Callable[..., "BitrixAPIValuesRequest[V3FieldListData, V3Field]"]:
         return client.example.field.list
 ```
 
@@ -855,6 +861,23 @@ def start(self, start: Optional[int]) -> Self:
 Expose `select_all()` together with `select()` when the endpoint accepts a select list. `_select_all()` builds the selection from `ObjectMetadata.bitrix_codes` and preserves existing nested selections. Do not duplicate the registered codes in a manager constant.
 
 Do not expose `select()` or `select_all()` when the endpoint has no `select` parameter. This does not prevent selecting fields of a related object through `select_related("relation.field")`: the parent keeps its default response fields, while the related manager receives the nested selection. Do not expose `start()` when the scope method does not accept it. Do not claim ordering support that the wrapper cannot express.
+
+### Collection loading and ordering capabilities
+
+Declare endpoint capabilities on the manager independently:
+
+```python
+_IS_LIST_METHOD: ClassVar[bool] = True
+_SUPPORTS_ORDER: ClassVar[bool] = True
+```
+
+Both defaults are defined by `BaseObjectManager`. `_IS_LIST_METHOD=True` enables the list caller's pagination. Set it to `False` only when one API response contains the complete collection and the values adapter handles its raw shape directly. `BaseListFieldManager` uses `False` because `lists.field.get` returns a mapping of fields. This is still a collection of objects, not a single-object request. The base loader retains response caching and `select_related()` and applies `limit` locally.
+
+`_SUPPORTS_ORDER` describes server-side ordering, not filtering or pagination. Set it to `False` when the wrapper cannot express ordering; list-element, list-section, and list-field managers use this value. `_ORDER_KEY=None` means order fields are top-level parameters; it does not disable ordering. Do not set `_IS_LIST_METHOD=False` merely to suppress unsupported order parameters on an otherwise paginated endpoint.
+
+With server-side ordering, paginated queries use the API order for `reverse()` and `last()`. Complete collections, and paginated queries without ordering support, reverse the API response order locally. For the latter, the base loader fetches all remaining pages without passing the manager limit to the list request, reverses the materialized `BitrixObjectList` in place, then applies `limit`. Thus `last()` through `reverse().first()` returns the last object in response order, not necessarily the object with the largest primary key. An explicit `start` still determines where loading begins. Ordinary unreversed paginated queries retain their normal request limit.
+
+Fast loading requires both flags to be `True`: its ID traversal depends on server-side ordering. Otherwise, evaluating a fast query raises `BitrixObjectError` before the entity request. Explicit `_order()` calls on a manager with `_SUPPORTS_ORDER=False` also raise. Keep this logic in the base manager; concrete managers should override capability constants rather than duplicate collection loading.
 
 ### Alternative load methods and endpoint-specific parameters
 
@@ -1004,11 +1027,11 @@ For every related field, the manager:
 1. Ensures that the relation source ID is available in the parent response. Without an explicit `select`, a complete default response is used unchanged. If an explicit `select` is already active or `_IS_COMPLETE_WITHOUT_SELECT = False`, only the direct relation codes requested by `select_related()` are appended. A required `select` on a manager without public `select()` raises `BitrixObjectError` before that entity request is sent.
 2. Materializes parents if necessary.
 3. Collects unique related PKs while preserving first-seen order.
-4. Calls the related manager's public `from_pks()` once and enables fast loading.
+4. Calls the related manager's public `from_pks()` once. Fast loading is enabled only when that manager has both `_IS_LIST_METHOD=True` and `_SUPPORTS_ORDER=True`; otherwise its normal collection loader is used.
 5. Applies a terminal ordinary field as `select` only on the manager of the object that owns that field. Intermediate relation paths remain `select_related()` state.
 6. Replaces cached placeholders with returned objects; missing remote rows remain PK-only placeholders.
 
-Therefore every object intended as a relation target must have a list endpoint that can filter by a collection of IDs and a public `from_pks()` method. If terminal fields are requested, its manager must additionally expose public `select()`. Do not emulate this with a loop of single-object requests.
+Therefore every object intended as a relation target must have a collection endpoint that can filter by a collection of IDs and a public `from_pks()` method. Pagination and server-side ordering are not required for preloading. If terminal fields are requested, its manager must additionally expose public `select()`. Do not emulate this with a loop of single-object requests.
 
 ### Add
 

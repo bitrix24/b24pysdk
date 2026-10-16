@@ -17,7 +17,10 @@ __all__ = [
 
 
 class Get(BaseEntity):
-    """Callable context for ``lists.get`` and its nested methods."""
+    """Class for retrieving data of the universal list or array of lists.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/lists/lists/index.html
+    """
 
     @cached_property
     def iblock(self) -> Iblock:
@@ -36,7 +39,30 @@ class Get(BaseEntity):
             start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIValuesRequest[JSONList, BaseList]:
-        """Return universal lists of the requested information-block type."""
+        """Retrieve data from universal list or array of lists
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/lists/lists/lists-get.html
+
+        The method returns a universal list or an array of lists.
+
+        Args:
+            iblock_type_id: Identifier of the information block type;
+
+            iblock_id: Identifier of the information block;
+
+            iblock_code: Symbolic code of the information block;
+
+            socnet_group_id: Group identifier
+
+            iblock_order: Object for sorting list fields;
+
+            start: Parameter used for pagination control;
+
+            timeout: Timeout in seconds.
+
+        Return:
+            Instance of BitrixAPIValueRequest
+        """
 
         params: JSONDict = {
             "IBLOCK_TYPE_ID": iblock_type_id,

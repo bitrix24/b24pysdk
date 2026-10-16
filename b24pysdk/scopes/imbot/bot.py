@@ -9,7 +9,10 @@ __all__ = [
 
 
 class Bot(BaseEntity):
-    """"""
+    """Class for retrieving list of registered chatbots.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/outdated/bots/index.html
+    """
 
     @type_checker
     def list(
@@ -17,7 +20,7 @@ class Bot(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Deprecated"""
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
             timeout=timeout,

@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Folder(BaseEntity):
-    """"""
+    """Class for obtaining the chat file storage folder.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chats/files/index.html
+    """
 
     @type_checker
     def get(
@@ -21,7 +24,20 @@ class Folder(BaseEntity):
             dialog_id: Optional[Text] = None,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """"""
+        """Get chat file storage folder
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/files/im-disk-folder-get.html
+
+        The method retrieves the identifier of the folder where chat files are stored.
+
+        Args:
+            chat_id: Chat identifier, required if dialog_id is not provided;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

@@ -11,7 +11,10 @@ __all__ = [
 
 
 class File(BaseEntity):
-    """"""
+    """Class for managing files in chats.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/im.v2/files/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -26,7 +29,22 @@ class File(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a link to download a file
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/im.v2/files/file-download.html
+
+        The method returns a link to download a file from the chat.
+
+        Args:
+            dialog_id: ID for the dialog;
+
+            file_id: ID of the file on Drive;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "dialogId": dialog_id,
@@ -47,7 +65,22 @@ class File(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Upload file
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/im.v2/files/file-upload.html
+
+        The method uploads a file to the chat on behalf of the current user.
+
+        Args:
+            dialog_id: ID of the dialog;
+
+            fields: Object with file and message parameters;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "dialogId": dialog_id,

@@ -13,7 +13,10 @@ __all__ = [
 
 
 class Department(BaseEntity):
-    """"""
+    """Class for retrieving departments by their name.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chats/search/index.html
+    """
 
     @type_checker
     def list(
@@ -25,7 +28,26 @@ class Department(BaseEntity):
             limit: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONList]:
-        """"""
+        """Find departments
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/search/im-search-department-list.html
+
+        The method performs a search for departments by their full name.
+
+        Args:
+            find: Search phrase for finding the beginning of words in the full name of the department;
+
+            user_data: Return the manager's data in the field;
+
+            offset: Offset for the department selection;
+
+            limit: Number of items in the selection;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             FIND=find,

@@ -17,7 +17,10 @@ __all__ = [
 
 
 class Get(BaseEntity):
-    """Callable context for ``lists.element.get`` and nested methods."""
+    """Class for retrieving an element or a list elements.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/lists/elements/index.html
+    """
 
     @cached_property
     def file(self) -> File:
@@ -38,7 +41,34 @@ class Get(BaseEntity):
             start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIValuesRequest[JSONList, BaseListElement]:
-        """Return elements of the requested Bitrix24 list."""
+        """Return elements of the requested Bitrix24 list
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/lists/elements/lists-element-get.html
+
+        The method returns an element or a list of elements.
+
+        Args:
+            iblock_type_id: Identifier of the information block type;
+
+            iblock_id: Identifier of the information block;
+
+            iblock_code: Symbolic code of the information block;
+
+            element_id: Identifier of the element;
+
+            element_code: Symbolic code of the element;
+
+            select: An array containing a list of fields to select;
+
+            filter: An object for filtering element fields;
+
+            start: Offset for pagination;
+
+            timeout: Timeout in seconds.
+
+        Return:
+            Instance of BitrixAPIValueRequest
+        """
 
         if iblock_id is MISSING and iblock_code is MISSING:
             raise ValueError("Pass iblock_id or iblock_code.")

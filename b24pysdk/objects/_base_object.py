@@ -227,7 +227,7 @@ class BaseObject(ABC, Generic[BOPKT]):
 
     @property
     def bitrix_pk(self) -> BOPKT:
-        """Return the object primary key, if it is known."""
+        """Return the normalized primary key without loading remote data."""
         return self._bitrix_pk
 
     @property
@@ -309,6 +309,10 @@ class BaseObject(ABC, Generic[BOPKT]):
         absent non-required field means ``None`` or requires a full reload.
         Internal SDK loading paths may pass ``copy_data=False`` when ownership
         of a fresh API response is transferred directly to the object.
+
+        This method does not change ``bitrix_pk`` or verify that the supplied
+        data belongs to that key. All cached field projections are invalidated;
+        local changes are retained only when ``clear_local_data=False``.
         """
 
         bitrix_data = self._normalize_bitrix_data(bitrix_data)
@@ -517,7 +521,7 @@ class BaseObject(ABC, Generic[BOPKT]):
         return result
 
     def _delete(self, *, timeout: Timeout = None) -> bool:
-        """Delete this object from Bitrix24."""
+        """Delete remotely without clearing loaded data or local changes."""
         return self._make_delete_request(timeout=timeout).result
 
     def _get_delete_api_wrapper(self, client: "ClientType") -> Callable[..., "BitrixAPIRequest[bool]"]:
@@ -555,7 +559,12 @@ class BaseObject(ABC, Generic[BOPKT]):
             cached_field.delete_cached_value(self)
 
     def _reload_bitrix_data(self) -> JSONDict:
-        """Load and return complete raw Bitrix24 data."""
+        """Load complete remote data while preserving unsaved local changes.
+
+        Cached field projections are invalidated when the response is installed.
+        This internal reload differs from ``refresh()``'s default behavior,
+        which discards local changes.
+        """
 
         bitrix_data = self._get_bitrix_data()
 
@@ -566,7 +575,7 @@ class BaseObject(ABC, Generic[BOPKT]):
             copy_data=False,
         )
 
-        return bitrix_data
+        return self._bitrix_data
 
     def refresh(self, *, clear_local_data: bool = True) -> Self:
         """Reload object data from Bitrix24 and return this object.
@@ -778,7 +787,13 @@ class BaseObject(ABC, Generic[BOPKT]):
             *,
             bitrix_field: Optional[BaseField[Any, Any]] = None,
     ):
-        """Store raw field value by Bitrix24 field code as a local change."""
+        """Store an already serialized value as a local change by Bitrix code.
+
+        Writability is checked, but conversion and value validation are left to
+        the caller. No remote data is loaded. Mutable values are retained by
+        reference, and every cached projection of the source code is invalidated.
+        Use descriptor assignment to convert a public Python value first.
+        """
 
         if bitrix_field is None:
             bitrix_field = self._meta.get_field_by_bitrix_code(bitrix_code)

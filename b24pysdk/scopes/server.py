@@ -14,7 +14,10 @@ __all__ = [
 
 
 class Server(BaseScope):
-    """"""
+    """Class for obtaining current server time.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/common/index.html
+    """
 
     @type_checker
     def time(
@@ -22,7 +25,18 @@ class Server(BaseScope):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIValueRequest[Text, datetime]:
-        """"""
+        """Get current server time
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/common/system/server-time.html
+
+        The method returns the current server time in the format YYYY-MM-DDThh:mm:ss±hh:mm.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
         return self._make_bitrix_api_request(
             api_wrapper=self.time,
             timeout=timeout,

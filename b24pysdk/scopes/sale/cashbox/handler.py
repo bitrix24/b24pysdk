@@ -13,7 +13,10 @@ __all__ = [
 
 
 class Handler(BaseEntity):
-    """"""
+    """Class for working with cash register handlers.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sale/cashbox/index.html
+    """
 
     @type_checker
     def add(
@@ -26,7 +29,28 @@ class Handler(BaseEntity):
         supports_ffd105: Optional[bool] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add cashbox handler
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/cashbox/sale-cashbox-handler-add.html
+
+        The method adds a REST cashbox handler.
+
+        Args:
+            code: Code of the REST handler;
+
+            name: Name of the REST handler;
+
+            settings: Handler settings;
+
+            sort: Sorting parameter;
+
+            supports_ffd105: Indicates whether the cashbox supports fiscal data format version 1.05;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "CODE": code,
@@ -53,7 +77,20 @@ class Handler(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete cashbox handler
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/cashbox/sale-cashbox-handler-delete.html
+
+        The method deletes the REST cashbox handler.
+
+        Args:
+            bitrix_id: Identifier of the cashbox handler;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "ID": bitrix_id,
@@ -71,7 +108,18 @@ class Handler(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of available cash register handlers
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/cashbox/sale-cashbox-handler-list.html
+
+        The method retrieves a list of available REST cash register handlers.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
@@ -86,7 +134,22 @@ class Handler(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update cash register handler
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/cashbox/sale-cashbox-handler-update.html
+
+        The method updates the data of the REST cash register handler.
+
+        Args:
+            bitrix_id: Identifier of the handler being updated;
+
+            fields: Values of the fields to be updated;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "ID": bitrix_id,

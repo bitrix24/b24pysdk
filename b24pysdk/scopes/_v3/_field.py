@@ -1,14 +1,21 @@
 from typing import Iterable, Text
 
 from ..._constants import MISSING
-from ...api.requests import BitrixAPIRequest
+from ...api.requests import BitrixAPIValueRequest, BitrixAPIValuesRequest
+from ...schemas.v3.field import V3Field, V3FieldGetData, V3FieldListData
 from ...utils.functional import type_checker
 from ...utils.types import JSONDict, Timeout
+from .._adapters import BitrixSchemaAdapter, BitrixSchemasAdapter
 from .._base_entity import BaseEntity
 
 
 class Field(BaseEntity):
-    """Base class for retrieving entity fields.
+    """Retrieve REST API v3 field descriptions as V3Field schemas.
+
+    Raw result envelopes remain available through ``result``. Adapted ``value``
+    and ``values`` unwrap ``item`` and ``items`` respectively. An explicit
+    ``select`` must include all V3Field attributes when using adapted access;
+    use raw ``result`` when requesting only part of a field description.
 
     Documentation: https://apidocs.bitrix24.com/api-reference/rest-v3.html#openapi
     """
@@ -20,7 +27,7 @@ class Field(BaseEntity):
             *,
             select: Iterable[Text] = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValueRequest[V3FieldGetData, V3Field]:
         """Get field description
 
         The method returns the description of the entity field by name.
@@ -33,7 +40,8 @@ class Field(BaseEntity):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Lazy request exposing raw ``result.item`` and an adapted
+            ``V3Field`` through ``value``.
         """
 
         params: JSONDict = {
@@ -50,6 +58,8 @@ class Field(BaseEntity):
             api_wrapper=self.get,
             params=params,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValueRequest,
+            result_adapter=BitrixSchemaAdapter(V3Field, wrapper="item"),
         )
 
     @type_checker
@@ -58,7 +68,7 @@ class Field(BaseEntity):
             *,
             select: Iterable[Text] = MISSING,
             timeout: Timeout = None,
-    ) -> BitrixAPIRequest:
+    ) -> BitrixAPIValuesRequest[V3FieldListData, V3Field]:
         """Get a list of fields
 
         The method returns a list of available fields for the entity.
@@ -69,7 +79,8 @@ class Field(BaseEntity):
             timeout: Timeout in seconds.
 
         Returns:
-            Instance of BitrixAPIRequest
+            Lazy request exposing raw ``result.items`` and adapted
+            ``V3Field`` instances through ``values``.
         """
 
         params: JSONDict = {}
@@ -84,4 +95,6 @@ class Field(BaseEntity):
             api_wrapper=self.list,
             params=params or None,
             timeout=timeout,
+            bitrix_api_request_type=BitrixAPIValuesRequest,
+            result_adapter=BitrixSchemasAdapter(V3Field, wrapper="items"),
         )

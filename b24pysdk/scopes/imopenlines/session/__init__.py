@@ -15,7 +15,10 @@ __all__ = [
 
 
 class Session(BaseEntity):
-    """"""
+    """Class for managing operator sessions in chats.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/index.html
+    """
 
     @cached_property
     def head(self) -> Head:
@@ -39,7 +42,20 @@ class Session(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Take over the dialogue from the current operator
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/sessions/imopenlines-session-intercept.html
+
+        The method transfers the current dialogue to the operator who calls the method.
+
+        Args:
+            chat_id: Identifier of the open line chat;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "CHAT_ID": chat_id,
@@ -58,7 +74,20 @@ class Session(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Join the dialogue
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/sessions/imopenlines-session-join.html
+
+        The method adds the current operator to an active dialogue in the open channels.
+
+        Args:
+            chat_id: Identifier of the open line chat;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             CHAT_ID=chat_id,
@@ -77,7 +106,20 @@ class Session(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get chat by user code
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/sessions/imopenlines-session-open.html
+
+        The method returns the chat ID of the line based on the user code.
+
+        Args:
+            user_code: String code of the user for the external system channel;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             USER_CODE=user_code,
@@ -96,7 +138,20 @@ class Session(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Start a new dialogue
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/sessions/imopenlines-session-start.html
+
+        The method initiates a new session in the current open line chat.
+
+        Args:
+            chat_id: Identifier of the open line chat;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             CHAT_ID=chat_id,

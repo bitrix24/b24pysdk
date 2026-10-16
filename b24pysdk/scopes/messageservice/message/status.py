@@ -25,7 +25,24 @@ class Status(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update message delivery status
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/messageservice/messageservice-message-status-update.html
+
+        The method updates the delivery status of a message sent through a messaging provider.
+
+        Args:
+            code: Provider code;
+
+            message_id: External identifier of the message, recieved by the application handler when message was sent;
+
+            status: New status of the message;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "CODE": code,

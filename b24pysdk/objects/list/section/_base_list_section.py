@@ -43,6 +43,7 @@ class BaseListSection(BaseObject[int]):
     PK = int
 
     _FILTER_LOOKUPS = frozenset({
+        FilterLookup.IN,
         FilterLookup.NOT_EXACT,
         FilterLookup.GT,
         FilterLookup.GTE,
@@ -143,6 +144,8 @@ class BaseListSectionManager(BaseObjectManager[_BaseListSectionT], Generic[_Base
     """Query and creation manager shared by all list-section types."""
 
     _ORDER_KEY = None
+    # lists.section.get has no ordering parameter.
+    _SUPPORTS_ORDER = False
 
     __slots__ = ()
 
@@ -184,6 +187,10 @@ class BaseListSectionManager(BaseObjectManager[_BaseListSectionT], Generic[_Base
     def filter(self, **filters: Any) -> Self:
         """Return sections filtered by SDK object attribute names."""
         return self._filter(**filters)
+
+    def from_pks(self, bitrix_pks: Iterable[int]) -> Self:
+        """Return sections whose identifiers belong to the supplied iterable."""
+        return self._from_pks(bitrix_pks)
 
     def select(self, *fields: Text) -> Self:
         """Return sections with the requested SDK object fields selected."""

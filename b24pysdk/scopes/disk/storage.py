@@ -2,7 +2,6 @@ from typing import Iterable, Optional, Sequence, Text
 
 from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
-from ...utils.converters import bool_to_bitrix
 from ...utils.functional import type_checker
 from ...utils.types import B24File, JSONDict, JSONList, Timeout
 from .._base_entity import BaseEntity
@@ -45,7 +44,7 @@ class Storage(BaseEntity):
             Instance of BitrixAPIRequest.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "data": data,
         }
@@ -82,7 +81,7 @@ class Storage(BaseEntity):
             Instance of BitrixAPIRequest.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 
@@ -121,7 +120,7 @@ class Storage(BaseEntity):
             Instance of BitrixAPIRequest.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 
@@ -157,7 +156,6 @@ class Storage(BaseEntity):
         Returns:
             Instance of BitrixAPIRequest.
         """
-
         return self._make_bitrix_api_request(
             api_wrapper=self.get_fields,
             timeout=timeout,
@@ -180,7 +178,6 @@ class Storage(BaseEntity):
         Returns:
             Instance of BitrixAPIRequest.
         """
-
         return self._make_bitrix_api_request(
             api_wrapper=self.get_for_app,
             timeout=timeout,
@@ -247,7 +244,6 @@ class Storage(BaseEntity):
         Returns:
             Instance of BitrixAPIRequest.
         """
-
         return self._make_bitrix_api_request(
             api_wrapper=self.get_types,
             timeout=timeout,
@@ -275,7 +271,7 @@ class Storage(BaseEntity):
             Instance of BitrixAPIRequest.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "newName": new_name,
         }
@@ -317,14 +313,14 @@ class Storage(BaseEntity):
             Instance of BitrixAPIRequest.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "fileContent": B24File(file_content).to_b24(),
             "data": data,
         }
 
         if generate_unique_name is not MISSING:
-            params["generateUniqueName"] = bool_to_bitrix(generate_unique_name)
+            params["generateUniqueName"] = generate_unique_name
 
         if rights is not MISSING:
             if rights.__class__ is not list:
@@ -337,4 +333,3 @@ class Storage(BaseEntity):
             params=params,
             timeout=timeout,
         )
-

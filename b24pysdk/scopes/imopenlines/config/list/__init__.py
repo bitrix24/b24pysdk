@@ -12,7 +12,10 @@ __all__ = [
 
 
 class List(BaseEntity):
-    """"""
+    """Class for retrieving open channels.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/index.html
+    """
 
     @type_checker
     def get(
@@ -22,7 +25,22 @@ class List(BaseEntity):
             options: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the list of open channels
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/imopenlines-config-list-get.html
+
+        The method retrieves a list of open channels.
+
+        Args:
+            params: Selection parameters;
+
+            options: Additional options;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         payload = dict()
 

@@ -18,7 +18,10 @@ __all__ = [
 
 
 class Chat(BaseEntity):
-    """"""
+    """Class for working with group chats on behalf of a bot.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/chats/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -59,7 +62,24 @@ class Chat(BaseEntity):
             bot_token: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Create a group chat
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/chats/chat-add.html
+
+        The method creates a new group chat on behalf of the bot.
+
+        Args:
+            bot_id: Bot ID;
+
+            fields: Properties of the chat being created;
+
+            bot_token: Unique authorization bot token;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "botId": bot_id,
@@ -84,7 +104,24 @@ class Chat(BaseEntity):
             bot_token: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get information about the chat
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/chats/chat-get.html
+
+        The method returns information about the chat.
+
+        Args:
+            bot_id: Bot ID;
+
+            dialog_id: Dialog ID;
+
+            bot_token: Unique authorization bot token;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "botId": bot_id,
@@ -109,7 +146,24 @@ class Chat(BaseEntity):
             bot_token: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Leave chat
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/chats/chat-leave.html
+
+        The method removes the bot from chat.
+
+        Args:
+            bot_id: Bot ID;
+
+            dialog_id: Dialog ID;
+
+            bot_token: Unique authorization bot token;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "botId": bot_id,
@@ -135,7 +189,26 @@ class Chat(BaseEntity):
             bot_token: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Assign chat owner
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/chats/chat-set-owner.html
+
+        The method transfers chat ownership to another user.
+
+        Args:
+            bot_id: Bot ID;
+
+            dialog_id: Dialog ID;
+
+            user_id: ID of the new chat owner;
+
+            bot_token: Unique authorization bot token;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "botId": bot_id,
@@ -162,7 +235,26 @@ class Chat(BaseEntity):
             bot_token: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update chat properties
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/chats/chat-update.html
+
+        The method updates chat properties.
+
+        Args:
+            bot_id: Bot ID;
+
+            dialog_id: Dialog ID;
+
+            fields: Properties of the chat to be updated;
+
+            bot_token: Unique authorization bot token;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "botId": bot_id,

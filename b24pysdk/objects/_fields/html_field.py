@@ -12,7 +12,13 @@ __all__ = [
 
 
 class HTMLField(TextField):
-    """Field that exposes a Bitrix24 HTML value as ``str``."""
+    """Read HTML response envelopes as text and serialize writes as text.
+
+    A mapping such as ``{"TYPE": "HTML", "TEXT": "<b>Title</b>"}`` contributes
+    only its ``TEXT`` value; ``TYPE`` is not validated or retained. Plain text
+    responses are accepted too. Outgoing conversion is inherited from
+    ``TextField`` and does not recreate the response envelope.
+    """
 
     __slots__ = ()
 

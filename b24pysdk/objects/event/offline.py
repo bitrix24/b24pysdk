@@ -95,7 +95,12 @@ class OfflineEventManager(BaseObjectManager[_OfflineEventT], Generic[_OfflineEve
             auth_connector: Text = MISSING,
             error: bool = MISSING,
     ) -> Self:
-        """Return a query that reserves events through ``event.offline.get``."""
+        """Build a lazy reservation query using ``event.offline.get``.
+
+        Existing query filters and ordering are retained. Queue effects occur
+        when the query is evaluated, not when this builder is called. ``limit``
+        is an endpoint parameter, separate from the manager's ``limit()`` cap.
+        """
 
         params: JSONDict = {}
 
@@ -128,7 +133,11 @@ class OfflineEventManager(BaseObjectManager[_OfflineEventT], Generic[_OfflineEve
             message_id: Iterable[int] = MISSING,
             timeout: Timeout = None,
     ) -> bool:
-        """Clear records from a reserved offline-event package."""
+        """Immediately clear records from the explicit reserved package.
+
+        The current query's filters, limits, and ordering do not select targets
+        for this command; its explicit arguments are forwarded to the wrapper.
+        """
         return self._client.event.offline.clear(
             process_id,
             bitrix_id=bitrix_id,
@@ -143,7 +152,10 @@ class OfflineEventManager(BaseObjectManager[_OfflineEventT], Generic[_OfflineEve
             message_id: Iterable[int] = MISSING,
             timeout: Timeout = None,
     ) -> bool:
-        """Mark records from a reserved offline-event package as erroneous."""
+        """Immediately mark records from the explicit package as erroneous.
+
+        This command forwards its arguments independently of the current query.
+        """
         return self._client.event.offline.error(
             process_id,
             message_id=message_id,

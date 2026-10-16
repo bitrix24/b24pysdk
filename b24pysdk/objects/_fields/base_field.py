@@ -171,6 +171,12 @@ class BaseField(ABC, Generic[BRawT, BValueT]):
         instance.set_field_value(self.bitrix_code, self.to_bitrix_value(value), bitrix_field=self)
 
     def __delete__(self, instance: Optional["BaseObject"]):
+        """Discard the local assignment, restoring the normal remote read path.
+
+        Deleting a descriptor value does not clear the remote field. Assign
+        ``None`` instead when the field and endpoint allow clearing its value.
+        """
+
         if instance is None:
             raise AttributeError(f"Field {self!r} cannot be deleted from the object class.")
 
@@ -240,6 +246,9 @@ class BaseField(ABC, Generic[BRawT, BValueT]):
         individual ``None`` items are always rejected. Empty iterables remain
         valid. Scalar conversion is delegated directly to the concrete field so
         it can enforce its own empty-value semantics.
+
+        Non-null items that scalar conversion normalizes to ``None`` are omitted
+        from the returned list, so its length may differ from the raw input.
         """
 
         if self.is_multiple:
@@ -275,7 +284,9 @@ class BaseField(ABC, Generic[BRawT, BValueT]):
         cannot change the converted container, and generators have deterministic
         one-pass behavior. Whole-value and per-item ``None`` rules mirror
         ``from_bitrix_value()``. Scalar conversion is delegated to the concrete
-        field implementation.
+        field implementation. Unlike read conversion, its results are retained
+        even when a non-null input item converts to ``None``. A new outer list
+        does not imply defensive copying of mutable items.
         """
 
         if self.is_multiple:

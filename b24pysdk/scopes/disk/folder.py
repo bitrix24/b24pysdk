@@ -3,7 +3,7 @@ from typing import Dict, Iterable, Optional, Sequence, Text
 from ..._constants import MISSING
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import type_checker
-from ...utils.types import B24File, JSONDict, Timeout
+from ...utils.types import B24File, JSONDict, JSONList, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -23,6 +23,7 @@ class Folder(BaseEntity):
             bitrix_id: int,
             data: Dict,
             *,
+            rights: JSONList = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
         """
@@ -35,16 +36,23 @@ class Folder(BaseEntity):
         Args:
             bitrix_id: The ID of the folder;
             data: Dictionary describing the folder, requires NAME field;
+            rights: Access rights for the created folder;
             timeout: Timeout in seconds.
 
         Returns:
             Instance of BitrixAPIRequest.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "data": data,
         }
+
+        if rights is not MISSING:
+            if rights.__class__ is not list:
+                rights = list(rights)
+
+            params["rights"] = rights
 
         return self._make_bitrix_api_request(
             api_wrapper=self.add_sub_folder,
@@ -76,7 +84,7 @@ class Folder(BaseEntity):
             Instance of BitrixAPIRequest with the copied folder structure.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "targetFolderId": target_folder_id,
         }
@@ -109,7 +117,7 @@ class Folder(BaseEntity):
             Instance of BitrixAPIRequest indicating the success of deletion.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 
@@ -141,7 +149,7 @@ class Folder(BaseEntity):
             Instance of BitrixAPIRequest with the folder details.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 
@@ -173,7 +181,7 @@ class Folder(BaseEntity):
             Instance of BitrixAPIRequest with the public link information.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 
@@ -211,7 +219,7 @@ class Folder(BaseEntity):
             Instance of BitrixAPIRequest with list of files and folders.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 
@@ -277,7 +285,7 @@ class Folder(BaseEntity):
             Instance of BitrixAPIRequest indicating success of to trash action.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 
@@ -311,7 +319,7 @@ class Folder(BaseEntity):
             Instance of BitrixAPIRequest with the moved folder structure.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "targetFolderId": target_folder_id,
         }
@@ -346,7 +354,7 @@ class Folder(BaseEntity):
             Instance of BitrixAPIRequest indicating the success of renaming.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
             "newName": new_name,
         }
@@ -379,7 +387,7 @@ class Folder(BaseEntity):
             Instance of BitrixAPIRequest indicating the success of restore action.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 
@@ -398,9 +406,26 @@ class Folder(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Assign access permissions to folder
 
-        params = {
+        Documentation: https://apidocs.bitrix24.com/api-reference/disk/folder/disk-folder-share-to-user.html
+
+        The method assigns access permissions to a folder.
+
+        Args:
+            bitrix_id: Identifier of the folder;
+
+            user_id: The ID of the user to whom access is granted
+
+            task_name: Level of access granted to the user;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+
+        params: JSONDict = {
             "id": bitrix_id,
             "userId": user_id,
             "taskName": task_name,
@@ -442,7 +467,7 @@ class Folder(BaseEntity):
             Instance of BitrixAPIRequest indicating success of the upload.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 

@@ -169,6 +169,9 @@ class BaseListFieldManager(BaseObjectManager[_BaseListFieldT], Generic[_BaseList
 
     _FILTER_KEY = None
     _ORDER_KEY = None
+    # lists.field.get returns a complete field mapping, not a paginated array.
+    _IS_LIST_METHOD = False
+    _SUPPORTS_ORDER = False
 
     __slots__ = ()
 

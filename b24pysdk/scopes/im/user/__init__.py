@@ -16,7 +16,10 @@ __all__ = [
 
 
 class User(BaseEntity):
-    """"""
+    """Class for retrieving user data.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chats/users/index.html
+    """
 
     @cached_property
     def list(self) -> List:
@@ -36,7 +39,22 @@ class User(BaseEntity):
             avatar_hr: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """"""
+        """Get user data
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/users/im-user-get.html
+
+        The retrieves data about the current user or a user by ID.
+
+        Args:
+            bitrix_id: User identifier;
+
+            avatar_hr: Frog for requesting avatar;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

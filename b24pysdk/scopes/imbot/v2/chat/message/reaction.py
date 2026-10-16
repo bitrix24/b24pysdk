@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Reaction(BaseEntity):
-    """"""
+    """Class for managing reactions.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/messages/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -29,7 +32,26 @@ class Reaction(BaseEntity):
             bot_token: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add reaction to message
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/messages/chat-message-reaction-add.html
+
+        The method adds a bot reaction to a message.
+
+        Args:
+            bot_id: Bot ID;
+
+            message_id: ID of the message to be updated;
+
+            reaction: Reaction code;
+
+            bot_token: Unique authorization bot token;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "botId": bot_id,
@@ -56,7 +78,26 @@ class Reaction(BaseEntity):
             bot_token: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete reaction from message
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/messages/chat-message-reaction-delete.html
+
+        The method removes the bot's reaction from a message.
+
+        Args:
+            bot_id: Bot ID;
+
+            message_id: ID of the message to be updated;
+
+            reaction: Reaction code;
+
+            bot_token: Unique authorization bot token;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "botId": bot_id,

@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Dialog(BaseEntity):
-    """"""
+    """Class for retrieving operator dialog data.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/index.html
+    """
 
     @type_checker
     def get(
@@ -24,7 +27,26 @@ class Dialog(BaseEntity):
             user_code: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get information about the operator's dialog
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/sessions/imopenlines-dialog-get.html
+
+        The method returns data from the open line chat.
+
+        Args:
+            chat_id: Identifier of the open line chat;
+
+            dialog_id: Identifier of the open line dialog;
+
+            session_id: Identifier of the session;
+
+            user_code: String code of the user for the external system channel;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

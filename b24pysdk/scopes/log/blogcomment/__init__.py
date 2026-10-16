@@ -14,7 +14,10 @@ __all__ = [
 
 
 class Blogcomment(BaseEntity):
-    """"""
+    """Class for managing comments on news feed messages.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/log/blogcomment/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -36,7 +39,26 @@ class Blogcomment(BaseEntity):
             files: Iterable[Sequence[Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add a comment to the message
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/log/blogcomment/log-blogcomment-add.html
+
+        The method adds a comment to a news feed message.
+
+        Args:
+            post_id: Identifier of the news feed message;
+
+            text: The text of the comment;
+
+            user_id: Identifier of the user on behalf of whom the comment is published;
+
+            files: An array of files;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "POST_ID": post_id,
@@ -63,7 +85,22 @@ class Blogcomment(BaseEntity):
             user_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete comment from a post
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/log/blogcomment/log-blogcomment-delete.html
+
+        The method removes a comment from the news feed.
+
+        Args:
+            comment_id: Identifier of the comment;
+
+            user_id: The identifier of the user performing the deletion;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "COMMENT_ID": comment_id,

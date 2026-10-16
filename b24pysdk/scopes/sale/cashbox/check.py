@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Check(BaseEntity):
-    """"""
+    """Class for saving receipt printing result.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sale/cashbox/index.html
+    """
 
     @type_checker
     def apply(
@@ -28,7 +31,34 @@ class Check(BaseEntity):
         shift_number: Optional[Text] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Save the result of printing the receipt
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/cashbox/sale-cashbox-check-apply.html
+
+        The method saves the result of printing a receipt that was printed on REST cash register.
+
+        Args:
+            uuid: UUID of the receipt;
+
+            print_end_time: Time when the receipt printing ended;
+
+            reg_number_kkt: Registration number of the cash register;
+
+            fiscal_doc_attr: Fiscal attribute of the document;
+
+            fiscal_doc_number: Fiscal document number;
+
+            fiscal_receipt_number: Fiscal receipt number;
+
+            fn_number: Fiscal storage number;
+
+            shift_number: Shift number;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "UUID": uuid,

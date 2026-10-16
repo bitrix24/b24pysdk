@@ -13,7 +13,10 @@ __all__ = [
 
 
 class List(BaseEntity):
-    """"""
+    """Class for retrieving data about users.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chats/users/index.html
+    """
 
     @type_checker
     def get(
@@ -21,9 +24,27 @@ class List(BaseEntity):
             bitrix_id: Iterable[Union[int, Text]],
             *,
             avatar_hr: Optional[bool] = MISSING,
+            result_type: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[Union[JSONDict, JSONList]]:
-        """"""
+        """Get user data
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/users/im-user-list-get.html
+
+        The method returns data about users based on a list of identifiers.
+
+        Args:
+            bitrix_id: An array of user identifiers or a JSON string containing an array;
+
+            avatar_hr: Parameter to request the avatar_hr field with the high-resolution avatar URL;
+
+            result_type: Format of the result;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if bitrix_id.__class__ is not list:
             bitrix_id = list(bitrix_id)
@@ -34,6 +55,9 @@ class List(BaseEntity):
 
         if avatar_hr is not MISSING:
             params["AVATAR_HR"] = bool_to_bitrix(avatar_hr, is_required=True)
+
+        if result_type is not MISSING:
+            params["RESULT_TYPE"] = result_type
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,

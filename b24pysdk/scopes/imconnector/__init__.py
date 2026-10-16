@@ -19,7 +19,10 @@ __all__ = [
 
 
 class Imconnector(BaseScope):
-    """"""
+    """Class for working with connectors.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/imconnector/index.html
+    """
 
     @cached_property
     def chat(self) -> Chat:
@@ -55,7 +58,24 @@ class Imconnector(BaseScope):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Activate connector
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/imconnector/imconnector-activate.html
+
+        The method activates or deactivates the connector on the specified open line.
+
+        Args:
+            connector: The string code of the connector specified;
+
+            line: The identifier of the open line;
+
+            active: Activation flag;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if isinstance(active, bool):
             active = int(active)
@@ -78,7 +98,18 @@ class Imconnector(BaseScope):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the list of connectors
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/imconnector/imconnector-list.html
+
+        The method returns a list of all connectors registered in Bitrix24.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         return self._make_bitrix_api_request(
             api_wrapper=self.list,
@@ -101,10 +132,44 @@ class Imconnector(BaseScope):
             need_system_messages: Optional[bool] = MISSING,
             need_signature: Optional[bool] = MISSING,
             chat_group: Optional[bool] = MISSING,
-            comment: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Register the connector
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/imconnector/imconnector-register.html
+
+        The method registers a custom connector for Open Channels.
+
+        Args:
+            bitrix_id: Unique identifier for the connector;
+
+            name: Name of the connector in the interface;
+
+            icon: Parameters for the main icon;
+
+            placement_handler: URL of the embedding handler for the connector settings;
+
+            icon_disabled: Parameters for the inactive state icon;
+
+            del_external_messages: Allows deleting incoming messages;
+
+            edit_internal_messages: Allows editing operator messages;
+
+            del_internal_messages: Allows deleting operator messages;
+
+            newsletter: Allows using the channel in CRM newsletters;
+
+            need_system_messages: Allows sending system messages to the channel;
+
+            need_signature: Adds the operator's signature to messages;
+
+            chat_group: Connector chat processing mode indicator;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             ID=bitrix_id,
@@ -137,9 +202,6 @@ class Imconnector(BaseScope):
         if chat_group is not MISSING:
             params["CHAT_GROUP"] = bool_to_bitrix(chat_group, is_required=True)
 
-        if comment is not MISSING:
-            params["COMMENT"] = comment
-
         return self._make_bitrix_api_request(
             api_wrapper=self.register,
             params=params,
@@ -152,12 +214,24 @@ class Imconnector(BaseScope):
             connector: Text,
             *,
             line: Optional[Union[int, Text]] = MISSING,
-            error: Optional[bool] = MISSING,
-            configured: Optional[bool] = MISSING,
-            status: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the status of the connector
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/imconnector/imconnector-status.html
+
+        The method returns the current status of the connector for the specified open line.
+
+        Args:
+            connector: The string code of the connector specified;
+
+            line: The identifier of the open line;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             CONNECTOR=connector,
@@ -165,15 +239,6 @@ class Imconnector(BaseScope):
 
         if line is not MISSING:
             params["LINE"] = line
-
-        if error is not MISSING:
-            params["ERROR"] = bool_to_bitrix(error, is_required=True)
-
-        if configured is not MISSING:
-            params["CONFIGURED"] = bool_to_bitrix(configured, is_required=True)
-
-        if status is not MISSING:
-            params["STATUS"] = bool_to_bitrix(status, is_required=True)
 
         return self._make_bitrix_api_request(
             api_wrapper=self.status,
@@ -188,7 +253,20 @@ class Imconnector(BaseScope):
             bitrix_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Unregister the connector
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/imconnector/imconnector-unregister.html
+
+        The method removes a user connector.
+
+        Args:
+            bitrix_id: The identifier of the connector that was provided during registration;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

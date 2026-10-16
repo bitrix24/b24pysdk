@@ -28,6 +28,11 @@ class ObjectField(BaseCachedField[Any, BOT], Generic[BOT]):
     provided ``discriminator`` and then cached on the field descriptor.
     A concrete class is validated when the field is created and is not resolved
     through the registry.
+
+    Successful string resolution is shared by all owners of this descriptor,
+    including subclasses that inherit it. Register application overrides before
+    its first resolution, and redeclare the projection when a subclass changes
+    its source descriptor or needs a different discriminator.
     """
 
     __slots__ = ("_discriminator", "_object_class", "source_field")

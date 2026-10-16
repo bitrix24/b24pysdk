@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Data(BaseEntity):
-    """"""
+    """Class for managing connector settings.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/imconnector/index.html
+    """
 
     @type_checker
     def set(
@@ -22,7 +25,24 @@ class Data(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Set connector settings
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/imconnector/imconnector-connector-data-set.html
+
+        The method sets the channel settings in an external system for a custom connector and specified open line.
+
+        Args:
+            connector: The string code of the connector;
+
+            line: Identifier of the open line;
+
+            data: Object containing the channel settings in the external system;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             CONNECTOR=connector,

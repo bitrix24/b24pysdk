@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Dialog(BaseEntity):
-    """"""
+    """Class to obtain information about dialogs.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/outdated/chats/index.html
+    """
 
     @type_checker
     def get(
@@ -20,7 +23,7 @@ class Dialog(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Deprecated"""
 
         params = {
             "DIALOG_ID": dialog_id,

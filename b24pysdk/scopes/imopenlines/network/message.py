@@ -13,7 +13,10 @@ __all__ = [
 
 
 class Message(BaseEntity):
-    """"""
+    """Class for sending messages on behalf of the open channel.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/index.html
+    """
 
     @type_checker
     def add(
@@ -27,7 +30,30 @@ class Message(BaseEntity):
             url_preview: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Send a message to a user on behalf of thee open channel
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/imopenlines-network-message-add.html
+
+        The method sends a message to a user on bahalf of the open channel connected in Bitrix24 Network.
+
+        Args:
+            code: Code of the open channel, a string of 32 characters;
+
+            user_id: Identifier of the message recipient;
+
+            message: Text of the message;
+
+            attach: Attachment;
+
+            keyboard: Keyboard;
+
+            url_preview: Link preview;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             CODE=code,

@@ -13,7 +13,10 @@ __all__ = [
 
 
 class Last(BaseEntity):
-    """"""
+    """Class for managing user's history search queries.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chats/search/index.html
+    """
 
     @type_checker
     def add(
@@ -22,7 +25,20 @@ class Last(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Add entry to search history
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/search/im-search-last-add.html
+
+        The method adds a dialog to the last search history.
+
+        Args:
+            dialog_id: Identifier for the message object: user or chat;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             DIALOG_ID=dialog_id,
@@ -41,7 +57,20 @@ class Last(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Delete record from search history
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/search/im-search-last-delete.html
+
+        The method removes a dialog from the last search history.
+
+        Args:
+            dialog_id: Identifier for the message object: user or chat;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             DIALOG_ID=dialog_id,
@@ -62,7 +91,24 @@ class Last(BaseEntity):
             skip_dialog: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONList]:
-        """"""
+        """Get search history
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/search/im-search-last-get.html
+
+        The method returns a list of dialogs from the history of the last search.
+
+        Args:
+            skip_openlines: Skip Open Channels chats;
+
+            skip_chat: Skip group chat;
+
+            skip_dialog: Skip personal dialogs;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

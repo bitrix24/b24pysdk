@@ -3,7 +3,6 @@ from typing import Literal, Optional, Sequence, Text, Union
 
 from ...._constants import MISSING
 from ....api.requests import BitrixAPIRequest
-from ....utils.converters import bool_to_bitrix
 from ....utils.functional import type_checker
 from ....utils.types import B24File, JSONDict, Timeout
 from ..._base_entity import BaseEntity
@@ -15,7 +14,10 @@ __all__ = [
 
 
 class Item(BaseEntity):
-    """"""
+    """Class for working with data storage items.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/entity/items/index.html
+    """
 
     @cached_property
     def property(self) -> Property:
@@ -32,7 +34,26 @@ class Item(BaseEntity):
             start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of storage items
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/entity/items/entity-item-get.html
+
+        The method retrieves a list of items from the application's data storage.
+
+        Args:
+            entity: Identifier of the application's data storage;
+
+            sort: Object for sorting;
+
+            filter: Object for filtering;
+
+            start: Pagination parameter;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "ENTITY": entity,
@@ -54,33 +75,59 @@ class Item(BaseEntity):
         )
 
     @type_checker
-    def add(  # noqa: C901
+    def add(
             self,
             entity: Text,
             name: Text,
             *,
-            active: Optional[bool] = MISSING,
-            date_active_from: Optional[Text] = MISSING,
-            date_active_to: Optional[Text] = MISSING,
-            sort: Optional[int] = MISSING,
+            property_values: JSONDict = MISSING,
+            section: int = MISSING,
+            date_active_from: Text = MISSING,
+            date_active_to: Text = MISSING,
             preview_picture: Sequence[Text] = MISSING,
-            preview_text: Optional[Text] = MISSING,
             detail_picture: Sequence[Text] = MISSING,
-            detail_text: Optional[Text] = MISSING,
-            code: Optional[Text] = MISSING,
-            section: Optional[int] = MISSING,
-            property_values: Optional[JSONDict] = MISSING,
+            user_fields: JSONDict = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add storage item
 
-        params = {
+        Documentation: https://apidocs.bitrix24.com/api-reference/entity/items/entity-item-add.html
+
+        The method adds an item to the application's data storage.
+
+        Args:
+            entity: Identifier of the application's data storage;
+
+            name: Name of the storage item;
+
+            date_active_from: Start date of the item's section;
+
+            date_active_to: End date of the item's activity;
+
+            preview_picture: Preview image of the item;
+
+            detail_picture: Detailed image of the item;
+
+            section: Identifier of the storage section;
+
+            property_values: Property values of the item;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+
+        params: JSONDict = {
             "ENTITY": entity,
             "NAME": name,
         }
 
-        if active is not MISSING:
-            params["ACTIVE"] = bool_to_bitrix(active, is_required=True)
+        if property_values is not MISSING:
+            params["PROPERTY_VALUES"] = property_values
+
+        if section is not MISSING:
+            params["SECTION"] = section
 
         if date_active_from is not MISSING:
             params["DATE_ACTIVE_FROM"] = date_active_from
@@ -88,29 +135,18 @@ class Item(BaseEntity):
         if date_active_to is not MISSING:
             params["DATE_ACTIVE_TO"] = date_active_to
 
-        if sort is not MISSING:
-            params["SORT"] = sort
-
         if preview_picture is not MISSING:
             params["PREVIEW_PICTURE"] = B24File(preview_picture).to_b24()
-
-        if preview_text is not MISSING:
-            params["PREVIEW_TEXT"] = preview_text
 
         if detail_picture is not MISSING:
             params["DETAIL_PICTURE"] = B24File(detail_picture).to_b24()
 
-        if detail_text is not MISSING:
-            params["DETAIL_TEXT"] = detail_text
+        if user_fields is not MISSING:
+            for field_code, value in user_fields.items():
+                if not isinstance(field_code, str) or not field_code.startswith("UF_"):
+                    raise ValueError("User field codes must start with 'UF_'")
 
-        if code is not MISSING:
-            params["CODE"] = code
-
-        if section is not MISSING:
-            params["SECTION"] = section
-
-        if property_values is not MISSING:
-            params["PROPERTY_VALUES"] = property_values
+                params[field_code] = value
 
         return self._make_bitrix_api_request(
             api_wrapper=self.add,
@@ -123,34 +159,63 @@ class Item(BaseEntity):
             self,
             entity: Text,
             bitrix_id: int,
-            property_values: JSONDict,
             *,
-            name: Optional[Text] = MISSING,
-            active: Optional[bool] = MISSING,
-            date_active_from: Optional[Text] = MISSING,
-            date_active_to: Optional[Text] = MISSING,
-            sort: Optional[int] = MISSING,
+            name: Text = MISSING,
+            property_values: JSONDict = MISSING,
+            section: int = MISSING,
+            date_active_from: Text = MISSING,
+            date_active_to: Text = MISSING,
             preview_picture: Union[Sequence[Text], Literal[False]] = MISSING,
-            preview_text: Optional[Text] = MISSING,
             detail_picture: Union[Sequence[Text], Literal[False]] = MISSING,
-            detail_text: Optional[Text] = MISSING,
-            code: Optional[Text] = MISSING,
-            section: Optional[int] = MISSING,
+            user_fields: JSONDict = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update a storage item
 
-        params = {
+        Documentation: https://apidocs.bitrix24.com/api-reference/entity/items/entity-item-update.html
+
+        The method updates an existing storage item.
+
+        Args:
+            entity: Identifier of the application's data storageж
+
+            bitrix_id: Identifier of the storage item;
+
+            name: Name of the storage item;
+
+            property_values: Property values of the storage item;
+
+            section: Identifier of the storage section;
+
+            date_active_from: Start date of the item's activity;
+
+            date_active_to: End date of the item's activity;
+
+            preview_picture: Preview image of the item;
+
+            detail_picture: Detailed image of the item;
+
+            user_fields: User fields of the item;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
+
+        params: JSONDict = {
             "ENTITY": entity,
             "ID": bitrix_id,
-            "PROPERTY_VALUES": property_values,
         }
 
         if name is not MISSING:
             params["NAME"] = name
 
-        if active is not MISSING:
-            params["ACTIVE"] = bool_to_bitrix(active, is_required=True)
+        if property_values is not MISSING:
+            params["PROPERTY_VALUES"] = property_values
+
+        if section is not MISSING:
+            params["SECTION"] = section
 
         if date_active_from is not MISSING:
             params["DATE_ACTIVE_FROM"] = date_active_from
@@ -158,30 +223,22 @@ class Item(BaseEntity):
         if date_active_to is not MISSING:
             params["DATE_ACTIVE_TO"] = date_active_to
 
-        if sort is not MISSING:
-            params["SORT"] = sort
-
         if preview_picture is not MISSING:
             params["PREVIEW_PICTURE"] = (
                 False if preview_picture is False else B24File(preview_picture).to_b24()
             )
-
-        if preview_text is not MISSING:
-            params["PREVIEW_TEXT"] = preview_text
 
         if detail_picture is not MISSING:
             params["DETAIL_PICTURE"] = (
                 False if detail_picture is False else B24File(detail_picture).to_b24()
             )
 
-        if detail_text is not MISSING:
-            params["DETAIL_TEXT"] = detail_text
+        if user_fields is not MISSING:
+            for field_code, value in user_fields.items():
+                if not isinstance(field_code, str) or not field_code.startswith("UF_"):
+                    raise ValueError("User field codes must start with 'UF_'")
 
-        if code is not MISSING:
-            params["CODE"] = code
-
-        if section is not MISSING:
-            params["SECTION"] = section
+                params[field_code] = value
 
         return self._make_bitrix_api_request(
             api_wrapper=self.update,
@@ -197,7 +254,22 @@ class Item(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete a storage item
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/entity/items/entity-item-delete.html
+
+        The method removes an item from the application's data storage.
+
+        Args:
+            entity: Identifier of the application's data storage;
+
+            bitrix_id: Identifier of the storage item to be deleted;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "ENTITY": entity,

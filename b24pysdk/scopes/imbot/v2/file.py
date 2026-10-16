@@ -12,7 +12,10 @@ __all__ = [
 
 
 class File(BaseEntity):
-    """"""
+    """Class for working with files to the chat on behalf of the bot.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/files/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -28,7 +31,24 @@ class File(BaseEntity):
             bot_token: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a link to download a file
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/files/file-download.html
+
+        The method returns a link to download a file from the chat.
+
+        Args:
+            bot_id: Bot ID;
+
+            file_id: ID of the file on Drive;
+
+            bot_token: Unique authorization token for the bot;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "botId": bot_id,
@@ -54,7 +74,25 @@ class File(BaseEntity):
             bot_token: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Upload file
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/files/file-upload.html
+
+        The method uploads a file to the chat on behalf of the current user.
+
+        Args:
+            bot_id: Bot ID;
+
+            dialog_id: ID of the dialog;
+
+            fields: Object with file and message parameters;
+
+            bot_token: Unique authorization token for the bot;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest"""
 
         params: JSONDict = {
             "botId": bot_id,

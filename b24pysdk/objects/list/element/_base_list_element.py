@@ -43,7 +43,13 @@ __all__ = [
 
 
 class BaseListElement(BaseObject[int]):
-    """Shared object implementation for Bitrix24 list elements."""
+    """Shared object implementation for Bitrix24 list elements.
+
+    Concrete SDK variants supply ``IBLOCK_TYPE_ID``. Portal-specific subclasses
+    supply ``IBLOCK_ID`` and descriptors for their ``PROPERTY_*`` fields. These
+    class constants define request context and the registry discriminator, while
+    ``bitrix_pk`` remains the element's own ID.
+    """
 
     OBJECT_KEY = "list.element"
     PK = int
@@ -89,7 +95,12 @@ class BaseListElement(BaseObject[int]):
             *,
             timeout: Timeout = None,
     ) -> Dict[Text, "BaseListField"]:
-        """Return list-field objects cached for this list discriminator."""
+        """Return the complete field-object mapping for this list context.
+
+        The current client caches these objects under ``list.field`` and the
+        list discriminator in ``bitrix_objects``. The cache belongs to the
+        metadata objects, rather than the consuming element's class.
+        """
 
         cache_key = "list.field", self.get_discriminator()
         objects_cache = self.client.get_cache("bitrix_objects")
@@ -166,6 +177,11 @@ class BaseListElement(BaseObject[int]):
         whose keys are property-value IDs. Ordinary descriptors consume only
         the mapping values. ``FileField`` keeps each one-item mapping because a
         list file needs both the property-value ID and the file ID.
+
+        The parent hook still handles local precedence, lazy reloads, and
+        missing required fields. Local write values bypass response unwrapping;
+        non-mapping values, including ordinary confirmed write values installed
+        by ``_apply_updated_data()``, are also returned unchanged.
         """
 
         if not bitrix_code.startswith("PROPERTY_"):
@@ -178,6 +194,11 @@ class BaseListElement(BaseObject[int]):
         has_local_value = local_data is not None and bitrix_code in local_data
         value = super().get_field_value(bitrix_code, bitrix_field=bitrix_field)
 
+        # Local writes have no response envelope. Confirmed ordinary writes
+        # are stored as scalar/list values and also pass through unchanged.
+        # A remote mapping is the PROPERTY_* envelope keyed by value IDs,
+        # not a standalone dictionary-valued property. A custom type accepting
+        # dictionary write values would need separate handling for that format.
         if has_local_value or not isinstance(value, Mapping):
             return value
 
@@ -203,7 +224,20 @@ class BaseListElement(BaseObject[int]):
         return client.lists.element.update
 
     def _get_update_params(self, updated_data: JSONDict) -> JSONDict:
-        """Build a full element payload while leaving existing files untouched."""
+        """Build a preservation payload for the list-element update endpoint.
+
+        Omitted ordinary properties may be cleared by Bitrix24, so complete
+        remote data is loaded before writable values are carried forward.
+        Response property-value IDs are removed from remote values directly,
+        without reading local changes through ``get_field_value()``. Only values
+        in ``updated_data`` override the preserved remote state, so selective
+        saves do not send unrelated local edits. Unchanged files are omitted
+        because their read metadata is not a valid upload payload.
+
+        A non-null undeclared ``PROPERTY_*`` value raises before sending the
+        update, since its writability and file semantics cannot be inferred.
+        The generic builder supplies the element key and fixed list context.
+        """
 
         bitrix_data = self._bitrix_data
 
@@ -235,14 +269,26 @@ class BaseListElement(BaseObject[int]):
             if is_not_writable:
                 continue
 
+            # Preserve remote files by omission; only explicit file writes below
+            # should be serialized into the update request.
             if isinstance(bitrix_field, FileField):
                 continue
 
             if bitrix_code.startswith("PROPERTY_") and isinstance(raw_value, Mapping):
-                fields[bitrix_code] = self.get_field_value(bitrix_code, bitrix_field=bitrix_field)
+                # Preserve the remote value, not a local edit excluded from
+                # update_fields. Mapping keys are response property-value IDs.
+                values = list(raw_value.values())
+
+                if bitrix_field.is_multiple:
+                    fields[bitrix_code] = values
+                elif len(values) > 1:
+                    raise ValueError(f"Single field {bitrix_code!r} returned multiple Bitrix24 property values.")
+                else:
+                    fields[bitrix_code] = values[0] if values else None
             else:
                 fields[bitrix_code] = raw_value
 
+        # Only explicitly supplied writes replace preserved remote values.
         fields.update(updated_data)
 
         return super()._get_update_params(fields)
@@ -279,7 +325,12 @@ class BaseListElement(BaseObject[int]):
             *,
             timeout: Timeout = None,
     ) -> List[Text]:
-        """Return absolute download URLs for one file property."""
+        """Return absolute API-provided links for opening a file property.
+
+        ``field_id`` is the numeric property ID, not a file ID or property-value
+        ID. Relative links are resolved against the current portal. This method
+        does not download content or populate a file schema's local cache.
+        """
 
         urls = self.client.lists.element.get.file.url(
             **self._meta.required_class_params,
@@ -299,6 +350,8 @@ class BaseListElementManager(BaseObjectManager[_BaseListElementT], Generic[_Base
     """Query and creation manager shared by all list-element types."""
 
     _ORDER_KEY = None
+    # lists.element.get supports pagination but has no ordering parameter.
+    _SUPPORTS_ORDER = False
 
     __slots__ = ()
 

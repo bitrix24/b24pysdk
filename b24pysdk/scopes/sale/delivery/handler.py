@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Handler(BaseEntity):
-    """"""
+    """Class for working with delivery service handlers in online stores.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sale/delivery/handler/index.html
+    """
 
     @type_checker
     def add(
@@ -26,7 +29,30 @@ class Handler(BaseEntity):
         description: Optional[Text] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add delivery service handler
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/delivery/handler/sale-delivery-handler-add.html
+
+        The method adds a delivery service handler.
+
+        Args:
+            code: Symbolic code of the delivery service handler;
+
+            name: Name of the delivery service handler;
+
+            settings: Object containing information about the settings of the delivery service handler;
+
+            profiles: Array containing a list of delivery profiles objects;
+
+            sort: Sorting;
+
+            description: Description of the delivery service handler;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "CODE": code,
@@ -60,7 +86,32 @@ class Handler(BaseEntity):
         profiles: Optional[JSONList] = MISSING,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update delivery service handler
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/delivery/handler/sale-delivery-handler-update.html
+
+        The method updates the delivery service handler.
+
+        Args:
+            bitrix_id: Identifier of the delivery service handler;
+
+            code: Symbolic code of the delivery service handler;
+
+            name: Name of the delivery service handler;
+
+            sort: Sorting;
+
+            description: Description of the delivery service handler;
+
+            settings: Object containing information about the settings of the delivery service handler;
+
+            profiles: Array containing a list of delivery profiles objects;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "ID": bitrix_id,
@@ -97,7 +148,20 @@ class Handler(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete delivery service handler
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/delivery/handler/sale-delivery-handler-delete.html
+
+        The method deletes the delivery service handler.
+
+        Args:
+            bitrix_id: Identifier of the delivery service;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "ID": bitrix_id,
@@ -115,7 +179,18 @@ class Handler(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get a list of delivery service handlers
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/delivery/handler/sale-delivery-handler-list.html
+
+        The method retrieves a list of delivery service handlers.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         return self._make_bitrix_api_request(
             api_wrapper=self.list,

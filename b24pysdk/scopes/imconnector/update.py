@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Update(BaseEntity):
-    """"""
+    """Class for modifying messages.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/imconnector/index.html
+    """
 
     @type_checker
     def messages(
@@ -22,7 +25,24 @@ class Update(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update sent messages
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/imconnector/imconnector-update-messages.html
+
+        The method updates the data of previously sent messages from an external system in an open line.
+
+        Args:
+            connector: The string code of the connector;
+
+            line: Identifier of the open line;
+
+            messages: An array of messages;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if messages.__class__ is not list:
             messages = list(messages)

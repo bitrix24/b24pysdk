@@ -20,7 +20,10 @@ __all__ = [
 
 
 class Lists(BaseScope):
-    """Methods for Bitrix24 universal lists."""
+    """Methods for Bitrix24 universal lists.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/lists/lists/index.html
+    """
 
     @cached_property
     def element(self) -> Element:
@@ -54,7 +57,30 @@ class Lists(BaseScope):
             rights: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIValueRequest[int, BaseList]:
-        """Create a universal list and adapt its identifier to a list object."""
+        """Create a universal list
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/lists/lists/lists-add.html
+
+        The method creates a universal list.
+
+        Args:
+            iblock_type_id: Identifier of the information block type;
+
+            iblock_code: Symbolic code of the information block;
+
+            fields: Array of list fields;
+
+            socnet_group_id: Group identifier;
+
+            messages: Array of labels for list items and sections;
+
+            rights: Access permission settings for the list;
+
+            timeout: Timeout in seconds.
+
+        Return:
+            Instance of BitrixAPIValueRequest
+        """
 
         params: JSONDict = {
             "IBLOCK_TYPE_ID": iblock_type_id,
@@ -92,7 +118,24 @@ class Lists(BaseScope):
             iblock_code: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """Delete a universal list by identifier or symbolic code."""
+        """Delete a universal list by identifier or symbolic code
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/lists/lists/lists-delete.html
+
+        The method removes a universal list.
+
+        Args:
+            iblock_type_id: Identifier of the information block type;
+
+            iblock_id: Identifier of the information block;
+
+            iblock_code: Symbolic code of the information block;
+
+            timeout: Timeout in seconds.
+
+        Return:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "IBLOCK_TYPE_ID": iblock_type_id,
@@ -123,7 +166,32 @@ class Lists(BaseScope):
             rights: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """Update a universal list by identifier or symbolic code."""
+        """Update a universal list
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/lists/lists/lists-update.html
+
+        The method updates the universal list.
+
+        Args:
+            iblock_type_id: Identifier of the information block type;
+
+            fields: Array of list fields;
+
+            iblock_id: Identifier of the information block;
+
+            iblock_code: Symbolic code of the information block;
+
+            socnet_group_id: Group identifier;
+
+            messages: Array of labels for list items and sections;
+
+            rights: Access permission settings for the list;
+
+            timeout: Timeout in seconds.
+
+        Return:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "IBLOCK_TYPE_ID": iblock_type_id,

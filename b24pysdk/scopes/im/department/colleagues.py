@@ -13,7 +13,10 @@ __all__ = [
 
 
 class Colleagues(BaseEntity):
-    """"""
+    """Class for retrieving information about colleagues.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chats/departments/index.html
+    """
 
     @type_checker
     def list(
@@ -24,7 +27,24 @@ class Colleagues(BaseEntity):
             limit: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[List[Union[int, JSONDict]]]:
-        """"""
+        """Get the list of colleagues for the current user
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/departments/im-department-colleagues-list.html
+
+        The method retrieves a list of colleagues for the current user.
+
+        Args:
+            user_data: Returned detailed user data;
+
+            offset: Offset for user selection;
+
+            limit: Number of items in the selection;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

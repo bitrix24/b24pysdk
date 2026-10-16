@@ -29,7 +29,10 @@ class _ListFieldsAdapter(BitrixObjectsAdapter[BaseListField]):
 
 
 class Field(BaseEntity):
-    """"""
+    """Class for working with universal list fields
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/lists/fields/index.html
+    """
 
     @cached_property
     def type(self) -> Type:
@@ -46,7 +49,26 @@ class Field(BaseEntity):
             iblock_code: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIValueRequest[Text, BaseListField]:
-        """"""
+        """Create a field for universal list
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/lists/fields/lists-field-add.html
+
+        The method creates a list field.
+
+        Args:
+            iblock_type_id: Information block type ID;
+
+            fields: Array of parameters;
+
+            iblock_id: Identifier of the information block;
+
+            iblock_code: Symbolic code of the information block;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "IBLOCK_TYPE_ID": iblock_type_id,
@@ -87,7 +109,26 @@ class Field(BaseEntity):
             field_id: Union[Text, Iterable[Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIValuesRequest[JSONDict, BaseListField]:
-        """"""
+        """Get field parameters
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/lists/fields/lists-field-get.html
+
+        The method returns a list about a field or a list of fields.
+
+        Args:
+            iblock_type_id: Information block type ID;
+
+            iblock_id: Identifier of the information block;
+
+            iblock_code: Symbolic code of the information block;
+
+            field_id: Identifier of the field;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "IBLOCK_TYPE_ID": iblock_type_id,
@@ -131,7 +172,28 @@ class Field(BaseEntity):
             iblock_code: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Update the universal list field
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/lists/fields/lists-field-update.html
+
+        The method updates a list field.
+
+        Args:
+            iblock_type_id: Information block type ID;
+
+            field_id: Identifier of the field;
+
+            fields: Array of parameters;
+
+            iblock_id: Identifier of the information block;
+
+            iblock_code: Symbolic code of the information block;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "IBLOCK_TYPE_ID": iblock_type_id,
@@ -164,7 +226,26 @@ class Field(BaseEntity):
             iblock_code: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Delete field from universal list
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/lists/fields/lists-field-delete.html
+
+        The method removes a field from the list.
+
+        Args:
+            iblock_type_id: Information block type ID;
+
+            field_id: Identifier of the field;
+
+            iblock_id: Identifier of the information block;
+
+            iblock_code: Symbolic code of the information block;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "IBLOCK_TYPE_ID": iblock_type_id,

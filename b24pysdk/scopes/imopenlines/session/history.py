@@ -12,7 +12,10 @@ __all__ = [
 
 
 class History(BaseEntity):
-    """"""
+    """Class for retrieving message history and session data.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/index.html
+    """
 
     @type_checker
     def get(
@@ -22,7 +25,22 @@ class History(BaseEntity):
             session_id: Optional[Union[int, Text]] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get message history of the dialogue
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/sessions/imopenlines-session-history-get.html
+
+        The method returns the message history of an open line session.
+
+        Args:
+            chat_id: Identifier of the open line chat;
+
+            session_id: Identifier of the open line session;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

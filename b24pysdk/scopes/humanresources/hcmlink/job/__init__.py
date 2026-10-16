@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Job(BaseEntity):
-    """"""
+    """Class for working with job synchronization.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sign/hcm-link/index.html
+    """
 
     @cached_property
     def status(self) -> Status:
@@ -27,7 +30,22 @@ class Job(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Update HCM link job
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sign/hcm-link/humanresources-hcmlink-job-update.html
+
+        The method updates an HCM link synchronization job.
+
+        Args:
+            bitrix_id: Synchronization job ID;
+
+            fields: Job data;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

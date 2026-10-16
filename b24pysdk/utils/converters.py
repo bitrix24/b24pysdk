@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 import typing
 import zoneinfo
 
@@ -135,12 +135,12 @@ def bool_to_bitrix(
     raise ValueError(f"Cannot convert Python value to Bitrix24 bool: {value!r}")
 
 @typing.overload
-def datetime_from_bitrix(value: typing.Text, /, *, is_required: typing.Literal[True]) -> datetime.datetime: ...
+def datetime_from_bitrix(value: typing.Text, /, *, is_required: typing.Literal[True]) -> dt.datetime: ...
 
 @typing.overload
-def datetime_from_bitrix(value: typing.Optional[typing.Text], /, *, is_required: typing.Literal[False] = False) -> typing.Optional[datetime.datetime]: ...
+def datetime_from_bitrix(value: typing.Optional[typing.Text], /, *, is_required: typing.Literal[False] = False) -> typing.Optional[dt.datetime]: ...
 
-def datetime_from_bitrix(value: typing.Optional[typing.Text], /, *, is_required: bool = False) -> typing.Optional[datetime.datetime]:
+def datetime_from_bitrix(value: typing.Optional[typing.Text], /, *, is_required: bool = False) -> typing.Optional[dt.datetime]:
     """
     Convert a Bitrix24 datetime value to Python ``datetime``.
 
@@ -165,19 +165,19 @@ def datetime_from_bitrix(value: typing.Optional[typing.Text], /, *, is_required:
 
     if isinstance(value, str):
         try:
-            return datetime.datetime.fromisoformat(value)
+            return dt.datetime.fromisoformat(value)
         except ValueError:
             return _parse_dt(value, dayfirst=True)
 
     raise ValueError(f"Cannot convert Bitrix24 value to datetime: {value!r}")
 
 @typing.overload
-def date_from_bitrix(value: typing.Text, /, *, is_required: typing.Literal[True]) -> datetime.date: ...
+def date_from_bitrix(value: typing.Text, /, *, is_required: typing.Literal[True]) -> dt.date: ...
 
 @typing.overload
-def date_from_bitrix(value: typing.Optional[typing.Text], /, *, is_required: typing.Literal[False] = False) -> typing.Optional[datetime.date]: ...
+def date_from_bitrix(value: typing.Optional[typing.Text], /, *, is_required: typing.Literal[False] = False) -> typing.Optional[dt.date]: ...
 
-def date_from_bitrix(value: typing.Optional[typing.Text], /, *, is_required: bool = False) -> typing.Optional[datetime.date]:
+def date_from_bitrix(value: typing.Optional[typing.Text], /, *, is_required: bool = False) -> typing.Optional[dt.date]:
     """
     Convert a Bitrix24 date value to Python ``date``.
 
@@ -202,19 +202,19 @@ def date_from_bitrix(value: typing.Optional[typing.Text], /, *, is_required: boo
 
     if isinstance(value, str):
         try:
-            return datetime.date.fromisoformat(value[:10])
+            return dt.date.fromisoformat(value[:10])
         except ValueError:
             return _parse_dt(value, dayfirst=True).date()
 
     raise ValueError(f"Cannot convert Bitrix24 value to date: {value!r}")
 
 @typing.overload
-def date_to_bitrix(value: datetime.date, /, *, is_required: typing.Literal[True]) -> typing.Text: ...
+def date_to_bitrix(value: dt.date, /, *, is_required: typing.Literal[True]) -> typing.Text: ...
 
 @typing.overload
-def date_to_bitrix(value: typing.Optional[datetime.date], /, *, is_required: typing.Literal[False] = False) -> typing.Optional[typing.Text]: ...
+def date_to_bitrix(value: typing.Optional[dt.date], /, *, is_required: typing.Literal[False] = False) -> typing.Optional[typing.Text]: ...
 
-def date_to_bitrix(value: typing.Optional[datetime.date], /, *, is_required: bool = False) -> typing.Optional[typing.Text]:
+def date_to_bitrix(value: typing.Optional[dt.date], /, *, is_required: bool = False) -> typing.Optional[typing.Text]:
     """
     Convert a Python ``date`` value to Bitrix24 date value.
 
@@ -237,21 +237,21 @@ def date_to_bitrix(value: typing.Optional[datetime.date], /, *, is_required: boo
 
         raise ValueError(f"Cannot convert empty Python value to Bitrix24 date: {value!r}")
 
-    if isinstance(value, datetime.datetime):
+    if isinstance(value, dt.datetime):
         return value.date().isoformat()
 
-    if isinstance(value, datetime.date):
+    if isinstance(value, dt.date):
         return value.isoformat()
 
     raise ValueError(f"Cannot convert Python value to Bitrix24 date: {value!r}")
 
 @typing.overload
-def datetime_to_bitrix(value: datetime.datetime, /, *, is_required: typing.Literal[True]) -> typing.Text: ...
+def datetime_to_bitrix(value: dt.datetime, /, *, is_required: typing.Literal[True]) -> typing.Text: ...
 
 @typing.overload
-def datetime_to_bitrix(value: typing.Optional[datetime.datetime], /, *, is_required: typing.Literal[False] = False) -> typing.Optional[typing.Text]: ...
+def datetime_to_bitrix(value: typing.Optional[dt.datetime], /, *, is_required: typing.Literal[False] = False) -> typing.Optional[typing.Text]: ...
 
-def datetime_to_bitrix(value: typing.Optional[datetime.datetime], /, *, is_required: bool = False) -> typing.Optional[typing.Text]:
+def datetime_to_bitrix(value: typing.Optional[dt.datetime], /, *, is_required: bool = False) -> typing.Optional[typing.Text]:
     """
     Convert a Python ``datetime`` value to Bitrix24 datetime value.
 
@@ -274,7 +274,7 @@ def datetime_to_bitrix(value: typing.Optional[datetime.datetime], /, *, is_requi
 
         raise ValueError(f"Cannot convert empty Python value to Bitrix24 datetime: {value!r}")
 
-    if isinstance(value, datetime.datetime):
+    if isinstance(value, dt.datetime):
         return value.isoformat(timespec="seconds")
 
     raise ValueError(f"Cannot convert Python value to Bitrix24 datetime: {value!r}")
@@ -524,14 +524,15 @@ def text_from_bitrix(value: typing.Optional[typing.Text], /, *, is_required: boo
 
     Args:
         value: Bitrix24 text value.
-        is_required: Whether empty values should be treated as an error.
+        is_required: Whether ``None`` should be treated as an error. Empty
+            strings are valid regardless of this flag.
 
     Returns:
-        Python ``str`` instance, or ``None`` when ``is_required`` is False
-        and the input value is empty.
+        The input string unchanged, including an empty string. Returns ``None``
+        when ``is_required`` is False and the input value is ``None``.
 
     Raises:
-        ValueError: If the value is required but empty, or cannot be converted
+        ValueError: If the value is required but ``None``, or cannot be converted
             to ``str``.
     """
 
@@ -558,15 +559,15 @@ def text_to_bitrix(value: typing.Optional[typing.Text], /, *, is_required: bool 
 
     Args:
         value: Python text value.
-        is_required: Whether ``None`` or an empty string should be treated as an
-            error.
+        is_required: Whether ``None`` should be treated as an error. Empty
+            strings are valid regardless of this flag.
 
     Returns:
-        Bitrix24 text value. Returns ``None`` when ``is_required`` is False
-        and the input value is empty.
+        The input string unchanged, including an empty string. Returns ``None``
+        when ``is_required`` is False and the input value is ``None``.
 
     Raises:
-        ValueError: If the value is required but empty, or cannot be converted
+        ValueError: If the value is required but ``None``, or cannot be converted
             to Bitrix24 text.
     """
 
@@ -582,12 +583,12 @@ def text_to_bitrix(value: typing.Optional[typing.Text], /, *, is_required: bool 
     raise ValueError(f"Cannot convert Python value to Bitrix24 text: {value!r}")
 
 @typing.overload
-def time_from_bitrix(value: typing.Text, /, *, is_required: typing.Literal[True]) -> datetime.time: ...
+def time_from_bitrix(value: typing.Text, /, *, is_required: typing.Literal[True]) -> dt.time: ...
 
 @typing.overload
-def time_from_bitrix(value: typing.Optional[typing.Text], /, *, is_required: typing.Literal[False] = False) -> typing.Optional[datetime.time]: ...
+def time_from_bitrix(value: typing.Optional[typing.Text], /, *, is_required: typing.Literal[False] = False) -> typing.Optional[dt.time]: ...
 
-def time_from_bitrix(value: typing.Optional[typing.Text], /, *, is_required: bool = False) -> typing.Optional[datetime.time]:
+def time_from_bitrix(value: typing.Optional[typing.Text], /, *, is_required: bool = False) -> typing.Optional[dt.time]:
     """
     Convert a Bitrix24 time value to Python ``time``.
 
@@ -612,19 +613,19 @@ def time_from_bitrix(value: typing.Optional[typing.Text], /, *, is_required: boo
 
     if isinstance(value, str):
         try:
-            return datetime.time.fromisoformat(value)
+            return dt.time.fromisoformat(value)
         except ValueError:
             return _parse_dt(value, dayfirst=True).time()
 
     raise ValueError(f"Cannot convert Bitrix24 value to time: {value!r}")
 
 @typing.overload
-def time_to_bitrix(value: datetime.time, /, *, is_required: typing.Literal[True]) -> typing.Text: ...
+def time_to_bitrix(value: dt.time, /, *, is_required: typing.Literal[True]) -> typing.Text: ...
 
 @typing.overload
-def time_to_bitrix(value: typing.Optional[datetime.time], /, *, is_required: typing.Literal[False] = False) -> typing.Optional[typing.Text]: ...
+def time_to_bitrix(value: typing.Optional[dt.time], /, *, is_required: typing.Literal[False] = False) -> typing.Optional[typing.Text]: ...
 
-def time_to_bitrix(value: typing.Optional[datetime.time], /, *, is_required: bool = False) -> typing.Optional[typing.Text]:
+def time_to_bitrix(value: typing.Optional[dt.time], /, *, is_required: bool = False) -> typing.Optional[typing.Text]:
     """
     Convert a Python ``time`` value to Bitrix24 time value.
 
@@ -633,7 +634,8 @@ def time_to_bitrix(value: typing.Optional[datetime.time], /, *, is_required: boo
         is_required: Whether ``None`` should be treated as an error.
 
     Returns:
-        Bitrix24 time value with seconds precision. Returns ``None`` when
+        Bitrix24 time value with seconds precision; microseconds are omitted.
+        An existing UTC offset is retained. Returns ``None`` when
         ``is_required`` is False and the input value is ``None``.
 
     Raises:
@@ -647,8 +649,8 @@ def time_to_bitrix(value: typing.Optional[datetime.time], /, *, is_required: boo
 
         raise ValueError(f"Cannot convert empty Python value to Bitrix24 time: {value!r}")
 
-    if isinstance(value, datetime.time):
-        return value.isoformat(timespec="minutes")
+    if isinstance(value, dt.time):
+        return value.isoformat(timespec="seconds")
 
     raise ValueError(f"Cannot convert Python value to Bitrix24 time: {value!r}")
 

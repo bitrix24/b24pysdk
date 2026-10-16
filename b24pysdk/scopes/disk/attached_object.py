@@ -2,7 +2,7 @@ from typing import Text
 
 from ...api.requests import BitrixAPIRequest
 from ...utils.functional import classproperty, type_checker
-from ...utils.types import Timeout
+from ...utils.types import JSONDict, Timeout
 from .._base_entity import BaseEntity
 
 __all__ = [
@@ -42,7 +42,7 @@ class AttachedObject(BaseEntity):
             Instance of BitrixAPIRequest.
         """
 
-        params = {
+        params: JSONDict = {
             "id": bitrix_id,
         }
 

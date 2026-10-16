@@ -77,14 +77,15 @@ class BaseRequester(ABC):
             initial_retry_delay: Delay before the first retry. Falsy values fall
                 back to the global SDK default initial retry delay.
             retry_delay_increment: Additional delay added after each used retry.
-                Falsy values fall back to the global SDK default increment.
+                None uses the global SDK default increment. Zero keeps the
+                delay constant across retries.
         """
         self._config = Config()
         self._timeout = timeout or self._config.default_timeout
         self._max_retries = max_retries or self._config.default_max_retries
         self._retries_remaining = self._max_retries
         self._initial_retry_delay = initial_retry_delay or self._config.default_initial_retry_delay
-        self._retry_delay_increment = retry_delay_increment or self._config.default_retry_delay_increment
+        self._retry_delay_increment = self._config.default_retry_delay_increment if retry_delay_increment is None else retry_delay_increment
 
     @property
     def _headers(self) -> Dict:

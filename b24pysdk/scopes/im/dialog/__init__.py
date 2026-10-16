@@ -15,7 +15,10 @@ __all__ = [
 
 
 class Dialog(BaseEntity):
-    """"""
+    """Class for working with dialogs.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chats/index.html
+    """
 
     @cached_property
     def messages(self) -> Messages:
@@ -39,7 +42,20 @@ class Dialog(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """"""
+        """Get chat data
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/im-dialog-get.html
+
+        The method retrieves information about a chat.
+
+        Args:
+            dialog_id: Chat identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             DIALOG_ID=dialog_id,
@@ -59,7 +75,22 @@ class Dialog(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Set the 'unread' flag for messages
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/messages/im-dialog-unread.html
+
+        The method sets the 'unread' flag for messages in a dialog starting from the specified message.
+
+        Args:
+            dialog_id: Chat identifier;
+
+            message_id: Identifier of the first unread message;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             DIALOG_ID=dialog_id,
@@ -79,7 +110,20 @@ class Dialog(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Send 'User is typing' indicator
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/messages/im-dialog-writing.html
+
+        The method sends a 'User is typing' indicator to the chat.
+
+        Args:
+            dialog_id: Chat identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             DIALOG_ID=dialog_id,

@@ -44,7 +44,7 @@ flask = [
 ]
 dev = [
     "pre-commit",
-    "ruff==0.16.8",
+    "ruff==0.17.1",
 ]
 test = [
     "environs>=11.0.0",

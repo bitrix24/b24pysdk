@@ -19,7 +19,10 @@ __all__ = [
 
 
 class Notify(BaseEntity):
-    """"""
+    """Class for managing chat notifications.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chats/notifications/index.html
+    """
 
     @cached_property
     def personal(self) -> Personal:
@@ -57,9 +60,37 @@ class Notify(BaseEntity):
             tag: Optional[Text] = MISSING,
             sub_tag: Optional[Text] = MISSING,
             attach: Optional[Union[JSONDict, Text]] = MISSING,
+            client_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[Union[int, bool]]:
-        """"""
+        """Send notification
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/notifications/im-notify.html
+
+        The method sends a notification to a user.
+
+        Args:
+            user_id: User identifier;
+
+            message: The text of notification;
+
+            type: The type of notification;
+
+            message_out: The text of notification for external channels;
+
+            tag: A unique tag for the notification within the application;
+
+            sub_tag: An additional notification tag without uniqueness checks;
+
+            attach: An attachment for the notification in object format or JSON string;
+
+            client_id: The application identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
             "USER_ID": user_id,
@@ -81,6 +112,9 @@ class Notify(BaseEntity):
         if attach is not MISSING:
             params["ATTACH"] = attach
 
+        if client_id is not MISSING:
+            params["CLIENT_ID"] = client_id
+
         return self._make_bitrix_api_request(
             api_wrapper=self,
             params=params,
@@ -90,15 +124,30 @@ class Notify(BaseEntity):
     @type_checker
     def answer(
             self,
-            bitrix_id: int,
+            notify_id: int,
             answer_text: Text,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """"""
+        """Responding to notifications with quick response
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/notifications/im-notify-answer.html
+
+        The method sends a text quick response to a notification.
+
+        Args:
+            notify_id: The identifier of the notification that supports a quick response;
+
+            answer_text: The text of the quick response;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
-            "ID": bitrix_id,
+            "NOTIFY_ID": notify_id,
             "ANSWER_TEXT": answer_text,
         }
 
@@ -111,15 +160,30 @@ class Notify(BaseEntity):
     @type_checker
     def confirm(
             self,
-            bitrix_id: int,
+            notify_id: int,
             notify_value: bool,
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """"""
+        """Interacting with notification buttons
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/notifications/im-notify-confirm.html
+
+        The method sends the selected value of the notification button.
+
+        Args:
+            notify_id: The identifier of the notification that supports a quick response;
+
+            notify_value: Value of the selected button;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = {
-            "ID": bitrix_id,
+            "NOTIFY_ID": notify_id,
             "NOTIFY_VALUE": bool_to_bitrix(notify_value, is_required=True),
         }
 
@@ -139,7 +203,26 @@ class Notify(BaseEntity):
             client_id: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Delete notification
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/notifications/im-notify-delete.html
+
+        The method removes a notification by ID or by tags.
+
+        Args:
+            bitrix_id: Identifier of the notification to be deleted;
+
+            tag: Unique tag of the notification within the application;
+
+            sub_tag: Additional tag of the notification;
+
+            client_id: This parameter is required only for webhooks;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -171,7 +254,26 @@ class Notify(BaseEntity):
             convert_text: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """"""
+        """Get notifications
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/notifications/im-notify-get.html
+
+        The method returns a list of users notifications in parts.
+
+        Args:
+            last_id: Identifier of the last notification from the previous page to load the next one;
+
+            last_type: Technical pagination cursor;
+
+            limit: Number of notifications per page;
+
+            convert_text: Convert notification text;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

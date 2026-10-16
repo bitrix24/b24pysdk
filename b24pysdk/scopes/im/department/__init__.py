@@ -17,7 +17,10 @@ __all__ = [
 
 
 class Department(BaseEntity):
-    """"""
+    """Class for retrieving information about departments.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chats/departments/index.html
+    """
 
     @cached_property
     def colleagues(self) -> Colleagues:
@@ -42,7 +45,22 @@ class Department(BaseEntity):
             user_data: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONList]:
-        """"""
+        """Get information about the department
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/departments/im-department-get.html
+
+        The method retrieves data about departments by their identifiers.
+
+        Args:
+            bitrix_id: An array of department identifiers;
+
+            user_data: Return data about the department head;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if bitrix_id.__class__ is not list:
             bitrix_id = list(bitrix_id)

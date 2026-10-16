@@ -13,7 +13,10 @@ __all__ = [
 
 
 class File(BaseEntity):
-    """Methods for file properties of Bitrix24 list elements."""
+    """Methods for file properties of Bitrix24 list elements.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/lists/elements/index.html
+    """
 
     @type_checker
     def url(
@@ -27,7 +30,30 @@ class File(BaseEntity):
             element_code: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[List[Text]]:
-        """Return download paths for one element file property."""
+        """Get file path
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/lists/elements/lists-element-get-file-url.html
+
+        The method returns the file path.
+
+        Args:
+            iblock_type_id: Identifier of the information block type;
+
+            field_id: Identifier of the File or File (Drive) property;
+
+            iblock_id: Identifier of the information block;
+
+            iblock_code: Symbolic code of the information block;
+
+            element_id: Identifier of the element;
+
+            element_code: Symbolic code of the element;
+
+            timeout: Timeout in seconds.
+
+        Return:
+            Instance of BitrixAPIRequest
+        """
 
         if iblock_id is MISSING and iblock_code is MISSING:
             raise ValueError("Pass iblock_id or iblock_code.")

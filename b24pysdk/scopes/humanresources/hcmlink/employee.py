@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Employee(BaseEntity):
-    """"""
+    """Class for retrieving employees from HR systems and Bitrix24.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sign/hcm-link/index.html
+    """
 
     @type_checker
     def list(
@@ -24,7 +27,26 @@ class Employee(BaseEntity):
             updated_at: Text = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONList]:
-        """"""
+        """Get mapped HCM link employee list
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sign/hcm-link/humanresources-hcmlink-employee-list.html
+
+        The method retrieves a list of mapped employees from the HR system and Bitrix24.
+
+        Args:
+            company: Company code in the HR system;
+
+            limit: Number of records per page;
+
+            offset: Offset for page navigation;
+
+            updated_at: Modification date in ISO 8601 format;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "company": company,
@@ -54,7 +76,24 @@ class Employee(BaseEntity):
             job: JSONDict = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """"""
+        """Transfer HCM link employee list
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sign/hcm-link/humanresources-hcmlink-employee-set.html
+
+        The method transfers a list of employees from an HR systemto the HCM link integration.
+
+        Args:
+            company: Company code in the HR system;
+
+            data: List of employees from the HR system;
+
+            job: Data for updating the synchronization job;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if data.__class__ is not list:
             data = list(data)

@@ -13,7 +13,10 @@ __all__ = [
 
 
 class Company(BaseEntity):
-    """"""
+    """Class for managing companies from HR systems.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sign/hcm-link/index.html
+    """
 
     @cached_property
     def user(self) -> User:
@@ -27,7 +30,20 @@ class Company(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[int]:
-        """"""
+        """Add HCM link company
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sign/hcm-link/humanresources-hcmlink-company-add.html
+
+        The method adds a company from an HR system to the HCM link integration.
+
+        Args:
+            fields: Company data from the HR system;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "fields": fields,
@@ -46,7 +62,20 @@ class Company(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Delete HCM link company
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sign/hcm-link/humanresources-hcmlink-company-delete.html
+
+        The method deletes a company from the HCM link integration.
+
+        Args:
+            bitrix_id: HCM link company ID;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,
@@ -67,7 +96,24 @@ class Company(BaseEntity):
             user_id: int = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONList]:
-        """"""
+        """Get HCM link company list
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sign/hcm-link/humanresources-hcmlink-company-list.html
+
+        The method retrieves a list of companies connected to the HCM link integration.
+
+        Args:
+            limit: Number of records per page;
+
+            offset: Offset for page navigation;
+
+            user_id: Bitrix24 user ID;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -94,7 +140,22 @@ class Company(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Update HCM link company
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sign/hcm-link/humanresources-hcmlink-company-update.html
+
+        The method updates a company from an HR system and the list of its fields in the HCM link integration.
+
+        Args:
+            bitrix_id: HCM link company ID;
+
+            fields: New company data from the HR system;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

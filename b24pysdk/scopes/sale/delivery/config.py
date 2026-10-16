@@ -9,7 +9,10 @@ __all__ = [
 
 
 class Config(BaseEntity):
-    """"""
+    """Class for managing delivery service settings.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sale/delivery/delivery/index.html
+    """
 
     @type_checker
     def update(
@@ -19,7 +22,22 @@ class Config(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update delivery service settings
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/delivery/delivery/sale-delivery-config-update.html
+
+        The method updates the delivery service settings.
+
+        Args:
+            bitrix_id: Identifier of the delivery service;
+
+            config: Values of the delivery service settings;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "ID": bitrix_id,
@@ -39,7 +57,20 @@ class Config(BaseEntity):
         *,
         timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get delivery service settings
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sale/delivery/delivery/sale-delivery-config-get.html
+
+        The method retrieves the settings of the delivery service.
+
+        Args:
+            bitrix_id: Identifier of the delivery service;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "ID": bitrix_id,

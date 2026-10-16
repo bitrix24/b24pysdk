@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Bot(BaseEntity):
-    """"""
+    """Class for managing lifecycle of a chatbot.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/bots/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -28,7 +31,24 @@ class Bot(BaseEntity):
             bot_token: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get information about the bot
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/bots/bot-get.html
+
+        The method returns information about the bot.
+
+        Args:
+            bot_id: Bot ID;
+
+            code: Bot code;
+
+            bot_token: Unique authorization bot token;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -57,7 +77,26 @@ class Bot(BaseEntity):
             offset: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """List of application bots
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/bots/bot-list.html
+
+        The method returns a list of bots for the current application in an extended format.
+
+        Args:
+            bot_token: Unique authorization bot token;
+
+            filter: Parameter for filtering;
+
+            limit: Number of records;
+
+            offset: Offset for pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 
@@ -86,7 +125,20 @@ class Bot(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Register a bot
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/bots/bot-register.html
+
+        The method register a new chat bot.
+
+        Args:
+            fields: Object with bot parameters;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "fields": fields,
@@ -106,7 +158,22 @@ class Bot(BaseEntity):
             bot_token: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Unregister a bot
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/bots/bot-unregister.html
+
+        The method deletes the bot.
+
+        Args:
+            bot_id: Bor ID;
+
+            bot_token: Unique authorization bot token;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "botId": bot_id,
@@ -130,7 +197,24 @@ class Bot(BaseEntity):
             bot_token: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update a bot
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/bots/bot-update.html
+
+        The method updates the properties of the bot.
+
+        Args:
+            bot_id: Bor ID;
+
+            fields: Object with bot parameters to be updated;
+
+            bot_token: Unique authorization bot token;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "botId": bot_id,

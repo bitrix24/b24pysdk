@@ -13,7 +13,10 @@ __all__ = [
 
 
 class File(BaseEntity):
-    """"""
+    """Class managing files in knowledge base.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/note/file/index.html
+    """
 
     @cached_property
     def field(self) -> Field:
@@ -29,7 +32,24 @@ class File(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Upload a file to document
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/note/file/note-file-add.html
+
+        The method uploads a file to a document and returns a file object.
+
+        Args:
+            document_id: Identifier of the document to which the file should be attached;
+
+            file_name: File name with extension;
+
+            file_content: Binary file content in Base64 encoding;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "documentId": document_id,
@@ -51,7 +71,22 @@ class File(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get document file data
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/note/file/note-file-get.html
+
+        The method returns file metadata and ready-to-use Markdown block to insert the attachment into a document.
+
+        Args:
+            bitrix_id: File identifier;
+
+            document_id: Document identifier to which the file is attached;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

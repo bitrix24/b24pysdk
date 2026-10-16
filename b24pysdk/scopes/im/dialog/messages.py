@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Messages(BaseEntity):
-    """"""
+    """Class for retrieving messages.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chats/messages/index.html
+    """
 
     @type_checker
     def get(
@@ -24,7 +27,26 @@ class Messages(BaseEntity):
             limit: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """"""
+        """Retrieve a list of recent messages
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/messages/im-dialog-messages-get.html
+
+        The method retrieves messages from the specified conversation, including system messages.
+
+        Args:
+            dialog_id: Chat identifier;
+
+            last_id: Message identifier relative to which older messages should be loaded;
+
+            first_id: Message identifier relative to which newer messages should be loaded;
+
+            limit: Limit on the number of messages in the response;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             DIALOG_ID=dialog_id,
@@ -59,7 +81,34 @@ class Messages(BaseEntity):
             last_id: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """"""
+        """Find message in chat
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/messages/im-dialog-messages-search.html
+
+        The method performs a search for messages in the chat.
+
+        Args:
+            chat_id: Chat identifier;
+
+            search_message: Search string for the message text;
+
+            date_from: Start of the search period in ISO 8601 format;
+
+            date_to: End of the search period in ISO 8601 format;
+
+            date: Search for messages on a specific date in ISO 8601 format;
+
+            order: Sorting parameters;
+
+            limit: Number of messages returned;
+
+            last_id: Identifier of the last message from the previous selection for pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "CHAT_ID": chat_id,

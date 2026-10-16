@@ -9,7 +9,10 @@ __all__ = [
 
 
 class Status(BaseEntity):
-    """"""
+    """Class for checking activity of job synchronization.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sign/hcm-link/index.html
+    """
 
     @type_checker
     def get(
@@ -18,7 +21,20 @@ class Status(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """"""
+        """Get HCM link job Status
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sign/hcm-link/humanresources-hcmlink-job-status-get.html
+
+        The method checks whether an HCM link synchronization job is active.
+
+        Args:
+            bitrix_id: Synchronization job ID;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

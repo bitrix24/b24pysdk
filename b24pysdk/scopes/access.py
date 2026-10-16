@@ -13,7 +13,10 @@ __all__ = [
 
 
 class Access(BaseScope):
-    """"""
+    """CLass for retrieving names of access codes.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/common/system/index.html
+    """
 
     @type_checker
     def name(
@@ -22,7 +25,20 @@ class Access(BaseScope):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIValueRequest[AccessNamesData, AccessNamesDict]:
-        """"""
+        """Get access permission names
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/common/system/access-name.html
+
+        The  method retrieves the names of access permissions.
+
+        Args:
+            access: List of access codes for which names need to be retrieved;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if access.__class__ is not list:
             access = list(access)

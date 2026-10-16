@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Userfieldtype(BaseScope):
-    """"""
+    """Class for managing an application's own custom field types.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/widgets/user-field/index.html
+    """
 
     @type_checker
     def add(
@@ -25,7 +28,28 @@ class Userfieldtype(BaseScope):
             options: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Register a new user fields type
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/widgets/user-field/userfieldtype-add.html
+
+        The method registers a new type of user fields.
+
+        Args:
+            user_type_id: String type code;
+
+            handler: Custom type handler address;
+
+            title: Textual type name;
+
+            description: Textual type description;
+
+            options: Additional settings;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "USER_TYPE_ID": user_type_id,
@@ -54,7 +78,20 @@ class Userfieldtype(BaseScope):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Delete registered user field type
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/widgets/user-field/userfieldtype-delete.html
+
+        The method removes a user field type registered by the application.
+
+        Args:
+            user_type_id: String code of the type;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "USER_TYPE_ID": user_type_id,
@@ -73,7 +110,20 @@ class Userfieldtype(BaseScope):
             start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONDict]:
-        """"""
+        """Get a list of registered user field types
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/widgets/user-field/userfieldtype-list.html
+
+        The method retrieves a list of user fields types registered by the application.
+
+        Args:
+            start: Offset for pagination;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
         params: JSONDict = {}
 
         if start is not MISSING:
@@ -96,7 +146,28 @@ class Userfieldtype(BaseScope):
             options: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Change settings for user field type
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/widgets/user-field/userfieldtype-update.html
+
+        The method modifies settings of a user field type previously registered by the application.
+
+        Args:
+            user_type_id: String type code;
+
+            handler: Custom type handler address;
+
+            title: Textual type name;
+
+            description: Textual type description;
+
+            options: Additional settings;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "USER_TYPE_ID": user_type_id,

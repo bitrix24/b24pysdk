@@ -19,9 +19,10 @@ class B24APIBatchResult:
     Result payload of a Bitrix24 batch response.
 
     Stores per-command batch results, errors, pagination metadata, and timing
-    data. The collection shape follows the original batch request shape:
-    mapping requests produce mapping results, while sequence requests produce
-    list results.
+    data. Each section retains the dictionary or list shape supplied by the
+    API caller. Do not infer its shape solely from the request collection:
+    ``call_batches()`` normalizes sections to dictionaries when it combines
+    multiple physical batches, including for a sequence of input commands.
     """
 
     result: Union[Dict[Text, B24APIResult], List[B24APIResult]]

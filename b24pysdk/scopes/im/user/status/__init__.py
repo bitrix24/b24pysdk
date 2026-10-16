@@ -13,7 +13,10 @@ __all__ = [
 
 
 class Status(BaseEntity):
-    """"""
+    """Class for managing user's chat status.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chats/users/index.html
+    """
 
     @cached_property
     def idle(self) -> Idle:
@@ -26,7 +29,18 @@ class Status(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[Union[Text, bool]]:
-        """"""
+        """Get user status
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/users/im-user-status-get.html
+
+        The method returns the status of the current user.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         return self._make_bitrix_api_request(
             api_wrapper=self.get,
@@ -40,7 +54,20 @@ class Status(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Set user status
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/users/im-user-status-set.html
+
+        The method sets current user's status.
+
+        Args:
+            status: The new status of the user;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             STATUS=status,

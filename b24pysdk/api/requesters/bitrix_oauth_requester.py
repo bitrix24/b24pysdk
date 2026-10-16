@@ -1,3 +1,4 @@
+import re
 from typing import Any, Dict, Final, Optional, Text
 
 import requests
@@ -173,6 +174,22 @@ class BitrixOAuthRequester(BaseRequester):
             return value
 
         return self._mask_sensitive_value(value)
+
+    def _get_url_for_log(self, url: Text) -> Text:
+        """Mask sensitive OAuth query parameters when secure logging is enabled."""
+
+        if not self._config.secure_log:
+            return url
+
+        return re.sub(
+            r"([?&])([^=&#]+)=([^&#]*)",
+            lambda match: (
+                f"{match[1]}{match[2]}={self._MASKED_VALUE}"
+                if match[2].lower() in self._SENSITIVE_LOG_KEYS
+                else match[0]
+            ),
+            url,
+        )
 
     def _get_oauth_for_log(self) -> JSONDict:
         """Return OAuth app credentials prepared for logging."""

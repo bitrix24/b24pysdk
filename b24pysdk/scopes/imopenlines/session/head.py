@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Head(BaseEntity):
-    """"""
+    """Class for saving supervisor's evaluation for the completed session.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/index.html
+    """
 
     @type_checker
     def vote(
@@ -23,7 +26,24 @@ class Head(BaseEntity):
             comment: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Rate employee performance in the dialog
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/sessions/imopenlines-session-head-vote.html
+
+        The method saves the manager's reting and comment for a completed dialog.
+
+        Args:
+            session_id: Session identifier;
+
+            rating: Manager's rating;
+
+            comment: Manager's comment on the rating;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if rating is MISSING and comment is MISSING:
             raise ValueError("Either rating or comment must be provided.")

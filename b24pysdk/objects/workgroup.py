@@ -103,7 +103,12 @@ class Workgroup(BaseObject[int]):
 
     @classmethod
     def _normalize_bitrix_data(cls, bitrix_data: JSONDict, /) -> JSONDict:
-        """Normalize workgroup responses to registered Bitrix24 field codes."""
+        """Normalize camelCase keys and API aliases to descriptor field codes.
+
+        A fresh top-level mapping is returned; nested values remain shared.
+        Already canonical codes pass through unchanged, allowing normalization
+        at both PK extraction and object-data installation.
+        """
         return {
             _BITRIX_DATA_FIELD_ALIASES.get(field_name, camel_to_upper(field_name)): value
             for field_name, value in bitrix_data.items()

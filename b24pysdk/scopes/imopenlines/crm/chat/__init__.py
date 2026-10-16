@@ -15,7 +15,10 @@ __all__ = [
 
 
 class Chat(BaseEntity):
-    """"""
+    """Class for managing CRM object chats.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/chats/index.html
+    """
 
     @cached_property
     def user(self) -> User:
@@ -31,7 +34,24 @@ class Chat(BaseEntity):
             active_only: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get chats for CRM object
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/chats/imopenlines-crm-chat-get.html
+
+        The method retrieves a list of chats associated with a CRM object.
+
+        Args:
+            crm_entity_type: Type of the CRM object;
+
+            crm_entity: Identifier of the CRM object;
+
+            active_only: Flag to return only active chats;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             CRM_ENTITY_TYPE=crm_entity_type,
@@ -55,7 +75,22 @@ class Chat(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the identifier of the last chat
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/chats/imopenlines-crm-chat-get-last-id.html
+
+        The method retrieves the identifier of the last chat associated with the CRM object.
+
+        Args:
+            crm_entity_type: Type of the CRM object;
+
+            crm_entity: Identifier of the CRM object;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             CRM_ENTITY_TYPE=crm_entity_type,

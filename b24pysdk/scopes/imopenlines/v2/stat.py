@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Stat(BaseEntity):
-    """"""
+    """Class for retrieving open channel statistics for a period.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/statistics/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -32,7 +35,34 @@ class Stat(BaseEntity):
             operator_id_list: Iterable[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get aggregate statistics
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/statistics/imopenlines-v2-stat-get.html
+
+        The method retrieves aggregate open channels statistics for a period.
+
+        Args:
+            date_from: Start of the period in ISO 8601 format;
+
+            date_to: End of the period in ISO 8601 format;
+
+            config_id: Open channel ID;
+
+            config_id_list: List of open channel IDs;
+
+            source: Channel code;
+
+            source_list: List of channel codes;
+
+            operator_id: Operator ID;
+
+            operator_id_list: List of operator IDs;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "dateFrom": date_from,

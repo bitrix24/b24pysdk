@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Delete(BaseEntity):
-    """"""
+    """Class for deleting messages
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/imconnector/index.html
+    """
 
     @type_checker
     def messages(
@@ -22,7 +25,24 @@ class Delete(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete sent messages
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/imconnector/imconnector-delete-messages.html
+
+        The method removes messages from an open line that were sent by an external system.
+
+        Args:
+            connector: The string code of the connector;
+
+            line: Identifier of the open line;
+
+            messages: An array of messages;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if messages.__class__ is not list:
             messages = list(messages)

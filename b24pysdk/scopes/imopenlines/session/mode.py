@@ -13,7 +13,10 @@ __all__ = [
 
 
 class Mode(BaseEntity):
-    """"""
+    """Class for managing dialog modes for operators.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/index.html
+    """
 
     @type_checker
     def pin(
@@ -23,7 +26,22 @@ class Mode(BaseEntity):
             activate: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Pin or unpin a dialog
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/sessions/imopenlines-session-mode-pin.html
+
+        The method pins or unpins a dialog to the current operator.
+
+        Args:
+            chat_id: Identifier of the open line chat;
+
+            activate: Pinning flag;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             CHAT_ID=chat_id,
@@ -44,7 +62,18 @@ class Mode(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Pin all available dialogs to the operator
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/sessions/imopenlines-session-mode-pin-all.html
+
+        The method pins all available active dialogs to the current operator.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         return self._make_bitrix_api_request(
             api_wrapper=self.pin_all,
@@ -59,7 +88,22 @@ class Mode(BaseEntity):
             activate: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Switch the dialog to silent mode
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/sessions/imopenlines-session-mode-silent.html
+
+        The method enables or isables the silent messaging mode in the dialog.
+
+        Args:
+            chat_id: Identifier of the open line chat;
+
+            activate: Activation flag;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             CHAT_ID=chat_id,
@@ -80,7 +124,18 @@ class Mode(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Unpin all operator dialogs
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/sessions/imopenlines-session-mode-unpin-all.html
+
+        The method unpins all available pinned dialogs from the current operator.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         return self._make_bitrix_api_request(
             api_wrapper=self.unpin_all,

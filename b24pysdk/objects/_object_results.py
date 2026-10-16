@@ -121,8 +121,10 @@ class BitrixObjectList(list[BOT], Generic[BOT]):
 
         Request objects are created first and passed together to the client,
         which may split them into protocol-sized batches. Numeric results are
-        converted to booleans. For each truthy success result, exactly the data sent for that object is applied to its loaded
-        state. False success values and API errors are reported without marking
+        converted to booleans. For each truthy API result, the object's supplied
+        update values are applied to its loaded state. Endpoint-specific request
+        builders may add preservation fields to the wire payload. False result
+        values and API errors are reported without marking
         fields clean. If the list is empty, or every local snapshot is empty, no
         client call is made.
 
@@ -214,6 +216,8 @@ class BitrixObjectList(list[BOT], Generic[BOT]):
         executes the request collection and results are translated from internal
         string batch keys back to object instances. An empty list short-circuits
         without resolving a client or making an API call.
+
+        Loaded object data and local changes are not cleared after deletion.
 
         Raises:
             BitrixObjectError: If any contained object has no public
@@ -315,12 +319,18 @@ class BitrixObjectBatchAddResult(Generic[BOT]):
 
 
 class BitrixObjectBatchWriteResult(Generic[BOT]):
-    """Object-keyed success and error mappings from a bulk write operation.
+    """Object-keyed API result and error mappings from a bulk write operation.
 
     ``results`` and ``errors`` expose fresh ``BitrixObjectList`` views over the
     mapping keys and preserve the provider used for the originating list-level
     operation. The raw API values remain available in ``result`` and
     ``result_error``.
+
+    A result entry can be false without appearing in ``result_error``.
+    ``is_success`` and ``has_errors`` describe API errors only; inspect each
+    result value when the endpoint's success flag matters. Equal objects share
+    one mapping key, so repeated list entries need not produce separate entries
+    in these views.
     """
 
     __slots__ = ("_client_provider", "result", "result_error")
@@ -342,20 +352,20 @@ class BitrixObjectBatchWriteResult(Generic[BOT]):
 
     @property
     def is_success(self) -> bool:
-        """Return whether the batch write completed without errors."""
+        """Return whether no API errors were reported, even if results are false."""
         return not self.has_errors
 
     @property
     def has_errors(self) -> bool:
-        """Return whether the batch write contains any errors."""
+        """Return whether the API error mapping is non-empty."""
         return bool(self.result_error)
 
     @property
     def results(self) -> BitrixObjectList[BOT]:
-        """Return objects whose bulk write operation succeeded."""
+        """Return objects with API result entries, including false results."""
         return BitrixObjectList(self.result, client_provider=self._client_provider)
 
     @property
     def errors(self) -> BitrixObjectList[BOT]:
-        """Return objects whose bulk write operation failed."""
+        """Return objects with API error entries."""
         return BitrixObjectList(self.result_error, client_provider=self._client_provider)

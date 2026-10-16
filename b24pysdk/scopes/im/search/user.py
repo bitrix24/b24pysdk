@@ -13,7 +13,10 @@ __all__ = [
 
 
 class User(BaseEntity):
-    """"""
+    """Class for retrieving users.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chats/search/im-search-user-list.html
+    """
 
     @type_checker
     def list(
@@ -21,12 +24,30 @@ class User(BaseEntity):
             find: Text,
             *,
             business: Optional[bool] = MISSING,
-            avatar_hr: Optional[bool] = MISSING,
             offset: Optional[int] = MISSING,
             limit: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[JSONList]:
-        """"""
+        """Find user
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/search/im-search-user-list.html
+
+        The method allows you to search for users by first name, last name, job title, and department.
+
+        Args:
+            find: Search phrase;
+
+            business: Search only among business users;
+
+            offset: Offset for the user selection;
+
+            limit: Number of items in the selection;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             FIND=find,
@@ -34,9 +55,6 @@ class User(BaseEntity):
 
         if business is not MISSING:
             params["BUSINESS"] = bool_to_bitrix(business, is_required=True)
-
-        if avatar_hr is not MISSING:
-            params["AVATAR_HR"] = bool_to_bitrix(avatar_hr, is_required=True)
 
         if offset is not MISSING:
             params["OFFSET"] = offset

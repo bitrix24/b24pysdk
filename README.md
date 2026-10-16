@@ -1611,10 +1611,13 @@ For every selected relation at the current level, evaluation performs the follow
 
 5. **Create one bulk related-manager query for that `ObjectField`.**
 
-   Conceptually the SDK performs:
+   Conceptually the SDK starts with:
 
    ```python
-   RelatedObject.objects.using(client=client).from_pks(unique_pks).as_fast()
+   related = RelatedObject.objects.using(client=client).from_pks(unique_pks)
+
+   if related._IS_LIST_METHOD and related._SUPPORTS_ORDER:
+       related = related.as_fast()
    ```
 
    The same `Client` is propagated from the parent manager.
@@ -1811,7 +1814,7 @@ For nested relations, each relation level is processed recursively after its par
 
 Therefore, when `select_related()` is active, a fast parent stream is materialized into `BitrixObjectList` before relation loading.
 
-Related objects themselves are loaded through their manager's `from_pks(...).as_fast()` path.
+Related objects are loaded through their manager's `from_pks(...)` path. The SDK enables `as_fast()` only when that manager supports both list pagination and server-side ordering. Other related managers use their normal collection loader; they still perform one logical bulk query per relation rather than one query per parent object.
 
 #### Requirements and errors
 
@@ -1865,14 +1868,23 @@ All object managers inherit the following common behavior:
 | `.timeout(value)` | Set the request timeout on the query |
 | `.all()` | Mark the current query as an executable lazy result query |
 | `.limit(n)` | Limit the logical number of returned objects |
-| `.reverse()` | Reverse effective ordering |
-| `.as_fast()` | Enable optimized one-pass fast loading |
+| `.reverse()` | Reverse server ordering or materialize and reverse API response order locally |
+| `.as_fast()` | Enable optimized one-pass loading when pagination and server ordering are supported |
 | `.to_list()` | Materialize into `BitrixObjectList[T]` |
 | `.count()` | Count matching objects; respects `limit`, ignores `start` |
 | `.exists()` | Return whether at least one matching object exists |
 | `.first()` | Return the first matching object or `None` |
-| `.last()` | Reverse and return one object |
+| `.last()` | Reverse and return one object; without server ordering, load the complete remaining collection |
 | `.select_related(...)` | Bulk-load supported object relations |
+
+Pagination and ordering are separate endpoint capabilities. When implementing a custom manager, `_IS_LIST_METHOD` controls list pagination and `_SUPPORTS_ORDER` controls server-side ordering; both default to `True`.
+
+- Set `_IS_LIST_METHOD=False` for an endpoint that returns its complete collection in one response. The manager consumes the adapted `.values` directly and applies its limit locally. List-field managers use this mode for the field mapping returned by `lists.field.get`.
+- Set `_SUPPORTS_ORDER=False` when the endpoint cannot sort results. List-element, list-section, and list-field managers use this setting. Filtering can remain available. `_ORDER_KEY=None` alone does not disable sorting.
+
+Without server-side ordering, `.reverse()` reverses the API response order locally before applying `.limit(n)`. For a paginated endpoint, it first loads all remaining pages without a request limit. Consequently, `.last()` can require loading the entire remaining collection and returns its last object in response order, not necessarily the largest primary key. A configured `start` still applies. Unreversed paginated queries retain their normal limit.
+
+Fast mode requires both pagination and server-side ordering. An incompatible fast query raises `BitrixObjectError` when loaded; `select_related()` automatically keeps the normal loading mode for related managers without these capabilities.
 
 Concrete managers additionally expose only the endpoint-supported subset of:
 

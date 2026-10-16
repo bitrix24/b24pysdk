@@ -11,7 +11,10 @@ __all__ = [
 
 
 class Status(BaseEntity):
-    """"""
+    """Class for transferring external channel messages to Bitrix24.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/imconnector/index.html
+    """
 
     @type_checker
     def delivery(
@@ -22,7 +25,24 @@ class Status(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update status 'Delivered'
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/imconnector/imconnector-send-status-delivery.html
+
+        The method confirms in Bitrix24 that an outgoing message from an open line has been successfully delivered to an external system.
+
+        Args:
+            connector: The string code of the connector;
+
+            line: Identifier of the open line;
+
+            messages: An array of messages;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if messages.__class__ is not list:
             messages = list(messages)
@@ -48,7 +68,22 @@ class Status(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Check 'Read' status
+
+        The method confirms in Bitrix24 that an outgoing message from an open line has been read.
+
+        Args:
+            connector: The string code of the connector;
+
+            line: Identifier of the open line;
+
+            messages: An array of messages;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if messages.__class__ is not list:
             messages = list(messages)

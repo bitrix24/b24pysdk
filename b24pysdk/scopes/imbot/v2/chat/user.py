@@ -12,7 +12,10 @@ __all__ = [
 
 
 class User(BaseEntity):
-    """"""
+    """Class for manage participants in chat groups.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/chats/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -29,7 +32,26 @@ class User(BaseEntity):
             bot_token: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add participants to chat
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/chats/chat-user-add.html
+
+        The method adds participants to the chat.
+
+        Args:
+            bot_id: Bot ID;
+
+            dialog_id: Dialog ID;
+
+            user_ids: Array of user IDs to add;
+
+            bot_token: Unique authorization bot token;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         if user_ids.__class__ is not list:
             user_ids = list(user_ids)
@@ -59,7 +81,26 @@ class User(BaseEntity):
             bot_token: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Remove a participant from the chat
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/chats/chat-user-delete.html
+
+        The method removes a participant from the chat.
+
+        Args:
+            bot_id: Bot ID;
+
+            dialog_id: Dialog ID;
+
+            user_id: User ID to be removed;
+
+            bot_token: Unique authorization bot token;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "botId": bot_id,
@@ -85,10 +126,30 @@ class User(BaseEntity):
             bot_token: Optional[Text] = MISSING,
             order: Optional[JSONDict] = MISSING,
             limit: Optional[int] = MISSING,
-            offset: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """List of chat participants
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/chats/chat-user-list.html
+
+        The method returns a list of chat participants.
+
+        Args:
+            bot_id: Bot ID;
+
+            dialog_id: Dialog ID;
+
+            bot_token: Unique authorization bot token;
+
+            order: Parameter for sorting;
+
+            limit: Number of records;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "botId": bot_id,
@@ -103,9 +164,6 @@ class User(BaseEntity):
 
         if limit is not MISSING:
             params["limit"] = limit
-
-        if offset is not MISSING:
-            params["offset"] = offset
 
         return self._make_bitrix_api_request(
             api_wrapper=self.list,

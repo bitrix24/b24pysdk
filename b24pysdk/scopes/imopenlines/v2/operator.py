@@ -13,7 +13,10 @@ __all__ = [
 
 
 class Operator(BaseEntity):
-    """"""
+    """Class for retrieves operator ctatuses and load.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/statistics/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -33,7 +36,34 @@ class Operator(BaseEntity):
             limit: int = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get operators with load
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/statistics/imopenlines-v2-operator-list.html
+
+        The method retrieves operators with their current status and load.
+
+        Args:
+            config_id: Open channel ID;
+
+            config_id_list: List of open channel IDs;
+
+            user_id: Operator ID;
+
+            user_id_list: List of operator IDs;
+
+            status: Operator status;
+
+            has_free_slots: Filter by available free slots;
+
+            offset: Pagination offset;
+
+            limit: Page size;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

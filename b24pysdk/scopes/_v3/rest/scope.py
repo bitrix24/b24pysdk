@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Scope(BaseEntity):
-    """"""
+    """Class for helping to determine the scope.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/index.html
+    """
 
     @type_checker
     def list(
@@ -23,7 +26,24 @@ class Scope(BaseEntity):
             filter_module: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get the method-to-scope mapping for all module
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/rest-v3.html
+
+        The method helps to determine the scope when the method page does not specify it.
+
+        Args:
+            filter_controller: Filter by controller name;
+
+            filter_method: Filter by method name;
+
+            filter_module: Filter by module name;
+
+            timeout: Timeout in seconds.
+
+        Return:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

@@ -34,7 +34,6 @@ class Rights(BaseEntity):
         Returns:
             Instance of BitrixAPIRequest.
         """
-
         return self._make_bitrix_api_request(
             api_wrapper=self.get_tasks,
             timeout=timeout,

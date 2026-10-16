@@ -16,7 +16,10 @@ __all__ = [
 
 
 class Config(BaseEntity):
-    """"""
+    """Class for working with open channels.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/index.html
+    """
 
     @cached_property
     def list(self) -> List:
@@ -35,7 +38,20 @@ class Config(BaseEntity):
             params: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Add open channel
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/imopenlines-config-add.html
+
+        The method adds a new open channel.
+
+        Args:
+            params: Object with open channel settings;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         payload = dict()
 
@@ -55,7 +71,20 @@ class Config(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Delete open channel
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/imopenlines-config-delete.html
+
+        The method removes an open channel.
+
+        Args:
+            config_id: Identifier of the open channel;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             CONFIG_ID=config_id,
@@ -76,7 +105,24 @@ class Config(BaseEntity):
             show_offline: Optional[bool] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Get open line by ID
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/imopenlines-config-get.html
+
+        The method retrieves the settings of an open line by its ID.
+
+        Args:
+            config_id: Identifier of the open channel;
+
+            with_queue: Return operator queue data;
+
+            show_offline: Return offline operators iin the queue;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params = dict(
             CONFIG_ID=config_id,
@@ -102,7 +148,22 @@ class Config(BaseEntity):
             params: Optional[JSONDict] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Update open channel
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/imopenlines/openlines/imopenlines-config-update.html
+
+        The method updates an open channel.
+
+        Args:
+            config_id: Identifier of the open channel;
+
+            params: Object with open channel settings for the update;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         payload = dict(
             CONFIG_ID=config_id,

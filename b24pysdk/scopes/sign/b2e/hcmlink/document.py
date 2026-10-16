@@ -9,7 +9,10 @@ __all__ = [
 
 
 class Document(BaseEntity):
-    """"""
+    """Class for retrieving data of a signed document linked to HCM Link.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/sign/index.html
+    """
 
     @type_checker
     def get(
@@ -18,7 +21,20 @@ class Document(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Retrieve signed HCM link document
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/sign/sign-b2e-hcmlink-document-get.html
+
+        The method returns data of a signed e-Signature for HR document linked to HCM Link.
+
+        Args:
+            bitrix_id: Signing participant identifier;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "id": bitrix_id,

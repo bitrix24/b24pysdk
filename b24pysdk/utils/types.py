@@ -70,8 +70,11 @@ ObjectDiscriminator = typing.Optional[
 ]
 """A scalar or composite hashable discriminator used by the object registry."""
 
-DefaultTimeout = typing.Union[Number, typing.Tuple[Number, Number]]
-"""Timeout duration, represented as a single number or a tuple for connect and read timeouts."""
+DefaultTimeout = typing.Union[Number, typing.Tuple[typing.Optional[Number], Number]]
+"""A numeric timeout or (connect, read) tuple; only connect may be None.
+
+Scalar None is excluded. Use Timeout for an optional request-level setting.
+"""
 
 Timeout = typing.Optional[DefaultTimeout]
 """An optional timeout setting for API requests."""

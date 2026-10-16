@@ -1,4 +1,4 @@
-from typing import IO, Dict, Optional, Text, Tuple
+from typing import Optional, Text
 
 from ...utils.types import JSONDict, Number, Timeout
 from ..requesters import BitrixAPIRequester
@@ -12,7 +12,6 @@ def call(
         url: Text,
         *,
         params: Optional[JSONDict] = None,
-        files: Optional[Dict[Text, Tuple[Text, IO]]] = None,
         timeout: Timeout = None,
         max_retries: Optional[int] = None,
         initial_retry_delay: Optional[Number] = None,
@@ -29,8 +28,7 @@ def call(
 
     Args:
         url: Absolute Bitrix REST endpoint URL.
-        params: Request parameters sent in the request body.
-        files: Files attached to the request.
+        params: JSON-compatible parameters sent in the request body.
         timeout: Request timeout in seconds.
         max_retries: Maximum retry attempts for transport-level failures.
         initial_retry_delay: Delay before the first retry, in seconds.
@@ -46,7 +44,6 @@ def call(
     return BitrixAPIRequester(
         url=url,
         params=params,
-        files=files,
         timeout=timeout,
         max_retries=max_retries,
         initial_retry_delay=initial_retry_delay,

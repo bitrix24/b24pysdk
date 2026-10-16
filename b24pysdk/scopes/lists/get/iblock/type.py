@@ -14,7 +14,10 @@ __all__ = [
 
 
 class Type(BaseEntity):
-    """"""
+    """Class for retrieving identifier of the information block type.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/lists/lists/index.html
+    """
 
     @type_checker
     def id(
@@ -24,7 +27,22 @@ class Type(BaseEntity):
             iblock_code: Optional[Text] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIValueRequest[ListIBlockTypeLiteral, ListIBlockType]:
-        """"""
+        """Get the information block type ID
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/lists/lists/lists-get-iblock-type-id.html
+
+        The method returns the unformation block type ID.
+
+        Args:
+            iblock_id: Information block ID;
+
+            iblock_code: Symbolic code of the information block;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Idle(BaseEntity):
-    """"""
+    """Class for managing user's automatic Away chat status.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chats/users/index.html
+    """
 
     @type_checker
     def end(
@@ -20,7 +23,18 @@ class Idle(BaseEntity):
             *,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Disable automatic status 'Away'
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/users/im-user-status-idle-end.html
+
+        The method disables the automatic 'Away' status.
+
+        Args:
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         return self._make_bitrix_api_request(
             api_wrapper=self.end,
@@ -34,7 +48,20 @@ class Idle(BaseEntity):
             ago: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest[bool]:
-        """"""
+        """Enable automatic status 'Away'
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chats/users/im-user-status-idle-start.html
+
+        The method enables the automatic status 'Away' for the current user.
+
+        Args:
+            ago: How many minutes ago to set the 'Away' status;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {}
 

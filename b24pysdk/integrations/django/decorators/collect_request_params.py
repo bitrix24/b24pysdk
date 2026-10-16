@@ -30,7 +30,7 @@ def collect_request_params(view_func: _FT) -> _FT:
 
     Merge behavior
     --------------
-    - JSON body is used as the initial mapping.
+    - A JSON object is used as the initial mapping; other JSON values and invalid JSON are treated as an empty mapping.
     - values from ``request.GET`` overwrite keys from the JSON body.
     - values from ``request.POST`` overwrite keys from JSON and query string.
     - multi-value keys are stored as ``list``.
@@ -52,9 +52,11 @@ def collect_request_params(view_func: _FT) -> _FT:
             return view_func(request, *args, **kwargs)
 
         try:
-            request.params = json.loads(request.body)
+            params = json.loads(request.body)
         except json.JSONDecodeError:
-            request.params = {}
+            params = {}
+
+        request.params = params if isinstance(params, dict) else {}
 
         for src in (request.GET, request.POST):
             for key, values in src.lists():

@@ -12,7 +12,10 @@ __all__ = [
 
 
 class InputAction(BaseEntity):
-    """"""
+    """Class for managing bot's action indicator.
+
+    Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/ui/index.html
+    """
 
     @classproperty
     def _name(cls) -> Text:
@@ -30,7 +33,28 @@ class InputAction(BaseEntity):
             duration: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIRequest:
-        """"""
+        """Send the bot action indicator
+
+        Documentation: https://apidocs.bitrix24.com/api-reference/chat-bots/chat-bots-v2/imbot.v2/ui/chat-input-action-notify.html
+
+        The method sends a bot action indicator in the chat.
+
+        Args:
+            bot_id: Bot ID;
+
+            dialog_id: Dialog ID;
+
+            bot_token: Unique authorization bot token;
+
+            status_message_code: Status code of the action;
+
+            duration: Duration of the indicator display in seconds;
+
+            timeout: Timeout in seconds.
+
+        Returns:
+            Instance of BitrixAPIRequest
+        """
 
         params: JSONDict = {
             "botId": bot_id,
