@@ -346,7 +346,7 @@ for deal in response["result"]:
     print(deal["TITLE"])
 ```
 
-Do not pass `order`, `sort`, or `start` to `call_list_fast()` because the helper manages these parameters internally.
+Do not pass `order`, `sort`, `ELEMENT_ORDER`, or `start` to `call_list_fast()` because the helper manages these parameters internally. Parameter names are checked case-insensitively.
 
 ### Low-level batch
 
@@ -494,7 +494,7 @@ request = client.crm.deal.list().as_list_fast(
 
 For adapted fast-list requests, `.values` is also a generator.
 
-Fast pagination manages `order`, `sort`, and `start` internally. Do not set these parameters on the original request:
+Fast pagination manages `order`, `sort`, `ELEMENT_ORDER` (`element_order` in the list-element wrapper), and `start` internally. Do not set these parameters on the original request:
 
 ```python
 request = client.crm.deal.list(
@@ -1880,11 +1880,13 @@ All object managers inherit the following common behavior:
 Pagination and ordering are separate endpoint capabilities. When implementing a custom manager, `_IS_LIST_METHOD` controls list pagination and `_SUPPORTS_ORDER` controls server-side ordering; both default to `True`.
 
 - Set `_IS_LIST_METHOD=False` for an endpoint that returns its complete collection in one response. The manager consumes the adapted `.values` directly and applies its limit locally. List-field managers use this mode for the field mapping returned by `lists.field.get`.
-- Set `_SUPPORTS_ORDER=False` when the endpoint cannot sort results. List-element, list-section, and list-field managers use this setting. Filtering can remain available. `_ORDER_KEY=None` alone does not disable sorting.
+- Set `_SUPPORTS_ORDER=False` when the endpoint cannot sort results. List-section and list-field managers use this setting. Filtering can remain available. `_ORDER_KEY=None` alone does not disable sorting.
 
 Without server-side ordering, `.reverse()` reverses the API response order locally before applying `.limit(n)`. For a paginated endpoint, it first loads all remaining pages without a request limit. Consequently, `.last()` can require loading the entire remaining collection and returns its last object in response order, not necessarily the largest primary key. A configured `start` still applies. Unreversed paginated queries retain their normal limit.
 
 Fast mode requires both pagination and server-side ordering. An incompatible fast query raises `BitrixObjectError` when loaded; `select_related()` automatically keeps the normal loading mode for related managers without these capabilities.
+
+List-element managers support server-side ordering through the wrapper's `element_order` parameter (`ELEMENT_ORDER` in the REST payload). Use SDK field names and `-` for descending order, for example `ProjectElement.objects.order("name", "-bitrix_id").all()`. Their `reverse()` and `last()` use server-side ordering; local reversal remains necessary for list sections and fields. Fast loading is also available for elements with PK-only ordering and no `start`; its caller uses `ELEMENT_ORDER` and preserves the uppercase `FILTER` mapping while adding the moving-ID condition.
 
 Concrete managers additionally expose only the endpoint-supported subset of:
 

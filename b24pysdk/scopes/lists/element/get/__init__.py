@@ -28,7 +28,7 @@ class Get(BaseEntity):
         return File(self)
 
     @type_checker
-    def __call__(
+    def __call__(  # noqa: C901
             self,
             iblock_type_id: Annotated[Text, ListIBlockTypeLiteral],
             *,
@@ -38,6 +38,7 @@ class Get(BaseEntity):
             element_code: Optional[Text] = MISSING,
             select: Optional[Iterable[Text]] = MISSING,
             filter: Optional[JSONDict] = MISSING,
+            element_order: JSONDict = MISSING,
             start: Optional[int] = MISSING,
             timeout: Timeout = None,
     ) -> BitrixAPIValuesRequest[JSONList, BaseListElement]:
@@ -61,6 +62,8 @@ class Get(BaseEntity):
             select: An array containing a list of fields to select;
 
             filter: An object for filtering element fields;
+
+            element_order: An object for sorting element fields;
 
             start: Offset for pagination;
 
@@ -97,6 +100,9 @@ class Get(BaseEntity):
 
         if filter is not MISSING:
             params["FILTER"] = filter
+
+        if element_order is not MISSING:
+            params["ELEMENT_ORDER"] = element_order
 
         if start is not MISSING:
             params["start"] = start

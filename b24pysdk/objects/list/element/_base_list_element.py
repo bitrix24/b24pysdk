@@ -349,9 +349,7 @@ _BaseListElementT = TypeVar("_BaseListElementT", bound=BaseListElement)
 class BaseListElementManager(BaseObjectManager[_BaseListElementT], Generic[_BaseListElementT]):
     """Query and creation manager shared by all list-element types."""
 
-    _ORDER_KEY = None
-    # lists.element.get supports pagination but has no ordering parameter.
-    _SUPPORTS_ORDER = False
+    _ORDER_KEY = "element_order"
 
     __slots__ = ()
 
@@ -393,6 +391,10 @@ class BaseListElementManager(BaseObjectManager[_BaseListElementT], Generic[_Base
     def filter(self, **filters: Any) -> Self:
         """Return elements filtered by SDK object attribute names."""
         return self._filter(**filters)
+
+    def order(self, *fields: Text) -> Self:
+        """Return elements ordered by SDK field names through ELEMENT_ORDER."""
+        return self._order(*fields)
 
     def from_pks(self, bitrix_pks: Iterable[int]) -> Self:
         """Return elements whose identifiers belong to the supplied iterable."""

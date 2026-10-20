@@ -33,7 +33,7 @@ class _ListFastCaller(BaseListCaller):
     _DEFAULT_ORDER_PATTERN: Final[Callable[[Text, Text], JSONDict]] = staticmethod(
         lambda id_field, sorting: {"order": {id_field: sorting}},
     )
-    _MANAGED_PARAMS: Final[Tuple[Text, ...]] = ("order", "sort", "start")
+    _MANAGED_PARAMS: Final[Tuple[Text, ...]] = ("order", "sort", "element_order", "start")
     _START: Final[int] = -1
 
     _REQUEST_ID_FIELDS: Final[Dict[Text, Text]] = {
@@ -47,10 +47,12 @@ class _ListFastCaller(BaseListCaller):
         "department": lambda id_field, sorting: {"SORT": id_field, "ORDER": sorting},
         "user": lambda id_field, sorting: {"SORT": id_field, "ORDER": sorting},
         "user.userfield": lambda id_field, sorting: {"order": {id_field: sorting}},
+        "lists.element.get": lambda id_field, sorting: {"ELEMENT_ORDER": {id_field: sorting}},
     }
 
     _FILTER_PATTERNS: Final[Dict[Text, Callable[[Text, Union[int, Text]], JSONDict]]] = {
         "department": lambda filter_key, filter_value: {filter_key: filter_value},
+        "lists.element.get": lambda filter_key, filter_value: {"FILTER": {filter_key: filter_value}},
     }
 
     __slots__ = (
@@ -103,8 +105,9 @@ class _ListFastCaller(BaseListCaller):
             auth_token: OAuth access token or webhook token.
             is_webhook: Whether ``auth_token`` is a webhook token.
             api_method: List-like REST method name.
-            params: Base method parameters. ``order``, ``sort``, and ``start``
-                must not be passed because this caller manages them internally.
+            params: Base method parameters. ``order``, ``sort``,
+                ``element_order``, and ``start`` must not be passed because this
+                caller manages them internally; names are case-insensitive.
             descending: Retrieve items by descending ID-like field when ``True``.
             limit: Maximum number of yielded items, or ``None`` for all items.
             prefer_version: Preferred API version. V3 methods are rejected
@@ -715,8 +718,9 @@ def call_list_fast(
         is_webhook: Whether ``auth_token`` is a webhook token.
         api_method: List-like REST method name, for example ``crm.deal.list``.
         params: Base method parameters sent to Bitrix. Must not contain
-            ``order``, ``sort``, or ``start`` because this helper generates
-            these parameters internally.
+            ``order``, ``sort``, ``element_order``, or ``start`` because this
+            helper generates these parameters internally. Names are checked
+            case-insensitively, including raw ``ELEMENT_ORDER``.
         descending: Retrieve items in descending ID order when ``True``.
         limit: Maximum number of items to retrieve.
         timeout: Request timeout in seconds.

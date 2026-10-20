@@ -43,7 +43,7 @@ class Profile(BaseSchema[ProfileData]):
     admin: bool
     name: Text
     last_name: Text
-    personal_gender: PersonalGender
+    personal_gender: Optional[PersonalGender]
     time_zone: Optional[ZoneInfo]
 
     @classmethod
@@ -62,7 +62,7 @@ class Profile(BaseSchema[ProfileData]):
             admin=bool_from_bitrix(bitrix_data["ADMIN"], is_required=True),
             name=text_from_bitrix(bitrix_data["NAME"], is_required=True),
             last_name=text_from_bitrix(bitrix_data["LAST_NAME"], is_required=True),
-            personal_gender=PersonalGender(bitrix_data["PERSONAL_GENDER"]),
+            personal_gender=PersonalGender(bitrix_data["PERSONAL_GENDER"]) if bitrix_data["PERSONAL_GENDER"] else None,
             time_zone=timezone_from_bitrix(bitrix_data["TIME_ZONE"]),
         )
 
@@ -78,6 +78,6 @@ class Profile(BaseSchema[ProfileData]):
             "ADMIN": bool_from_bitrix(self.admin, is_required=True),
             "NAME": text_to_bitrix(self.name, is_required=True),
             "LAST_NAME": text_to_bitrix(self.last_name, is_required=True),
-            "PERSONAL_GENDER": self.personal_gender.value,
+            "PERSONAL_GENDER": self.personal_gender.value if self.personal_gender is not None else "",
             "TIME_ZONE": timezone_to_bitrix(self.time_zone) or "",
         }
