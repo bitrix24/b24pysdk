@@ -15,6 +15,7 @@ ENV_FILE := $(firstword $(wildcard .env.local .env))
 ENV_FILE_FLAG := $(if $(ENV_FILE),--env-file $(ENV_FILE),)
 
 .PHONY: help build-ci test-ci shell-ci ensure-ci-image build-dev ensure-dev-image test test-int test-int-webhook test-int-oauth lint shell
+.PHONY: build-test test-all test-integration test-integration-webhook test-integration-oauth test-unit test-marker test-path
 
 help: ## Show this help
 	@echo "Available targets:"
@@ -73,25 +74,25 @@ test-integration: build-test
 		--env-file .env.local \
 		$(TEST_IMAGE) tests/integration
 
-# Run integration tests with AUTH_TYPE set to webhook
+# Run integration tests with B24_PREFER_AUTH_TYPE set to webhook
 test-integration-webhook: build-test
 	docker run --rm -t \
 		--env-file .env.local \
-		-e PREFER_AUTH_TYPE=webhook \
+		-e B24_PREFER_AUTH_TYPE=webhook \
 		$(TEST_IMAGE) tests/integration
 
-# Run integration tests with AUTH_TYPE set to oauth
+# Run integration tests with B24_PREFER_AUTH_TYPE set to oauth
 test-integration-oauth: build-test
 	docker run --rm -t \
 		--env-file .env.local \
-		-e PREFER_AUTH_TYPE=oauth \
+		-e B24_PREFER_AUTH_TYPE=oauth \
 		$(TEST_IMAGE) tests/integration
 
-# Execute all unit tests located in the tests/integration/unit directory
+# Execute all unit tests located in the tests/unit directory
 test-unit: build-test
 	docker run --rm -t \
 		--env-file .env.local \
-		$(TEST_IMAGE) tests/integration/unit
+		$(TEST_IMAGE) tests/unit
 
 # Run tests filtered by a specific pytest marker
 test-marker: build-test
